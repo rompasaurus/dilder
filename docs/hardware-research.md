@@ -1,6 +1,6 @@
 # Hardware Research & Materials List
 
-Research compiled during Phase 1 planning for the RegardedPal prototype test bench.
+Research compiled during Phase 1 planning for the Dilder prototype test bench.
 
 ---
 

@@ -1,6 +1,6 @@
 # Prompt Progression
 
-A record of every prompt submitted during the development of RegardedPal.
+A record of every prompt submitted during the development of Dilder.
 
 ---
 
@@ -12,7 +12,7 @@ A record of every prompt submitted during the development of RegardedPal.
 - **Files Created/Modified:**
   - `PromptProgression.md` (created)
   - `.git/` (initialized)
-  - GitHub repo `rompasaurus/RegardedPal` (created)
+  - GitHub repo `rompasaurus/dilder` (created)
 
 ## Prompt #2
 - **Date/Time:** 2026-04-08

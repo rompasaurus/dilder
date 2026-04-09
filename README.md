@@ -1,4 +1,4 @@
-# RegardedPal
+# Dilder
 
 A Tamagotchi-inspired virtual pet built on a Raspberry Pi Zero with an e-ink display, battery pack, and 3D-printed case — developed entirely in the open as a learning platform, blog series, and YouTube companion project.
 
@@ -96,7 +96,7 @@ Each phase maps to a section of the blog/YouTube series and can be followed inde
 - [ ] Mini-games
 - [ ] Seasonal/event-based pet outfits or moods
 - [ ] Publish a "build your own" kit guide
-- [ ] Community gallery — show off your RegardedPal
+- [ ] Community gallery — show off your Dilder
 
 ---
 

@@ -1,6 +1,6 @@
-# RegardedPal Website Plan
+# Dilder Website Plan
 
-A static documentation site and project portfolio for the RegardedPal build series -- inspired by [pwnagotchi.ai](https://pwnagotchi.ai/) but tailored for a build-along audience with blog updates, video embeds, and community links.
+A static documentation site and project portfolio for the Dilder build series -- inspired by [pwnagotchi.ai](https://pwnagotchi.ai/) but tailored for a build-along audience with blog updates, video embeds, and community links.
 
 ---
 
@@ -17,8 +17,8 @@ A static documentation site and project portfolio for the RegardedPal build seri
 
 The pwnagotchi site is built with **Hugo** using the **Hugo Learn** documentation theme. It is a flat, docs-only site with no blog or landing page. What we are borrowing and what we are doing differently:
 
-| pwnagotchi pattern | RegardedPal approach |
-|-------------------|---------------------|
+| pwnagotchi pattern | Dilder approach |
+|-------------------|--------------------|
 | Hugo Learn theme (sidebar nav, sequential reading) | Similar sidebar nav, but with a proper landing page |
 | FontAwesome icons per nav section | Keep this -- makes the sidebar scannable |
 | Discord badge in sidebar | Yes -- Discord invite link prominent in nav/header |
@@ -59,7 +59,7 @@ The pwnagotchi site is built with **Hugo** using the **Hugo Learn** documentatio
 ## Site Structure
 
 ```
-regardedpal.dev (or GitHub Pages)
+dilder.dev (or GitHub Pages)
 |
 +-- / ............................ Landing page (hero, project intro, latest update)
 |
@@ -104,7 +104,7 @@ regardedpal.dev (or GitHub Pages)
 
 ### Landing Page (`/`)
 - Hero section with project tagline and a render/photo of the device
-- "What is RegardedPal?" -- 2-3 sentence summary
+- "What is Dilder?" -- 2-3 sentence summary
 - Current phase status badge (e.g., "Phase 1: Hardware Setup")
 - Latest blog post preview
 - Quick links: Docs, Blog, Discord, GitHub
@@ -138,7 +138,7 @@ regardedpal.dev (or GitHub Pages)
 ### Community (`/community/`)
 - Discord invite with server description and rules summary
 - Patreon with tier descriptions
-- Future: gallery of community-built RegardedPals
+- Future: gallery of community-built Dilders
 
 ### Prompt Log (`/prompts/`)
 - Rendered version of PromptProgression.md
@@ -149,7 +149,7 @@ regardedpal.dev (or GitHub Pages)
 
 ## Discord Server Plan
 
-**Server name:** RegardedPal
+**Server name:** Dilder
 
 **Channels:**
 
@@ -162,7 +162,7 @@ regardedpal.dev (or GitHub Pages)
 | Build Series | #hardware | Hardware questions, wiring help |
 | Build Series | #software | Code questions, debugging |
 | Build Series | #3d-printing | Case design, print settings |
-| Build Series | #show-your-build | Photos/videos of your RegardedPal |
+| Build Series | #show-your-build | Photos/videos of your Dilder |
 | Development | #dev-log | Automated updates from GitHub pushes |
 | Development | #suggestions | Feature requests and ideas |
 | Development | #bugs | Bug reports |
@@ -172,7 +172,7 @@ regardedpal.dev (or GitHub Pages)
 
 ## Patreon Plan
 
-**Page name:** RegardedPal (or rompasaurus)
+**Page name:** Dilder (or rompasaurus)
 
 **Tiers (suggested):**
 
@@ -187,7 +187,7 @@ regardedpal.dev (or GitHub Pages)
 ## Deployment
 
 - **Host:** GitHub Pages (free, tied to the repo)
-- **Domain:** Custom domain TBD (e.g., `regardedpal.dev` or subdomain)
+- **Domain:** Custom domain TBD (e.g., `dilder.dev` or subdomain)
 - **Build:** GitHub Actions workflow -- on push to `main`, build MkDocs and deploy to `gh-pages` branch
 - **Source:** `website/` folder in the main repo, or a separate `docs` branch
 
