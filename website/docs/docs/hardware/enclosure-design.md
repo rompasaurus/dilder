@@ -10,8 +10,13 @@ Design specifications and constraints for the Dilder 3D-printed case.
 
 **Concept renders:**
 
-- [prototype-v1.svg](https://github.com/rompasaurus/dilder/blob/main/docs/concepts/prototype-v1.svg) — Initial rough layout
-- [prototype-v2.svg](https://github.com/rompasaurus/dilder/blob/main/docs/concepts/prototype-v2.svg) — Dimension-accurate revision (current reference)
+### v1 — Initial rough layout
+
+![Prototype v1 concept render](../../assets/images/prototype-v1.svg)
+
+### v2 — Dimension-accurate revision (current reference)
+
+![Prototype v2 concept render](../../assets/images/prototype-v2.svg)
 
 ---
 

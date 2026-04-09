@@ -1,0 +1,456 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <defs>
+    <filter id="plastic">
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
+      <feBlend in="SourceGraphic" in2="grayNoise" mode="multiply"/>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="4" dy="4" stdDeviation="6" flood-opacity="0.35"/>
+    </filter>
+    <filter id="btnShadow">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-opacity="0.5"/>
+    </filter>
+    <filter id="inset">
+      <feComponentTransfer in="SourceAlpha"><feFuncA type="table" tableValues="1 0"/></feComponentTransfer>
+      <feGaussianBlur stdDeviation="4"/>
+      <feOffset dx="2" dy="3" result="offsetblur"/>
+      <feFlood flood-color="#000" flood-opacity="0.6" result="color"/>
+      <feComposite in2="offsetblur" operator="in"/>
+      <feComposite in2="SourceAlpha" operator="in"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode/></feMerge>
+    </filter>
+    <linearGradient id="caseGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#303030"/>
+      <stop offset="40%" stop-color="#222222"/>
+      <stop offset="100%" stop-color="#181818"/>
+    </linearGradient>
+    <linearGradient id="caseSideGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2a2a2a"/>
+      <stop offset="100%" stop-color="#1a1a1a"/>
+    </linearGradient>
+    <radialGradient id="btnGrad" cx="50%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#484848"/>
+      <stop offset="100%" stop-color="#282828"/>
+    </radialGradient>
+    <radialGradient id="centerBtnGrad" cx="50%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#5a8a5a"/>
+      <stop offset="100%" stop-color="#2d5a2d"/>
+    </radialGradient>
+    <linearGradient id="screenGrad" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="#ece8db"/>
+      <stop offset="100%" stop-color="#e2ddd0"/>
+    </linearGradient>
+    <!-- PCB green -->
+    <linearGradient id="pcbGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a8a2a"/>
+      <stop offset="100%" stop-color="#126b1e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#f5f5f0"/>
+
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="bold" fill="#333">RegardedPal -- Prototype Concept v2</text>
+  <text x="600" y="62" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#888">Accurate dimensions at 4:1 scale | Based on Waveshare 2.13" HAT (65x30.2mm) + Pi Zero WH (65x30mm)</text>
+
+  <!-- ==================== DIMENSION REFERENCE ==================== -->
+  <g transform="translate(30, 88)">
+    <text x="0" y="0" font-family="monospace" font-size="10" fill="#aaa">Real dimensions (mm):</text>
+    <text x="0" y="14" font-family="monospace" font-size="10" fill="#aaa">Case outer: 88 x 34 x 19 | Display window: 57 x 27 | Active pixels: 48.55 x 23.71 (250x122) | Button cluster: 18 x 20</text>
+    <text x="0" y="28" font-family="monospace" font-size="10" fill="#aaa">Face area: 2992mm2 | Display: 1539mm2 (51%) | Buttons: ~360mm2 (12%) | Frame/bezel: 37%</text>
+  </g>
+
+  <!-- ==================== FRONT VIEW (4:1 scale) ==================== -->
+  <!-- Case: 88mm x 34mm = 352px x 136px -->
+  <text x="280" y="140" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">FRONT VIEW (4:1)</text>
+
+  <g transform="translate(104, 155)">
+    <!-- Case body -->
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="352" height="136" rx="20" ry="20" fill="url(#caseGrad)" filter="url(#plastic)"/>
+      <!-- Subtle highlight edge -->
+      <rect x="1" y="1" width="350" height="134" rx="19" ry="19" fill="none" stroke="#444" stroke-width="0.5" opacity="0.3"/>
+    </g>
+
+    <!-- Display recess: display glass is 59.2x29.2mm = 236.8x116.8px, positioned with 2mm wall + small lip -->
+    <!-- Case wall 2mm=8px, bezel lip ~1mm=4px around glass -->
+    <!-- Glass position on PCB: roughly centered, slight offset for FPC connector -->
+    <!-- Display recess cut into case top: 57x27mm = 228x108px -->
+    <rect x="12" y="14" width="228" height="108" rx="4" ry="4" fill="#080808" filter="url(#inset)"/>
+
+    <!-- E-ink screen visible area (glass): 59.2x29.2mm but case lip covers ~1mm each side -->
+    <!-- Visible: ~57x27mm = 228x108px -->
+    <rect x="14" y="16" width="224" height="104" rx="2" ry="2" fill="url(#screenGrad)"/>
+
+    <!-- Active pixel area within glass: 48.55x23.71mm = 194.2x94.84px -->
+    <!-- Centered within visible glass area -->
+    <!-- Offset: (224-194.2)/2 = 14.9px from left, (104-94.8)/2 = 4.6px from top -->
+    <rect x="29" y="21" width="194" height="95" rx="0" ry="0" fill="none" stroke="#ccc8bb" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.5"/>
+
+    <!-- Placeholder pet sprite on e-ink (within active area) -->
+    <g transform="translate(70, 28)">
+      <!-- Simple cat - pixel art style for e-ink -->
+      <!-- Body -->
+      <rect x="25" y="35" width="50" height="38" rx="5" fill="#1a1a1a"/>
+      <!-- Head -->
+      <rect x="20" y="5" width="60" height="36" rx="8" fill="#1a1a1a"/>
+      <!-- Left ear -->
+      <polygon points="24,8 14,-8 36,4" fill="#1a1a1a"/>
+      <!-- Right ear -->
+      <polygon points="76,8 86,-8 64,4" fill="#1a1a1a"/>
+      <!-- Left eye -->
+      <rect x="32" y="16" width="10" height="10" rx="2" fill="#e2ddd0"/>
+      <rect x="35" y="19" width="5" height="5" fill="#1a1a1a"/>
+      <!-- Right eye -->
+      <rect x="58" y="16" width="10" height="10" rx="2" fill="#e2ddd0"/>
+      <rect x="61" y="19" width="5" height="5" fill="#1a1a1a"/>
+      <!-- Nose -->
+      <rect x="46" y="30" width="8" height="5" rx="2" fill="#e2ddd0"/>
+      <!-- Mouth -->
+      <path d="M42,37 Q50,44 58,37" stroke="#e2ddd0" stroke-width="1.5" fill="none"/>
+      <!-- Left paw -->
+      <rect x="28" y="66" width="14" height="10" rx="4" fill="#1a1a1a"/>
+      <!-- Right paw -->
+      <rect x="58" y="66" width="14" height="10" rx="4" fill="#1a1a1a"/>
+      <!-- Tail -->
+      <path d="M73,62 Q92,50 86,32" stroke="#1a1a1a" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </g>
+
+    <!-- Status bar at bottom of active area -->
+    <line x1="32" y1="104" x2="220" y2="104" stroke="#1a1a1a" stroke-width="0.5" opacity="0.4"/>
+    <text x="36" y="101" font-family="monospace" font-size="8" fill="#1a1a1a">HP:100</text>
+    <text x="80" y="101" font-family="monospace" font-size="8" fill="#1a1a1a">FD:80</text>
+    <text x="124" y="101" font-family="monospace" font-size="8" fill="#1a1a1a">JY:90</text>
+    <text x="168" y="101" font-family="monospace" font-size="8" fill="#1a1a1a">ZZ:70</text>
+
+    <!-- Title bar -->
+    <text x="36" y="30" font-family="monospace" font-size="9" fill="#1a1a1a">RegardedPal</text>
+    <line x1="32" y1="33" x2="220" y2="33" stroke="#1a1a1a" stroke-width="0.5" opacity="0.4"/>
+
+    <!-- ===== D-PAD BUTTON CLUSTER ===== -->
+    <!-- Button area: right side of case, 18x20mm = 72x80px -->
+    <!-- Centered vertically: (136-80)/2 = 28px from top -->
+    <!-- Positioned after display: starts at ~260px from left edge -->
+    <!-- Center of cluster: x=296, y=68 -->
+
+    <!-- Subtle recessed circle behind d-pad cluster -->
+    <circle cx="296" cy="68" r="46" fill="#1a1a1a" opacity="0.3"/>
+
+    <!-- Up button: 10mm=40px spacing from center -->
+    <g filter="url(#btnShadow)">
+      <circle cx="296" cy="36" r="11" fill="url(#btnGrad)" stroke="#1a1a1a" stroke-width="1.2"/>
+      <polygon points="296,29 290,40 302,40" fill="#666"/>
+    </g>
+
+    <!-- Down button -->
+    <g filter="url(#btnShadow)">
+      <circle cx="296" cy="100" r="11" fill="url(#btnGrad)" stroke="#1a1a1a" stroke-width="1.2"/>
+      <polygon points="296,107 290,96 302,96" fill="#666"/>
+    </g>
+
+    <!-- Left button -->
+    <g filter="url(#btnShadow)">
+      <circle cx="264" cy="68" r="11" fill="url(#btnGrad)" stroke="#1a1a1a" stroke-width="1.2"/>
+      <polygon points="257,68 268,61 268,75" fill="#666"/>
+    </g>
+
+    <!-- Right button -->
+    <g filter="url(#btnShadow)">
+      <circle cx="328" cy="68" r="11" fill="url(#btnGrad)" stroke="#1a1a1a" stroke-width="1.2"/>
+      <polygon points="335,68 324,61 324,75" fill="#666"/>
+    </g>
+
+    <!-- Center/Select button -->
+    <g filter="url(#btnShadow)">
+      <circle cx="296" cy="68" r="13" fill="url(#centerBtnGrad)" stroke="#1a1a1a" stroke-width="1.2"/>
+      <circle cx="296" cy="68" r="5" fill="none" stroke="#7aba7a" stroke-width="1.2" opacity="0.5"/>
+    </g>
+
+    <!-- USB port - bottom edge, centered under PCB area -->
+    <rect x="120" y="134" width="16" height="4" rx="1" fill="#0a0a0a" stroke="#333" stroke-width="0.5"/>
+
+    <!-- SD card slot - left edge -->
+    <rect x="-2" y="80" width="4" height="12" rx="1" fill="#0a0a0a" stroke="#333" stroke-width="0.5"/>
+
+    <!-- Dimension annotations -->
+    <!-- Total width -->
+    <line x1="0" y1="-12" x2="352" y2="-12" stroke="#bbb" stroke-width="0.5"/>
+    <line x1="0" y1="-16" x2="0" y2="-8" stroke="#bbb" stroke-width="0.5"/>
+    <line x1="352" y1="-16" x2="352" y2="-8" stroke="#bbb" stroke-width="0.5"/>
+    <text x="176" y="-18" text-anchor="middle" font-family="monospace" font-size="10" fill="#999">88mm</text>
+
+    <!-- Display width -->
+    <line x1="12" y1="130" x2="240" y2="130" stroke="#6b9fcf" stroke-width="0.5"/>
+    <line x1="12" y1="126" x2="12" y2="134" stroke="#6b9fcf" stroke-width="0.5"/>
+    <line x1="240" y1="126" x2="240" y2="134" stroke="#6b9fcf" stroke-width="0.5"/>
+    <text x="126" y="142" text-anchor="middle" font-family="monospace" font-size="9" fill="#6b9fcf">57mm window</text>
+
+    <!-- Button cluster width -->
+    <line x1="253" y1="130" x2="340" y2="130" stroke="#cf6b6b" stroke-width="0.5"/>
+    <line x1="253" y1="126" x2="253" y2="134" stroke="#cf6b6b" stroke-width="0.5"/>
+    <line x1="340" y1="126" x2="340" y2="134" stroke="#cf6b6b" stroke-width="0.5"/>
+    <text x="296" y="142" text-anchor="middle" font-family="monospace" font-size="9" fill="#cf6b6b">~22mm</text>
+
+    <!-- Total height -->
+    <line x1="362" y1="0" x2="362" y2="136" stroke="#bbb" stroke-width="0.5"/>
+    <line x1="358" y1="0" x2="366" y2="0" stroke="#bbb" stroke-width="0.5"/>
+    <line x1="358" y1="136" x2="366" y2="136" stroke="#bbb" stroke-width="0.5"/>
+    <text x="370" y="72" font-family="monospace" font-size="10" fill="#999">34mm</text>
+  </g>
+
+  <!-- Front view labels -->
+  <text x="230" y="318" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#6b9fcf">Display: 51% of face</text>
+  <text x="400" y="318" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#cf6b6b">Buttons: 12% of face</text>
+  <text x="120" y="308" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="8" fill="#999">SD</text>
+  <text x="228" y="308" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="8" fill="#999">micro-USB</text>
+
+  <!-- ==================== SIDE VIEW (4:1 scale) ==================== -->
+  <!-- Case: 34mm tall x 19mm deep = 136px x 76px -->
+  <text x="680" y="140" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">SIDE VIEW -- RIGHT (4:1)</text>
+
+  <g transform="translate(642, 155)">
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="76" height="136" rx="10" ry="10" fill="url(#caseSideGrad)" filter="url(#plastic)"/>
+      <!-- Shell seam -->
+      <line x1="0" y1="68" x2="76" y2="68" stroke="#333" stroke-width="0.8" stroke-dasharray="3,2"/>
+    </g>
+
+    <!-- Button bumps protruding from right face -->
+    <ellipse cx="78" cy="36" rx="4" ry="6" fill="#383838" stroke="#444" stroke-width="0.5"/>
+    <ellipse cx="78" cy="68" rx="5" ry="7" fill="#2d5a2d" stroke="#444" stroke-width="0.5"/>
+    <ellipse cx="78" cy="100" rx="4" ry="6" fill="#383838" stroke="#444" stroke-width="0.5"/>
+
+    <!-- Depth dimension -->
+    <line x1="0" y1="-12" x2="76" y2="-12" stroke="#bbb" stroke-width="0.5"/>
+    <line x1="0" y1="-16" x2="0" y2="-8" stroke="#bbb" stroke-width="0.5"/>
+    <line x1="76" y1="-16" x2="76" y2="-8" stroke="#bbb" stroke-width="0.5"/>
+    <text x="38" y="-18" text-anchor="middle" font-family="monospace" font-size="10" fill="#999">19mm</text>
+
+    <!-- Height dimension -->
+    <line x1="90" y1="0" x2="90" y2="136" stroke="#bbb" stroke-width="0.5"/>
+    <line x1="86" y1="0" x2="94" y2="0" stroke="#bbb" stroke-width="0.5"/>
+    <line x1="86" y1="136" x2="94" y2="136" stroke="#bbb" stroke-width="0.5"/>
+    <text x="98" y="72" font-family="monospace" font-size="10" fill="#999">34mm</text>
+
+    <!-- Internal stack indication -->
+    <text x="38" y="30" text-anchor="middle" font-family="monospace" font-size="7" fill="#666">top shell</text>
+    <text x="38" y="58" text-anchor="middle" font-family="monospace" font-size="7" fill="#666">HAT</text>
+    <text x="38" y="82" text-anchor="middle" font-family="monospace" font-size="7" fill="#666">Pi Zero</text>
+    <text x="38" y="110" text-anchor="middle" font-family="monospace" font-size="7" fill="#666">bottom shell</text>
+
+    <!-- Internal stack lines -->
+    <line x1="8" y1="40" x2="68" y2="40" stroke="#555" stroke-width="0.3" stroke-dasharray="2,2"/>
+    <line x1="8" y1="65" x2="68" y2="65" stroke="#555" stroke-width="0.3" stroke-dasharray="2,2"/>
+    <line x1="8" y1="90" x2="68" y2="90" stroke="#555" stroke-width="0.3" stroke-dasharray="2,2"/>
+  </g>
+
+  <!-- ==================== BACK VIEW (4:1 scale) ==================== -->
+  <text x="960" y="140" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">BACK VIEW (4:1)</text>
+
+  <g transform="translate(784, 155)">
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="352" height="136" rx="20" ry="20" fill="#1a1a1a" filter="url(#plastic)"/>
+      <rect x="1" y="1" width="350" height="134" rx="19" ry="19" fill="none" stroke="#333" stroke-width="0.5" opacity="0.3"/>
+    </g>
+
+    <!-- Vent slots -->
+    <rect x="140" y="50" width="20" height="3" rx="1" fill="#111"/>
+    <rect x="140" y="58" width="20" height="3" rx="1" fill="#111"/>
+    <rect x="140" y="66" width="20" height="3" rx="1" fill="#111"/>
+    <rect x="140" y="74" width="20" height="3" rx="1" fill="#111"/>
+    <rect x="140" y="82" width="20" height="3" rx="1" fill="#111"/>
+
+    <!-- Screw holes (4x M2) -->
+    <circle cx="24" cy="24" r="4" fill="#111" stroke="#333" stroke-width="0.5"/>
+    <circle cx="328" cy="24" r="4" fill="#111" stroke="#333" stroke-width="0.5"/>
+    <circle cx="24" cy="112" r="4" fill="#111" stroke="#333" stroke-width="0.5"/>
+    <circle cx="328" cy="112" r="4" fill="#111" stroke="#333" stroke-width="0.5"/>
+    <text x="24" y="20" text-anchor="middle" font-family="monospace" font-size="6" fill="#555">M2</text>
+    <text x="328" y="20" text-anchor="middle" font-family="monospace" font-size="6" fill="#555">M2</text>
+
+    <!-- Battery cover outline (future) -->
+    <rect x="200" y="30" width="120" height="76" rx="4" ry="4" fill="none" stroke="#444" stroke-width="0.8" stroke-dasharray="4,2"/>
+    <text x="260" y="72" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#555">Battery bay</text>
+    <text x="260" y="84" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="8" fill="#555">(future)</text>
+
+    <!-- Branding area -->
+    <text x="70" y="72" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#333" font-weight="bold">RegardedPal</text>
+  </g>
+
+  <!-- ==================== CROSS-SECTION / EXPLODED VIEW ==================== -->
+  <text x="360" y="370" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">CROSS-SECTION -- INTERNAL STACK (4:1)</text>
+
+  <g transform="translate(60, 395)">
+    <!-- Cross section showing the layer stack from top to bottom -->
+    <!-- Total height: 19mm = 76px -->
+
+    <!-- Top shell: 2mm = 8px -->
+    <rect x="0" y="0" width="352" height="8" rx="3" ry="0" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+    <text x="360" y="7" font-family="monospace" font-size="9" fill="#999">Top shell (2mm)</text>
+
+    <!-- Display glass + gap: sits in recess of top shell, ~1.05mm thick -->
+    <rect x="8" y="8" width="228" height="5" fill="#b8b4a8" stroke="#999" stroke-width="0.5"/>
+    <text x="360" y="13" font-family="monospace" font-size="9" fill="#6b9fcf">Display glass (1mm)</text>
+
+    <!-- E-paper HAT PCB: ~1.6mm = 6px -->
+    <rect x="8" y="13" width="260" height="7" fill="#1a6a2a" stroke="#0d4d0d" stroke-width="0.5"/>
+    <rect x="240" y="13" width="28" height="7" fill="#1a6a2a" stroke="#0d4d0d" stroke-width="0.5"/>
+    <text x="360" y="20" font-family="monospace" font-size="9" fill="#4a4">HAT PCB (1.6mm)</text>
+
+    <!-- GPIO header: ~8.5mm = 34px (connects HAT to Pi) -->
+    <rect x="12" y="20" width="5" height="25" fill="#d4a017" stroke="#a07020" stroke-width="0.5"/>
+    <rect x="20" y="20" width="5" height="25" fill="#d4a017" stroke="#a07020" stroke-width="0.5"/>
+    <rect x="28" y="20" width="5" height="25" fill="#d4a017" stroke="#a07020" stroke-width="0.5"/>
+    <text x="40" y="36" font-family="monospace" font-size="7" fill="#d4a017">GPIO pins</text>
+
+    <!-- Button stems in the button area (right side, extending from top shell) -->
+    <rect x="280" y="8" width="8" height="20" fill="#444" stroke="#555" stroke-width="0.5"/>
+    <rect x="300" y="8" width="8" height="20" fill="#444" stroke="#555" stroke-width="0.5"/>
+    <rect x="320" y="8" width="8" height="20" fill="#444" stroke="#555" stroke-width="0.5"/>
+    <text x="304" y="36" text-anchor="middle" font-family="monospace" font-size="7" fill="#888">button stems</text>
+
+    <!-- Button perfboard -->
+    <rect x="270" y="28" width="72" height="6" fill="#7a5a1a" opacity="0.7" stroke="#a07020" stroke-width="0.5"/>
+    <text x="360" y="34" font-family="monospace" font-size="9" fill="#a07020">Button PCB</text>
+
+    <!-- Pi Zero PCB: ~1.6mm = 6px -->
+    <rect x="8" y="45" width="260" height="7" fill="#1a6a2a" stroke="#0d4d0d" stroke-width="0.5"/>
+    <text x="360" y="51" font-family="monospace" font-size="9" fill="#4a4">Pi Zero PCB (1.6mm)</text>
+
+    <!-- Pi components underneath: ~2mm -->
+    <rect x="30" y="52" width="40" height="6" rx="1" fill="#333" stroke="#555" stroke-width="0.3"/>
+    <rect x="90" y="52" width="20" height="4" rx="1" fill="#333" stroke="#555" stroke-width="0.3"/>
+    <rect x="140" y="52" width="15" height="5" rx="1" fill="#333" stroke="#555" stroke-width="0.3"/>
+    <text x="360" y="58" font-family="monospace" font-size="9" fill="#666">Pi components</text>
+
+    <!-- Air gap / battery space -->
+    <rect x="270" y="38" width="72" height="22" fill="none" stroke="#666" stroke-width="0.5" stroke-dasharray="3,2"/>
+    <text x="306" y="52" text-anchor="middle" font-family="monospace" font-size="7" fill="#666">wire space</text>
+
+    <!-- Bottom shell: 2mm = 8px -->
+    <rect x="0" y="62" width="352" height="8" rx="0" ry="3" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
+    <text x="360" y="69" font-family="monospace" font-size="9" fill="#999">Bottom shell (2mm)</text>
+
+    <!-- Total height dimension on left -->
+    <line x1="-14" y1="0" x2="-14" y2="70" stroke="#bbb" stroke-width="0.5"/>
+    <line x1="-18" y1="0" x2="-10" y2="0" stroke="#bbb" stroke-width="0.5"/>
+    <line x1="-18" y1="70" x2="-10" y2="70" stroke="#bbb" stroke-width="0.5"/>
+    <text x="-20" y="38" text-anchor="end" font-family="monospace" font-size="9" fill="#bbb">19mm</text>
+
+    <!-- Width dimensions on bottom -->
+    <line x1="8" y1="78" x2="268" y2="78" stroke="#4a4" stroke-width="0.5"/>
+    <line x1="8" y1="74" x2="8" y2="82" stroke="#4a4" stroke-width="0.5"/>
+    <line x1="268" y1="74" x2="268" y2="82" stroke="#4a4" stroke-width="0.5"/>
+    <text x="138" y="90" text-anchor="middle" font-family="monospace" font-size="9" fill="#4a4">Pi + HAT: 65mm</text>
+
+    <line x1="270" y1="78" x2="342" y2="78" stroke="#a07020" stroke-width="0.5"/>
+    <line x1="270" y1="74" x2="270" y2="82" stroke="#a07020" stroke-width="0.5"/>
+    <line x1="342" y1="74" x2="342" y2="82" stroke="#a07020" stroke-width="0.5"/>
+    <text x="306" y="90" text-anchor="middle" font-family="monospace" font-size="9" fill="#a07020">Btns: 18mm</text>
+  </g>
+
+  <!-- ==================== TOP-DOWN INTERNAL LAYOUT ==================== -->
+  <text x="860" y="370" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">TOP-DOWN INTERNAL LAYOUT (4:1)</text>
+
+  <g transform="translate(684, 395)">
+    <!-- Case outline -->
+    <rect x="0" y="0" width="352" height="136" rx="18" ry="18" fill="none" stroke="#555" stroke-width="1.5"/>
+
+    <!-- Pi Zero + HAT stack (same footprint: 65x30mm = 260x120px) -->
+    <!-- Centered vertically with 2mm walls: x=8, y=8, 260x120 -->
+    <rect x="8" y="8" width="260" height="120" rx="2" ry="2" fill="url(#pcbGrad)" opacity="0.25" stroke="#2a8a3a" stroke-width="1"/>
+    <text x="138" y="65" text-anchor="middle" font-family="monospace" font-size="11" fill="#2a8a3a">Pi Zero WH + e-Paper HAT</text>
+    <text x="138" y="80" text-anchor="middle" font-family="monospace" font-size="9" fill="#2a8a3a">65 x 30mm (stacked)</text>
+
+    <!-- Display glass outline on HAT -->
+    <rect x="12" y="12" width="237" height="117" rx="1" ry="1" fill="none" stroke="#6b9fcf" stroke-width="0.8" stroke-dasharray="3,2"/>
+    <text x="130" y="100" text-anchor="middle" font-family="monospace" font-size="8" fill="#6b9fcf">Display glass: 59.2 x 29.2mm</text>
+
+    <!-- Active pixel area -->
+    <rect x="33" y="18" width="194" height="95" rx="0" ry="0" fill="#e8e4d8" opacity="0.3" stroke="#999" stroke-width="0.5" stroke-dasharray="2,1"/>
+    <text x="130" y="48" text-anchor="middle" font-family="monospace" font-size="8" fill="#888">Active: 48.55 x 23.71mm</text>
+    <text x="130" y="58" text-anchor="middle" font-family="monospace" font-size="8" fill="#888">250 x 122 pixels</text>
+
+    <!-- Button perfboard area -->
+    <rect x="272" y="18" width="72" height="100" rx="2" ry="2" fill="#7a5a1a" opacity="0.2" stroke="#a07020" stroke-width="1"/>
+
+    <!-- Button positions -->
+    <circle cx="308" cy="38" r="7" fill="#444" opacity="0.5" stroke="#666" stroke-width="1"/>
+    <circle cx="308" cy="98" r="7" fill="#444" opacity="0.5" stroke="#666" stroke-width="1"/>
+    <circle cx="284" cy="68" r="7" fill="#444" opacity="0.5" stroke="#666" stroke-width="1"/>
+    <circle cx="332" cy="68" r="7" fill="#444" opacity="0.5" stroke="#666" stroke-width="1"/>
+    <circle cx="308" cy="68" r="9" fill="#2d5a2d" opacity="0.4" stroke="#4a8a4a" stroke-width="1"/>
+
+    <text x="308" y="124" text-anchor="middle" font-family="monospace" font-size="8" fill="#a07020">Button PCB</text>
+
+    <!-- GPIO wiring indication -->
+    <path d="M272,40 Q260,35 260,30" stroke="#d4a017" stroke-width="1" fill="none" stroke-dasharray="2,2"/>
+    <path d="M272,60 Q260,55 260,40" stroke="#d4a017" stroke-width="1" fill="none" stroke-dasharray="2,2"/>
+    <path d="M272,80 Q260,75 260,50" stroke="#d4a017" stroke-width="1" fill="none" stroke-dasharray="2,2"/>
+    <text x="255" y="25" text-anchor="end" font-family="monospace" font-size="7" fill="#d4a017">GPIO wires</text>
+
+    <!-- USB port position -->
+    <rect x="130" y="132" width="16" height="6" rx="1" fill="#333" stroke="#555" stroke-width="0.5"/>
+    <text x="146" y="130" text-anchor="middle" font-family="monospace" font-size="7" fill="#888">USB</text>
+
+    <!-- SD slot position -->
+    <rect x="-3" y="80" width="6" height="14" rx="1" fill="#333" stroke="#555" stroke-width="0.5"/>
+    <text x="8" y="78" font-family="monospace" font-size="7" fill="#888">SD</text>
+  </g>
+
+  <!-- ==================== SPECIFICATIONS TABLE ==================== -->
+  <g transform="translate(60, 530)">
+    <text x="0" y="0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#555">Specifications Summary</text>
+
+    <text x="0" y="24" font-family="monospace" font-size="11" fill="#777">CASE</text>
+    <text x="80" y="24" font-family="monospace" font-size="11" fill="#555">88 x 34 x 19mm (3.46 x 1.34 x 0.75in)</text>
+    <text x="0" y="40" font-family="monospace" font-size="11" fill="#777">WEIGHT</text>
+    <text x="80" y="40" font-family="monospace" font-size="11" fill="#555">~45g estimated (with battery ~65g)</text>
+    <text x="0" y="56" font-family="monospace" font-size="11" fill="#777">DISPLAY</text>
+    <text x="80" y="56" font-family="monospace" font-size="11" fill="#555">Waveshare 2.13" e-Paper V4 | 250x122px | B&amp;W | SPI | SSD1680</text>
+    <text x="0" y="72" font-family="monospace" font-size="11" fill="#777">BRAIN</text>
+    <text x="80" y="72" font-family="monospace" font-size="11" fill="#555">Raspberry Pi Zero WH (BCM2835 1GHz / Zero 2: BCM2710 1GHz quad)</text>
+    <text x="0" y="88" font-family="monospace" font-size="11" fill="#777">INPUT</text>
+    <text x="80" y="88" font-family="monospace" font-size="11" fill="#555">5x 6mm tactile buttons (D-pad + select) | 5 GPIO pins</text>
+    <text x="0" y="104" font-family="monospace" font-size="11" fill="#777">POWER</text>
+    <text x="80" y="104" font-family="monospace" font-size="11" fill="#555">Micro-USB (dev) | LiPo 3.7V 1200mAh + PowerBoost 500C (future)</text>
+    <text x="0" y="120" font-family="monospace" font-size="11" fill="#777">CASE</text>
+    <text x="80" y="120" font-family="monospace" font-size="11" fill="#555">3D printed PLA/PETG | 2-piece shell | 4x M2 screws | snap-fit option</text>
+
+    <line x1="0" y1="130" x2="580" y2="130" stroke="#ddd" stroke-width="0.5"/>
+
+    <text x="0" y="150" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#555">Face Real Estate Breakdown</text>
+    <!-- Proportional bar -->
+    <rect x="0" y="162" width="310" height="20" rx="3" fill="#6b9fcf" opacity="0.7"/>
+    <rect x="310" y="162" width="73" height="20" fill="#cf6b6b" opacity="0.7"/>
+    <rect x="383" y="162" width="196" height="20" rx="3" fill="#999" opacity="0.3"/>
+    <text x="155" y="176" text-anchor="middle" font-family="monospace" font-size="10" fill="white" font-weight="bold">Display window: 51%</text>
+    <text x="346" y="176" text-anchor="middle" font-family="monospace" font-size="9" fill="white">Btns: 12%</text>
+    <text x="481" y="176" text-anchor="middle" font-family="monospace" font-size="9" fill="#666">Bezel/frame: 37%</text>
+
+    <text x="0" y="200" font-family="monospace" font-size="10" fill="#999">Display-to-button ratio: 4.3 : 1 (display occupies 4.3x the face area of buttons)</text>
+  </g>
+
+  <!-- ==================== SIZE COMPARISON ==================== -->
+  <g transform="translate(684, 575)">
+    <text x="176" y="0" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#555">Size Comparison (1:1 scale)</text>
+
+    <!-- Credit card outline for reference: 85.6 x 53.98mm -->
+    <rect x="50" y="20" width="86" height="54" rx="3" ry="3" fill="none" stroke="#ccc" stroke-width="1"/>
+    <text x="93" y="50" text-anchor="middle" font-family="monospace" font-size="7" fill="#bbb">Credit card</text>
+    <text x="93" y="58" text-anchor="middle" font-family="monospace" font-size="6" fill="#bbb">85.6 x 54mm</text>
+
+    <!-- RegardedPal at 1:1: 88x34mm -->
+    <rect x="175" y="30" width="88" height="34" rx="5" ry="5" fill="url(#caseGrad)" opacity="0.6" stroke="#555" stroke-width="1"/>
+    <text x="219" y="50" text-anchor="middle" font-family="monospace" font-size="7" fill="#aaa">RegardedPal</text>
+    <text x="219" y="58" text-anchor="middle" font-family="monospace" font-size="6" fill="#888">88 x 34mm</text>
+
+    <!-- AA battery for reference: 50.5 x 14.5mm -->
+    <rect x="300" y="37" width="51" height="14" rx="7" ry="7" fill="none" stroke="#ccc" stroke-width="1"/>
+    <text x="325" y="47" text-anchor="middle" font-family="monospace" font-size="6" fill="#bbb">AA battery</text>
+
+    <text x="176" y="85" text-anchor="middle" font-family="monospace" font-size="9" fill="#999">Slightly wider than a credit card, about 2/3 the height</text>
+  </g>
+</svg>
