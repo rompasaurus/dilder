@@ -71,3 +71,12 @@ A record of every prompt submitted during the development of RegardedPal.
   - `docs/hardware-research.md` (modified — updated display to V3, added breadboard detail)
   - `README.md` (modified — added setup guide link to docs table and Phase 1 checklist)
   - `PromptProgression.md` (modified)
+
+## Prompt #8
+- **Date/Time:** 2026-04-09
+- **Prompt:** "Ok I want to setup a documentation webpage/portfolio to provide an indepth guide on how this project is progressing and in realtime along with page for documentation and research contact information and introduction as well lets create a new folder to begin planning this and also I would like to use https://pwnagotchi.ai/ as a somewhat of inspiration for how to set this up up and organize this website doesnt need to be anything rediculous in fact static pages my be the ideal format along with a discord group and patreon page lets roll out this folder and christen it with a new md file"
+- **Input Tokens (est):** ~120
+- **Output Tokens (est):** ~3,500
+- **Files Created/Modified:**
+  - `website/PLAN.md` (created — website plan with site structure, page descriptions, Discord/Patreon plans, SSG comparison, pwnagotchi analysis)
+  - `PromptProgression.md` (modified)
