@@ -253,3 +253,61 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `website/mkdocs.yml` (modified — Patreon social link updated)
   - `website/docs/community/support.md` (modified — Patreon URL updated)
   - `website/docs/about/contact.md` (modified — Patreon URL updated)
+
+---
+
+## Prompt #20
+- **Date/Time:** 2026-04-09
+- **Prompt:** "There's a 404 error — it's not loading despite the domain pointing correctly and the GitHub hook deploying."
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~300
+- **Commit:** `0af7962` — Clarify Pages source setting in workflow comment
+- **Files Created/Modified:**
+  - `.github/workflows/deploy-site.yml` (modified — added comment clarifying Pages must be set to "Deploy from a branch → gh-pages" not "GitHub Actions")
+
+---
+
+## Prompt #21
+- **Date/Time:** 2026-04-09
+- **Prompt:** "Make that branch for me so that it triggers the deploy."
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~150
+- **Commit:** `1c7f210` — Trigger GitHub Pages deployment via website/ path change
+- **Files Created/Modified:**
+  - `website/requirements.txt` (modified — added comment to satisfy workflow paths filter and trigger first deployment)
+
+---
+
+## Prompt #22
+- **Date/Time:** 2026-04-09
+- **Prompt:** *(Shared GitHub Actions build log showing successful deploy to gh-pages branch with CNAME resolution to dilder.dev)*
+- **Input Tokens (est):** ~200 (build log)
+- **Output Tokens (est):** ~200
+- **Commit:** `18c8876` — Lowercase CNAME domain
+- **Files Created/Modified:**
+  - `website/docs/CNAME` (modified — changed `Dilder.dev` to `dilder.dev` for consistency)
+
+---
+
+## Prompt #23
+- **Date/Time:** 2026-04-09
+- **Prompt:** "Now we need to pull in the documentation for the Pi Zero WH and the e-ink display. Reach out to the official documentation and put it in its own folder in the docs folder. We need to then extract the pinout and pertinent documentation and attach it to the Wiring & Pinout doc."
+- **Input Tokens (est):** ~55
+- **Output Tokens (est):** ~8,500
+- **Commit:** `61525d6` — Add official hardware reference docs and expand wiring pinout
+- **Files Created/Modified:**
+  - `website/docs/docs/reference/pi-zero-wh.md` (created — full 40-pin GPIO table, electrical limits, SPI/I²C/UART/PWM protocol assignments, BCM vs physical numbering guide, official links)
+  - `website/docs/docs/reference/waveshare-eink.md` (created — display specs, HAT pin mapping with signal behaviour table, SPI protocol details, refresh rules, V3 vs V4 comparison, Python setup examples, safety notes, official links)
+  - `website/docs/docs/hardware/wiring-pinout.md` (modified — expanded with full 40-pin header map, signal behaviour table, wiring diagram, SPI config table, links to new reference docs, troubleshooting section)
+  - `website/mkdocs.yml` (modified — Reference section added to nav)
+
+---
+
+## Prompt #24
+- **Date/Time:** 2026-04-09
+- **Prompt:** "Update the prompts file with this and the commit."
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~400
+- **Commit:** pending — this is the commit
+- **Files Created/Modified:**
+  - `PromptProgression.md` (modified — added Prompts #20–24)
