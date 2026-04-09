@@ -6,7 +6,7 @@ If you find the build series useful and want to help keep it going, Patreon is t
 
 ## Patreon Page
 
-[**patreon.com/PLACEHOLDER**](https://patreon.com/PLACEHOLDER){ .md-button .md-button--primary }
+[**patreon.com/PLACEHOLDER**](https://patreon.com/MchenrysDevelopment){ .md-button .md-button--primary }
 
 *(Link will be updated once the Patreon page is live)*
 

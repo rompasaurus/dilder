@@ -6,7 +6,7 @@
 |----------|------|
 | GitHub | [github.com/rompasaurus/dilder](https://github.com/rompasaurus/dilder) |
 | Discord | [Join the server](../community/discord.md) |
-| Patreon | [patreon.com/PLACEHOLDER](https://patreon.com/PLACEHOLDER) |
+| Patreon | [patreon.com/PLACEHOLDER](https://patreon.com/MchenrysDevelopment) |
 | YouTube | [@rompasaurus](https://youtube.com/@rompasaurus) |
 
 ---
