@@ -18,11 +18,11 @@ The goal isn't just to build a thing — it's to show *how* the thing gets built
 
 | Component | Details |
 |-----------|---------|
-| Board | Raspberry Pi Zero (W or 2 W) |
-| Display | E-ink / e-paper display (SPI) |
-| Power | LiPo battery + charging circuit |
+| Board | Raspberry Pi Zero WH (W or 2 W, pre-soldered headers) |
+| Display | [Waveshare 2.13" e-Paper HAT V4](https://www.amazon.de/-/en/gp/product/B07Q5PZMGT) — 250x122px, black & white, SPI, SSD1680 driver |
+| Power | LiPo battery + Adafruit PowerBoost 500C (or TP4056 + MT3608 budget option) |
 | Enclosure | 3D-printed case (STL files provided) |
-| Input | Buttons (TBD — d-pad, action buttons, etc.) |
+| Input | 5x 6x6mm tactile push buttons (3 nav + 2 action) via GPIO |
 
 ---
 
@@ -31,19 +31,19 @@ The goal isn't just to build a thing — it's to show *how* the thing gets built
 Each phase maps to a section of the blog/YouTube series and can be followed independently.
 
 ### Phase 0 — Project Planning & Documentation
-> *You are here*
 
 - [x] Create repository and project structure
 - [x] Define project intent and scope
 - [x] Begin prompt progression log ([PromptProgression.md](PromptProgression.md))
-- [ ] Outline full phase roadmap
-- [ ] Define the "pet" — personality, stats, behaviors
+- [x] Outline full phase roadmap
+- [ ] Define the "pet" — personality, stats, behaviors (deferred to Phase 3)
 - [ ] Create initial wireframes / pixel art concepts for e-ink display
 
 ### Phase 1 — Hardware Selection & Setup
+> *You are here*
 
-- [ ] Finalize component list with links/part numbers
-- [ ] Set up Pi Zero with headless Raspbian
+- [x] Finalize component list with links/part numbers ([hardware-research.md](docs/hardware-research.md))
+- [ ] Set up Pi Zero with headless Raspberry Pi OS ([setup guide](docs/setup-guide.md))
 - [ ] Wire and test e-ink display (SPI connection)
 - [ ] Wire and test button inputs (GPIO)
 - [ ] Test battery + charging circuit
@@ -105,6 +105,8 @@ Each phase maps to a section of the blog/YouTube series and can be followed inde
 | Resource | Description |
 |----------|-------------|
 | [PromptProgression.md](PromptProgression.md) | Every AI prompt used in development, timestamped with token counts and file changes |
+| [docs/hardware-research.md](docs/hardware-research.md) | Component research, materials list, GPIO pinout, and enclosure concepts |
+| [docs/setup-guide.md](docs/setup-guide.md) | Complete hardware & development environment setup guide |
 | Blog (TBD) | Written companion posts for each phase |
 | YouTube (TBD) | Video walkthroughs for each phase |
 
