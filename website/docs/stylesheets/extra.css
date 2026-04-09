@@ -1,0 +1,40 @@
+/* Dilder — custom theme overrides */
+
+/* Tighten up the hero section on the landing page */
+.md-typeset h1:first-child {
+    font-size: 2.4rem;
+    margin-bottom: 0.4rem;
+}
+
+/* Cards grid layout for the landing page quick links */
+.grid.cards > ul {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Phase status badge */
+.phase-badge {
+    display: inline-block;
+    background: var(--md-primary-fg-color);
+    color: var(--md-primary-bg-color);
+    padding: 0.2em 0.7em;
+    border-radius: 2em;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+/* Blog post dates in a subtle style */
+.md-post__meta {
+    color: var(--md-default-fg-color--light);
+    font-size: 0.85rem;
+}
+
+/* Code block font size */
+.md-typeset code {
+    font-size: 0.85em;
+}
+
+/* Slightly more breathing room on nav sidebar */
+.md-nav__item {
+    padding: 0.1em 0;
+}
