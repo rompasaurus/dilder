@@ -308,6 +308,6 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Prompt:** "Update the prompts file with this and the commit."
 - **Input Tokens (est):** ~15
 - **Output Tokens (est):** ~400
-- **Commit:** pending — this is the commit
+- **Commit:** `09519b5` — Update PromptProgression with Prompts 20–24
 - **Files Created/Modified:**
   - `PromptProgression.md` (modified — added Prompts #20–24)
