@@ -476,3 +476,18 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `.gitignore` (modified — added build artifacts, Waveshare lib files, pico_sdk_import.cmake, `__pycache__/`, `.vscode/`)
   - `PromptProgression.md` (modified — added Prompts #27–35, updated all pending commit hashes)
   - All new and modified files committed and pushed to origin/main
+
+---
+
+## Prompt #36
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Now that the dev environment is set up, let's make a Python GUI to interface with the Pico — view logs, debug, and create a simple utility to draw images and type text on an emulated e-ink display that can then be either saved locally or sent to the e-ink display live. When saved, add it to an assets folder in the root of this project directory. Also, if there are any other useful utilities that can be added to enhance the development and usage of the Pico W, add them to this Python UI. Let's make this in Tkinter and put it in the root of this project in a directory called DevTool. Also I need an in-depth walkthrough of this implementation in the folder as well — an MD with a TOC and step-by-step instructions."
+- **Input Tokens (est):** ~150
+- **Output Tokens (est):** ~55,000
+- **Commit:** *(see below)*
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (created — 950-line Tkinter GUI with five tabs: display emulator with pencil/eraser/line/rect/text tools and save/load/send; serial monitor with connect/disconnect/send/log; firmware flash utility with BOOTSEL detection and build buttons; asset manager with preview and delete; GPIO pin reference viewer; dark theme; threaded serial I/O)
+  - `DevTool/requirements.txt` (created — pyserial, Pillow)
+  - `DevTool/README.md` (created — 11-section walkthrough with TOC: requirements, installation, all five tabs documented with usage instructions, file formats, architecture overview, class structure, threading model, troubleshooting table)
+  - `assets/` (created — empty directory for saved display images)
+  - `PromptProgression.md` (modified — added Prompt #36)
