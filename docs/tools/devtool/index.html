@@ -12,13 +12,13 @@
         <meta name="author" content="rompasaurus">
       
       
-        <link rel="canonical" href="https://dilder.dev/docs/setup/dev-environment/">
+        <link rel="canonical" href="https://dilder.dev/docs/tools/devtool/">
       
       
-        <link rel="prev" href="../display-setup/">
+        <link rel="prev" href="../../software/project-structure/">
       
       
-        <link rel="next" href="../../software/project-structure/">
+        <link rel="next" href="../setup-cli/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Dev Environment - Dilder</title>
+        <title>DevTool (GUI) - Dilder</title>
       
     
     
@@ -92,7 +92,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#dev-environment" class="md-skip">
+        <a href="#devtool-pico-w-development-companion" class="md-skip">
           Skip to content
         </a>
       
@@ -126,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Dev Environment
+              DevTool (GUI)
             
           </span>
         </div>
@@ -1020,8 +1020,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1037,11 +1035,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
         
           
           <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
@@ -1062,7 +1060,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1080,7 +1078,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../first-time-setup/" class="md-nav__link">
+      <a href="../../setup/first-time-setup/" class="md-nav__link">
         
   
   
@@ -1108,7 +1106,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../pi-zero-setup/" class="md-nav__link">
+      <a href="../../setup/pi-zero-setup/" class="md-nav__link">
         
   
   
@@ -1136,7 +1134,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../display-setup/" class="md-nav__link">
+      <a href="../../setup/display-setup/" class="md-nav__link">
         
   
   
@@ -1161,37 +1159,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Dev Environment
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../setup/dev-environment/" class="md-nav__link">
         
   
   
@@ -1207,276 +1178,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-1-install-vscode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 1 — Install VSCode
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-2-install-the-micropico-extension" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 2 — Install the MicroPico Extension
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Step 2 — Install the MicroPico Extension">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Install
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#configure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configure
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-3-serial-port-permissions-linux" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 3 — Serial Port Permissions (Linux)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-4-connect-to-the-pico-w" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 4 — Connect to the Pico W
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Step 4 — Connect to the Pico W">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#open-the-repl" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Open the REPL
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-5-project-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 5 — Project Structure
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Step 5 — Project Structure">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#upload-files-to-pico-w" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Upload Files to Pico W
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-6-running-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 6 — Running Code
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Step 6 — Running Code">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#run-the-current-file" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Run the Current File
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#run-on-boot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Run on Boot
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-7-debugging" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 7 — Debugging
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Step 7 — Debugging">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#repl-debugging" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        REPL Debugging
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#interactive-debugging" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Interactive Debugging
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#mpremote-cli-alternative" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        mpremote (CLI Alternative)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#useful-vscode-settings" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Useful VSCode Settings
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#keyboard-shortcuts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Keyboard Shortcuts
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1585,6 +1286,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1600,11 +1303,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" checked>
         
           
           <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
@@ -1625,7 +1328,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1640,10 +1343,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../tools/devtool/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevTool (GUI)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1659,6 +1389,492 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-system-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install System Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-python-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Python Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#launching-the-devtool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Launching the DevTool
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tab-1-display-emulator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tab 1 — Display Emulator
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tab 1 — Display Emulator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#drawing-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Drawing Tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#text-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Text Tool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saving-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Saving Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loading-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#send-to-pico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Send to Pico
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tab-2-serial-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tab 2 — Serial Monitor
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tab 2 — Serial Monitor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#connecting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connecting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viewing-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Viewing Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sending-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sending Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saving-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Saving Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tab-3-flash-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tab 3 — Flash Firmware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tab 3 — Flash Firmware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#selecting-a-uf2-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Selecting a UF2 File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flashing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flashing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-from-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building from Source
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tab-4-asset-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tab 4 — Asset Manager
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tab 4 — Asset Manager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#browsing-assets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Browsing Assets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#previewing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Previewing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deleting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deleting
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tab-5-gpio-pin-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tab 5 — GPIO Pin Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tab-6-connection-utility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tab 6 — Connection Utility
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tab 6 — Connection Utility">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usb-serial-walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USB Serial Walkthrough
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wi-fi-walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wi-Fi Walkthrough
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tab-7-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tab 7 — Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Formats
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Formats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pbm-portable-bitmap-p4-binary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PBM (Portable Bitmap — P4 Binary)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bin-raw-display-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BIN (Raw Display Buffer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#png-portable-network-graphics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PNG (Portable Network Graphics)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#class-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#threading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Threading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1671,7 +1887,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tools/setup-cli/" class="md-nav__link">
+      <a href="../setup-cli/" class="md-nav__link">
         
   
   
@@ -1699,7 +1915,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tools/website-dev/" class="md-nav__link">
+      <a href="../website-dev/" class="md-nav__link">
         
   
   
@@ -2194,10 +2410,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Overview
+        Requirements
       
     </span>
   </a>
@@ -2205,33 +2421,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-install-vscode" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1 — Install VSCode
+        Installation
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-2-install-the-micropico-extension" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 2 — Install the MicroPico Extension
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Step 2 — Install the MicroPico Extension">
+    <nav class="md-nav" aria-label="Installation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#install-system-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Install System Dependencies
       
     </span>
   </a>
@@ -2239,10 +2444,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#configure" class="md-nav__link">
+  <a href="#install-python-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configure
+        Install Python Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify
       
     </span>
   </a>
@@ -2255,10 +2471,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-serial-port-permissions-linux" class="md-nav__link">
+  <a href="#launching-the-devtool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3 — Serial Port Permissions (Linux)
+        Launching the DevTool
       
     </span>
   </a>
@@ -2266,22 +2482,66 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-connect-to-the-pico-w" class="md-nav__link">
+  <a href="#tab-1-display-emulator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 4 — Connect to the Pico W
+        Tab 1 — Display Emulator
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 4 — Connect to the Pico W">
+    <nav class="md-nav" aria-label="Tab 1 — Display Emulator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#open-the-repl" class="md-nav__link">
+  <a href="#drawing-tools" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Open the REPL
+        Drawing Tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#text-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Text Tool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saving-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Saving Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loading-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#send-to-pico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Send to Pico
       
     </span>
   </a>
@@ -2294,22 +2554,55 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-5-project-structure" class="md-nav__link">
+  <a href="#tab-2-serial-monitor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 5 — Project Structure
+        Tab 2 — Serial Monitor
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 5 — Project Structure">
+    <nav class="md-nav" aria-label="Tab 2 — Serial Monitor">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#upload-files-to-pico-w" class="md-nav__link">
+  <a href="#connecting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Upload Files to Pico W
+        Connecting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viewing-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Viewing Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sending-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sending Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saving-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Saving Logs
       
     </span>
   </a>
@@ -2322,22 +2615,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-6-running-code" class="md-nav__link">
+  <a href="#tab-3-flash-firmware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 6 — Running Code
+        Tab 3 — Flash Firmware
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 6 — Running Code">
+    <nav class="md-nav" aria-label="Tab 3 — Flash Firmware">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#run-the-current-file" class="md-nav__link">
+  <a href="#selecting-a-uf2-file" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Run the Current File
+        Selecting a UF2 File
       
     </span>
   </a>
@@ -2345,10 +2638,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#run-on-boot" class="md-nav__link">
+  <a href="#flashing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Run on Boot
+        Flashing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-from-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building from Source
       
     </span>
   </a>
@@ -2361,22 +2665,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-7-debugging" class="md-nav__link">
+  <a href="#tab-4-asset-manager" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 7 — Debugging
+        Tab 4 — Asset Manager
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 7 — Debugging">
+    <nav class="md-nav" aria-label="Tab 4 — Asset Manager">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#repl-debugging" class="md-nav__link">
+  <a href="#browsing-assets" class="md-nav__link">
     <span class="md-ellipsis">
       
-        REPL Debugging
+        Browsing Assets
       
     </span>
   </a>
@@ -2384,10 +2688,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#interactive-debugging" class="md-nav__link">
+  <a href="#previewing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Interactive Debugging
+        Previewing
       
     </span>
   </a>
@@ -2395,10 +2699,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#mpremote-cli-alternative" class="md-nav__link">
+  <a href="#deleting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        mpremote (CLI Alternative)
+        Deleting
       
     </span>
   </a>
@@ -2411,10 +2715,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#useful-vscode-settings" class="md-nav__link">
+  <a href="#tab-5-gpio-pin-reference" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Useful VSCode Settings
+        Tab 5 — GPIO Pin Reference
       
     </span>
   </a>
@@ -2422,13 +2726,141 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#keyboard-shortcuts" class="md-nav__link">
+  <a href="#tab-6-connection-utility" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Keyboard Shortcuts
+        Tab 6 — Connection Utility
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Tab 6 — Connection Utility">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usb-serial-walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USB Serial Walkthrough
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wi-fi-walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wi-Fi Walkthrough
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tab-7-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tab 7 — Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Formats
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Formats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pbm-portable-bitmap-p4-binary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PBM (Portable Bitmap — P4 Binary)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bin-raw-display-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BIN (Raw Display Buffer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#png-portable-network-graphics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PNG (Portable Network Graphics)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#class-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#threading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Threading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2463,244 +2895,511 @@
   
 
 
-<h1 id="dev-environment">Dev Environment<a class="headerlink" href="#dev-environment" title="Permanent link">&para;</a></h1>
-<p>How to set up VSCode on Linux for Pico W development, debugging, and file management.</p>
+<h1 id="devtool-pico-w-development-companion">DevTool — Pico W Development Companion<a class="headerlink" href="#devtool-pico-w-development-companion" title="Permanent link">&para;</a></h1>
+<p>A Tkinter GUI application for developing on the Raspberry Pi Pico W with the Waveshare 2.13" e-ink display. Provides a display emulator, serial monitor, firmware flash utility, asset manager, GPIO reference, USB/Wi-Fi connection walkthrough, and built-in documentation — all in one window.</p>
 <hr />
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The Pico W is a microcontroller, not a Linux computer — you can't SSH into it or run an editor on it. Instead, you edit code on your local machine and upload it to the Pico W over USB.</p>
-<p>The recommended workflow:</p>
-<ol>
-<li><strong>Edit</strong> code in VSCode on your Linux machine</li>
-<li><strong>Upload</strong> files to the Pico W via the MicroPico extension</li>
-<li><strong>Run</strong> and <strong>debug</strong> directly from VSCode using the serial REPL</li>
-</ol>
-<hr />
-<h2 id="step-1-install-vscode">Step 1 — Install VSCode<a class="headerlink" href="#step-1-install-vscode" title="Permanent link">&para;</a></h2>
-<p>If you don't already have VSCode installed:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Arch Linux / CachyOS</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sudo<span class="w"> </span>pacman<span class="w"> </span>-S<span class="w"> </span>code
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Ubuntu / Debian</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>code
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Or download from https://code.visualstudio.com/</span>
-</span></code></pre></div>
-<hr />
-<h2 id="step-2-install-the-micropico-extension">Step 2 — Install the MicroPico Extension<a class="headerlink" href="#step-2-install-the-micropico-extension" title="Permanent link">&para;</a></h2>
-<p>MicroPico (formerly Pico-W-Go) provides:</p>
-<ul>
-<li>File upload/download to/from the Pico W</li>
-<li>Integrated MicroPython REPL terminal</li>
-<li>Run scripts directly on the Pico W</li>
-<li>Auto-completion for MicroPython APIs</li>
-<li>Pico W project management</li>
-</ul>
-<h3 id="install">Install<a class="headerlink" href="#install" title="Permanent link">&para;</a></h3>
-<ol>
-<li>Open VSCode</li>
-<li>Go to <strong>Extensions</strong> (<code>Ctrl+Shift+X</code>)</li>
-<li>Search for <strong>"MicroPico"</strong></li>
-<li>Install the extension by <strong>paulober</strong></li>
-</ol>
-<h3 id="configure">Configure<a class="headerlink" href="#configure" title="Permanent link">&para;</a></h3>
-<p>After installing, set your project as a MicroPico project:</p>
-<ol>
-<li>Open your Dilder project folder in VSCode</li>
-<li>Open the Command Palette (<code>Ctrl+Shift+P</code>)</li>
-<li>Run <strong>MicroPico: Configure Project</strong></li>
-<li>This creates a <code>.micropico</code> file in your project root</li>
-</ol>
-<hr />
-<h2 id="step-3-serial-port-permissions-linux">Step 3 — Serial Port Permissions (Linux)<a class="headerlink" href="#step-3-serial-port-permissions-linux" title="Permanent link">&para;</a></h2>
-<p>The Pico W appears as <code>/dev/ttyACM0</code> when connected. Your user needs permission to access it.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Add your user to the dialout group</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>dialout<span class="w"> </span><span class="nv">$USER</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Log out and back in for the change to take effect</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># Verify:</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>groups<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>dialout
-</span></code></pre></div>
-<div class="admonition warning">
-<p class="admonition-title">Common gotcha</p>
-<p>If MicroPico can't connect, this is almost always the cause. The group change only takes effect after a full logout/login (not just a new terminal).</p>
-</div>
-<hr />
-<h2 id="step-4-connect-to-the-pico-w">Step 4 — Connect to the Pico W<a class="headerlink" href="#step-4-connect-to-the-pico-w" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Plug the Pico W into your computer via USB</li>
-<li>In VSCode, the MicroPico status bar should show <strong>"Pico Connected"</strong> at the bottom</li>
-<li>If not, open Command Palette → <strong>MicroPico: Connect</strong></li>
-</ol>
-<h3 id="open-the-repl">Open the REPL<a class="headerlink" href="#open-the-repl" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Click the <strong>MicroPico terminal icon</strong> in the bottom panel, or</li>
-<li>Command Palette → <strong>MicroPico: Toggle REPL</strong></li>
-</ul>
-<p>You should see the MicroPython <code>&gt;&gt;&gt;</code> prompt in the VSCode terminal.</p>
-<hr />
-<h2 id="step-5-project-structure">Step 5 — Project Structure<a class="headerlink" href="#step-5-project-structure" title="Permanent link">&para;</a></h2>
-<p>Create this structure in your project for the firmware:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dilder/
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>├── firmware/              # MicroPython code for the Pico W
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>│   ├── main.py            # Entry point (runs on boot)
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│   ├── boot.py            # Pre-boot config (Wi-Fi, etc.)
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│   ├── epd2in13_V3.py     # Waveshare display driver
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>│   ├── epdconfig.py       # SPI/GPIO config for driver
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>│   ├── core/
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│   │   ├── display.py     # Display wrapper
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>│   │   └── input.py       # Button input handler
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>│   └── assets/
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>│       └── sprites/       # 1-bit images
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>├── website/               # MkDocs site (existing)
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>├── docs/                  # Research docs (existing)
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>└── .micropico             # MicroPico config
-</span></code></pre></div>
-<h3 id="upload-files-to-pico-w">Upload Files to Pico W<a class="headerlink" href="#upload-files-to-pico-w" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Upload a single file:</strong> Right-click the file in the explorer → <strong>MicroPico: Upload File to Pico</strong></li>
-<li><strong>Upload the entire project:</strong> Command Palette → <strong>MicroPico: Upload Project to Pico</strong></li>
-<li><strong>Download from Pico:</strong> Command Palette → <strong>MicroPico: Download Project from Pico</strong></li>
-</ul>
-<hr />
-<h2 id="step-6-running-code">Step 6 — Running Code<a class="headerlink" href="#step-6-running-code" title="Permanent link">&para;</a></h2>
-<h3 id="run-the-current-file">Run the Current File<a class="headerlink" href="#run-the-current-file" title="Permanent link">&para;</a></h3>
-<ol>
-<li>Open a <code>.py</code> file in the editor</li>
-<li>Click the <strong>Run</strong> button in the MicroPico status bar, or</li>
-<li>Command Palette → <strong>MicroPico: Run Current File on Pico</strong></li>
-</ol>
-<p>The script runs on the Pico W and output appears in the REPL terminal.</p>
-<h3 id="run-on-boot">Run on Boot<a class="headerlink" href="#run-on-boot" title="Permanent link">&para;</a></h3>
-<p>Any code in <code>main.py</code> on the Pico W runs automatically when it powers on. Upload your <code>main.py</code> and reset the board to test auto-start behavior.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Reset the Pico W from REPL</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">machine</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">machine</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-</span></code></pre></div>
-<hr />
-<h2 id="step-7-debugging">Step 7 — Debugging<a class="headerlink" href="#step-7-debugging" title="Permanent link">&para;</a></h2>
-<h3 id="repl-debugging">REPL Debugging<a class="headerlink" href="#repl-debugging" title="Permanent link">&para;</a></h3>
-<p>The simplest approach: use <code>print()</code> statements and the REPL.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># In your code</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Button state: </span><span class="si">{</span><span class="n">btn</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Display BUSY: </span><span class="si">{</span><span class="n">busy_pin</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span></code></pre></div>
-<h3 id="interactive-debugging">Interactive Debugging<a class="headerlink" href="#interactive-debugging" title="Permanent link">&para;</a></h3>
-<p>You can paste code directly into the REPL to test hardware interactively:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span><span class="p">,</span> <span class="n">SPI</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">spi</span> <span class="o">=</span> <span class="n">SPI</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">4_000_000</span><span class="p">,</span> <span class="n">sck</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">mosi</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">11</span><span class="p">))</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cs</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">OUT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cs</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># select display</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">spi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># send a test byte</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cs</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># deselect</span>
-</span></code></pre></div>
-<h3 id="mpremote-cli-alternative">mpremote (CLI Alternative)<a class="headerlink" href="#mpremote-cli-alternative" title="Permanent link">&para;</a></h3>
-<p><code>mpremote</code> is a command-line tool for managing MicroPython devices. Useful when you want to script uploads or run files without VSCode.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Install</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>install<span class="w"> </span>mpremote
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># List connected devices</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>mpremote<span class="w"> </span>connect<span class="w"> </span>list
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Run a file on the Pico W (without uploading)</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>mpremote<span class="w"> </span>run<span class="w"> </span>firmware/hello_display.py
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1"># Upload a file</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>mpremote<span class="w"> </span>cp<span class="w"> </span>firmware/main.py<span class="w"> </span>:main.py
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="c1"># Upload a directory</span>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>mpremote<span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>firmware/<span class="w"> </span>:
-</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>
-</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="c1"># Open the REPL</span>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>mpremote<span class="w"> </span>repl
-</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>
-</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="c1"># Reset the board</span>
-</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>mpremote<span class="w"> </span>reset
-</span></code></pre></div>
-<hr />
-<h2 id="useful-vscode-settings">Useful VSCode Settings<a class="headerlink" href="#useful-vscode-settings" title="Permanent link">&para;</a></h2>
-<p>Add to your <code>.vscode/settings.json</code>:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="nt">&quot;micropico.syncFolder&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;firmware&quot;</span><span class="p">,</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="nt">&quot;micropico.openOnStart&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">&quot;python.languageServer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Pylance&quot;</span><span class="p">,</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="nt">&quot;python.analysis.extraPaths&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="s2">&quot;firmware&quot;</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">],</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="nt">&quot;files.associations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">        </span><span class="nt">&quot;*.py&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>This tells MicroPico to sync only the <code>firmware/</code> folder to the Pico W, and gives Pylance the right paths for autocomplete.</p>
-<hr />
-<h2 id="keyboard-shortcuts">Keyboard Shortcuts<a class="headerlink" href="#keyboard-shortcuts" title="Permanent link">&para;</a></h2>
+<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Action</th>
+<th>Requirement</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python 3.9+</td>
+<td>Comes with most Linux distributions</td>
+</tr>
+<tr>
+<td>Tkinter</td>
+<td>Usually included with Python. On Arch: <code>sudo pacman -S tk</code></td>
+</tr>
+<tr>
+<td>pyserial</td>
+<td>For USB serial communication with the Pico W</td>
+</tr>
+<tr>
+<td>Pillow (optional)</td>
+<td>For PNG export/import and better text rendering</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<h3 id="install-system-dependencies">Install System Dependencies<a class="headerlink" href="#install-system-dependencies" title="Permanent link">&para;</a></h3>
+<p>Tkinter is a Python binding to Tcl/Tk. It's usually bundled with Python, but some distros package it separately.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Arch / CachyOS</label><label for="__tabbed_1_2">Ubuntu / Debian</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sudo<span class="w"> </span>pacman<span class="w"> </span>-S<span class="w"> </span>tk<span class="w"> </span>python
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-tk
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="install-python-dependencies">Install Python Dependencies<a class="headerlink" href="#install-python-dependencies" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>DevTool/
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</span></code></pre></div>
+<p>This installs:</p>
+<ul>
+<li><code>pyserial</code> — required for the serial monitor and image upload</li>
+<li><code>Pillow</code> — optional but recommended for PNG support and better text rendering</li>
+</ul>
+<h3 id="verify">Verify<a class="headerlink" href="#verify" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import tkinter; import serial; print(&#39;OK&#39;)&quot;</span>
+</span></code></pre></div>
+<p>If this prints <code>OK</code>, you're ready to go.</p>
+<hr />
+<h2 id="launching-the-devtool">Launching the DevTool<a class="headerlink" href="#launching-the-devtool" title="Permanent link">&para;</a></h2>
+<p>From the project root:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>DevTool/devtool.py
+</span></code></pre></div>
+<p>The application opens with seven tabs across the top:</p>
+<table>
+<thead>
+<tr>
+<th>Tab</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Display Emulator</strong></td>
+<td>Draw and design 250×122 e-ink images</td>
+</tr>
+<tr>
+<td><strong>Serial Monitor</strong></td>
+<td>View live printf output from the Pico W</td>
+</tr>
+<tr>
+<td><strong>Flash Firmware</strong></td>
+<td>Flash .uf2 files to the Pico W</td>
+</tr>
+<tr>
+<td><strong>Assets</strong></td>
+<td>Browse and manage saved display images</td>
+</tr>
+<tr>
+<td><strong>GPIO Pins</strong></td>
+<td>Visual pin assignment reference</td>
+</tr>
+<tr>
+<td><strong>Connect</strong></td>
+<td>Step-by-step USB serial and Wi-Fi connection walkthrough</td>
+</tr>
+<tr>
+<td><strong>Docs</strong></td>
+<td>Searchable built-in documentation for the entire application</td>
+</tr>
+</tbody>
+</table>
+<p>A log bar at the bottom shows status messages and timestamps.</p>
+<hr />
+<h2 id="tab-1-display-emulator">Tab 1 — Display Emulator<a class="headerlink" href="#tab-1-display-emulator" title="Permanent link">&para;</a></h2>
+<p>The display emulator is a 250×122 pixel canvas (scaled 3× for visibility) that exactly matches the Waveshare 2.13" V3 e-ink display. Everything you draw here is a 1-bit monochrome image — black or white only, just like the real display.</p>
+<h3 id="drawing-tools">Drawing Tools<a class="headerlink" href="#drawing-tools" title="Permanent link">&para;</a></h3>
+<p>The toolbar at the top provides six tools:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Description</th>
 <th>Shortcut</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Toggle REPL</td>
-<td><code>Ctrl+Shift+P</code> → "MicroPico: Toggle REPL"</td>
+<td><strong>Pencil</strong></td>
+<td>Freehand draw in black. Click or drag.</td>
+<td>Default</td>
 </tr>
 <tr>
-<td>Run current file</td>
-<td>Click status bar <strong>Run</strong> button</td>
+<td><strong>Eraser</strong></td>
+<td>Freehand erase to white. Click or drag.</td>
+<td></td>
 </tr>
 <tr>
-<td>Upload file</td>
-<td>Right-click → "Upload File to Pico"</td>
+<td><strong>Line</strong></td>
+<td>Click start point, drag to end point, release.</td>
+<td></td>
 </tr>
 <tr>
-<td>Upload project</td>
-<td><code>Ctrl+Shift+P</code> → "MicroPico: Upload Project"</td>
+<td><strong>Rect</strong></td>
+<td>Draw a rectangle outline. Click one corner, drag to opposite.</td>
+<td></td>
 </tr>
 <tr>
-<td>Soft reset</td>
-<td>Type <code>Ctrl+D</code> in the REPL</td>
+<td><strong>Fill Rect</strong></td>
+<td>Draw a filled black rectangle. Same interaction as Rect.</td>
+<td></td>
 </tr>
 <tr>
-<td>Interrupt running code</td>
-<td>Type <code>Ctrl+C</code> in the REPL</td>
+<td><strong>Text</strong></td>
+<td>Click a position, type text in the dialog. Renders to pixels.</td>
+<td></td>
 </tr>
 </tbody>
 </table>
+<p><strong>Size</strong> controls the brush width (pencil/eraser) and line thickness (line/rect).</p>
+<p><strong>Clear</strong> resets the canvas to all white.</p>
+<p><strong>Invert</strong> flips every pixel (black becomes white, white becomes black). Useful for creating white-on-black designs.</p>
+<h3 id="text-tool">Text Tool<a class="headerlink" href="#text-tool" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Select <strong>Text</strong> from the toolbar.</li>
+<li>Set the <strong>Font</strong> size (8–48 px).</li>
+<li>Click anywhere on the canvas.</li>
+<li>A dialog appears — type your text and press OK.</li>
+<li>The text is rasterized into the pixel buffer.</li>
+</ol>
+<p>If Pillow is installed, text renders using the DejaVu Sans Mono font at the exact pixel size. Without Pillow, text renders as filled blocks (approximate).</p>
+<h3 id="saving-images">Saving Images<a class="headerlink" href="#saving-images" title="Permanent link">&para;</a></h3>
+<p>Click <strong>Save</strong> in the toolbar. Enter a name (no extension). Three files are created in the <code>assets/</code> directory:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Format</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name.pbm</code></td>
+<td>PBM binary (P4)</td>
+<td>Standard 1-bit image format, viewable in any image viewer</td>
+</tr>
+<tr>
+<td><code>name.bin</code></td>
+<td>Raw packed bytes</td>
+<td>Direct upload format for the Pico W display buffer</td>
+</tr>
+<tr>
+<td><code>name.png</code></td>
+<td>PNG (if Pillow installed)</td>
+<td>Easy to view and share</td>
+</tr>
+</tbody>
+</table>
+<p><strong>PBM</strong> is the primary format — it's a standard image format that needs no dependencies to read or write.</p>
+<p><strong>BIN</strong> is the raw display buffer in the same byte layout the Waveshare driver uses: each byte holds 8 horizontal pixels, MSB first, row by row. This can be loaded directly into the display framebuffer in C code.</p>
+<h3 id="loading-images">Loading Images<a class="headerlink" href="#loading-images" title="Permanent link">&para;</a></h3>
+<p>Click <strong>Load</strong> to open any <code>.pbm</code>, <code>.bin</code>, or <code>.png</code> file. The image is loaded into the canvas and can be further edited.</p>
+<h3 id="send-to-pico">Send to Pico<a class="headerlink" href="#send-to-pico" title="Permanent link">&para;</a></h3>
+<p>Click <strong>Send to Pico</strong> to transmit the current canvas image to the Pico W over USB serial. This sends a raw byte stream with an <code>IMG:</code> header followed by the width, height, and pixel data.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This requires firmware on the Pico W that listens for the <code>IMG:</code> protocol. The hello world examples don't include this — it's for future firmware development.</p>
+</div>
+<hr />
+<h2 id="tab-2-serial-monitor">Tab 2 — Serial Monitor<a class="headerlink" href="#tab-2-serial-monitor" title="Permanent link">&para;</a></h2>
+<p>A full-featured serial terminal for communicating with the Pico W over USB.</p>
+<h3 id="connecting">Connecting<a class="headerlink" href="#connecting" title="Permanent link">&para;</a></h3>
+<ol>
+<li>The <strong>Port</strong> dropdown auto-detects available serial devices. The Pico W typically appears as <code>/dev/ttyACM0</code>.</li>
+<li><strong>Baud rate</strong> defaults to 115200 (matching the Pico W's USB serial configuration).</li>
+<li>Click <strong>Connect</strong> to open the connection.</li>
+<li>The status indicator turns green when connected.</li>
+</ol>
+<p>If no ports appear, click <strong>Refresh</strong>. Make sure the Pico W is plugged in and running firmware (not in BOOTSEL mode).</p>
+<h3 id="viewing-output">Viewing Output<a class="headerlink" href="#viewing-output" title="Permanent link">&para;</a></h3>
+<p>Serial data from the Pico W appears in the output area in real time. This is where you see <code>printf()</code> output from your C programs.</p>
+<ul>
+<li><strong>Auto-scroll</strong> keeps the view at the bottom as new lines arrive. Uncheck to freeze the view for reading.</li>
+<li><strong>Clear</strong> empties the output area.</li>
+</ul>
+<h3 id="sending-commands">Sending Commands<a class="headerlink" href="#sending-commands" title="Permanent link">&para;</a></h3>
+<p>Type in the input bar at the bottom and press <strong>Enter</strong> or click <strong>Send</strong>. The text is sent to the Pico W followed by <code>\r\n</code>.</p>
+<p>Special buttons:</p>
+<ul>
+<li><strong>Ctrl+C</strong> — sends an interrupt signal (useful for stopping running code)</li>
+<li><strong>Reset</strong> — sends a soft-reset signal (Ctrl+D)</li>
+</ul>
+<h3 id="saving-logs">Saving Logs<a class="headerlink" href="#saving-logs" title="Permanent link">&para;</a></h3>
+<p>Click <strong>Save Log</strong> to save the entire output history to a text file with a timestamped filename.</p>
+<hr />
+<h2 id="tab-3-flash-firmware">Tab 3 — Flash Firmware<a class="headerlink" href="#tab-3-flash-firmware" title="Permanent link">&para;</a></h2>
+<p>A visual interface for flashing <code>.uf2</code> firmware files to the Pico W.</p>
+<h3 id="selecting-a-uf2-file">Selecting a UF2 File<a class="headerlink" href="#selecting-a-uf2-file" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Browse</strong> — open a file picker to select any <code>.uf2</code> file.</li>
+<li><strong>Quick Flash</strong> buttons — one-click selection of the pre-built hello world programs (if they've been built):<ul>
+<li><strong>Hello Serial</strong> — <code>dev-setup/hello-world-serial/build/hello_serial.uf2</code></li>
+<li><strong>Hello Display</strong> — <code>dev-setup/hello-world/build/hello_dilder.uf2</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="flashing">Flashing<a class="headerlink" href="#flashing" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Put the Pico W in <strong>BOOTSEL mode</strong> (unplug, hold BOOTSEL, plug in, release).</li>
+<li>Click <strong>Detect RPI-RP2</strong> — the tool searches for the mounted USB drive.</li>
+<li>Click <strong>Flash</strong> — the <code>.uf2</code> file is copied to the drive.</li>
+<li>The Pico W reboots automatically.</li>
+</ol>
+<h3 id="building-from-source">Building from Source<a class="headerlink" href="#building-from-source" title="Permanent link">&para;</a></h3>
+<p>The <strong>Build Projects</strong> section has buttons to compile each hello world project directly from the DevTool:</p>
+<ul>
+<li><strong>Build Hello Serial</strong> — runs CMake + Ninja in <code>dev-setup/hello-world-serial/</code></li>
+<li><strong>Build Hello Display</strong> — runs CMake + Ninja in <code>dev-setup/hello-world/</code></li>
+</ul>
+<p>Build output appears in the log bar at the bottom. The buttons handle copying <code>pico_sdk_import.cmake</code> and creating the build directory automatically.</p>
+<hr />
+<h2 id="tab-4-asset-manager">Tab 4 — Asset Manager<a class="headerlink" href="#tab-4-asset-manager" title="Permanent link">&para;</a></h2>
+<p>Browse and manage the 1-bit display images saved in the <code>assets/</code> directory.</p>
+<h3 id="browsing-assets">Browsing Assets<a class="headerlink" href="#browsing-assets" title="Permanent link">&para;</a></h3>
+<p>The file list on the left shows all <code>.pbm</code>, <code>.bin</code>, and <code>.png</code> files in <code>assets/</code>. Click <strong>Refresh</strong> to reload the list.</p>
+<h3 id="previewing">Previewing<a class="headerlink" href="#previewing" title="Permanent link">&para;</a></h3>
+<p>Click any file to see a 2× scaled preview on the right. The preview shows the image as it would appear on the e-ink display.</p>
+<p>File info (name, size, dimensions) is shown below the preview.</p>
+<h3 id="deleting">Deleting<a class="headerlink" href="#deleting" title="Permanent link">&para;</a></h3>
+<p>Select a file and click <strong>Delete</strong> to remove it. A confirmation dialog appears first.</p>
+<p><strong>Open Folder</strong> opens the <code>assets/</code> directory in your system file manager.</p>
+<hr />
+<h2 id="tab-5-gpio-pin-reference">Tab 5 — GPIO Pin Reference<a class="headerlink" href="#tab-5-gpio-pin-reference" title="Permanent link">&para;</a></h2>
+<p>A read-only visual reference showing the Pico W's 40-pin header with all Dilder project assignments highlighted:</p>
+<ul>
+<li><strong>Display pins</strong> (SPI1): GP8–GP13</li>
+<li><strong>Button pins</strong>: GP2–GP6</li>
+<li><strong>Power</strong>: 3V3(OUT), GND</li>
+<li><strong>SPI configuration</strong>: Mode 0, 4 MHz, MSB first</li>
+</ul>
+<p>This tab is a quick reference so you don't need to switch to the documentation while developing.</p>
+<hr />
+<h2 id="tab-6-connection-utility">Tab 6 — Connection Utility<a class="headerlink" href="#tab-6-connection-utility" title="Permanent link">&para;</a></h2>
+<p>A guided walkthrough for connecting the Pico W to your computer. Switch between USB Serial and Wi-Fi modes using the radio buttons at the top.</p>
+<h3 id="usb-serial-walkthrough">USB Serial Walkthrough<a class="headerlink" href="#usb-serial-walkthrough" title="Permanent link">&para;</a></h3>
+<p>Four steps, each with a live <strong>Check</strong> button that verifies the current state:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>What it checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Step 1 — Plug in the Pico W</strong></td>
+<td>Runs <code>lsusb</code> to detect the Pico W USB device (vendor ID <code>2e8a</code>). Confirms the cable is a data cable.</td>
+</tr>
+<tr>
+<td><strong>Step 2 — Verify serial port</strong></td>
+<td>Checks if <code>/dev/ttyACM0</code> exists. If not, explains why (BOOTSEL mode, charge-only cable, no firmware).</td>
+</tr>
+<tr>
+<td><strong>Step 3 — Check permissions</strong></td>
+<td>Verifies your user is in the <code>uucp</code> (Arch) or <code>dialout</code> (Debian) group. Shows the fix command if not.</td>
+</tr>
+<tr>
+<td><strong>Step 4 — Open Serial Monitor</strong></td>
+<td>Links directly to the Serial Monitor tab. One click to switch over and connect.</td>
+</tr>
+</tbody>
+</table>
+<p>Each check button gives a green checkmark, yellow warning, or red error with a specific explanation.</p>
+<p>The <strong>"Fix: Add me to serial group"</strong> button auto-detects the correct group, tries <code>pkexec</code> for a graphical sudo prompt first, falls back to opening a terminal emulator with the command, and shows a confirmation dialog before running.</p>
+<h3 id="wi-fi-walkthrough">Wi-Fi Walkthrough<a class="headerlink" href="#wi-fi-walkthrough" title="Permanent link">&para;</a></h3>
+<p>Guides you through adding Wi-Fi support to your Pico W firmware:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>What it covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Overview</strong></td>
+<td>Explains the CYW43439 Wi-Fi chip, 802.11n 2.4 GHz capability.</td>
+</tr>
+<tr>
+<td><strong>Step 1 — Add Wi-Fi credentials</strong></td>
+<td>Provides the exact C code to initialise Wi-Fi and connect to a network. Copy-paste ready.</td>
+</tr>
+<tr>
+<td><strong>Step 2 — CMake configuration</strong></td>
+<td>Shows which library to link: <code>pico_cyw43_arch_lwip_threadsafe_background</code>.</td>
+</tr>
+<tr>
+<td><strong>Step 3 — Find Pico on network</strong></td>
+<td>Network scan button that checks the ARP table for reachable devices. Shows how to print the IP from firmware.</td>
+</tr>
+<tr>
+<td><strong>Step 4 — Communication options</strong></td>
+<td>Explains TCP sockets, HTTP server, UDP broadcast, and mDNS discovery.</td>
+</tr>
+<tr>
+<td><strong>Quick Connect</strong></td>
+<td>Enter an IP and port to test a live TCP connection to the Pico W. Shows success, timeout, or connection refused.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tab-7-documentation">Tab 7 — Documentation<a class="headerlink" href="#tab-7-documentation" title="Permanent link">&para;</a></h2>
+<p>Built-in searchable documentation for the entire DevTool application.</p>
+<p><strong>Layout:</strong></p>
+<ul>
+<li><strong>Left sidebar</strong> — Table of contents. Click any section to jump to it.</li>
+<li><strong>Right panel</strong> — Full documentation text with syntax-highlighted headings and code blocks.</li>
+<li><strong>Search bar</strong> — Type a keyword and press Find. All matches are highlighted in yellow. Click Clear to reset.</li>
+</ul>
+<p><strong>Sections covered:</strong></p>
+<ul>
+<li>Display Emulator (all tools, saving, loading, send to Pico)</li>
+<li>Serial Monitor (connecting, sending, special buttons, log saving)</li>
+<li>Flash Firmware (BOOTSEL steps, build buttons)</li>
+<li>Assets (browse, preview, delete)</li>
+<li>GPIO Pins (pin assignments)</li>
+<li>Connection Utility (USB and Wi-Fi)</li>
+<li>Keyboard Shortcuts</li>
+<li>File Formats (PBM, BIN, PNG with byte layout)</li>
+<li>Troubleshooting (common errors and fixes)</li>
+</ul>
+<p>This tab means you never need to leave the DevTool to look up how something works.</p>
+<hr />
+<h2 id="file-formats">File Formats<a class="headerlink" href="#file-formats" title="Permanent link">&para;</a></h2>
+<h3 id="pbm-portable-bitmap-p4-binary">PBM (Portable Bitmap — P4 Binary)<a class="headerlink" href="#pbm-portable-bitmap-p4-binary" title="Permanent link">&para;</a></h3>
+<p>Standard 1-bit image format. Header followed by packed binary data.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>P4
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>250 122
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>&lt;binary data: ceil(250/8) * 122 = 3904 bytes&gt;
+</span></code></pre></div>
+<p>Each byte holds 8 pixels, MSB = leftmost pixel. <code>1</code> = black, <code>0</code> = white.</p>
+<h3 id="bin-raw-display-buffer">BIN (Raw Display Buffer)<a class="headerlink" href="#bin-raw-display-buffer" title="Permanent link">&para;</a></h3>
+<p>No header — just the raw packed bytes in the same format the Waveshare display driver uses.</p>
+<ul>
+<li>Byte width: <code>ceil(250/8)</code> = 32 bytes per row</li>
+<li>Total: 32 × 122 = 3,904 bytes</li>
+<li>Bit order: MSB first within each byte</li>
+<li><code>1</code> = black pixel, <code>0</code> = white pixel</li>
+</ul>
+<p>To use in C code on the Pico W:</p>
+<div class="language-c highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Load from filesystem or embed as a const array</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">image_data</span><span class="p">[</span><span class="mi">3904</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* bin file contents */</span><span class="w"> </span><span class="p">};</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">EPD_2in13_V3_Display</span><span class="p">(</span><span class="n">image_data</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="png-portable-network-graphics">PNG (Portable Network Graphics)<a class="headerlink" href="#png-portable-network-graphics" title="Permanent link">&para;</a></h3>
+<p>Standard PNG format, 250×122 pixels, 1-bit depth. Requires Pillow to export. Can be opened in any image viewer or editor.</p>
+<hr />
+<h2 id="architecture-overview">Architecture Overview<a class="headerlink" href="#architecture-overview" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>DevTool/
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    devtool.py          # Single-file application (~2800 lines)
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    requirements.txt    # Python dependencies
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    README.md           # Full documentation
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>assets/                 # Saved display images (created automatically)
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    *.pbm               # PBM binary 1-bit images
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    *.bin               # Raw display buffer bytes
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    *.png               # PNG exports (if Pillow available)
+</span></code></pre></div>
+<h3 id="class-structure">Class Structure<a class="headerlink" href="#class-structure" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Parent</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DilderDevTool</code></td>
+<td><code>tk.Tk</code></td>
+<td>Main application window, notebook tabs, log bar</td>
+</tr>
+<tr>
+<td><code>DisplayEmulator</code></td>
+<td><code>ttk.Frame</code></td>
+<td>E-ink canvas, drawing tools, save/load/send</td>
+</tr>
+<tr>
+<td><code>SerialMonitor</code></td>
+<td><code>ttk.Frame</code></td>
+<td>Serial connection, read thread, output display</td>
+</tr>
+<tr>
+<td><code>FlashUtility</code></td>
+<td><code>ttk.Frame</code></td>
+<td>UF2 selection, BOOTSEL detection, flash copy</td>
+</tr>
+<tr>
+<td><code>AssetManager</code></td>
+<td><code>ttk.Frame</code></td>
+<td>File list, preview canvas, delete/open</td>
+</tr>
+<tr>
+<td><code>PinViewer</code></td>
+<td><code>ttk.Frame</code></td>
+<td>Static GPIO reference text</td>
+</tr>
+<tr>
+<td><code>ConnectionUtility</code></td>
+<td><code>ttk.Frame</code></td>
+<td>USB/Wi-Fi setup walkthrough with live checks</td>
+</tr>
+<tr>
+<td><code>DocumentationTab</code></td>
+<td><code>ttk.Frame</code></td>
+<td>Searchable built-in documentation with TOC sidebar</td>
+</tr>
+<tr>
+<td><code>ProgramsTab</code></td>
+<td><code>ttk.Frame</code></td>
+<td>Animated programs and quick deploy buttons</td>
+</tr>
+</tbody>
+</table>
+<h3 id="threading">Threading<a class="headerlink" href="#threading" title="Permanent link">&para;</a></h3>
+<p>The serial monitor runs a background daemon thread (<code>_read_loop</code>) that continuously reads from the serial port. All UI updates from the thread go through <code>winfo_toplevel().after(0, callback)</code> to stay on the Tkinter main thread.</p>
+<p>Build operations in the flash utility and serial send also run in background threads.</p>
 <hr />
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Symptom</th>
-<th>Check</th>
+<th>Problem</th>
+<th>Solution</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>MicroPico shows "No Pico connected"</td>
-<td>USB cable plugged in? Data cable (not charge-only)? Check <code>ls /dev/ttyACM*</code></td>
+<td><code>ModuleNotFoundError: No module named 'tkinter'</code></td>
+<td>Install Tk: <code>sudo pacman -S tk</code> (Arch) or <code>sudo apt install python3-tk</code> (Debian)</td>
 </tr>
 <tr>
-<td>Permission denied on <code>/dev/ttyACM0</code></td>
-<td>Add user to <code>dialout</code> group, then log out and back in</td>
+<td><code>ModuleNotFoundError: No module named 'serial'</code></td>
+<td><code>pip install pyserial</code> (not <code>serial</code> — that's a different package)</td>
 </tr>
 <tr>
-<td>REPL unresponsive</td>
-<td>Press <code>Ctrl+C</code> to interrupt running code, or <code>Ctrl+D</code> to soft-reset</td>
+<td>Text tool renders blocks instead of letters</td>
+<td>Install Pillow: <code>pip install Pillow</code></td>
 </tr>
 <tr>
-<td>Upload fails</td>
-<td>Close any other serial connections (screen, minicom) — only one program can use the serial port</td>
+<td>Serial monitor can't connect</td>
+<td>Check that the Pico W is plugged in and running firmware. Verify with <code>ls /dev/ttyACM*</code>. Check serial group membership.</td>
 </tr>
 <tr>
-<td>MicroPython autocomplete not working</td>
-<td>Install the <code>micropython-stubs</code> package and configure <code>python.analysis.extraPaths</code></td>
+<td>No serial ports in dropdown</td>
+<td>Click Refresh. If still empty, the Pico W may be in BOOTSEL mode or not connected.</td>
 </tr>
 <tr>
-<td>File not found on Pico after upload</td>
-<td>Check <code>micropico.syncFolder</code> setting — it may be uploading from the wrong directory</td>
+<td>Flash button says "not detected"</td>
+<td>Put the Pico W in BOOTSEL mode: unplug, hold BOOTSEL, plug in, release. Then click Detect.</td>
+</tr>
+<tr>
+<td>Build buttons fail</td>
+<td>Verify <code>PICO_SDK_PATH</code> is set and <code>arm-none-eabi-gcc</code> is installed. Run <code>python3 setup.py --status</code> to check.</td>
+</tr>
+<tr>
+<td>Canvas drawing is slow</td>
+<td>The canvas uses individual rectangles per pixel at 3× scale. For large fills, there may be brief lag — this is a Tkinter limitation, not a bug.</td>
+</tr>
+<tr>
+<td>PNG save/load not working</td>
+<td>Install Pillow: <code>pip install Pillow</code>. PBM and BIN formats work without it.</td>
 </tr>
 </tbody>
 </table>
@@ -2743,7 +3442,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../display-setup/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Display Setup">
+          <a href="../../software/project-structure/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Project Structure">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2753,20 +3452,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Display Setup
+                Project Structure
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../software/project-structure/" class="md-footer__link md-footer__link--next" aria-label="Next: Project Structure">
+          <a href="../setup-cli/" class="md-footer__link md-footer__link--next" aria-label="Next: Setup CLI">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Project Structure
+                Setup CLI
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -12,13 +12,13 @@
         <meta name="author" content="rompasaurus">
       
       
-        <link rel="canonical" href="https://dilder.dev/docs/hardware/enclosure-design/">
+        <link rel="canonical" href="https://dilder.dev/docs/tools/website-dev/">
       
       
-        <link rel="prev" href="../wiring-pinout/">
+        <link rel="prev" href="../setup-cli/">
       
       
-        <link rel="next" href="../../setup/first-time-setup/">
+        <link rel="next" href="../../reference/pico-w/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Enclosure Design - Dilder</title>
+        <title>Website Dev CLI - Dilder</title>
       
     
     
@@ -92,7 +92,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#enclosure-design" class="md-skip">
+        <a href="#website-dev-cli" class="md-skip">
           Skip to content
         </a>
       
@@ -126,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Enclosure Design
+              Website Dev CLI
             
           </span>
         </div>
@@ -873,8 +873,6 @@
                 
   
   
-    
-  
   
   
     
@@ -890,11 +888,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
           <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
@@ -915,7 +913,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -933,7 +931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../materials-list/" class="md-nav__link">
+      <a href="../../hardware/materials-list/" class="md-nav__link">
         
   
   
@@ -961,7 +959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../wiring-pinout/" class="md-nav__link">
+      <a href="../../hardware/wiring-pinout/" class="md-nav__link">
         
   
   
@@ -986,37 +984,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Enclosure Design
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../hardware/enclosure-design/" class="md-nav__link">
         
   
   
@@ -1032,120 +1003,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#form-factor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Form Factor
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Form Factor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#v1-initial-rough-layout" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1 — Initial rough layout
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v2-dimension-accurate-revision-current-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v2 — Dimension-accurate revision (current reference)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v2-dimensions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v2 Dimensions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#component-dimensions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Component Dimensions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#design-constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Design Constraints
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#material-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Material Options
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#future-revisions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Future Revisions
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1429,6 +1286,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1444,11 +1303,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" checked>
         
           
           <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
@@ -1469,7 +1328,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1487,7 +1346,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tools/devtool/" class="md-nav__link">
+      <a href="../devtool/" class="md-nav__link">
         
   
   
@@ -1515,7 +1374,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tools/setup-cli/" class="md-nav__link">
+      <a href="../setup-cli/" class="md-nav__link">
         
   
   
@@ -1540,10 +1399,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../tools/website-dev/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Website Dev CLI
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1559,6 +1445,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interactive-menu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interactive Menu
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typical-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typical Workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2038,49 +1988,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#form-factor" class="md-nav__link">
+  <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Form Factor
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Form Factor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#v1-initial-rough-layout" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1 — Initial rough layout
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v2-dimension-accurate-revision-current-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v2 — Dimension-accurate revision (current reference)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v2-dimensions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v2 Dimensions
+        Usage
       
     </span>
   </a>
@@ -2088,10 +1999,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#component-dimensions" class="md-nav__link">
+  <a href="#commands" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Component Dimensions
+        Commands
       
     </span>
   </a>
@@ -2099,10 +2010,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#design-constraints" class="md-nav__link">
+  <a href="#interactive-menu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Design Constraints
+        Interactive Menu
       
     </span>
   </a>
@@ -2110,21 +2021,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#material-options" class="md-nav__link">
+  <a href="#typical-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Material Options
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#future-revisions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Future Revisions
+        Typical Workflow
       
     </span>
   </a>
@@ -2151,177 +2051,81 @@
   
 
 
-<h1 id="enclosure-design">Enclosure Design<a class="headerlink" href="#enclosure-design" title="Permanent link">&para;</a></h1>
-<p>Design specifications and constraints for the Dilder 3D-printed case.</p>
-<blockquote>
-<p><strong>Note:</strong> Enclosure design is deferred until Phase 5/6, when the final board (Pico W or Pi Zero) is confirmed. The current prototype lives on a breadboard. These specs are initial concepts based on the Pi Zero + HAT form factor and will be revised.</p>
-</blockquote>
+<h1 id="website-dev-cli">Website Dev CLI<a class="headerlink" href="#website-dev-cli" title="Permanent link">&para;</a></h1>
+<p>A Python CLI for managing the MkDocs Material documentation site. Handles virtual environment setup, local development server, builds, and deployment — with an interactive menu or direct command invocation.</p>
 <hr />
-<h2 id="form-factor">Form Factor<a class="headerlink" href="#form-factor" title="Permanent link">&para;</a></h2>
-<p><strong>Style:</strong> Landscape rectangle — "iPod Nano" layout with display dominating the left face and a compact button cluster on the right.</p>
-<p><strong>Concept renders:</strong></p>
-<h3 id="v1-initial-rough-layout">v1 — Initial rough layout<a class="headerlink" href="#v1-initial-rough-layout" title="Permanent link">&para;</a></h3>
-<p><img alt="Prototype v1 concept render" src="../../../assets/images/prototype-v1.svg" /></p>
-<h3 id="v2-dimension-accurate-revision-current-reference">v2 — Dimension-accurate revision (current reference)<a class="headerlink" href="#v2-dimension-accurate-revision-current-reference" title="Permanent link">&para;</a></h3>
-<p><img alt="Prototype v2 concept render" src="../../../assets/images/prototype-v2.svg" /></p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>website/
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python3<span class="w"> </span>dev.py<span class="w">              </span><span class="c1"># interactive arrow-key menu</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>python3<span class="w"> </span>dev.py<span class="w"> </span>&lt;command&gt;<span class="w">    </span><span class="c1"># direct invocation</span>
+</span></code></pre></div>
+<p>No external dependencies — runs on Python 3.9+ standard library. MkDocs and its dependencies are installed into an isolated virtual environment by the <code>install</code> command.</p>
 <hr />
-<h2 id="v2-dimensions">v2 Dimensions<a class="headerlink" href="#v2-dimensions" title="Permanent link">&para;</a></h2>
+<h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Metric</th>
-<th>Value</th>
+<th>Command</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Case outer dimensions</td>
-<td>88 × 34 × 19mm</td>
+<td><code>install</code></td>
+<td>Create Python venv and install MkDocs Material + all dependencies</td>
 </tr>
 <tr>
-<td>Display window cutout</td>
-<td>57 × 27mm</td>
+<td><code>serve</code></td>
+<td>Start local dev server with hot-reload on <code>localhost:8000</code></td>
 </tr>
 <tr>
-<td>Active pixel area</td>
-<td>48.55 × 23.71mm (250×122 px)</td>
+<td><code>build</code></td>
+<td>Build static site to <code>site/</code> directory</td>
 </tr>
 <tr>
-<td>Button cluster width</td>
-<td>~22mm</td>
+<td><code>deploy</code></td>
+<td>Deploy to GitHub Pages via <code>mkdocs gh-deploy</code></td>
 </tr>
 <tr>
-<td>Button center-to-center</td>
-<td>~10mm</td>
+<td><code>clean</code></td>
+<td>Remove the <code>site/</code> build output</td>
 </tr>
 <tr>
-<td>Display face coverage</td>
-<td>51%</td>
+<td><code>check</code></td>
+<td>Verify prerequisites (Python 3.10+, <code>mkdocs.yml</code> exists)</td>
 </tr>
 <tr>
-<td>Button face coverage</td>
-<td>12%</td>
-</tr>
-<tr>
-<td>Display-to-button ratio</td>
-<td>4.3 : 1</td>
-</tr>
-<tr>
-<td>Estimated weight</td>
-<td>~45g bare / ~65g with battery</td>
-</tr>
-<tr>
-<td>Size reference</td>
-<td>Slightly wider than a credit card, ~2/3 the height</td>
+<td><code>status</code></td>
+<td>Show environment status (venv, installed packages, build state)</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="component-dimensions">Component Dimensions<a class="headerlink" href="#component-dimensions" title="Permanent link">&para;</a></h2>
-<p>Sourced from official datasheets and measured hardware.</p>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Dimension</th>
-<th>Source</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Pico W board</td>
-<td>51 × 21 × 3.9mm</td>
-<td>Pico W datasheet</td>
-</tr>
-<tr>
-<td>Pi Zero board (future)</td>
-<td>65 × 30 × 5mm</td>
-<td>Official Raspberry Pi spec</td>
-</tr>
-<tr>
-<td>Waveshare HAT board</td>
-<td>65 × 30.2mm</td>
-<td>Waveshare specification</td>
-</tr>
-<tr>
-<td>Display glass outline</td>
-<td>59.2 × 29.2 × 1.05mm</td>
-<td>V3 specification PDF</td>
-</tr>
-<tr>
-<td>Display active area</td>
-<td>48.55 × 23.71mm</td>
-<td>V3 specification PDF</td>
-</tr>
-<tr>
-<td>Dot pitch</td>
-<td>0.194 × 0.194mm</td>
-<td>V3 specification PDF</td>
-</tr>
-<tr>
-<td>6×6mm tactile button</td>
-<td>6 × 6 × 4.3–9.5mm</td>
-<td>Standard spec</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition note">
-<p class="admonition-title">Pico W is smaller</p>
-<p>The Pico W (51 × 21mm) is significantly smaller than the Pi Zero (65 × 30mm). If the final build uses the Pico W, the enclosure could be more compact — but the display board (65 × 30.2mm) is still the space-limiting factor.</p>
-</div>
-<hr />
-<h2 id="design-constraints">Design Constraints<a class="headerlink" href="#design-constraints" title="Permanent link">&para;</a></h2>
-<p>These constraints must be satisfied by any enclosure design:</p>
-<ol>
-<li><strong>Display cutout:</strong> 57 × 27mm with 1mm case lip overlap around display glass</li>
-<li><strong>Button holes:</strong> 5× circular apertures, ~7mm diameter, d-pad cross pattern with ~10mm center-to-center</li>
-<li><strong>USB access:</strong> Micro-USB slot on edge (power and data during development)</li>
-<li><strong>Assembly:</strong> 2-piece shell (top + bottom), 4× M2 corner screws</li>
-<li><strong>Shell seam:</strong> Horizontal split at case midpoint</li>
-<li><strong>Battery bay:</strong> Reserved space for LiPo battery (later phase)</li>
-<li><strong>Ventilation:</strong> Slot vents on back panel</li>
-</ol>
-<hr />
-<h2 id="material-options">Material Options<a class="headerlink" href="#material-options" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Material</th>
-<th>Pros</th>
-<th>Cons</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>PLA</td>
-<td>Easy to print, good detail, cheap</td>
-<td>Brittle, warps in heat</td>
-</tr>
-<tr>
-<td>PETG</td>
-<td>Tougher than PLA, better heat resistance</td>
-<td>Slightly harder to print, less detail</td>
-</tr>
-<tr>
-<td>ABS</td>
-<td>Good mechanical properties</td>
-<td>Warps badly without enclosure, fumes</td>
-</tr>
-<tr>
-<td>ASA</td>
-<td>Weather resistant, UV stable</td>
-<td>Expensive, similar print difficulty to ABS</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Recommendation for prototype:</strong> PLA. Fast to iterate, lowest barrier to getting prints done. Switch to PETG or ASA for a final build.</p>
-<hr />
-<h2 id="future-revisions">Future Revisions<a class="headerlink" href="#future-revisions" title="Permanent link">&para;</a></h2>
+<h2 id="interactive-menu">Interactive Menu<a class="headerlink" href="#interactive-menu" title="Permanent link">&para;</a></h2>
+<p>Running <code>dev.py</code> with no arguments launches an interactive menu with arrow-key navigation:</p>
 <ul>
-<li><strong>v3:</strong> Incorporate real component fits once hardware is assembled — verify display + board stack height, button stem clearance</li>
-<li><strong>v4:</strong> Add lanyard loop, finalize battery bay for specific battery model</li>
-<li><strong>Final:</strong> Choose between Pico W and Pi Zero form factor, finalize internal mount points</li>
+<li><strong>↑ / ↓</strong> — navigate between commands</li>
+<li><strong>Enter</strong> — execute the selected command</li>
+<li><strong>q</strong> — quit</li>
 </ul>
+<p>Each command shows a description footer and environment status badges. After execution, the menu returns for the next action.</p>
+<hr />
+<h2 id="typical-workflow">Typical Workflow<a class="headerlink" href="#typical-workflow" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># First time — set up the environment</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python3<span class="w"> </span>dev.py<span class="w"> </span>install
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Development — edit Markdown, preview live</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>python3<span class="w"> </span>dev.py<span class="w"> </span>serve
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Open http://localhost:8000 in your browser</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1"># Ready to publish</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>python3<span class="w"> </span>dev.py<span class="w"> </span>deploy
+</span></code></pre></div>
+<hr />
+<div class="admonition info">
+<p class="admonition-title">Source</p>
+<p>The script lives at <a href="https://github.com/rompasaurus/dilder/blob/main/website/dev.py"><code>website/dev.py</code></a>. Site configuration is in <a href="https://github.com/rompasaurus/dilder/blob/main/website/mkdocs.yml"><code>website/mkdocs.yml</code></a>.</p>
+</div>
 
 
 
@@ -2361,7 +2165,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../wiring-pinout/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Wiring &amp; Pinout">
+          <a href="../setup-cli/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Setup CLI">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2371,20 +2175,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Wiring & Pinout
+                Setup CLI
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../setup/first-time-setup/" class="md-footer__link md-footer__link--next" aria-label="Next: First-Time Setup (C SDK)">
+          <a href="../../reference/pico-w/" class="md-footer__link md-footer__link--next" aria-label="Next: Pico W">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                First-Time Setup (C SDK)
+                Pico W
               </div>
             </div>
             <div class="md-footer__button md-icon">

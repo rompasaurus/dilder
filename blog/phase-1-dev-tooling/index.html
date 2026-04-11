@@ -12,31 +12,29 @@
         <meta name="author" content="rompasaurus">
       
       
-        <link rel="canonical" href="https://dilder.dev/docs/hardware/enclosure-design/">
+        <link rel="canonical" href="https://dilder.dev/blog/phase-1-dev-tooling/">
       
       
-        <link rel="prev" href="../wiring-pinout/">
+        <link rel="prev" href="../phase-1-hardware-begins/">
       
-      
-        <link rel="next" href="../../setup/first-time-setup/">
       
       
         
       
       
-      <link rel="icon" href="../../../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Enclosure Design - Dilder</title>
+        <title>Phase 1 Continued: Dev Environment & Tooling - Dilder</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -55,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -92,7 +90,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#enclosure-design" class="md-skip">
+        <a href="#phase-1-continued-dev-environment-tooling" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +104,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="Dilder" class="md-header__button md-logo" aria-label="Dilder" data-md-component="logo">
+    <a href="../.." title="Dilder" class="md-header__button md-logo" aria-label="Dilder" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73A2 2 0 1 0 10 4c0 .74.4 1.39 1 1.73V7h-1c-3.87 0-7 3.13-7 7H2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h1v1a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2v-1h1c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1M9.7 15.45l-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45m9 0-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45"/></svg>
@@ -126,7 +124,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Enclosure Design
+              Phase 1 Continued: Dev Environment &amp; Tooling
             
           </span>
         </div>
@@ -239,7 +237,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../.." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -256,11 +254,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../../blog/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
   
@@ -276,13 +276,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../docs/" class="md-tabs__link">
           
   
   
@@ -302,7 +300,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../community/" class="md-tabs__link">
+        <a href="../../community/" class="md-tabs__link">
           
   
   
@@ -322,7 +320,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../about/" class="md-tabs__link">
+        <a href="../../about/" class="md-tabs__link">
           
   
   
@@ -340,7 +338,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../prompts/" class="md-tabs__link">
+      <a href="../../prompts/" class="md-tabs__link">
         
   
   
@@ -364,7 +362,9 @@
           
             
               
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
@@ -375,7 +375,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="Dilder" class="md-nav__button md-logo" aria-label="Dilder" data-md-component="logo">
+    <a href="../.." title="Dilder" class="md-nav__button md-logo" aria-label="Dilder" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73A2 2 0 1 0 10 4c0 .74.4 1.39 1 1.73V7h-1c-3.87 0-7 3.13-7 7H2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h1v1a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2v-1h1c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1M9.7 15.45l-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45m9 0-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45"/></svg>
@@ -405,7 +405,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -429,26 +429,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -466,7 +471,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -481,12 +486,14 @@
                 
   
   
+    
+  
   
     
   
   
-    <li class="md-nav__item">
-      <a href="../../../blog/" class="md-nav__link">
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -520,17 +527,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
         
           
-          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
             
   
   
@@ -568,7 +578,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../blog/archive/2026/" class="md-nav__link">
+      <a href="../archive/2026/" class="md-nav__link">
         
   
   
@@ -610,17 +620,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
         
           
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
             
   
   
@@ -658,7 +671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../blog/category/hardware/" class="md-nav__link">
+      <a href="../category/hardware/" class="md-nav__link">
         
   
   
@@ -688,7 +701,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../blog/category/planning/" class="md-nav__link">
+      <a href="../category/planning/" class="md-nav__link">
         
   
   
@@ -718,7 +731,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../blog/category/software/" class="md-nav__link">
+      <a href="../category/software/" class="md-nav__link">
         
   
   
@@ -748,7 +761,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../blog/category/tools/" class="md-nav__link">
+      <a href="../category/tools/" class="md-nav__link">
         
   
   
@@ -788,31 +801,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -830,7 +838,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -848,7 +856,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../" class="md-nav__link">
+      <a href="../../docs/" class="md-nav__link">
         
   
   
@@ -873,31 +881,26 @@
                 
   
   
-    
   
   
-  
     
     
     
     
       
       
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
             
   
   
@@ -915,7 +918,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -933,7 +936,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../materials-list/" class="md-nav__link">
+      <a href="../../docs/hardware/materials-list/" class="md-nav__link">
         
   
   
@@ -961,7 +964,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../wiring-pinout/" class="md-nav__link">
+      <a href="../../docs/hardware/wiring-pinout/" class="md-nav__link">
         
   
   
@@ -986,37 +989,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Enclosure Design
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../docs/hardware/enclosure-design/" class="md-nav__link">
         
   
   
@@ -1032,120 +1008,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#form-factor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Form Factor
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Form Factor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#v1-initial-rough-layout" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1 — Initial rough layout
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v2-dimension-accurate-revision-current-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v2 — Dimension-accurate revision (current reference)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v2-dimensions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v2 Dimensions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#component-dimensions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Component Dimensions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#design-constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Design Constraints
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#material-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Material Options
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#future-revisions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Future Revisions
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1172,20 +1034,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
         
           
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
             
   
   
@@ -1221,7 +1080,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../setup/first-time-setup/" class="md-nav__link">
+      <a href="../../docs/setup/first-time-setup/" class="md-nav__link">
         
   
   
@@ -1249,7 +1108,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../setup/pi-zero-setup/" class="md-nav__link">
+      <a href="../../docs/setup/pi-zero-setup/" class="md-nav__link">
         
   
   
@@ -1277,7 +1136,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../setup/display-setup/" class="md-nav__link">
+      <a href="../../docs/setup/display-setup/" class="md-nav__link">
         
   
   
@@ -1305,7 +1164,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../setup/dev-environment/" class="md-nav__link">
+      <a href="../../docs/setup/dev-environment/" class="md-nav__link">
         
   
   
@@ -1347,20 +1206,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
         
           
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
             
   
   
@@ -1396,7 +1252,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../software/project-structure/" class="md-nav__link">
+      <a href="../../docs/software/project-structure/" class="md-nav__link">
         
   
   
@@ -1438,20 +1294,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
         
           
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
             
   
   
@@ -1487,7 +1340,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tools/devtool/" class="md-nav__link">
+      <a href="../../docs/tools/devtool/" class="md-nav__link">
         
   
   
@@ -1515,7 +1368,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tools/setup-cli/" class="md-nav__link">
+      <a href="../../docs/tools/setup-cli/" class="md-nav__link">
         
   
   
@@ -1543,7 +1396,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tools/website-dev/" class="md-nav__link">
+      <a href="../../docs/tools/website-dev/" class="md-nav__link">
         
   
   
@@ -1585,20 +1438,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
         
           
-          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
             
   
   
@@ -1634,7 +1484,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/pico-w/" class="md-nav__link">
+      <a href="../../docs/reference/pico-w/" class="md-nav__link">
         
   
   
@@ -1662,7 +1512,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/pi-zero-wh/" class="md-nav__link">
+      <a href="../../docs/reference/pi-zero-wh/" class="md-nav__link">
         
   
   
@@ -1690,7 +1540,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/waveshare-eink/" class="md-nav__link">
+      <a href="../../docs/reference/waveshare-eink/" class="md-nav__link">
         
   
   
@@ -1785,7 +1635,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../community/" class="md-nav__link">
+      <a href="../../community/" class="md-nav__link">
         
   
   
@@ -1813,7 +1663,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../community/discord/" class="md-nav__link">
+      <a href="../../community/discord/" class="md-nav__link">
         
   
   
@@ -1841,7 +1691,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../community/support/" class="md-nav__link">
+      <a href="../../community/support/" class="md-nav__link">
         
   
   
@@ -1928,7 +1778,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../about/" class="md-nav__link">
+      <a href="../../about/" class="md-nav__link">
         
   
   
@@ -1956,7 +1806,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../about/contact/" class="md-nav__link">
+      <a href="../../about/contact/" class="md-nav__link">
         
   
   
@@ -1991,7 +1841,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../prompts/" class="md-nav__link">
+      <a href="../../prompts/" class="md-nav__link">
         
   
   
@@ -2019,6 +1869,8 @@
             
             
               
+                
+              
               <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
@@ -2038,49 +1890,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#form-factor" class="md-nav__link">
+  <a href="#the-problem" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Form Factor
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Form Factor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#v1-initial-rough-layout" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1 — Initial rough layout
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v2-dimension-accurate-revision-current-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v2 — Dimension-accurate revision (current reference)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v2-dimensions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v2 Dimensions
+        The Problem
       
     </span>
   </a>
@@ -2088,10 +1901,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#component-dimensions" class="md-nav__link">
+  <a href="#the-setup-cli-setuppy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Component Dimensions
+        The Setup CLI (setup.py)
       
     </span>
   </a>
@@ -2099,10 +1912,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#design-constraints" class="md-nav__link">
+  <a href="#the-devtool-gui" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Design Constraints
+        The DevTool GUI
       
     </span>
   </a>
@@ -2110,10 +1923,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#material-options" class="md-nav__link">
+  <a href="#c-first-development" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Material Options
+        C-First Development
       
     </span>
   </a>
@@ -2121,10 +1934,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#future-revisions" class="md-nav__link">
+  <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Future Revisions
+        What's Next
       
     </span>
   </a>
@@ -2140,187 +1953,191 @@
             
           
           
-            <div class="md-content" data-md-component="content">
-              
-              <article class="md-content__inner md-typeset">
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
                 
-                  
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="https://avatars.githubusercontent.com/u/rompasaurus" alt="rompasaurus">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          rompasaurus
+                        
+                      </strong>
+                      <br>
+                      Builder
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2026-04-11 00:00:00+00:00" class="md-ellipsis">April 11, 2026</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../category/software/">Software</a>, 
+                              <a href="../category/tools/">Tools</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              3 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
 
 
   
   
 
 
-<h1 id="enclosure-design">Enclosure Design<a class="headerlink" href="#enclosure-design" title="Permanent link">&para;</a></h1>
-<p>Design specifications and constraints for the Dilder 3D-printed case.</p>
-<blockquote>
-<p><strong>Note:</strong> Enclosure design is deferred until Phase 5/6, when the final board (Pico W or Pi Zero) is confirmed. The current prototype lives on a breadboard. These specs are initial concepts based on the Pi Zero + HAT form factor and will be revised.</p>
-</blockquote>
-<hr />
-<h2 id="form-factor">Form Factor<a class="headerlink" href="#form-factor" title="Permanent link">&para;</a></h2>
-<p><strong>Style:</strong> Landscape rectangle — "iPod Nano" layout with display dominating the left face and a compact button cluster on the right.</p>
-<p><strong>Concept renders:</strong></p>
-<h3 id="v1-initial-rough-layout">v1 — Initial rough layout<a class="headerlink" href="#v1-initial-rough-layout" title="Permanent link">&para;</a></h3>
-<p><img alt="Prototype v1 concept render" src="../../../assets/images/prototype-v1.svg" /></p>
-<h3 id="v2-dimension-accurate-revision-current-reference">v2 — Dimension-accurate revision (current reference)<a class="headerlink" href="#v2-dimension-accurate-revision-current-reference" title="Permanent link">&para;</a></h3>
-<p><img alt="Prototype v2 concept render" src="../../../assets/images/prototype-v2.svg" /></p>
-<hr />
-<h2 id="v2-dimensions">v2 Dimensions<a class="headerlink" href="#v2-dimensions" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Metric</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Case outer dimensions</td>
-<td>88 × 34 × 19mm</td>
-</tr>
-<tr>
-<td>Display window cutout</td>
-<td>57 × 27mm</td>
-</tr>
-<tr>
-<td>Active pixel area</td>
-<td>48.55 × 23.71mm (250×122 px)</td>
-</tr>
-<tr>
-<td>Button cluster width</td>
-<td>~22mm</td>
-</tr>
-<tr>
-<td>Button center-to-center</td>
-<td>~10mm</td>
-</tr>
-<tr>
-<td>Display face coverage</td>
-<td>51%</td>
-</tr>
-<tr>
-<td>Button face coverage</td>
-<td>12%</td>
-</tr>
-<tr>
-<td>Display-to-button ratio</td>
-<td>4.3 : 1</td>
-</tr>
-<tr>
-<td>Estimated weight</td>
-<td>~45g bare / ~65g with battery</td>
-</tr>
-<tr>
-<td>Size reference</td>
-<td>Slightly wider than a credit card, ~2/3 the height</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="component-dimensions">Component Dimensions<a class="headerlink" href="#component-dimensions" title="Permanent link">&para;</a></h2>
-<p>Sourced from official datasheets and measured hardware.</p>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Dimension</th>
-<th>Source</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Pico W board</td>
-<td>51 × 21 × 3.9mm</td>
-<td>Pico W datasheet</td>
-</tr>
-<tr>
-<td>Pi Zero board (future)</td>
-<td>65 × 30 × 5mm</td>
-<td>Official Raspberry Pi spec</td>
-</tr>
-<tr>
-<td>Waveshare HAT board</td>
-<td>65 × 30.2mm</td>
-<td>Waveshare specification</td>
-</tr>
-<tr>
-<td>Display glass outline</td>
-<td>59.2 × 29.2 × 1.05mm</td>
-<td>V3 specification PDF</td>
-</tr>
-<tr>
-<td>Display active area</td>
-<td>48.55 × 23.71mm</td>
-<td>V3 specification PDF</td>
-</tr>
-<tr>
-<td>Dot pitch</td>
-<td>0.194 × 0.194mm</td>
-<td>V3 specification PDF</td>
-</tr>
-<tr>
-<td>6×6mm tactile button</td>
-<td>6 × 6 × 4.3–9.5mm</td>
-<td>Standard spec</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition note">
-<p class="admonition-title">Pico W is smaller</p>
-<p>The Pico W (51 × 21mm) is significantly smaller than the Pi Zero (65 × 30mm). If the final build uses the Pico W, the enclosure could be more compact — but the display board (65 × 30.2mm) is still the space-limiting factor.</p>
-</div>
-<hr />
-<h2 id="design-constraints">Design Constraints<a class="headerlink" href="#design-constraints" title="Permanent link">&para;</a></h2>
-<p>These constraints must be satisfied by any enclosure design:</p>
+<h1 id="phase-1-continued-dev-environment-tooling">Phase 1 Continued: Dev Environment &amp; Tooling<a class="headerlink" href="#phase-1-continued-dev-environment-tooling" title="Permanent link">&para;</a></h1>
+<p>The hardware is wired up and running C firmware. Now we need proper tooling to make development sustainable. This post covers the setup CLI, DevTool GUI, and the workflow they enable.</p>
+<!-- more -->
+
+<h2 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link">&para;</a></h2>
+<p>Getting a Pico W development environment working from scratch involves a dozen steps: installing the ARM cross-compiler, cloning the Pico SDK, configuring environment variables, setting serial port permissions, building with CMake, flashing via BOOTSEL, and verifying output. Miss one step and you're debugging your toolchain instead of writing firmware.</p>
+<p>We needed two things:</p>
 <ol>
-<li><strong>Display cutout:</strong> 57 × 27mm with 1mm case lip overlap around display glass</li>
-<li><strong>Button holes:</strong> 5× circular apertures, ~7mm diameter, d-pad cross pattern with ~10mm center-to-center</li>
-<li><strong>USB access:</strong> Micro-USB slot on edge (power and data during development)</li>
-<li><strong>Assembly:</strong> 2-piece shell (top + bottom), 4× M2 corner screws</li>
-<li><strong>Shell seam:</strong> Horizontal split at case midpoint</li>
-<li><strong>Battery bay:</strong> Reserved space for LiPo battery (later phase)</li>
-<li><strong>Ventilation:</strong> Slot vents on back panel</li>
+<li><strong>A repeatable setup process</strong> — so anyone can go from zero to "Hello World on the display" without guesswork</li>
+<li><strong>A development companion</strong> — so day-to-day work (serial debugging, display preview, firmware flashing) doesn't require juggling terminal windows and external tools</li>
 </ol>
-<hr />
-<h2 id="material-options">Material Options<a class="headerlink" href="#material-options" title="Permanent link">&para;</a></h2>
+<h2 id="the-setup-cli-setuppy">The Setup CLI (<code>setup.py</code>)<a class="headerlink" href="#the-setup-cli-setuppy" title="Permanent link">&para;</a></h2>
+<p>An interactive Python script that walks through 14 steps in two checkpoints:</p>
+<ul>
+<li><strong>Checkpoint 1 (Steps 1–9):</strong> Serial Hello World — verifies the toolchain end-to-end without any display wiring</li>
+<li><strong>Checkpoint 2 (Steps 10–14):</strong> Display Hello World — connects the Waveshare and gets pixels on screen</li>
+</ul>
+<p>The script auto-detects your Linux distribution (Arch uses <code>uucp</code> for serial groups, Debian uses <code>dialout</code>), finds the <code>RPI-RP2</code> BOOTSEL mount point even when automount is slow, and captures CMake/Ninja build errors cleanly.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python3<span class="w"> </span>setup.py<span class="w">              </span><span class="c1"># interactive walkthrough</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python3<span class="w"> </span>setup.py<span class="w"> </span>--status<span class="w">     </span><span class="c1"># see what&#39;s done</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>python3<span class="w"> </span>setup.py<span class="w"> </span>--step<span class="w"> </span><span class="m">7</span><span class="w">     </span><span class="c1"># jump to a specific step</span>
+</span></code></pre></div>
+<p><a class="md-button" href="../../docs/tools/setup-cli/">Setup CLI docs <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
+<h2 id="the-devtool-gui">The DevTool GUI<a class="headerlink" href="#the-devtool-gui" title="Permanent link">&para;</a></h2>
+<p>A Tkinter application with seven tabs:</p>
 <table>
 <thead>
 <tr>
-<th>Material</th>
-<th>Pros</th>
-<th>Cons</th>
+<th>Tab</th>
+<th>What it does</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>PLA</td>
-<td>Easy to print, good detail, cheap</td>
-<td>Brittle, warps in heat</td>
+<td>Display Emulator</td>
+<td>250×122 canvas with pencil, eraser, line, rect, and text tools. Save to PBM/BIN/PNG or send directly to the Pico</td>
 </tr>
 <tr>
-<td>PETG</td>
-<td>Tougher than PLA, better heat resistance</td>
-<td>Slightly harder to print, less detail</td>
+<td>Serial Monitor</td>
+<td>Threaded USB serial terminal with auto-detect, command input, and log saving</td>
 </tr>
 <tr>
-<td>ABS</td>
-<td>Good mechanical properties</td>
-<td>Warps badly without enclosure, fumes</td>
+<td>Flash Firmware</td>
+<td>One-click UF2 flashing with BOOTSEL detection and CMake build integration</td>
 </tr>
 <tr>
-<td>ASA</td>
-<td>Weather resistant, UV stable</td>
-<td>Expensive, similar print difficulty to ABS</td>
+<td>Asset Manager</td>
+<td>Browse and preview saved display images</td>
+</tr>
+<tr>
+<td>GPIO Pin Reference</td>
+<td>Static Pico W pinout diagram</td>
+</tr>
+<tr>
+<td>Connection Utility</td>
+<td>USB and Wi-Fi setup walkthroughs with live verification checks</td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td>Searchable built-in docs with TOC sidebar</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Recommendation for prototype:</strong> PLA. Fast to iterate, lowest barrier to getting prints done. Switch to PETG or ASA for a final build.</p>
-<hr />
-<h2 id="future-revisions">Future Revisions<a class="headerlink" href="#future-revisions" title="Permanent link">&para;</a></h2>
+<p>The display emulator is the killer feature — design exactly what will appear on the e-ink screen, test it visually, then push it to the device. No more guessing whether your pixel coordinates are right.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>DevTool/
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>python3<span class="w"> </span>devtool.py
+</span></code></pre></div>
+<p><a class="md-button" href="../../docs/tools/devtool/">DevTool docs <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
+<h2 id="c-first-development">C-First Development<a class="headerlink" href="#c-first-development" title="Permanent link">&para;</a></h2>
+<p>An important decision: this project runs C on the Pico W, not MicroPython. The reasons:</p>
 <ul>
-<li><strong>v3:</strong> Incorporate real component fits once hardware is assembled — verify display + board stack height, button stem clearance</li>
-<li><strong>v4:</strong> Add lanyard loop, finalize battery bay for specific battery model</li>
-<li><strong>Final:</strong> Choose between Pico W and Pi Zero form factor, finalize internal mount points</li>
+<li><strong>Speed</strong> — direct hardware control without an interpreter layer</li>
+<li><strong>Flash efficiency</strong> — MicroPython firmware uses ~700KB of the 2MB flash; C leaves nearly the full 2MB for code and assets</li>
+<li><strong>Learning value</strong> — the whole point is to learn embedded development properly</li>
+</ul>
+<p>The <code>dev-setup/</code> folder contains two Hello World projects:</p>
+<ul>
+<li><code>hello-world-serial/</code> — LED blink + serial heartbeat (verifies toolchain)</li>
+<li><code>hello-world/</code> — text on the e-ink display (verifies full hardware chain)</li>
+</ul>
+<p>Both compile with CMake + Ninja and flash via UF2 copy to BOOTSEL.</p>
+<h2 id="whats-next">What's Next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<p>Phase 1 goals are nearly complete — hardware is wired, firmware compiles and runs, tooling is in place. Next up:</p>
+<ul>
+<li>Verify all 5 button inputs on the breadboard</li>
+<li>Display a custom image as proof-of-life</li>
+<li>Begin Phase 2: firmware scaffold with game loop, pet state machine, and sprite system</li>
 </ul>
 
 
@@ -2329,17 +2146,22 @@
 
 
 
+  
+  
+
+
+
+  
 
 
   
 
 
 
+      
+    </article>
+  </div>
 
-                
-              </article>
-            </div>
-          
           
   <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 
@@ -2358,10 +2180,12 @@
   
     
       
+        
+      
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../wiring-pinout/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Wiring &amp; Pinout">
+          <a href="../phase-1-hardware-begins/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Phase 1: Hardware — Pico W + E-Ink, Let&#39;s Go">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2371,27 +2195,11 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Wiring & Pinout
+                Phase 1: Hardware — Pico W + E-Ink, Let's Go
               </div>
             </div>
           </a>
         
-        
-          
-          <a href="../../setup/first-time-setup/" class="md-footer__link md-footer__link--next" aria-label="Next: First-Time Setup (C SDK)">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                First-Time Setup (C SDK)
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
         
       </nav>
     
@@ -2458,10 +2266,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
