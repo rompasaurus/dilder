@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -1027,7 +1027,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1252,6 +1252,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../docs/reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../docs/reference/pi-zero-wh/" class="md-nav__link">
         
   
@@ -1259,7 +1287,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1675,10 +1703,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pi-zero-wh" class="md-nav__link">
+  <a href="#pico-w-first-pi-zero-later" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pi Zero WH
+        Pico W First, Pi Zero Later
       
     </span>
   </a>
@@ -1687,6 +1715,17 @@
         
           <li class="md-nav__item">
   <a href="#tactile-buttons-over-capacitive-touch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tactile Buttons Over Capacitive Touch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tactile-buttons-over-capacitive-touch_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Tactile Buttons Over Capacitive Touch
@@ -1844,7 +1883,7 @@
 <h2 id="what-phase-0-covered">What Phase 0 Covered<a class="headerlink" href="#what-phase-0-covered" title="Permanent link">&para;</a></h2>
 <p>Phase 0 was purely planning. No hardware ordered, no code written. Just research and documentation:</p>
 <ul>
-<li><strong>Hardware research</strong> — identifying the right display (Waveshare 2.13" e-ink), compute (Pi Zero WH), and input options (tactile buttons)</li>
+<li><strong>Hardware research</strong> — identifying the right display (Waveshare 2.13" e-ink), compute (starting with Pico W, Pi Zero WH later), and input options (tactile buttons)</li>
 <li><strong>Enclosure concepts</strong> — rough proportions, button layout, display-to-case ratio</li>
 <li><strong>Project structure</strong> — phases, documentation format, GitHub repo</li>
 <li><strong>Website and community planning</strong> — this site, Discord, Patreon</li>
@@ -1858,21 +1897,16 @@
 <li><strong>Aesthetic</strong> — the Tamagotchi style aesthetic benefits from a high-contrast, "paper" look</li>
 <li><strong>Tradeoff</strong> — 2-second full refresh, 0.3-second partial refresh. Animation is possible but limited.</li>
 </ul>
-<h3 id="pi-zero-wh">Pi Zero WH<a class="headerlink" href="#pi-zero-wh" title="Permanent link">&para;</a></h3>
-<p>The Pi Zero WH was chosen over a custom MCU (Arduino, ESP32) because:</p>
-<ul>
-<li>Python ecosystem makes firmware prototyping fast</li>
-<li>The Waveshare HAT plugs directly onto the 40-pin header</li>
-<li>WiFi built in for remote development workflow</li>
-<li>More processing headroom for a future personality/AI system</li>
-</ul>
-<p>The "WH" variant is critical — pre-soldered headers. Without it you'd need to solder the 40-pin header yourself.</p>
+<h3 id="pico-w-first-pi-zero-later">Pico W First, Pi Zero Later<a class="headerlink" href="#pico-w-first-pi-zero-later" title="Permanent link">&para;</a></h3>
+<p>Development starts on the <strong>Raspberry Pi Pico W</strong> — it's what we have on hand, it's cheap (~€6), and it's ideal for prototyping the display and input system with MicroPython. Instant boot, simple USB workflow, no OS to configure.</p>
+<p>The <strong>Pi Zero WH</strong> is planned for Phase 5 when we need Linux, a filesystem, networking features, or more compute for a personality/AI system. The display and button wiring is nearly identical between the two boards.</p>
 <h3 id="tactile-buttons-over-capacitive-touch">Tactile Buttons Over Capacitive Touch<a class="headerlink" href="#tactile-buttons-over-capacitive-touch" title="Permanent link">&para;</a></h3>
+<h3 id="tactile-buttons-over-capacitive-touch_1">Tactile Buttons Over Capacitive Touch<a class="headerlink" href="#tactile-buttons-over-capacitive-touch_1" title="Permanent link">&para;</a></h3>
 <p>Five discrete 6×6mm tactile buttons (up, down, left, right, center/select) beat capacitive touch for a first prototype because:</p>
 <ul>
 <li>Breadboard-friendly — no soldering required for the test bench</li>
 <li>Tactile feedback matters for a game device</li>
-<li>Zero additional components needed (Pi's internal pull-ups handle everything)</li>
+<li>Zero additional components needed (Pico W's internal pull-ups handle everything)</li>
 </ul>
 <h2 id="prototype-concept">Prototype Concept<a class="headerlink" href="#prototype-concept" title="Permanent link">&para;</a></h2>
 <p>The enclosure concept settled on an "iPod Nano" style layout — landscape rectangle, display on the left covering ~75% of the face, compact d-pad cluster on the right.</p>
@@ -1901,7 +1935,7 @@
 </table>
 <p><a href="../../docs/hardware/enclosure-design/">See the hardware docs for full enclosure specs</a></p>
 <h2 id="whats-next">What's Next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
-<p>Phase 1 is hardware assembly. The components are ordered. The goal: power on the Pi, attach the display HAT, wire up buttons on a breadboard, and get something — anything — to show on the screen.</p>
+<p>Phase 1 is hardware assembly. The Pico W and e-ink display are on the bench. The goal: flash MicroPython, wire up the display and buttons on a breadboard, and get something — anything — to show on the screen.</p>
 <p>When the display shows its first pixel, Phase 1 is done.</p>
 
 
@@ -1950,13 +1984,13 @@
         
         
           
-          <a href="../phase-1-hardware-begins/" class="md-footer__link md-footer__link--next" aria-label="Next: Phase 1: Hardware — Components Ordered, Test Bench Planned">
+          <a href="../phase-1-hardware-begins/" class="md-footer__link md-footer__link--next" aria-label="Next: Phase 1: Hardware — Pico W + E-Ink, Let&#39;s Go">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Phase 1: Hardware — Components Ordered, Test Bench Planned
+                Phase 1: Hardware — Pico W + E-Ink, Let's Go
               </div>
             </div>
             <div class="md-footer__button md-icon">

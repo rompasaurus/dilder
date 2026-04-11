@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -1168,7 +1168,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1399,6 +1399,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/pi-zero-wh/" class="md-nav__link">
         
   
@@ -1406,7 +1434,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1890,6 +1918,9 @@
 
 <h1 id="enclosure-design">Enclosure Design<a class="headerlink" href="#enclosure-design" title="Permanent link">&para;</a></h1>
 <p>Design specifications and constraints for the Dilder 3D-printed case.</p>
+<blockquote>
+<p><strong>Note:</strong> Enclosure design is deferred until Phase 5/6, when the final board (Pico W or Pi Zero) is confirmed. The current prototype lives on a breadboard. These specs are initial concepts based on the Pi Zero + HAT form factor and will be revised.</p>
+</blockquote>
 <hr />
 <h2 id="form-factor">Form Factor<a class="headerlink" href="#form-factor" title="Permanent link">&para;</a></h2>
 <p><strong>Style:</strong> Landscape rectangle — "iPod Nano" layout with display dominating the left face and a compact button cluster on the right.</p>
@@ -1963,7 +1994,12 @@
 </thead>
 <tbody>
 <tr>
-<td>Pi Zero board</td>
+<td>Pico W board</td>
+<td>51 × 21 × 3.9mm</td>
+<td>Pico W datasheet</td>
+</tr>
+<tr>
+<td>Pi Zero board (future)</td>
 <td>65 × 30 × 5mm</td>
 <td>Official Raspberry Pi spec</td>
 </tr>
@@ -1975,22 +2011,17 @@
 <tr>
 <td>Display glass outline</td>
 <td>59.2 × 29.2 × 1.05mm</td>
-<td>V3/V4 specification PDF</td>
+<td>V3 specification PDF</td>
 </tr>
 <tr>
 <td>Display active area</td>
 <td>48.55 × 23.71mm</td>
-<td>V3/V4 specification PDF</td>
+<td>V3 specification PDF</td>
 </tr>
 <tr>
 <td>Dot pitch</td>
 <td>0.194 × 0.194mm</td>
-<td>V3/V4 specification PDF</td>
-</tr>
-<tr>
-<td>Pi + HAT stack height</td>
-<td>~15mm (with header)</td>
-<td>Measured</td>
+<td>V3 specification PDF</td>
 </tr>
 <tr>
 <td>6×6mm tactile button</td>
@@ -1999,18 +2030,21 @@
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Pico W is smaller</p>
+<p>The Pico W (51 × 21mm) is significantly smaller than the Pi Zero (65 × 30mm). If the final build uses the Pico W, the enclosure could be more compact — but the display board (65 × 30.2mm) is still the space-limiting factor.</p>
+</div>
 <hr />
 <h2 id="design-constraints">Design Constraints<a class="headerlink" href="#design-constraints" title="Permanent link">&para;</a></h2>
 <p>These constraints must be satisfied by any enclosure design:</p>
 <ol>
 <li><strong>Display cutout:</strong> 57 × 27mm with 1mm case lip overlap around display glass</li>
 <li><strong>Button holes:</strong> 5× circular apertures, ~7mm diameter, d-pad cross pattern with ~10mm center-to-center</li>
-<li><strong>USB access:</strong> Micro-USB slot on bottom edge (power and data during development)</li>
-<li><strong>SD card access:</strong> Slot on left edge (SD card can be removed without disassembly)</li>
+<li><strong>USB access:</strong> Micro-USB slot on edge (power and data during development)</li>
 <li><strong>Assembly:</strong> 2-piece shell (top + bottom), 4× M2 corner screws</li>
-<li><strong>Shell seam:</strong> Horizontal split at case midpoint (~9.5mm from each face)</li>
-<li><strong>Battery bay:</strong> Reserved space on right side behind button PCB — 30 × 19mm footprint (Phase 6)</li>
-<li><strong>Ventilation:</strong> 5× slot vents on back panel</li>
+<li><strong>Shell seam:</strong> Horizontal split at case midpoint</li>
+<li><strong>Battery bay:</strong> Reserved space for LiPo battery (later phase)</li>
+<li><strong>Ventilation:</strong> Slot vents on back panel</li>
 </ol>
 <hr />
 <h2 id="material-options">Material Options<a class="headerlink" href="#material-options" title="Permanent link">&para;</a></h2>
@@ -2049,9 +2083,9 @@
 <hr />
 <h2 id="future-revisions">Future Revisions<a class="headerlink" href="#future-revisions" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>v3:</strong> Incorporate real component fits once hardware is in hand — verify Pi + HAT stack height, button stem height clearance</li>
-<li><strong>v4:</strong> Add lanyard loop, redesign battery bay for specific battery model</li>
-<li><strong>Final:</strong> Remove breadboard references, finalize internal PCB mount points</li>
+<li><strong>v3:</strong> Incorporate real component fits once hardware is assembled — verify display + board stack height, button stem clearance</li>
+<li><strong>v4:</strong> Add lanyard loop, finalize battery bay for specific battery model</li>
+<li><strong>Final:</strong> Choose between Pico W and Pi Zero form factor, finalize internal mount points</li>
 </ul>
 
 
@@ -2109,13 +2143,13 @@
         
         
           
-          <a href="../../setup/pi-zero-setup/" class="md-footer__link md-footer__link--next" aria-label="Next: Pi Zero Setup">
+          <a href="../../setup/pi-zero-setup/" class="md-footer__link md-footer__link--next" aria-label="Next: Pico W Setup">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Pi Zero Setup
+                Pico W Setup
               </div>
             </div>
             <div class="md-footer__button md-icon">

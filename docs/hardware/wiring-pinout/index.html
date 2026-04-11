@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -961,15 +961,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#display-wiring-hat-no-jumpers-needed" class="md-nav__link">
+  <a href="#display-wiring-jumper-wires" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Display Wiring (HAT — no jumpers needed)
+        Display Wiring (Jumper Wires)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Display Wiring (HAT — no jumpers needed)">
+    <nav class="md-nav" aria-label="Display Wiring (Jumper Wires)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1045,10 +1045,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#complete-40-pin-header-map" class="md-nav__link">
+  <a href="#pico-w-pin-map-visual" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Complete 40-Pin Header Map
+        Pico W Pin Map (Visual)
       
     </span>
   </a>
@@ -1202,7 +1202,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1433,6 +1433,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/pi-zero-wh/" class="md-nav__link">
         
   
@@ -1440,7 +1468,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1809,15 +1837,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#display-wiring-hat-no-jumpers-needed" class="md-nav__link">
+  <a href="#display-wiring-jumper-wires" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Display Wiring (HAT — no jumpers needed)
+        Display Wiring (Jumper Wires)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Display Wiring (HAT — no jumpers needed)">
+    <nav class="md-nav" aria-label="Display Wiring (Jumper Wires)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1893,10 +1921,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#complete-40-pin-header-map" class="md-nav__link">
+  <a href="#pico-w-pin-map-visual" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Complete 40-Pin Header Map
+        Pico W Pin Map (Visual)
       
     </span>
   </a>
@@ -1957,28 +1985,31 @@
 
 
 <h1 id="wiring-pinout">Wiring &amp; Pinout<a class="headerlink" href="#wiring-pinout" title="Permanent link">&para;</a></h1>
-<p>GPIO assignments and breadboard wiring for the Dilder test bench.</p>
+<p>GPIO assignments and breadboard wiring for the Dilder test bench (Pico W).</p>
 <p>Full official hardware reference docs:</p>
 <ul>
-<li><a href="../../reference/pi-zero-wh/">Raspberry Pi Zero WH reference</a></li>
+<li><a href="../../reference/pico-w/">Raspberry Pi Pico W reference</a></li>
 <li><a href="../../reference/waveshare-eink/">Waveshare 2.13" e-Paper HAT reference</a></li>
 </ul>
 <hr />
-<h2 id="display-wiring-hat-no-jumpers-needed">Display Wiring (HAT — no jumpers needed)<a class="headerlink" href="#display-wiring-hat-no-jumpers-needed" title="Permanent link">&para;</a></h2>
-<p>The Waveshare 2.13" e-Paper HAT plugs directly onto the Pi Zero's 40-pin GPIO header. No jumper wires are needed for the display.</p>
+<h2 id="display-wiring-jumper-wires">Display Wiring (Jumper Wires)<a class="headerlink" href="#display-wiring-jumper-wires" title="Permanent link">&para;</a></h2>
+<p>The Waveshare 2.13" e-Paper HAT is designed for the Pi Zero's 40-pin header, but the Pico W has a different pinout. Connect the display to the Pico W using <strong>female-to-male jumper wires</strong> from the HAT's 8-pin header.</p>
 <div class="admonition tip">
-<p class="admonition-title">HAT = Header Attachment</p>
-<p>Align pin 1 on the HAT with pin 1 on the Pi (the corner nearest the SD card slot), press down firmly until the HAT sits flush. Always power off the Pi before attaching or removing it.</p>
+<p class="admonition-title">Finding the 8-pin header</p>
+<p>The HAT has an 8-pin 2.54mm pitch header along one edge, labeled: VCC, GND, DIN, CLK, CS, DC, RST, BUSY. Use F-M jumper wires from these pins to the Pico W on your breadboard.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Power off before wiring</p>
+<p>Always disconnect USB before connecting or disconnecting jumper wires. The e-ink panel can be damaged by voltage spikes.</p>
 </div>
 <h3 id="display-pin-mapping">Display Pin Mapping<a class="headerlink" href="#display-pin-mapping" title="Permanent link">&para;</a></h3>
-<p>Sourced from the <a href="../../reference/waveshare-eink/">Waveshare official reference</a>.</p>
 <table>
 <thead>
 <tr>
 <th>e-Paper Signal</th>
 <th>Function</th>
-<th>BCM GPIO</th>
-<th>Physical Pin</th>
+<th>Pico W GPIO</th>
+<th>Pico W Pin #</th>
 <th>Direction</th>
 </tr>
 </thead>
@@ -1986,57 +2017,57 @@
 <tr>
 <td>VCC</td>
 <td>3.3V power</td>
-<td>3.3V rail</td>
-<td>1</td>
+<td>3V3(OUT)</td>
+<td>36</td>
 <td>→ display</td>
 </tr>
 <tr>
 <td>GND</td>
 <td>Ground</td>
 <td>GND</td>
-<td>6</td>
+<td>38</td>
 <td>→ display</td>
 </tr>
 <tr>
 <td>DIN</td>
 <td>SPI MOSI — pixel data</td>
-<td>GPIO 10</td>
-<td>19</td>
+<td>GP11 (SPI1 TX)</td>
+<td>15</td>
 <td>→ display</td>
 </tr>
 <tr>
 <td>CLK</td>
 <td>SPI clock</td>
-<td>GPIO 11</td>
-<td>23</td>
+<td>GP10 (SPI1 SCK)</td>
+<td>14</td>
 <td>→ display</td>
 </tr>
 <tr>
 <td>CS</td>
 <td>Chip select (active LOW)</td>
-<td>GPIO 8 (CE0)</td>
-<td>24</td>
+<td>GP9 (SPI1 CSn)</td>
+<td>12</td>
 <td>→ display</td>
 </tr>
 <tr>
 <td>DC</td>
 <td>Data / command select</td>
-<td>GPIO 25</td>
-<td>22</td>
+<td>GP8</td>
+<td>11</td>
 <td>→ display</td>
 </tr>
 <tr>
 <td>RST</td>
 <td>Reset (active LOW)</td>
-<td>GPIO 17</td>
-<td>11</td>
+<td>GP12</td>
+<td>16</td>
 <td>→ display</td>
 </tr>
 <tr>
 <td>BUSY</td>
 <td>Busy flag (HIGH = refreshing)</td>
-<td>GPIO 24</td>
-<td>18</td>
+<td>GP13</td>
+<td>17</td>
 <td>← display</td>
 </tr>
 </tbody>
@@ -2075,70 +2106,69 @@
 </table>
 <hr />
 <h2 id="button-wiring-breadboard">Button Wiring (Breadboard)<a class="headerlink" href="#button-wiring-breadboard" title="Permanent link">&para;</a></h2>
-<p>Five 6×6mm tactile buttons wired to GPIO pins using the Pi's internal pull-up resistors. No external resistors needed.</p>
+<p>Five 6×6mm tactile buttons wired to GPIO pins using the Pico W's internal pull-up resistors. No external resistors needed.</p>
 <p><strong>Per-button wiring:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Pi GPIO pin ──── button leg A
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                 button leg B ──── GND rail
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Pico GPIO pin ──── button leg A
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                   button leg B ──── GND rail
 </span></code></pre></div></p>
 <p>When the button is pressed it pulls the GPIO line LOW → software reads as pressed.</p>
 <h3 id="button-gpio-assignments">Button GPIO Assignments<a class="headerlink" href="#button-gpio-assignments" title="Permanent link">&para;</a></h3>
-<p>Sourced from the <a href="../../reference/pi-zero-wh/">Pi Zero WH GPIO reference</a> — pins chosen to avoid SPI, I²C, UART, and PWM conflicts.</p>
+<p>Pins chosen to avoid SPI1 (display) and leave SPI0 free for future use.</p>
 <table>
 <thead>
 <tr>
 <th>Button</th>
-<th>BCM GPIO</th>
-<th>Physical Pin</th>
+<th>Pico W GPIO</th>
+<th>Pico W Pin #</th>
 <th>Internal pull-up</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Up</td>
-<td>GPIO 5</td>
-<td>29</td>
+<td>GP2</td>
+<td>4</td>
 <td>Enabled in software</td>
 </tr>
 <tr>
 <td>Down</td>
-<td>GPIO 6</td>
-<td>31</td>
+<td>GP3</td>
+<td>5</td>
 <td>Enabled in software</td>
 </tr>
 <tr>
 <td>Left</td>
-<td>GPIO 13</td>
-<td>33</td>
+<td>GP4</td>
+<td>6</td>
 <td>Enabled in software</td>
 </tr>
 <tr>
 <td>Right</td>
-<td>GPIO 19</td>
-<td>35</td>
+<td>GP5</td>
+<td>7</td>
 <td>Enabled in software</td>
 </tr>
 <tr>
 <td>Center / Select</td>
-<td>GPIO 26</td>
-<td>37</td>
+<td>GP6</td>
+<td>9</td>
 <td>Enabled in software</td>
 </tr>
 </tbody>
 </table>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">RPi.GPIO</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">GPIO</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">GPIO</span><span class="o">.</span><span class="n">setmode</span><span class="p">(</span><span class="n">GPIO</span><span class="o">.</span><span class="n">BCM</span><span class="p">)</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">BUTTONS</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="s1">&#39;up&#39;</span><span class="p">:</span>     <span class="mi">5</span><span class="p">,</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="s1">&#39;down&#39;</span><span class="p">:</span>   <span class="mi">6</span><span class="p">,</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="s1">&#39;left&#39;</span><span class="p">:</span>   <span class="mi">13</span><span class="p">,</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="s1">&#39;right&#39;</span><span class="p">:</span>  <span class="mi">19</span><span class="p">,</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="s1">&#39;center&#39;</span><span class="p">:</span> <span class="mi">26</span><span class="p">,</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">}</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="k">for</span> <span class="n">pin</span> <span class="ow">in</span> <span class="n">BUTTONS</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="n">GPIO</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">pin</span><span class="p">,</span> <span class="n">GPIO</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">pull_up_down</span><span class="o">=</span><span class="n">GPIO</span><span class="o">.</span><span class="n">PUD_UP</span><span class="p">)</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">BUTTONS</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="s1">&#39;up&#39;</span><span class="p">:</span>     <span class="n">Pin</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="s1">&#39;down&#39;</span><span class="p">:</span>   <span class="n">Pin</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="s1">&#39;left&#39;</span><span class="p">:</span>   <span class="n">Pin</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="s1">&#39;right&#39;</span><span class="p">:</span>  <span class="n">Pin</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="s1">&#39;center&#39;</span><span class="p">:</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">}</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># Read a button (0 = pressed, 1 = released)</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="k">if</span> <span class="n">BUTTONS</span><span class="p">[</span><span class="s1">&#39;center&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Center pressed!&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <hr />
 <h2 id="full-gpio-pin-budget">Full GPIO Pin Budget<a class="headerlink" href="#full-gpio-pin-budget" title="Permanent link">&para;</a></h2>
@@ -2146,158 +2176,163 @@
 <thead>
 <tr>
 <th>Function</th>
-<th>BCM GPIO</th>
-<th>Physical Pin</th>
+<th>Pico W GPIO</th>
+<th>Pico W Pin #</th>
 <th>Interface</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>e-ink DC</td>
+<td>GP8</td>
+<td>11</td>
+<td>Digital out</td>
+</tr>
+<tr>
+<td>e-ink CS</td>
+<td>GP9</td>
+<td>12</td>
+<td>SPI1 CSn</td>
+</tr>
+<tr>
+<td>e-ink CLK</td>
+<td>GP10</td>
+<td>14</td>
+<td>SPI1 SCK</td>
+</tr>
+<tr>
+<td>e-ink DIN</td>
+<td>GP11</td>
+<td>15</td>
+<td>SPI1 TX</td>
+</tr>
+<tr>
+<td>e-ink RST</td>
+<td>GP12</td>
+<td>16</td>
+<td>Digital out</td>
+</tr>
+<tr>
+<td>e-ink BUSY</td>
+<td>GP13</td>
+<td>17</td>
+<td>Digital in</td>
+</tr>
+<tr>
 <td>e-ink VCC</td>
-<td>3.3V</td>
-<td>1</td>
+<td>3V3(OUT)</td>
+<td>36</td>
 <td>Power</td>
 </tr>
 <tr>
 <td>e-ink GND</td>
 <td>GND</td>
-<td>6</td>
+<td>38</td>
 <td>Ground</td>
 </tr>
 <tr>
-<td>e-ink DIN</td>
-<td>GPIO 10</td>
-<td>19</td>
-<td>SPI MOSI</td>
-</tr>
-<tr>
-<td>e-ink CLK</td>
-<td>GPIO 11</td>
-<td>23</td>
-<td>SPI SCLK</td>
-</tr>
-<tr>
-<td>e-ink CS</td>
-<td>GPIO 8</td>
-<td>24</td>
-<td>SPI CE0</td>
-</tr>
-<tr>
-<td>e-ink DC</td>
-<td>GPIO 25</td>
-<td>22</td>
-<td>Digital out</td>
-</tr>
-<tr>
-<td>e-ink RST</td>
-<td>GPIO 17</td>
-<td>11</td>
-<td>Digital out</td>
-</tr>
-<tr>
-<td>e-ink BUSY</td>
-<td>GPIO 24</td>
-<td>18</td>
-<td>Digital in</td>
-</tr>
-<tr>
 <td>Button UP</td>
-<td>GPIO 5</td>
-<td>29</td>
+<td>GP2</td>
+<td>4</td>
 <td>Digital in</td>
 </tr>
 <tr>
 <td>Button DOWN</td>
-<td>GPIO 6</td>
-<td>31</td>
+<td>GP3</td>
+<td>5</td>
 <td>Digital in</td>
 </tr>
 <tr>
 <td>Button LEFT</td>
-<td>GPIO 13</td>
-<td>33</td>
+<td>GP4</td>
+<td>6</td>
 <td>Digital in</td>
 </tr>
 <tr>
 <td>Button RIGHT</td>
-<td>GPIO 19</td>
-<td>35</td>
+<td>GP5</td>
+<td>7</td>
 <td>Digital in</td>
 </tr>
 <tr>
 <td>Button CENTER</td>
-<td>GPIO 26</td>
-<td>37</td>
+<td>GP6</td>
+<td>9</td>
 <td>Digital in</td>
 </tr>
 <tr>
 <td>Piezo buzzer (future)</td>
-<td>GPIO 12 or 18</td>
-<td>32 / 12</td>
+<td>GP15</td>
+<td>20</td>
 <td>PWM</td>
 </tr>
 <tr>
 <td><strong>Pins used</strong></td>
-<td><strong>13</strong></td>
+<td><strong>12</strong></td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td><strong>Pins free</strong></td>
-<td><strong>13+ general GPIO remaining</strong></td>
+<td><strong>14+ GPIO remaining</strong></td>
 <td></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="complete-40-pin-header-map">Complete 40-Pin Header Map<a class="headerlink" href="#complete-40-pin-header-map" title="Permanent link">&para;</a></h2>
-<p>Pins used by this project are highlighted. Full electrical specs in the <a href="../../reference/pi-zero-wh/">Pi Zero WH reference</a>.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>       3V3  [ 1] [ 2]  5V
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>     GPIO2  [ 3] [ 4]  5V
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>     GPIO3  [ 5] [ 6]  GND
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>     GPIO4  [ 7] [ 8]  GPIO14
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>       GND  [ 9] [10]  GPIO15
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>▶  GPIO17  [11] [12]  GPIO18      RST  (e-ink)
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    GPIO27  [13] [14]  GND
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    GPIO22  [15] [16]  GPIO23
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>       3V3  [17] [18]  GPIO24 ◀   BUSY (e-ink)
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>▶  GPIO10  [19] [20]  GND         DIN  (e-ink)
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>     GPIO9  [21] [22]  GPIO25 ▶   DC   (e-ink)
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>▶  GPIO11  [23] [24]  GPIO8  ▶   CLK / CS (e-ink)
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>       GND  [25] [26]  GPIO7
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>     GPIO0  [27] [28]  GPIO1
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>▶   GPIO5  [29] [30]  GND         UP   (button)
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>▶   GPIO6  [31] [32]  GPIO12
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>▶  GPIO13  [33] [34]  GND         LEFT (button)
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>▶  GPIO19  [35] [36]  GPIO16      RIGHT (button)
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>▶  GPIO26  [37] [38]  GPIO20      CENTER (button)
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>       GND  [39] [40]  GPIO21
-</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>                                   DOWN = GPIO6 (pin 31)
-</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>▶ = used by Dilder
+<h2 id="pico-w-pin-map-visual">Pico W Pin Map (Visual)<a class="headerlink" href="#pico-w-pin-map-visual" title="Permanent link">&para;</a></h2>
+<p>Pins used by this project are highlighted. Full electrical specs in the <a href="../../reference/pico-w/">Pico W reference</a>.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>               ┌───USB───┐
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>   GP0  [ 1]   │         │  [40]  VBUS
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>   GP1  [ 2]   │  PICO   │  [39]  VSYS
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>   GND  [ 3]   │    W    │  [38]  GND       ◄── e-ink GND
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>▶  GP2  [ 4]   │         │  [37]  3V3_EN
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>▶  GP3  [ 5]   │         │  [36]  3V3(OUT)  ◄── e-ink VCC
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>▶  GP4  [ 6]   │         │  [35]  ADC_VREF
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>▶  GP5  [ 7]   │         │  [34]  GP28
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>   GND  [ 8]   │         │  [33]  AGND
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>▶  GP6  [ 9]   │         │  [32]  GP27
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>   GP7  [10]   │         │  [31]  GP26
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>▶  GP8  [11]   │         │  [30]  RUN
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>▶  GP9  [12]   │         │  [29]  GP22
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>   GND  [13]   │         │  [28]  GND
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>▶ GP10  [14]   │         │  [27]  GP21
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>▶ GP11  [15]   │         │  [26]  GP20
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>▶ GP12  [16]   │         │  [25]  GP19
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>▶ GP13  [17]   │         │  [24]  GP18
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>   GND  [18]   │         │  [23]  GND
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>  GP14  [19]   │         │  [22]  GP17
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>  GP15  [20]   └─────────┘  [21]  GP16
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>▶ = used by Dilder
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>Left side (pins 4–17):  Buttons (GP2–GP6) + Display SPI (GP8–GP13)
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>Right side (pin 36):    3V3 power to display
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>Right side (pin 38):    GND to display
 </span></code></pre></div>
 <hr />
 <h2 id="wiring-diagram-text">Wiring Diagram (Text)<a class="headerlink" href="#wiring-diagram-text" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Pi Zero WH
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Pico W (on breadboard)
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>│
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├─ Pin 1  (3.3V) ──────────────── HAT VCC
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>├─ Pin 6  (GND)  ──────────────── HAT GND ── breadboard GND rail
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>├─ Pin 19 (GPIO10 / MOSI) ─────── HAT DIN
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>├─ Pin 23 (GPIO11 / SCLK) ─────── HAT CLK
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>├─ Pin 24 (GPIO8  / CE0)  ─────── HAT CS
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>├─ Pin 22 (GPIO25) ────────────── HAT DC
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>├─ Pin 11 (GPIO17) ────────────── HAT RST
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>├─ Pin 18 (GPIO24) ────────────── HAT BUSY
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├─ Pin 36 (3V3 OUT) ──────────── e-Paper VCC
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>├─ Pin 38 (GND)     ──────────── e-Paper GND ── breadboard GND rail
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>├─ Pin 15 (GP11 / SPI1 TX)  ──── e-Paper DIN
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>├─ Pin 14 (GP10 / SPI1 SCK) ──── e-Paper CLK
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>├─ Pin 12 (GP9  / SPI1 CSn) ──── e-Paper CS
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>├─ Pin 11 (GP8)  ─────────────── e-Paper DC
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>├─ Pin 16 (GP12) ─────────────── e-Paper RST
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>├─ Pin 17 (GP13) ─────────────── e-Paper BUSY
 </span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>│
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>├─ Pin 29 (GPIO5)  ─── [BTN UP]     ─── GND
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>├─ Pin 31 (GPIO6)  ─── [BTN DOWN]   ─── GND
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>├─ Pin 33 (GPIO13) ─── [BTN LEFT]   ─── GND
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>├─ Pin 35 (GPIO19) ─── [BTN RIGHT]  ─── GND
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>└─ Pin 37 (GPIO26) ─── [BTN CENTER] ─── GND
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>├─ Pin 4  (GP2)  ─── [BTN UP]     ─── GND
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>├─ Pin 5  (GP3)  ─── [BTN DOWN]   ─── GND
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>├─ Pin 6  (GP4)  ─── [BTN LEFT]   ─── GND
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>├─ Pin 7  (GP5)  ─── [BTN RIGHT]  ─── GND
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>└─ Pin 9  (GP6)  ─── [BTN CENTER] ─── GND
 </span></code></pre></div>
 <hr />
 <h2 id="spi-configuration">SPI Configuration<a class="headerlink" href="#spi-configuration" title="Permanent link">&para;</a></h2>
-<p>The e-ink display requires SPI to be enabled before use. See <a href="../../setup/pi-zero-setup/">Pi Zero Setup</a> for instructions.</p>
+<p>The e-ink display uses SPI1 on the Pico W. No kernel configuration needed — SPI is set up in MicroPython code.</p>
 <table>
 <thead>
 <tr>
@@ -2307,8 +2342,8 @@
 </thead>
 <tbody>
 <tr>
-<td>Bus</td>
-<td>SPI0 (<code>/dev/spidev0.0</code>)</td>
+<td>Controller</td>
+<td>SPI1</td>
 </tr>
 <tr>
 <td>Mode</td>
@@ -2328,10 +2363,12 @@
 </tr>
 </tbody>
 </table>
-<p>Verify SPI is active after enabling:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>ls<span class="w"> </span>/dev/spi*
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1"># Expected: /dev/spidev0.0   /dev/spidev0.1</span>
-</span></code></pre></div></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span><span class="p">,</span> <span class="n">SPI</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">spi</span> <span class="o">=</span> <span class="n">SPI</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">4_000_000</span><span class="p">,</span> <span class="n">polarity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>          <span class="n">sck</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">mosi</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">11</span><span class="p">))</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">cs</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">OUT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># active LOW, start HIGH</span>
+</span></code></pre></div>
 <hr />
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <table>
@@ -2344,27 +2381,35 @@
 <tbody>
 <tr>
 <td>Display shows nothing</td>
-<td>SPI enabled? Run <code>ls /dev/spi*</code></td>
+<td>Wiring correct? VCC on 3V3(OUT) not VBUS? SPI pins correct?</td>
 </tr>
 <tr>
 <td>Garbage output</td>
 <td>Wrong driver version (V3 vs V4) — check PCB silkscreen</td>
 </tr>
 <tr>
-<td>Permission error on <code>/dev/spidev</code></td>
-<td>Add user to <code>spi</code> group: <code>sudo usermod -aG spi,gpio pi</code></td>
+<td>Display flickers then goes blank</td>
+<td>RST or BUSY wired to wrong pins</td>
 </tr>
 <tr>
 <td>BUSY pin always HIGH</td>
-<td>Display stuck in refresh — power cycle and run <code>epd.Clear()</code></td>
+<td>Display stuck in refresh — disconnect power, reconnect, run <code>epd.Clear()</code></td>
 </tr>
 <tr>
-<td>Button reads always HIGH</td>
-<td><code>GPIO.PUD_UP</code> not set, or button not connected to GND</td>
+<td>Button reads always HIGH (never pressed)</td>
+<td>Pull-up not set, or button not connected to GND</td>
 </tr>
 <tr>
 <td>Button reads always LOW</td>
 <td>Short to ground — check breadboard wiring</td>
+</tr>
+<tr>
+<td><code>OSError: [Errno 5] EIO</code></td>
+<td>SPI misconfigured — check SCK/MOSI pin assignments</td>
+</tr>
+<tr>
+<td>No serial connection to Pico</td>
+<td>Check USB cable supports data (not charge-only)</td>
 </tr>
 </tbody>
 </table>

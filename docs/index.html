@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -892,6 +892,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1122,7 +1133,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1353,6 +1364,34 @@
   
   
     <li class="md-nav__item">
+      <a href="reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="reference/pi-zero-wh/" class="md-nav__link">
         
   
@@ -1360,7 +1399,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1773,6 +1812,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1812,14 +1862,20 @@
 <h3 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h3>
 <p>Getting a working development environment.</p>
 <ul>
-<li><a href="setup/pi-zero-setup/">Pi Zero Setup</a> — OS flash, SSH, SPI, and system config</li>
-<li><a href="setup/display-setup/">Display Setup</a> — HAT wiring, Waveshare library, hello world</li>
-<li><a href="setup/dev-environment/">Dev Environment</a> — Python venv, rsync workflow, VS Code Remote-SSH</li>
+<li><a href="setup/pi-zero-setup/">Pico W Setup</a> — firmware flash, serial REPL, and smoke test</li>
+<li><a href="setup/display-setup/">Display Setup</a> — jumper wire connection, Waveshare driver, hello world</li>
+<li><a href="setup/dev-environment/">Dev Environment</a> — VSCode + MicroPico on Linux</li>
 </ul>
 <h3 id="software">Software<a class="headerlink" href="#software" title="Permanent link">&para;</a></h3>
 <p>Code architecture and reference.</p>
 <ul>
 <li><a href="software/project-structure/">Project Structure</a> — directory layout and module overview</li>
+</ul>
+<h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
+<p>Official hardware documentation.</p>
+<ul>
+<li><a href="reference/pico-w/">Pico W</a> — RP2040 specs, pinout, MicroPython firmware</li>
+<li><a href="reference/waveshare-eink/">Waveshare e-Paper HAT</a> — display specs, SPI protocol, driver setup</li>
 </ul>
 <hr />
 <div class="admonition tip">

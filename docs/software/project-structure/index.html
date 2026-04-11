@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -18,7 +18,7 @@
         <link rel="prev" href="../../setup/dev-environment/">
       
       
-        <link rel="next" href="../../reference/pi-zero-wh/">
+        <link rel="next" href="../../reference/pico-w/">
       
       
         
@@ -1025,7 +1025,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1348,6 +1348,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#key-differences-from-pi-zero-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Differences from Pi Zero Development
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1427,6 +1438,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/pi-zero-wh/" class="md-nav__link">
         
   
@@ -1434,7 +1473,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1924,6 +1963,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#key-differences-from-pi-zero-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Differences from Pi Zero Development
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1954,19 +2004,19 @@
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>├── docs/                        # Raw research and reference docs
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── hardware-research.md     # Component specs and enclosure design
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── setup-guide.md           # Full Pi Zero + display setup walkthrough
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   └── concepts/
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│       ├── prototype-v1.svg
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│       └── prototype-v2.svg
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>├── website/                     # This website (MkDocs project)
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   ├── mkdocs.yml
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│   └── docs/
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>└── firmware/                    # Pi Zero code (Phase 2+)
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    ├── main.py                  # Entry point
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    ├── requirements.txt
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    ├── venv/                    # (not committed)
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   └── concepts/
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│       ├── prototype-v1.svg
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│       └── prototype-v2.svg
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├── website/                     # This website (MkDocs project)
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   ├── mkdocs.yml
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   └── docs/
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>└── firmware/                    # MicroPython code for Pico W (Phase 2+)
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    ├── main.py                  # Entry point (runs on boot)
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    ├── boot.py                  # Pre-boot config (Wi-Fi setup, etc.)
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    ├── epd2in13_V3.py           # Waveshare display driver (uploaded from lib)
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    ├── epdconfig.py             # SPI/GPIO config for driver
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    │
 </span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    ├── core/
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    │   ├── display.py           # Display driver wrapper
@@ -1979,20 +2029,24 @@
 </span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>    │   └── animations.py        # Sprite animation sequences
 </span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>    │
 </span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>    └── assets/
-</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>        ├── sprites/             # 1-bit PNG sprites (250×122 or smaller)
-</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>        └── fonts/               # TTF fonts for display text
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>        ├── sprites/             # 1-bit PBM/raw sprites (250×122 or smaller)
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>        └── fonts/               # Bitmap font data (framebuf built-in or custom)
 </span></code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Firmware not yet written</p>
 <p>The <code>firmware/</code> directory structure above is the planned layout. Phase 2 will establish this scaffold.</p>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Flash storage limits</p>
+<p>The Pico W has 2MB of flash. MicroPython firmware uses ~700KB, leaving ~1.3MB for your code and assets. Keep sprite files small — use 1-bit monochrome bitmaps, not PNGs with metadata.</p>
+</div>
 <hr />
 <h2 id="planned-module-responsibilities">Planned Module Responsibilities<a class="headerlink" href="#planned-module-responsibilities" title="Permanent link">&para;</a></h2>
 <h3 id="coredisplaypy"><code>core/display.py</code><a class="headerlink" href="#coredisplaypy" title="Permanent link">&para;</a></h3>
-<p>Thin wrapper around the Waveshare e-Paper library:</p>
+<p>Thin wrapper around the Waveshare e-Paper driver:</p>
 <ul>
-<li>Initializes the display</li>
-<li>Exposes <code>render(image)</code> for full refresh and <code>render_partial(image)</code> for partial</li>
+<li>Initializes SPI and the display</li>
+<li>Exposes <code>render(buf)</code> for full refresh and <code>render_partial(buf)</code> for partial</li>
 <li>Handles cleanup and sleep mode</li>
 <li>Manages refresh rate limiting (prevent over-refreshing)</li>
 </ul>
@@ -2000,10 +2054,19 @@
 <p>Button input manager:</p>
 <ul>
 <li>Sets up GPIO pins with internal pull-ups</li>
-<li>Provides event-based callbacks: <code>on_press(button, callback)</code></li>
-<li>Handles software debouncing (10ms default)</li>
+<li>Provides event-based callbacks or polling: <code>is_pressed(button)</code></li>
+<li>Handles software debouncing (~10ms default)</li>
 <li>Button constants: <code>BTN_UP</code>, <code>BTN_DOWN</code>, <code>BTN_LEFT</code>, <code>BTN_RIGHT</code>, <code>BTN_SELECT</code></li>
 </ul>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">Input</span><span class="p">:</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">BTN_UP</span>     <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">)</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">BTN_DOWN</span>   <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">BTN_LEFT</span>   <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">BTN_RIGHT</span>  <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">)</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">BTN_SELECT</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">)</span>
+</span></code></pre></div>
 <h3 id="corelooppy"><code>core/loop.py</code><a class="headerlink" href="#corelooppy" title="Permanent link">&para;</a></h3>
 <p>Main game loop:</p>
 <ul>
@@ -2023,24 +2086,76 @@
 <h3 id="petanimationspy"><code>pet/animations.py</code><a class="headerlink" href="#petanimationspy" title="Permanent link">&para;</a></h3>
 <p>Sprite animation sequences:</p>
 <ul>
-<li>Each animation is a list of <code>(image_path, duration_ms)</code> tuples</li>
+<li>Each animation is a list of <code>(sprite_data, duration_ms)</code> tuples</li>
 <li><code>Animator</code> class tracks current frame, advances on tick</li>
-<li>Renders to a PIL <code>Image</code> object passed to <code>display.render_partial()</code></li>
+<li>Renders to a <code>framebuf.FrameBuffer</code> passed to <code>display.render_partial()</code></li>
 </ul>
 <hr />
 <h2 id="asset-format">Asset Format<a class="headerlink" href="#asset-format" title="Permanent link">&para;</a></h2>
 <h3 id="sprites">Sprites<a class="headerlink" href="#sprites" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Format: 1-bit PNG (black and white only)</li>
+<li>Format: 1-bit monochrome (raw bytearray or PBM)</li>
 <li>Coordinate space: 250×122 (full display) or any sub-region</li>
-<li>Naming: <code>{state}_{frame:02d}.png</code> — e.g., <code>idle_00.png</code>, <code>idle_01.png</code></li>
+<li>Naming: <code>{state}_{frame:02d}.pbm</code> — e.g., <code>idle_00.pbm</code>, <code>idle_01.pbm</code></li>
 </ul>
+<div class="admonition tip">
+<p class="admonition-title">Why not PNG?</p>
+<p>MicroPython doesn't include PIL/Pillow. The <code>framebuf</code> module works with raw byte arrays. Pre-convert sprites to 1-bit raw format on your dev machine before uploading.</p>
+</div>
 <h3 id="fonts">Fonts<a class="headerlink" href="#fonts" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Format: TTF</li>
-<li>Recommended: <a href="https://github.com/IdreesInc/Monocraft">Monocraft</a> or any bitmap-style monospace font</li>
-<li>Size: 8px–16px works well at 250×122 resolution</li>
+<li>MicroPython's built-in <code>framebuf.text()</code> provides an 8×8 pixel font</li>
+<li>For larger text, use bitmap font arrays or a custom font renderer</li>
+<li>Recommended size: 8px–16px works well at 250×122 resolution</li>
 </ul>
+<hr />
+<h2 id="key-differences-from-pi-zero-development">Key Differences from Pi Zero Development<a class="headerlink" href="#key-differences-from-pi-zero-development" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Pico W (MicroPython)</th>
+<th>Pi Zero (CPython + Linux)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Graphics</td>
+<td><code>framebuf.FrameBuffer</code></td>
+<td><code>PIL.Image</code> + <code>ImageDraw</code></td>
+</tr>
+<tr>
+<td>GPIO</td>
+<td><code>machine.Pin</code></td>
+<td><code>RPi.GPIO</code></td>
+</tr>
+<tr>
+<td>SPI</td>
+<td><code>machine.SPI</code></td>
+<td><code>spidev</code></td>
+</tr>
+<tr>
+<td>File I/O</td>
+<td>2MB flash, no SD</td>
+<td>Full Linux filesystem</td>
+</tr>
+<tr>
+<td>Imports</td>
+<td>Upload <code>.py</code> files to flash</td>
+<td><code>pip install</code> packages</td>
+</tr>
+<tr>
+<td>Debugging</td>
+<td>REPL over USB serial</td>
+<td>SSH + debugpy</td>
+</tr>
+<tr>
+<td>Boot</td>
+<td>Instant (~1s)</td>
+<td>30–90 seconds</td>
+</tr>
+</tbody>
+</table>
 
 
 
@@ -2097,13 +2212,13 @@
         
         
           
-          <a href="../../reference/pi-zero-wh/" class="md-footer__link md-footer__link--next" aria-label="Next: Pi Zero WH">
+          <a href="../../reference/pico-w/" class="md-footer__link md-footer__link--next" aria-label="Next: Pico W">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Pi Zero WH
+                Pico W
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -1027,7 +1027,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1136,10 +1136,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-problem" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Problem
+        Overview
       
     </span>
   </a>
@@ -1147,22 +1147,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#option-a-rsync-ssh-recommended" class="md-nav__link">
+  <a href="#step-1-install-vscode" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Option A — rsync + SSH (Recommended)
+        Step 1 — Install VSCode
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Option A — rsync + SSH (Recommended)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-install-the-micropico-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Install the MicroPico Extension
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2 — Install the MicroPico Extension">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#workflow" class="md-nav__link">
+  <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Workflow
+        Install
       
     </span>
   </a>
@@ -1170,21 +1181,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
+  <a href="#configure" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Setup
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#example-makefile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example Makefile
+        Configure
       
     </span>
   </a>
@@ -1197,22 +1197,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#option-b-vs-code-remote-ssh" class="md-nav__link">
+  <a href="#step-3-serial-port-permissions-linux" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Option B — VS Code Remote-SSH
+        Step 3 — Serial Port Permissions (Linux)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Option B — VS Code Remote-SSH">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-connect-to-the-pico-w" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Connect to the Pico W
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 4 — Connect to the Pico W">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#setup_1" class="md-nav__link">
+  <a href="#open-the-repl" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Setup
+        Open the REPL
       
     </span>
   </a>
@@ -1225,33 +1236,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#option-c-remote-debugging-with-debugpy" class="md-nav__link">
+  <a href="#step-5-project-structure" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Option C — Remote Debugging with debugpy
+        Step 5 — Project Structure
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Option C — Remote Debugging with debugpy">
+    <nav class="md-nav" aria-label="Step 5 — Project Structure">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#on-the-pi" class="md-nav__link">
+  <a href="#upload-files-to-pico-w" class="md-nav__link">
     <span class="md-ellipsis">
       
-        On the Pi
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#in-vs-code-local-machine" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        In VS Code (local machine)
+        Upload Files to Pico W
       
     </span>
   </a>
@@ -1264,10 +1264,99 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-at-boot-systemd" class="md-nav__link">
+  <a href="#step-6-running-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Run at Boot (systemd)
+        Step 6 — Running Code
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 6 — Running Code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#run-the-current-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run the Current File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-on-boot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run on Boot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Debugging
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 7 — Debugging">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#repl-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REPL Debugging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interactive-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interactive Debugging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mpremote-cli-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mpremote (CLI Alternative)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#useful-vscode-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Useful VSCode Settings
       
     </span>
   </a>
@@ -1275,10 +1364,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#useful-ssh-aliases" class="md-nav__link">
+  <a href="#keyboard-shortcuts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Useful SSH Aliases
+        Keyboard Shortcuts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
       
     </span>
   </a>
@@ -1455,6 +1555,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/pi-zero-wh/" class="md-nav__link">
         
   
@@ -1462,7 +1590,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1831,10 +1959,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-problem" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Problem
+        Overview
       
     </span>
   </a>
@@ -1842,22 +1970,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#option-a-rsync-ssh-recommended" class="md-nav__link">
+  <a href="#step-1-install-vscode" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Option A — rsync + SSH (Recommended)
+        Step 1 — Install VSCode
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Option A — rsync + SSH (Recommended)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-install-the-micropico-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Install the MicroPico Extension
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2 — Install the MicroPico Extension">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#workflow" class="md-nav__link">
+  <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Workflow
+        Install
       
     </span>
   </a>
@@ -1865,21 +2004,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
+  <a href="#configure" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Setup
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#example-makefile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example Makefile
+        Configure
       
     </span>
   </a>
@@ -1892,22 +2020,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#option-b-vs-code-remote-ssh" class="md-nav__link">
+  <a href="#step-3-serial-port-permissions-linux" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Option B — VS Code Remote-SSH
+        Step 3 — Serial Port Permissions (Linux)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Option B — VS Code Remote-SSH">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-connect-to-the-pico-w" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Connect to the Pico W
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 4 — Connect to the Pico W">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#setup_1" class="md-nav__link">
+  <a href="#open-the-repl" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Setup
+        Open the REPL
       
     </span>
   </a>
@@ -1920,33 +2059,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#option-c-remote-debugging-with-debugpy" class="md-nav__link">
+  <a href="#step-5-project-structure" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Option C — Remote Debugging with debugpy
+        Step 5 — Project Structure
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Option C — Remote Debugging with debugpy">
+    <nav class="md-nav" aria-label="Step 5 — Project Structure">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#on-the-pi" class="md-nav__link">
+  <a href="#upload-files-to-pico-w" class="md-nav__link">
     <span class="md-ellipsis">
       
-        On the Pi
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#in-vs-code-local-machine" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        In VS Code (local machine)
+        Upload Files to Pico W
       
     </span>
   </a>
@@ -1959,10 +2087,99 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-at-boot-systemd" class="md-nav__link">
+  <a href="#step-6-running-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Run at Boot (systemd)
+        Step 6 — Running Code
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 6 — Running Code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#run-the-current-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run the Current File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-on-boot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run on Boot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Debugging
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 7 — Debugging">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#repl-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REPL Debugging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interactive-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interactive Debugging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mpremote-cli-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mpremote (CLI Alternative)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#useful-vscode-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Useful VSCode Settings
       
     </span>
   </a>
@@ -1970,10 +2187,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#useful-ssh-aliases" class="md-nav__link">
+  <a href="#keyboard-shortcuts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Useful SSH Aliases
+        Keyboard Shortcuts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
       
     </span>
   </a>
@@ -2001,124 +2229,246 @@
 
 
 <h1 id="dev-environment">Dev Environment<a class="headerlink" href="#dev-environment" title="Permanent link">&para;</a></h1>
-<p>How to set up your local machine for editing code and deploying it to the Pi Zero efficiently.</p>
+<p>How to set up VSCode on Linux for Pico W development, debugging, and file management.</p>
 <hr />
-<h2 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link">&para;</a></h2>
-<p>You can't comfortably edit code directly on the Pi Zero — no GUI, small RAM, slow SD card I/O. The standard solution is to edit on your local machine and push changes to the Pi for execution.</p>
-<hr />
-<h2 id="option-a-rsync-ssh-recommended">Option A — rsync + SSH (Recommended)<a class="headerlink" href="#option-a-rsync-ssh-recommended" title="Permanent link">&para;</a></h2>
-<p>Edit locally, sync to Pi, run on Pi. Simple, works with any editor, no VS Code dependency.</p>
-<h3 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Permanent link">&para;</a></h3>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>The Pico W is a microcontroller, not a Linux computer — you can't SSH into it or run an editor on it. Instead, you edit code on your local machine and upload it to the Pico W over USB.</p>
+<p>The recommended workflow:</p>
 <ol>
-<li>Edit files on your local machine</li>
-<li><code>rsync</code> the changed files to the Pi</li>
-<li>SSH in and run the script</li>
+<li><strong>Edit</strong> code in VSCode on your Linux machine</li>
+<li><strong>Upload</strong> files to the Pico W via the MicroPico extension</li>
+<li><strong>Run</strong> and <strong>debug</strong> directly from VSCode using the serial REPL</li>
 </ol>
-<h3 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h3>
-<p>On your local machine, add this to your shell profile or create a <code>Makefile</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Sync the project to the Pi</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">alias</span><span class="w"> </span>dilder-sync<span class="o">=</span><span class="s1">&#39;rsync -avz --exclude=&quot;.git&quot; --exclude=&quot;venv&quot; \</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s1">    ~/code/dilder/ pi@dilder.local:~/dilder/&#39;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># SSH shortcut</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">dilder</span><span class="o">=</span><span class="s1">&#39;ssh pi@dilder.local&#39;</span>
-</span></code></pre></div>
-<h3 id="example-makefile">Example Makefile<a class="headerlink" href="#example-makefile" title="Permanent link">&para;</a></h3>
-<div class="language-makefile highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c"># ~/code/dilder/Makefile</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">REMOTE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>pi@dilder.local
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nv">REMOTE_DIR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>~/dilder
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nf">.PHONY</span><span class="o">:</span><span class="w"> </span><span class="n">sync</span> <span class="n">run</span> <span class="n">watch</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nf">sync</span><span class="o">:</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span>rsync<span class="w"> </span>-avz<span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;.git&quot;</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;venv&quot;</span><span class="w"> </span>./<span class="w"> </span><span class="k">$(</span>REMOTE<span class="k">)</span>:<span class="k">$(</span>REMOTE_DIR<span class="k">)</span>/
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="nf">run</span><span class="o">:</span><span class="w"> </span><span class="n">sync</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span>ssh<span class="w"> </span><span class="k">$(</span>REMOTE<span class="k">)</span><span class="w"> </span><span class="s2">&quot;cd </span><span class="k">$(</span>REMOTE_DIR<span class="k">)</span><span class="s2"> &amp;&amp; source venv/bin/activate &amp;&amp; python3 main.py&quot;</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="nf">watch</span><span class="o">:</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="c">    # Requires: brew install fswatch  (macOS)</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">    </span>fswatch<span class="w"> </span>-o<span class="w"> </span>src/<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>-n1<span class="w"> </span>-I<span class="o">{}</span><span class="w"> </span>make<span class="w"> </span>sync
-</span></code></pre></div>
-<p>Run with:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>run<span class="w">       </span><span class="c1"># sync and run</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>make<span class="w"> </span>watch<span class="w">     </span><span class="c1"># auto-sync on file change</span>
+<hr />
+<h2 id="step-1-install-vscode">Step 1 — Install VSCode<a class="headerlink" href="#step-1-install-vscode" title="Permanent link">&para;</a></h2>
+<p>If you don't already have VSCode installed:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Arch Linux / CachyOS</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sudo<span class="w"> </span>pacman<span class="w"> </span>-S<span class="w"> </span>code
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Ubuntu / Debian</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>code
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Or download from https://code.visualstudio.com/</span>
 </span></code></pre></div>
 <hr />
-<h2 id="option-b-vs-code-remote-ssh">Option B — VS Code Remote-SSH<a class="headerlink" href="#option-b-vs-code-remote-ssh" title="Permanent link">&para;</a></h2>
-<p>Full IDE experience directly on the Pi. Works best with the <strong>Pi Zero 2 W</strong> — the original Pi Zero W may be too slow for VS Code's language server.</p>
-<h3 id="setup_1">Setup<a class="headerlink" href="#setup_1" title="Permanent link">&para;</a></h3>
+<h2 id="step-2-install-the-micropico-extension">Step 2 — Install the MicroPico Extension<a class="headerlink" href="#step-2-install-the-micropico-extension" title="Permanent link">&para;</a></h2>
+<p>MicroPico (formerly Pico-W-Go) provides:</p>
+<ul>
+<li>File upload/download to/from the Pico W</li>
+<li>Integrated MicroPython REPL terminal</li>
+<li>Run scripts directly on the Pico W</li>
+<li>Auto-completion for MicroPython APIs</li>
+<li>Pico W project management</li>
+</ul>
+<h3 id="install">Install<a class="headerlink" href="#install" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Install the <strong>Remote - SSH</strong> extension in VS Code</li>
-<li>Open Command Palette → <strong>Remote-SSH: Connect to Host</strong></li>
-<li>Enter <code>pi@dilder.local</code></li>
-<li>Open the <code>~/dilder</code> folder on the remote</li>
+<li>Open VSCode</li>
+<li>Go to <strong>Extensions</strong> (<code>Ctrl+Shift+X</code>)</li>
+<li>Search for <strong>"MicroPico"</strong></li>
+<li>Install the extension by <strong>paulober</strong></li>
 </ol>
-<p>You can now edit files, use the integrated terminal, and run scripts — all executing on the Pi.</p>
+<h3 id="configure">Configure<a class="headerlink" href="#configure" title="Permanent link">&para;</a></h3>
+<p>After installing, set your project as a MicroPico project:</p>
+<ol>
+<li>Open your Dilder project folder in VSCode</li>
+<li>Open the Command Palette (<code>Ctrl+Shift+P</code>)</li>
+<li>Run <strong>MicroPico: Configure Project</strong></li>
+<li>This creates a <code>.micropico</code> file in your project root</li>
+</ol>
+<hr />
+<h2 id="step-3-serial-port-permissions-linux">Step 3 — Serial Port Permissions (Linux)<a class="headerlink" href="#step-3-serial-port-permissions-linux" title="Permanent link">&para;</a></h2>
+<p>The Pico W appears as <code>/dev/ttyACM0</code> when connected. Your user needs permission to access it.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Add your user to the dialout group</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>dialout<span class="w"> </span><span class="nv">$USER</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Log out and back in for the change to take effect</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># Verify:</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>groups<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>dialout
+</span></code></pre></div>
 <div class="admonition warning">
-<p class="admonition-title">Pi Zero W performance</p>
-<p>The original Pi Zero W (single-core, 512MB) is borderline for VS Code Remote-SSH. Expect slow IntelliSense and occasional timeouts. The rsync workflow is more reliable on the Zero W. The Zero 2 W handles it fine.</p>
+<p class="admonition-title">Common gotcha</p>
+<p>If MicroPico can't connect, this is almost always the cause. The group change only takes effect after a full logout/login (not just a new terminal).</p>
 </div>
 <hr />
-<h2 id="option-c-remote-debugging-with-debugpy">Option C — Remote Debugging with debugpy<a class="headerlink" href="#option-c-remote-debugging-with-debugpy" title="Permanent link">&para;</a></h2>
-<p>Run your script on the Pi with a debugger attached, and connect VS Code's debugger from your local machine.</p>
-<h3 id="on-the-pi">On the Pi<a class="headerlink" href="#on-the-pi" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pip<span class="w"> </span>install<span class="w"> </span>debugpy
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Start your script with debugpy listening on port 5678</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>python3<span class="w"> </span>-m<span class="w"> </span>debugpy<span class="w"> </span>--listen<span class="w"> </span><span class="m">0</span>.0.0.0:5678<span class="w"> </span>--wait-for-client<span class="w"> </span>main.py
-</span></code></pre></div>
-<h3 id="in-vs-code-local-machine">In VS Code (local machine)<a class="headerlink" href="#in-vs-code-local-machine" title="Permanent link">&para;</a></h3>
-<p>Add to <code>.vscode/launch.json</code>:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;attach&quot;</span><span class="p">,</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Attach to Pi&quot;</span><span class="p">,</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dilder.local&quot;</span><span class="p">,</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5678</span><span class="p">,</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nt">&quot;pathMappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">        </span><span class="nt">&quot;localRoot&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${workspaceFolder}&quot;</span><span class="p">,</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">        </span><span class="nt">&quot;remoteRoot&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/pi/dilder&quot;</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="p">}]</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>Press <strong>F5</strong> to connect. You can now set breakpoints locally that trigger on the Pi.</p>
+<h2 id="step-4-connect-to-the-pico-w">Step 4 — Connect to the Pico W<a class="headerlink" href="#step-4-connect-to-the-pico-w" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Plug the Pico W into your computer via USB</li>
+<li>In VSCode, the MicroPico status bar should show <strong>"Pico Connected"</strong> at the bottom</li>
+<li>If not, open Command Palette → <strong>MicroPico: Connect</strong></li>
+</ol>
+<h3 id="open-the-repl">Open the REPL<a class="headerlink" href="#open-the-repl" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Click the <strong>MicroPico terminal icon</strong> in the bottom panel, or</li>
+<li>Command Palette → <strong>MicroPico: Toggle REPL</strong></li>
+</ul>
+<p>You should see the MicroPython <code>&gt;&gt;&gt;</code> prompt in the VSCode terminal.</p>
 <hr />
-<h2 id="run-at-boot-systemd">Run at Boot (systemd)<a class="headerlink" href="#run-at-boot-systemd" title="Permanent link">&para;</a></h2>
-<p>When development is done, run Dilder automatically on boot:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Create a service file</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/systemd/system/dilder.service
+<h2 id="step-5-project-structure">Step 5 — Project Structure<a class="headerlink" href="#step-5-project-structure" title="Permanent link">&para;</a></h2>
+<p>Create this structure in your project for the firmware:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dilder/
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>├── firmware/              # MicroPython code for the Pico W
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>│   ├── main.py            # Entry point (runs on boot)
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│   ├── boot.py            # Pre-boot config (Wi-Fi, etc.)
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│   ├── epd2in13_V3.py     # Waveshare display driver
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>│   ├── epdconfig.py       # SPI/GPIO config for driver
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>│   ├── core/
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│   │   ├── display.py     # Display wrapper
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>│   │   └── input.py       # Button input handler
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>│   └── assets/
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>│       └── sprites/       # 1-bit images
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>├── website/               # MkDocs site (existing)
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>├── docs/                  # Research docs (existing)
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>└── .micropico             # MicroPico config
 </span></code></pre></div>
-<div class="language-ini highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">[Unit]</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="na">Description</span><span class="o">=</span><span class="s">Dilder virtual pet</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="na">After</span><span class="o">=</span><span class="s">network.target</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">[Service]</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="na">Type</span><span class="o">=</span><span class="s">simple</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="na">User</span><span class="o">=</span><span class="s">pi</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="na">WorkingDirectory</span><span class="o">=</span><span class="s">/home/pi/dilder</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="na">ExecStart</span><span class="o">=</span><span class="s">/home/pi/dilder/venv/bin/python3 /home/pi/dilder/main.py</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="na">Restart</span><span class="o">=</span><span class="s">on-failure</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="na">RestartSec</span><span class="o">=</span><span class="s">5</span>
+<h3 id="upload-files-to-pico-w">Upload Files to Pico W<a class="headerlink" href="#upload-files-to-pico-w" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Upload a single file:</strong> Right-click the file in the explorer → <strong>MicroPico: Upload File to Pico</strong></li>
+<li><strong>Upload the entire project:</strong> Command Palette → <strong>MicroPico: Upload Project to Pico</strong></li>
+<li><strong>Download from Pico:</strong> Command Palette → <strong>MicroPico: Download Project from Pico</strong></li>
+</ul>
+<hr />
+<h2 id="step-6-running-code">Step 6 — Running Code<a class="headerlink" href="#step-6-running-code" title="Permanent link">&para;</a></h2>
+<h3 id="run-the-current-file">Run the Current File<a class="headerlink" href="#run-the-current-file" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Open a <code>.py</code> file in the editor</li>
+<li>Click the <strong>Run</strong> button in the MicroPico status bar, or</li>
+<li>Command Palette → <strong>MicroPico: Run Current File on Pico</strong></li>
+</ol>
+<p>The script runs on the Pico W and output appears in the REPL terminal.</p>
+<h3 id="run-on-boot">Run on Boot<a class="headerlink" href="#run-on-boot" title="Permanent link">&para;</a></h3>
+<p>Any code in <code>main.py</code> on the Pico W runs automatically when it powers on. Upload your <code>main.py</code> and reset the board to test auto-start behavior.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Reset the Pico W from REPL</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">machine</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">machine</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</span></code></pre></div>
+<hr />
+<h2 id="step-7-debugging">Step 7 — Debugging<a class="headerlink" href="#step-7-debugging" title="Permanent link">&para;</a></h2>
+<h3 id="repl-debugging">REPL Debugging<a class="headerlink" href="#repl-debugging" title="Permanent link">&para;</a></h3>
+<p>The simplest approach: use <code>print()</code> statements and the REPL.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># In your code</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Button state: </span><span class="si">{</span><span class="n">btn</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Display BUSY: </span><span class="si">{</span><span class="n">busy_pin</span><span class="o">.</span><span class="n">value</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="interactive-debugging">Interactive Debugging<a class="headerlink" href="#interactive-debugging" title="Permanent link">&para;</a></h3>
+<p>You can paste code directly into the REPL to test hardware interactively:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span><span class="p">,</span> <span class="n">SPI</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">spi</span> <span class="o">=</span> <span class="n">SPI</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">4_000_000</span><span class="p">,</span> <span class="n">sck</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">mosi</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">11</span><span class="p">))</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cs</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">OUT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cs</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># select display</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">spi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># send a test byte</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cs</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># deselect</span>
+</span></code></pre></div>
+<h3 id="mpremote-cli-alternative">mpremote (CLI Alternative)<a class="headerlink" href="#mpremote-cli-alternative" title="Permanent link">&para;</a></h3>
+<p><code>mpremote</code> is a command-line tool for managing MicroPython devices. Useful when you want to script uploads or run files without VSCode.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Install</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>install<span class="w"> </span>mpremote
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># List connected devices</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>mpremote<span class="w"> </span>connect<span class="w"> </span>list
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Run a file on the Pico W (without uploading)</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>mpremote<span class="w"> </span>run<span class="w"> </span>firmware/hello_display.py
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1"># Upload a file</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>mpremote<span class="w"> </span>cp<span class="w"> </span>firmware/main.py<span class="w"> </span>:main.py
 </span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="k">[Install]</span>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span>
-</span></code></pre></div>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>dilder
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>dilder
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>dilder
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="c1"># Upload a directory</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>mpremote<span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>firmware/<span class="w"> </span>:
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="c1"># Open the REPL</span>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>mpremote<span class="w"> </span>repl
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="c1"># Reset the board</span>
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>mpremote<span class="w"> </span>reset
 </span></code></pre></div>
 <hr />
-<h2 id="useful-ssh-aliases">Useful SSH Aliases<a class="headerlink" href="#useful-ssh-aliases" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Add to ~/.ssh/config on your local machine</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Host<span class="w"> </span>dilder
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span>HostName<span class="w"> </span>dilder.local
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span>User<span class="w"> </span>pi
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span>ServerAliveInterval<span class="w"> </span><span class="m">60</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span>ServerAliveCountMax<span class="w"> </span><span class="m">3</span>
+<h2 id="useful-vscode-settings">Useful VSCode Settings<a class="headerlink" href="#useful-vscode-settings" title="Permanent link">&para;</a></h2>
+<p>Add to your <code>.vscode/settings.json</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="nt">&quot;micropico.syncFolder&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;firmware&quot;</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="nt">&quot;micropico.openOnStart&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">&quot;python.languageServer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Pylance&quot;</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="nt">&quot;python.analysis.extraPaths&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="s2">&quot;firmware&quot;</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">],</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="nt">&quot;files.associations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">        </span><span class="nt">&quot;*.py&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Then you can just <code>ssh dilder</code> instead of <code>ssh pi@dilder.local</code>.</p>
+<p>This tells MicroPico to sync only the <code>firmware/</code> folder to the Pico W, and gives Pylance the right paths for autocomplete.</p>
+<hr />
+<h2 id="keyboard-shortcuts">Keyboard Shortcuts<a class="headerlink" href="#keyboard-shortcuts" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Shortcut</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Toggle REPL</td>
+<td><code>Ctrl+Shift+P</code> → "MicroPico: Toggle REPL"</td>
+</tr>
+<tr>
+<td>Run current file</td>
+<td>Click status bar <strong>Run</strong> button</td>
+</tr>
+<tr>
+<td>Upload file</td>
+<td>Right-click → "Upload File to Pico"</td>
+</tr>
+<tr>
+<td>Upload project</td>
+<td><code>Ctrl+Shift+P</code> → "MicroPico: Upload Project"</td>
+</tr>
+<tr>
+<td>Soft reset</td>
+<td>Type <code>Ctrl+D</code> in the REPL</td>
+</tr>
+<tr>
+<td>Interrupt running code</td>
+<td>Type <code>Ctrl+C</code> in the REPL</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MicroPico shows "No Pico connected"</td>
+<td>USB cable plugged in? Data cable (not charge-only)? Check <code>ls /dev/ttyACM*</code></td>
+</tr>
+<tr>
+<td>Permission denied on <code>/dev/ttyACM0</code></td>
+<td>Add user to <code>dialout</code> group, then log out and back in</td>
+</tr>
+<tr>
+<td>REPL unresponsive</td>
+<td>Press <code>Ctrl+C</code> to interrupt running code, or <code>Ctrl+D</code> to soft-reset</td>
+</tr>
+<tr>
+<td>Upload fails</td>
+<td>Close any other serial connections (screen, minicom) — only one program can use the serial port</td>
+</tr>
+<tr>
+<td>MicroPython autocomplete not working</td>
+<td>Install the <code>micropython-stubs</code> package and configure <code>python.analysis.extraPaths</code></td>
+</tr>
+<tr>
+<td>File not found on Pico after upload</td>
+<td>Check <code>micropico.syncFolder</code> setting — it may be uploading from the wrong directory</td>
+</tr>
+</tbody>
+</table>
 
 
 

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -1025,7 +1025,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1258,6 +1258,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../pi-zero-wh/" class="md-nav__link">
         
   
@@ -1265,7 +1293,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1357,22 +1385,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hat-pin-mapping" class="md-nav__link">
+  <a href="#pin-mapping" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HAT Pin Mapping
+        Pin Mapping
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="HAT Pin Mapping">
+    <nav class="md-nav" aria-label="Pin Mapping">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gpio-connection-table" class="md-nav__link">
+  <a href="#connecting-to-pico-w-jumper-wires" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GPIO Connection Table
+        Connecting to Pico W (jumper wires)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connecting-to-pi-zero-hat-future" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connecting to Pi Zero (HAT — future)
       
     </span>
   </a>
@@ -1496,22 +1535,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#python-library-setup" class="md-nav__link">
+  <a href="#micropython-library-setup-pico-w" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Python Library Setup
+        MicroPython Library Setup (Pico W)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Python Library Setup">
+    <nav class="md-nav" aria-label="MicroPython Library Setup (Pico W)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#minimal-python-example-v3" class="md-nav__link">
+  <a href="#minimal-micropython-example-v3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Minimal Python Example (V3)
+        Minimal MicroPython Example (V3)
       
     </span>
   </a>
@@ -1524,10 +1563,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gpio-configuration-in-code" class="md-nav__link">
+  <a href="#cpython-library-setup-pi-zero-future" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GPIO Configuration in Code
+        CPython Library Setup (Pi Zero — future)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpio-configuration-in-micropython" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPIO Configuration in MicroPython
       
     </span>
   </a>
@@ -1903,22 +1953,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hat-pin-mapping" class="md-nav__link">
+  <a href="#pin-mapping" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HAT Pin Mapping
+        Pin Mapping
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="HAT Pin Mapping">
+    <nav class="md-nav" aria-label="Pin Mapping">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gpio-connection-table" class="md-nav__link">
+  <a href="#connecting-to-pico-w-jumper-wires" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GPIO Connection Table
+        Connecting to Pico W (jumper wires)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connecting-to-pi-zero-hat-future" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connecting to Pi Zero (HAT — future)
       
     </span>
   </a>
@@ -2042,22 +2103,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#python-library-setup" class="md-nav__link">
+  <a href="#micropython-library-setup-pico-w" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Python Library Setup
+        MicroPython Library Setup (Pico W)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Python Library Setup">
+    <nav class="md-nav" aria-label="MicroPython Library Setup (Pico W)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#minimal-python-example-v3" class="md-nav__link">
+  <a href="#minimal-micropython-example-v3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Minimal Python Example (V3)
+        Minimal MicroPython Example (V3)
       
     </span>
   </a>
@@ -2070,10 +2131,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gpio-configuration-in-code" class="md-nav__link">
+  <a href="#cpython-library-setup-pi-zero-future" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GPIO Configuration in Code
+        CPython Library Setup (Pi Zero — future)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpio-configuration-in-micropython" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPIO Configuration in MicroPython
       
     </span>
   </a>
@@ -2193,8 +2265,84 @@
 </tbody>
 </table>
 <hr />
-<h2 id="hat-pin-mapping">HAT Pin Mapping<a class="headerlink" href="#hat-pin-mapping" title="Permanent link">&para;</a></h2>
-<h3 id="gpio-connection-table">GPIO Connection Table<a class="headerlink" href="#gpio-connection-table" title="Permanent link">&para;</a></h3>
+<h2 id="pin-mapping">Pin Mapping<a class="headerlink" href="#pin-mapping" title="Permanent link">&para;</a></h2>
+<h3 id="connecting-to-pico-w-jumper-wires">Connecting to Pico W (jumper wires)<a class="headerlink" href="#connecting-to-pico-w-jumper-wires" title="Permanent link">&para;</a></h3>
+<p>The Waveshare HAT is designed for the Pi Zero's 40-pin header, but only 8 pins are actually used by the display. Connect these via jumper wires to the Pico W.</p>
+<table>
+<thead>
+<tr>
+<th>e-Paper Pin</th>
+<th>Function</th>
+<th>Pico W GPIO</th>
+<th>Pico W Pin #</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VCC</td>
+<td>Power 3.3V</td>
+<td>3V3(OUT)</td>
+<td>36</td>
+<td>→ display</td>
+</tr>
+<tr>
+<td>GND</td>
+<td>Ground</td>
+<td>GND</td>
+<td>38</td>
+<td>→ display</td>
+</tr>
+<tr>
+<td>DIN</td>
+<td>SPI MOSI — data in</td>
+<td>GP11 (SPI1 TX)</td>
+<td>15</td>
+<td>→ display</td>
+</tr>
+<tr>
+<td>CLK</td>
+<td>SPI clock</td>
+<td>GP10 (SPI1 SCK)</td>
+<td>14</td>
+<td>→ display</td>
+</tr>
+<tr>
+<td>CS</td>
+<td>Chip select (active LOW)</td>
+<td>GP9 (SPI1 CSn)</td>
+<td>12</td>
+<td>→ display</td>
+</tr>
+<tr>
+<td>DC</td>
+<td>Data/Command select</td>
+<td>GP8</td>
+<td>11</td>
+<td>→ display</td>
+</tr>
+<tr>
+<td>RST</td>
+<td>Reset (active LOW)</td>
+<td>GP12</td>
+<td>16</td>
+<td>→ display</td>
+</tr>
+<tr>
+<td>BUSY</td>
+<td>Busy flag (HIGH = busy)</td>
+<td>GP13</td>
+<td>17</td>
+<td>← display</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Where to connect on the HAT</p>
+<p>The HAT has an 8-pin 2.54mm header on the edge labeled VCC, GND, DIN, CLK, CS, DC, RST, BUSY. Use female-to-male jumper wires from these pins to the Pico W breadboard.</p>
+</div>
+<h3 id="connecting-to-pi-zero-hat-future">Connecting to Pi Zero (HAT — future)<a class="headerlink" href="#connecting-to-pi-zero-hat-future" title="Permanent link">&para;</a></h3>
+<p>When migrating to the Pi Zero in Phase 5, the HAT plugs directly onto the 40-pin header. No jumper wires needed.</p>
 <table>
 <thead>
 <tr>
@@ -2202,7 +2350,6 @@
 <th>Function</th>
 <th>BCM GPIO</th>
 <th>Physical Pin</th>
-<th>Direction</th>
 </tr>
 </thead>
 <tbody>
@@ -2211,56 +2358,48 @@
 <td>Power 3.3V</td>
 <td>3.3V</td>
 <td>1</td>
-<td>In</td>
 </tr>
 <tr>
 <td>GND</td>
 <td>Ground</td>
 <td>GND</td>
 <td>6</td>
-<td>In</td>
 </tr>
 <tr>
 <td>DIN</td>
 <td>SPI MOSI — data in</td>
 <td>GPIO 10</td>
 <td>19</td>
-<td>In</td>
 </tr>
 <tr>
 <td>CLK</td>
 <td>SPI clock</td>
 <td>GPIO 11</td>
 <td>23</td>
-<td>In</td>
 </tr>
 <tr>
 <td>CS</td>
 <td>Chip select (active LOW)</td>
 <td>GPIO 8 (CE0)</td>
 <td>24</td>
-<td>In</td>
 </tr>
 <tr>
 <td>DC</td>
 <td>Data/Command select</td>
 <td>GPIO 25</td>
 <td>22</td>
-<td>In</td>
 </tr>
 <tr>
 <td>RST</td>
 <td>Reset (active LOW)</td>
 <td>GPIO 17</td>
 <td>11</td>
-<td>In</td>
 </tr>
 <tr>
 <td>BUSY</td>
 <td>Busy flag (HIGH = busy)</td>
 <td>GPIO 24</td>
 <td>18</td>
-<td>Out</td>
 </tr>
 </tbody>
 </table>
@@ -2315,7 +2454,7 @@
 </tr>
 <tr>
 <td>Bus</td>
-<td>SPI Bus 0, CE0 (<code>/dev/spidev0.0</code>)</td>
+<td>SPI1 on Pico W (<code>GP10/GP11/GP9</code>); SPI0 CE0 on Pi Zero (<code>/dev/spidev0.0</code>)</td>
 </tr>
 </tbody>
 </table>
@@ -2369,7 +2508,7 @@
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">epd</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
 </span></code></pre></div>
 <h3 id="partial-refresh-fast-updates-no-flicker">Partial Refresh (fast updates, no flicker)<a class="headerlink" href="#partial-refresh-fast-updates-no-flicker" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">epd</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">PART_UPDATE</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">epd</span><span class="o">.</span><span class="n">init_part</span><span class="p">()</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">epd</span><span class="o">.</span><span class="n">displayPartial</span><span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">getbuffer</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># After 5 partial updates — do a full refresh to prevent ghosting</span>
 </span></code></pre></div>
@@ -2405,7 +2544,12 @@
 <td>SSD1680Z8</td>
 </tr>
 <tr>
-<td>Driver file</td>
+<td>MicroPython driver</td>
+<td><code>epd2in13_V3.py</code></td>
+<td><code>epd2in13_V4.py</code></td>
+</tr>
+<tr>
+<td>CPython driver (Pi)</td>
 <td><code>epd2in13_V3.py</code></td>
 <td><code>epd2in13_V4.py</code></td>
 </tr>
@@ -2423,7 +2567,8 @@
 </table>
 <div class="admonition warning">
 <p class="admonition-title">Use the correct driver file</p>
-<p>V3 and V4 require different Python driver files. Using the wrong one will either fail silently or produce garbage output. Check your PCB silkscreen to confirm your version.</p>
+<p>V3 and V4 require different driver files. Using the wrong one will either fail silently or produce garbage output. Check your PCB silkscreen to confirm your version.</p>
+<p><strong>This project uses V3</strong> (SSD1680 driver, confirmed on hand).</p>
 </div>
 <hr />
 <h2 id="identifying-your-version">Identifying Your Version<a class="headerlink" href="#identifying-your-version" title="Permanent link">&para;</a></h2>
@@ -2432,52 +2577,67 @@
 <li><strong>V3</strong> — printed as "2.13inch e-Paper HAT V3" or "2.13inch e-Paper HAT (C) V3"</li>
 <li><strong>V4</strong> — printed as "2.13inch e-Paper HAT V4"</li>
 </ul>
-<p>If ordering new: V4 is current. The product linked in the <a href="../../hardware/materials-list/">materials list</a> (B07Q5PZMGT) ships V3 or V4 depending on stock — confirm on arrival.</p>
 <hr />
-<h2 id="python-library-setup">Python Library Setup<a class="headerlink" href="#python-library-setup" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Clone the Waveshare library</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/waveshare/e-Paper.git
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Install Python library</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nb">cd</span><span class="w"> </span>e-Paper/RaspberryPi_JetsonNano/python
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>pip<span class="w"> </span>install<span class="w"> </span>.
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="c1"># Verify driver files exist</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>ls<span class="w"> </span>lib/waveshare_epd/epd2in13_V3.py<span class="w">   </span><span class="c1"># V3</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>ls<span class="w"> </span>lib/waveshare_epd/epd2in13_V4.py<span class="w">   </span><span class="c1"># V4</span>
+<h2 id="micropython-library-setup-pico-w">MicroPython Library Setup (Pico W)<a class="headerlink" href="#micropython-library-setup-pico-w" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Clone the Waveshare Pico e-Paper library</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/waveshare/Pico_ePaper_Code.git
 </span></code></pre></div>
-<h3 id="minimal-python-example-v3">Minimal Python Example (V3)<a class="headerlink" href="#minimal-python-example-v3" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;e-Paper/RaspberryPi_JetsonNano/python/lib&#39;</span><span class="p">)</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">waveshare_epd</span><span class="w"> </span><span class="kn">import</span> <span class="n">epd2in13_V3</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageDraw</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<p>The MicroPython driver files are in <code>Pico_ePaper_Code/python/lib/</code>. Upload these to your Pico W:</p>
+<ul>
+<li><code>epd2in13_V3.py</code> — display driver</li>
+<li><code>epdconfig.py</code> — SPI/GPIO configuration</li>
+</ul>
+<h3 id="minimal-micropython-example-v3">Minimal MicroPython Example (V3)<a class="headerlink" href="#minimal-micropython-example-v3" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span><span class="p">,</span> <span class="n">SPI</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">framebuf</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">utime</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1"># Import the Waveshare driver (upload to Pico W first)</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="kn">from</span><span class="w"> </span><span class="nn">epd2in13_V3</span><span class="w"> </span><span class="kn">import</span> <span class="n">EPD_2in13_V3</span>
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">epd</span> <span class="o">=</span> <span class="n">epd2in13_V3</span><span class="o">.</span><span class="n">EPD</span><span class="p">()</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">epd</span> <span class="o">=</span> <span class="n">EPD_2in13_V3</span><span class="p">()</span>
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">epd</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="n">epd</span><span class="o">.</span><span class="n">Clear</span><span class="p">()</span>
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="c1"># Canvas — note width/height are swapped for landscape</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">epd</span><span class="o">.</span><span class="n">width</span><span class="p">),</span> <span class="mi">255</span><span class="p">)</span>  <span class="c1"># white background</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="n">draw</span>  <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="n">draw</span><span class="o">.</span><span class="n">text</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="s2">&quot;Hello, Dilder!&quot;</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>           <span class="c1"># black text</span>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="n">epd</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">getbuffer</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
-</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="n">epd</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="c1"># Create a framebuffer — 250×122, 1-bit mono</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="n">buf</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">height</span> <span class="o">*</span> <span class="n">epd</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="mi">8</span><span class="p">)</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="n">fb</span> <span class="o">=</span> <span class="n">framebuf</span><span class="o">.</span><span class="n">FrameBuffer</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">epd</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">epd</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">framebuf</span><span class="o">.</span><span class="n">MONO_HLSB</span><span class="p">)</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="c1"># White background, black text</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="n">fb</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mh">0xff</span><span class="p">)</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="n">fb</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Hello, Dilder!&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">)</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="n">epd</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="n">utime</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="n">epd</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
 </span></code></pre></div>
 <hr />
-<h2 id="gpio-configuration-in-code">GPIO Configuration in Code<a class="headerlink" href="#gpio-configuration-in-code" title="Permanent link">&para;</a></h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Default pin assignments used by Waveshare library</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">RST_PIN</span>  <span class="o">=</span> <span class="mi">17</span>   <span class="c1"># GPIO 17, physical pin 11</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">DC_PIN</span>   <span class="o">=</span> <span class="mi">25</span>   <span class="c1"># GPIO 25, physical pin 22</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">CS_PIN</span>   <span class="o">=</span> <span class="mi">8</span>    <span class="c1"># GPIO 8 (CE0), physical pin 24</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">BUSY_PIN</span> <span class="o">=</span> <span class="mi">24</span>   <span class="c1"># GPIO 24, physical pin 18</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># SPI configuration</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">SPI_BUS</span>   <span class="o">=</span> <span class="mi">0</span>         <span class="c1"># /dev/spidev0.0</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="n">SPI_SPEED</span> <span class="o">=</span> <span class="mi">4_000_000</span> <span class="c1"># 4 MHz</span>
+<h2 id="cpython-library-setup-pi-zero-future">CPython Library Setup (Pi Zero — future)<a class="headerlink" href="#cpython-library-setup-pi-zero-future" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Clone the Waveshare library</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/waveshare/e-Paper.git
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Install Python library</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="nb">cd</span><span class="w"> </span>e-Paper/RaspberryPi_JetsonNano/python
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>pip<span class="w"> </span>install<span class="w"> </span>.
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="c1"># Verify driver files exist</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>ls<span class="w"> </span>lib/waveshare_epd/epd2in13_V3.py
+</span></code></pre></div>
+<hr />
+<h2 id="gpio-configuration-in-micropython">GPIO Configuration in MicroPython<a class="headerlink" href="#gpio-configuration-in-micropython" title="Permanent link">&para;</a></h2>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Default pin assignments for Pico W (Waveshare convention)</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">RST_PIN</span>  <span class="o">=</span> <span class="mi">12</span>   <span class="c1"># GP12, Pico pin 16</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">DC_PIN</span>   <span class="o">=</span> <span class="mi">8</span>    <span class="c1"># GP8, Pico pin 11</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">CS_PIN</span>   <span class="o">=</span> <span class="mi">9</span>    <span class="c1"># GP9 (SPI1 CSn), Pico pin 12</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">BUSY_PIN</span> <span class="o">=</span> <span class="mi">13</span>   <span class="c1"># GP13, Pico pin 17</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># SPI1 configuration</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="n">SCK_PIN</span>  <span class="o">=</span> <span class="mi">10</span>   <span class="c1"># GP10 (SPI1 SCK), Pico pin 14</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="n">MOSI_PIN</span> <span class="o">=</span> <span class="mi">11</span>   <span class="c1"># GP11 (SPI1 TX), Pico pin 15</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="c1"># SPI setup in MicroPython</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="n">spi</span> <span class="o">=</span> <span class="n">SPI</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">4_000_000</span><span class="p">,</span> <span class="n">polarity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>          <span class="n">sck</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="n">SCK_PIN</span><span class="p">),</span> <span class="n">mosi</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="n">MOSI_PIN</span><span class="p">))</span>
 </span></code></pre></div>
 <hr />
 <h2 id="safety-notes">Safety Notes<a class="headerlink" href="#safety-notes" title="Permanent link">&para;</a></h2>
@@ -2491,7 +2651,7 @@
 <tbody>
 <tr>
 <td>GPIO overvoltage</td>
-<td>All signals must be 3.3V — do NOT connect 5V sources without a level shifter</td>
+<td>All signals must be 3.3V — the Pico W is 3.3V logic, matching the display</td>
 </tr>
 <tr>
 <td>FPC cable</td>
@@ -2499,7 +2659,7 @@
 </tr>
 <tr>
 <td>Hot-plugging</td>
-<td>Always power off the Pi before attaching or removing the HAT</td>
+<td>Always disconnect power before changing wiring</td>
 </tr>
 <tr>
 <td>Refresh rate</td>
@@ -2522,8 +2682,12 @@
 <td><a href="https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT">waveshare.com/wiki/2.13inch_e-Paper_HAT</a></td>
 </tr>
 <tr>
-<td>GitHub library</td>
+<td>GitHub library (Pi)</td>
 <td><a href="https://github.com/waveshare/e-Paper">github.com/waveshare/e-Paper</a></td>
+</tr>
+<tr>
+<td>GitHub library (Pico)</td>
+<td><a href="https://github.com/waveshare/Pico_ePaper_Code">github.com/waveshare/Pico_ePaper_Code</a></td>
 </tr>
 <tr>
 <td>V3 spec sheet (PDF)</td>
@@ -2578,7 +2742,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../pi-zero-wh/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Pi Zero WH">
+          <a href="../pi-zero-wh/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Pi Zero WH (future)">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2588,7 +2752,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Pi Zero WH
+                Pi Zero WH (future)
               </div>
             </div>
           </a>

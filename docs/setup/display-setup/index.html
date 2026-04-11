@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -1027,7 +1027,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1108,27 +1108,66 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#attach-the-hat" class="md-nav__link">
+  <a href="#wire-the-display" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Attach the HAT
+        Wire the Display
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Wire the Display">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wiring-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wiring Table
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#install-the-waveshare-library" class="md-nav__link">
+  <a href="#install-the-waveshare-micropython-driver" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install the Waveshare Library
+        Install the Waveshare MicroPython Driver
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Install the Waveshare Library">
+    <nav class="md-nav" aria-label="Install the Waveshare MicroPython Driver">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download-the-driver-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the Driver Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-to-pico-w" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upload to Pico W
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#verify-the-driver-file" class="md-nav__link">
@@ -1147,21 +1186,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-the-demo-script" class="md-nav__link">
+  <a href="#run-a-test" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Run the Demo Script
+        Run a Test
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Run a Test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-smoke-test-via-repl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Smoke Test via REPL
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#write-a-minimal-script" class="md-nav__link">
+  <a href="#write-a-hello-world-script" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Write a Minimal Script
+        Write a Hello World Script
       
     </span>
   </a>
@@ -1399,6 +1455,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/pi-zero-wh/" class="md-nav__link">
         
   
@@ -1406,7 +1490,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1775,27 +1859,66 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#attach-the-hat" class="md-nav__link">
+  <a href="#wire-the-display" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Attach the HAT
+        Wire the Display
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Wire the Display">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wiring-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wiring Table
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#install-the-waveshare-library" class="md-nav__link">
+  <a href="#install-the-waveshare-micropython-driver" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install the Waveshare Library
+        Install the Waveshare MicroPython Driver
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Install the Waveshare Library">
+    <nav class="md-nav" aria-label="Install the Waveshare MicroPython Driver">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download-the-driver-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download the Driver Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-to-pico-w" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upload to Pico W
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#verify-the-driver-file" class="md-nav__link">
@@ -1814,21 +1937,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-the-demo-script" class="md-nav__link">
+  <a href="#run-a-test" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Run the Demo Script
+        Run a Test
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Run a Test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-smoke-test-via-repl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Smoke Test via REPL
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#write-a-minimal-script" class="md-nav__link">
+  <a href="#write-a-hello-world-script" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Write a Minimal Script
+        Write a Hello World Script
       
     </span>
   </a>
@@ -1889,36 +2029,108 @@
 
 
 <h1 id="display-setup">Display Setup<a class="headerlink" href="#display-setup" title="Permanent link">&para;</a></h1>
-<p>How to attach the Waveshare 2.13" e-Paper HAT (V3) and get your first image on screen.</p>
-<p><strong>Prerequisites:</strong> Complete <a href="../pi-zero-setup/">Pi Zero Setup</a> first — SPI must be enabled and Python dependencies installed.</p>
+<p>How to wire the Waveshare 2.13" e-Paper HAT (V3) to the Pico W and get your first image on screen.</p>
+<p><strong>Prerequisites:</strong> Complete <a href="../pi-zero-setup/">Pico W Setup</a> first — MicroPython must be flashed and the serial REPL working.</p>
 <hr />
-<h2 id="attach-the-hat">Attach the HAT<a class="headerlink" href="#attach-the-hat" title="Permanent link">&para;</a></h2>
-<p>The Waveshare HAT plugs directly onto the Pi Zero's 40-pin GPIO header. No jumper wires needed.</p>
-<ol>
-<li>Power off the Pi Zero (<code>sudo shutdown -h now</code>, wait for the activity LED to stop)</li>
-<li>Align the HAT's 40-pin female header with the Pi's male header</li>
-<li>Press down firmly and evenly — you should feel it seat fully</li>
-<li>Power the Pi back on</li>
-</ol>
+<h2 id="wire-the-display">Wire the Display<a class="headerlink" href="#wire-the-display" title="Permanent link">&para;</a></h2>
+<p>The Waveshare HAT is designed for the Pi Zero's 40-pin header, but we connect it to the Pico W using the HAT's 8-pin side header and jumper wires.</p>
 <div class="admonition warning">
-<p class="admonition-title">Never hot-plug the HAT</p>
-<p>Always power off the Pi before attaching or detaching the display. The e-ink panel can be damaged by voltage spikes during live connection.</p>
+<p class="admonition-title">Power off before wiring</p>
+<p>Always disconnect USB before connecting or disconnecting jumper wires. The e-ink panel can be damaged by voltage spikes.</p>
 </div>
+<h3 id="wiring-table">Wiring Table<a class="headerlink" href="#wiring-table" title="Permanent link">&para;</a></h3>
+<p>Use <strong>female-to-male jumper wires</strong>: female end onto the HAT's 8-pin header, male end into the Pico W's breadboard row.</p>
+<table>
+<thead>
+<tr>
+<th>e-Paper Pin (on HAT header)</th>
+<th>Pico W GPIO</th>
+<th>Pico W Pin #</th>
+<th>Wire Color (suggested)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VCC</td>
+<td>3V3(OUT)</td>
+<td>36</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>GND</td>
+<td>GND</td>
+<td>38</td>
+<td>Black</td>
+</tr>
+<tr>
+<td>DIN</td>
+<td>GP11 (SPI1 TX)</td>
+<td>15</td>
+<td>Blue</td>
+</tr>
+<tr>
+<td>CLK</td>
+<td>GP10 (SPI1 SCK)</td>
+<td>14</td>
+<td>Yellow</td>
+</tr>
+<tr>
+<td>CS</td>
+<td>GP9 (SPI1 CSn)</td>
+<td>12</td>
+<td>Orange</td>
+</tr>
+<tr>
+<td>DC</td>
+<td>GP8</td>
+<td>11</td>
+<td>Green</td>
+</tr>
+<tr>
+<td>RST</td>
+<td>GP12</td>
+<td>16</td>
+<td>White</td>
+</tr>
+<tr>
+<td>BUSY</td>
+<td>GP13</td>
+<td>17</td>
+<td>Purple</td>
+</tr>
+</tbody>
+</table>
+<p>See the <a href="../../hardware/wiring-pinout/">Wiring &amp; Pinout</a> page for the full visual diagram.</p>
 <hr />
-<h2 id="install-the-waveshare-library">Install the Waveshare Library<a class="headerlink" href="#install-the-waveshare-library" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>~/dilder
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Clone the Waveshare e-Paper library</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/waveshare/e-Paper.git
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Install the Python library</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nb">cd</span><span class="w"> </span>e-Paper/RaspberryPi_JetsonNano/python
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>pip<span class="w"> </span>install<span class="w"> </span>.
+<h2 id="install-the-waveshare-micropython-driver">Install the Waveshare MicroPython Driver<a class="headerlink" href="#install-the-waveshare-micropython-driver" title="Permanent link">&para;</a></h2>
+<p>The Waveshare Pico e-Paper library provides MicroPython drivers for the display.</p>
+<h3 id="download-the-driver-files">Download the Driver Files<a class="headerlink" href="#download-the-driver-files" title="Permanent link">&para;</a></h3>
+<p>On your dev machine:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/waveshare/Pico_ePaper_Code.git
+</span></code></pre></div>
+<p>You need two files from <code>Pico_ePaper_Code/python/lib/</code>:</p>
+<ul>
+<li><code>epd2in13_V3.py</code> — the V3 display driver</li>
+<li><code>epdconfig.py</code> — SPI and GPIO configuration</li>
+</ul>
+<h3 id="upload-to-pico-w">Upload to Pico W<a class="headerlink" href="#upload-to-pico-w" title="Permanent link">&para;</a></h3>
+<p>Using the MicroPico VSCode extension (see <a href="../dev-environment/">Dev Environment</a>):</p>
+<ol>
+<li>Open the <code>Pico_ePaper_Code/python/lib/</code> folder</li>
+<li>Upload <code>epd2in13_V3.py</code> and <code>epdconfig.py</code> to the Pico W's root filesystem</li>
+</ol>
+<p>Or via the REPL with <code>mpremote</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Install mpremote if you don&#39;t have it</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span>mpremote
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Upload driver files</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>mpremote<span class="w"> </span>cp<span class="w"> </span>Pico_ePaper_Code/python/lib/epd2in13_V3.py<span class="w"> </span>:epd2in13_V3.py
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>mpremote<span class="w"> </span>cp<span class="w"> </span>Pico_ePaper_Code/python/lib/epdconfig.py<span class="w"> </span>:epdconfig.py
 </span></code></pre></div>
 <h3 id="verify-the-driver-file">Verify the Driver File<a class="headerlink" href="#verify-the-driver-file" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># The V3 driver should be at:</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>ls<span class="w"> </span>lib/waveshare_epd/epd2in13_V3.py
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">[</span><span class="s1">&#39;boot.py&#39;</span><span class="p">,</span> <span class="s1">&#39;epd2in13_V3.py&#39;</span><span class="p">,</span> <span class="s1">&#39;epdconfig.py&#39;</span><span class="p">]</span>
 </span></code></pre></div>
 <div class="admonition danger">
 <p class="admonition-title">V3 vs V4 driver mismatch</p>
@@ -1927,86 +2139,99 @@
 <li><strong>V3</strong> uses <code>epd2in13_V3.py</code> (SSD1680)</li>
 <li><strong>V4</strong> uses <code>epd2in13_V4.py</code> (SSD1680Z8)</li>
 </ul>
-<p>Check your display's PCB silkscreen or the Waveshare product page.</p>
+<p>Check your display's PCB silkscreen.</p>
 </div>
 <hr />
-<h2 id="run-the-demo-script">Run the Demo Script<a class="headerlink" href="#run-the-demo-script" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>~/dilder/e-Paper/RaspberryPi_JetsonNano/python/examples
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python3<span class="w"> </span>epd_2in13_V3_test.py
-</span></code></pre></div>
-<p>You should see the display cycle through several test patterns — text, shapes, partial refresh. This confirms the hardware is working.</p>
-<hr />
-<h2 id="write-a-minimal-script">Write a Minimal Script<a class="headerlink" href="#write-a-minimal-script" title="Permanent link">&para;</a></h2>
-<p>Once the demo runs, write a minimal script to confirm you understand the API:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># ~/dilder/hello_display.py</span>
+<h2 id="run-a-test">Run a Test<a class="headerlink" href="#run-a-test" title="Permanent link">&para;</a></h2>
+<h3 id="quick-smoke-test-via-repl">Quick Smoke Test via REPL<a class="headerlink" href="#quick-smoke-test-via-repl" title="Permanent link">&para;</a></h3>
+<p>Connect to the Pico W REPL and run:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">epd2in13_V3</span><span class="w"> </span><span class="kn">import</span> <span class="n">EPD_2in13_V3</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> 
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s1">&#39;e-Paper/RaspberryPi_JetsonNano/python/lib&#39;</span><span class="p">))</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="kn">from</span><span class="w"> </span><span class="nn">waveshare_epd</span><span class="w"> </span><span class="kn">import</span> <span class="n">epd2in13_V3</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageDraw</span><span class="p">,</span> <span class="n">ImageFont</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">epd</span> <span class="o">=</span> <span class="n">epd2in13_V3</span><span class="o">.</span><span class="n">EPD</span><span class="p">()</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="k">try</span><span class="p">:</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initializing...&quot;</span><span class="p">)</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    <span class="n">epd</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    <span class="n">epd</span><span class="o">.</span><span class="n">Clear</span><span class="p">()</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    <span class="c1"># Create a blank white canvas</span>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    <span class="c1"># Note: display is landscape when width &gt; height</span>
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">epd</span><span class="o">.</span><span class="n">width</span><span class="p">),</span> <span class="mi">255</span><span class="p">)</span>  <span class="c1"># 255 = white</span>
-</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    <span class="n">draw</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>
-</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>    <span class="c1"># Draw some text</span>
-</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>    <span class="n">draw</span><span class="o">.</span><span class="n">text</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="s2">&quot;Hello, Dilder!&quot;</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># 0 = black</span>
-</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>    <span class="n">draw</span><span class="o">.</span><span class="n">rectangle</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">height</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">epd</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">outline</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>
-</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>    <span class="c1"># Display it</span>
-</span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>    <span class="n">epd</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">getbuffer</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
-</span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>
-</span><span id="__span-3-32"><a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>    <span class="c1"># Put display to sleep</span>
-</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a>    <span class="n">epd</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done.&quot;</span><span class="p">)</span>
-</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>
-</span><span id="__span-3-36"><a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a><span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-</span><span id="__span-3-37"><a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a>    <span class="n">epd</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-</span><span id="__span-3-38"><a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a>    <span class="n">epd2in13_V3</span><span class="o">.</span><span class="n">epdconfig</span><span class="o">.</span><span class="n">module_exit</span><span class="p">()</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">epd</span> <span class="o">=</span> <span class="n">EPD_2in13_V3</span><span class="p">()</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">epd</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">epd</span><span class="o">.</span><span class="n">Clear</span><span class="p">()</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Display cleared — you should see a white screen&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p>If the display goes white, the wiring and driver are working.</p>
+<hr />
+<h2 id="write-a-hello-world-script">Write a Hello World Script<a class="headerlink" href="#write-a-hello-world-script" title="Permanent link">&para;</a></h2>
+<p>Create <code>hello_display.py</code> on your dev machine and upload it to the Pico W:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># hello_display.py</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">epd2in13_V3</span><span class="w"> </span><span class="kn">import</span> <span class="n">EPD_2in13_V3</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">framebuf</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">utime</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="n">epd</span> <span class="o">=</span> <span class="n">EPD_2in13_V3</span><span class="p">()</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="k">try</span><span class="p">:</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initializing display...&quot;</span><span class="p">)</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">epd</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="n">epd</span><span class="o">.</span><span class="n">Clear</span><span class="p">()</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="c1"># Create a framebuffer — 250×122, 1-bit mono</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>    <span class="n">buf</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">height</span> <span class="o">*</span> <span class="n">epd</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="mi">8</span><span class="p">)</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>    <span class="n">fb</span> <span class="o">=</span> <span class="n">framebuf</span><span class="o">.</span><span class="n">FrameBuffer</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">epd</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">epd</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">framebuf</span><span class="o">.</span><span class="n">MONO_HLSB</span><span class="p">)</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>    <span class="c1"># White background</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>    <span class="n">fb</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mh">0xff</span><span class="p">)</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>    <span class="c1"># Black text and border</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>    <span class="n">fb</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Hello, Dilder!&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">)</span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>    <span class="n">fb</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Pico W + e-ink&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">)</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>    <span class="n">fb</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">epd</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">epd</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">)</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>    <span class="c1"># Send to display</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>    <span class="n">epd</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Image displayed!&quot;</span><span class="p">)</span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>    <span class="n">utime</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>
+</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>    <span class="c1"># Put display to sleep (low power)</span>
+</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a>    <span class="n">epd</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Display sleeping. Done.&quot;</span><span class="p">)</span>
+</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a>
+</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="__span-4-37"><a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-4-38"><a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-4-39"><a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a>        <span class="n">epd</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+</span><span id="__span-4-40"><a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a>    <span class="k">except</span><span class="p">:</span>
+</span><span id="__span-4-41"><a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a>        <span class="k">pass</span>
 </span></code></pre></div>
 <p>Run it:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>python3<span class="w"> </span>hello_display.py
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mpremote<span class="w"> </span>run<span class="w"> </span>hello_display.py
 </span></code></pre></div>
+<p>Or upload and run via MicroPico in VSCode.</p>
 <hr />
 <h2 id="canvas-orientation">Canvas Orientation<a class="headerlink" href="#canvas-orientation" title="Permanent link">&para;</a></h2>
-<p>The display is 250×122 pixels. The e-Paper library uses a coordinate system where:</p>
+<p>The display is 250×122 pixels. The Waveshare MicroPython driver uses:</p>
 <ul>
 <li><code>epd.width</code> = 122 (short dimension)</li>
 <li><code>epd.height</code> = 250 (long dimension)</li>
-<li>Landscape mode: create <code>Image.new('1', (epd.height, epd.width))</code> = 250×122</li>
+<li>Landscape mode: create <code>FrameBuffer(buf, epd.height, epd.width)</code> = 250×122</li>
 </ul>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>(0,0) ──────────────────── (249, 0)
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>  │                              │
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>  │     250 × 122 pixels         │
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>  │                              │
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>(0,121) ─────────────── (249, 121)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>(0,0) ──────────────────── (249, 0)
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>  │                              │
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  │     250 × 122 pixels         │
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>  │                              │
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>(0,121) ─────────────── (249, 121)
 </span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">framebuf vs PIL</p>
+<p>MicroPython uses <code>framebuf.FrameBuffer</code> instead of PIL/Pillow. The API is simpler — <code>fb.text()</code>, <code>fb.rect()</code>, <code>fb.pixel()</code>, <code>fb.fill()</code>. For more advanced graphics, you can draw into a bytearray and send it to the display.</p>
+</div>
 <hr />
 <h2 id="partial-refresh">Partial Refresh<a class="headerlink" href="#partial-refresh" title="Permanent link">&para;</a></h2>
 <p>Full refresh takes ~2 seconds and causes visible flicker. Partial refresh updates only changed pixels in ~0.3 seconds with no flicker. Use partial refresh for animation and UI updates.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Initialize for partial refresh</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">epd</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">PART_UPDATE</span><span class="p">)</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Update a region without full flicker</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">epd</span><span class="o">.</span><span class="n">displayPartial</span><span class="p">(</span><span class="n">epd</span><span class="o">.</span><span class="n">getbuffer</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Initialize for partial refresh</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">epd</span><span class="o">.</span><span class="n">init_part</span><span class="p">()</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Update without full flicker</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">epd</span><span class="o">.</span><span class="n">displayPartial</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
 </span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Refresh interval</p>
-<p>Full refresh too frequently causes display degradation. Waveshare recommends a full refresh at least every 10 partial updates, and not more frequently than every 180 seconds under normal use.</p>
+<p>Full refresh too frequently causes display degradation. Waveshare recommends a full refresh at least every 5 partial updates, and not more frequently than every 180 seconds under sustained use.</p>
 </div>
 <hr />
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
@@ -2021,8 +2246,8 @@
 <tbody>
 <tr>
 <td>Display shows nothing</td>
-<td>SPI not enabled</td>
-<td><code>ls /dev/spi*</code> — if empty, re-enable SPI in raspi-config</td>
+<td>Wiring wrong, or VCC not on 3V3(OUT)</td>
+<td>Double-check all 8 wires against the wiring table</td>
 </tr>
 <tr>
 <td>Display shows garbage</td>
@@ -2030,9 +2255,14 @@
 <td>Confirm V3 vs V4, use correct driver file</td>
 </tr>
 <tr>
-<td>Script crashes with permission error</td>
-<td>User not in <code>spi</code> group</td>
-<td><code>sudo usermod -aG spi,gpio pi</code> then re-login</td>
+<td><code>OSError: [Errno 5] EIO</code></td>
+<td>SPI misconfigured</td>
+<td>Verify GP10=SCK, GP11=MOSI, GP9=CS</td>
+</tr>
+<tr>
+<td><code>ImportError: no module named 'epd2in13_V3'</code></td>
+<td>Driver not uploaded</td>
+<td>Upload <code>epd2in13_V3.py</code> and <code>epdconfig.py</code> to Pico W</td>
 </tr>
 <tr>
 <td>Ghost image / burn-in</td>
@@ -2040,9 +2270,9 @@
 <td>Run <code>epd.Clear()</code> to do a full reset</td>
 </tr>
 <tr>
-<td>HAT not recognized</td>
-<td>Loose connection</td>
-<td>Power off, re-seat HAT</td>
+<td>No serial connection</td>
+<td>Cable is charge-only</td>
+<td>Use a data-capable USB cable</td>
 </tr>
 </tbody>
 </table>
@@ -2085,7 +2315,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../pi-zero-setup/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Pi Zero Setup">
+          <a href="../pi-zero-setup/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Pico W Setup">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2095,7 +2325,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Pi Zero Setup
+                Pico W Setup
               </div>
             </div>
           </a>

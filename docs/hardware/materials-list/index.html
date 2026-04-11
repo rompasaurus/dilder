@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -933,6 +933,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#development-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Platform
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#essential-components" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -955,10 +966,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#battery-power-phase-6" class="md-nav__link">
+  <a href="#battery-power-later-phase" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Battery Power (Phase 6)
+        Battery Power (Later Phase)
       
     </span>
   </a>
@@ -978,10 +989,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#raspberry-pi-zero-wh" class="md-nav__link">
+  <a href="#raspberry-pi-pico-w" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Raspberry Pi Zero WH
+        Raspberry Pi Pico W
       
     </span>
   </a>
@@ -1157,7 +1168,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1388,6 +1399,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/pi-zero-wh/" class="md-nav__link">
         
   
@@ -1395,7 +1434,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1764,6 +1803,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#development-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Platform
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#essential-components" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1786,10 +1836,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#battery-power-phase-6" class="md-nav__link">
+  <a href="#battery-power-later-phase" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Battery Power (Phase 6)
+        Battery Power (Later Phase)
       
     </span>
   </a>
@@ -1809,10 +1859,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#raspberry-pi-zero-wh" class="md-nav__link">
+  <a href="#raspberry-pi-pico-w" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Raspberry Pi Zero WH
+        Raspberry Pi Pico W
       
     </span>
   </a>
@@ -1869,6 +1919,10 @@
 <h1 id="materials-list">Materials List<a class="headerlink" href="#materials-list" title="Permanent link">&para;</a></h1>
 <p>All components needed to build a Dilder test bench. This list assumes you are building a breadboard prototype — no soldering required at this stage.</p>
 <hr />
+<h2 id="development-platform">Development Platform<a class="headerlink" href="#development-platform" title="Permanent link">&para;</a></h2>
+<p><strong>Phase 1 (current):</strong> Raspberry Pi Pico W with MicroPython. Cheap, fast to iterate, instant boot.</p>
+<p><strong>Future (Phase 5):</strong> Raspberry Pi Zero WH with Linux. Upgrade when you need a filesystem, SSH, or more compute.</p>
+<hr />
 <h2 id="essential-components">Essential Components<a class="headerlink" href="#essential-components" title="Permanent link">&para;</a></h2>
 <p>Order these first. Everything else can wait.</p>
 <table>
@@ -1881,34 +1935,29 @@
 </thead>
 <tbody>
 <tr>
-<td>Raspberry Pi Zero WH</td>
-<td>~€15</td>
-<td><strong>Get the "WH" variant</strong> — pre-soldered 40-pin GPIO header. Zero 2 WH preferred if available (quad-core).</td>
+<td>Raspberry Pi Pico W</td>
+<td>~€6</td>
+<td>RP2040 dual-core, 264KB SRAM, 2MB flash, WiFi + BLE. Micro-USB for power and programming.</td>
 </tr>
 <tr>
 <td>Waveshare 2.13" e-Paper HAT V3</td>
 <td>~€15</td>
-<td>SSD1680 driver, 250×122px, black/white. Plugs directly onto Pi Zero header.</td>
+<td>SSD1680 driver, 250×122px, black/white. Connected to Pico W via <strong>jumper wires</strong> (not HAT connector).</td>
 </tr>
 <tr>
-<td>Micro SD card (16GB+)</td>
-<td>~€6</td>
-<td>Class 10 or better. For Raspberry Pi OS Lite.</td>
-</tr>
-<tr>
-<td>Micro-USB power supply (5V 2.5A)</td>
-<td>~€9</td>
-<td>Any decent phone charger works during development.</td>
+<td>Micro-USB cable</td>
+<td>~€2</td>
+<td>Powers the Pico W and provides serial connection to your dev machine.</td>
 </tr>
 <tr>
 <td>Half-size breadboard</td>
 <td>~€4</td>
-<td>For wiring buttons without soldering.</td>
+<td>For wiring buttons and display connections.</td>
 </tr>
 <tr>
 <td>Jumper wire kit (M-F and M-M)</td>
 <td>~€4</td>
-<td>Assorted lengths. M-F for GPIO to breadboard, M-M for breadboard connections.</td>
+<td><strong>Required</strong> — the display HAT cannot plug directly into the Pico W. Use F-M wires from the HAT's 8-pin header to the breadboard.</td>
 </tr>
 <tr>
 <td>6×6mm tactile buttons (pack of 20)</td>
@@ -1917,7 +1966,7 @@
 </tr>
 <tr>
 <td><strong>Subtotal</strong></td>
-<td><strong>~€56</strong></td>
+<td><strong>~€34</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1935,9 +1984,9 @@
 </thead>
 <tbody>
 <tr>
-<td>GPIO T-Cobbler breakout + ribbon cable</td>
+<td>Pico WH (pre-soldered headers)</td>
 <td>~€7</td>
-<td>Labels all GPIO pins on the breadboard. Eliminates pin-counting errors.</td>
+<td>Easier breadboard use — no header soldering needed. Either Pico W or WH works.</td>
 </tr>
 <tr>
 <td>10kΩ resistor assortment</td>
@@ -1957,7 +2006,7 @@
 </tbody>
 </table>
 <hr />
-<h2 id="battery-power-phase-6">Battery Power (Phase 6)<a class="headerlink" href="#battery-power-phase-6" title="Permanent link">&para;</a></h2>
+<h2 id="battery-power-later-phase">Battery Power (Later Phase)<a class="headerlink" href="#battery-power-later-phase" title="Permanent link">&para;</a></h2>
 <p>Order these when you're ready to move off USB power.</p>
 <table>
 <thead>
@@ -1969,25 +2018,25 @@
 </thead>
 <tbody>
 <tr>
-<td>Adafruit PowerBoost 500C</td>
-<td>~€18</td>
-<td>LiPo charger + 5V boost regulator with load sharing. Best option for clean power.</td>
-</tr>
-<tr>
 <td>3.7V LiPo battery (1200mAh)</td>
 <td>~€10</td>
-<td>JST-PH connector. Fits the battery bay reserved in the enclosure.</td>
+<td>JST connector. Can power the Pico W via VSYS pin.</td>
 </tr>
 <tr>
-<td>Budget alternative: TP4056 + MT3608</td>
+<td>Adafruit PowerBoost 500C</td>
+<td>~€18</td>
+<td>LiPo charger + 5V boost regulator with load sharing.</td>
+</tr>
+<tr>
+<td>Budget alternative: TP4056 + boost converter</td>
 <td>~€2–3</td>
-<td>More wiring, more tuning, lower cost. Good for experienced builders.</td>
+<td>More wiring, more tuning, lower cost.</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="component-specs-reference">Component Specs Reference<a class="headerlink" href="#component-specs-reference" title="Permanent link">&para;</a></h2>
-<h3 id="raspberry-pi-zero-wh">Raspberry Pi Zero WH<a class="headerlink" href="#raspberry-pi-zero-wh" title="Permanent link">&para;</a></h3>
+<h3 id="raspberry-pi-pico-w">Raspberry Pi Pico W<a class="headerlink" href="#raspberry-pi-pico-w" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -1997,43 +2046,48 @@
 </thead>
 <tbody>
 <tr>
-<td>SoC</td>
-<td>BCM2835 (ARMv6, 1GHz single-core)</td>
+<td>Chip</td>
+<td>RP2040 (dual-core ARM Cortex-M0+ @ 133MHz)</td>
 </tr>
 <tr>
 <td>RAM</td>
-<td>512MB LPDDR2</td>
+<td>264KB SRAM</td>
+</tr>
+<tr>
+<td>Flash</td>
+<td>2MB onboard QSPI</td>
 </tr>
 <tr>
 <td>Wi-Fi</td>
-<td>802.11 b/g/n 2.4GHz</td>
+<td>802.11n 2.4GHz</td>
 </tr>
 <tr>
 <td>Bluetooth</td>
-<td>4.1 BLE</td>
+<td>BLE 5.2</td>
 </tr>
 <tr>
 <td>GPIO</td>
-<td>40-pin header (pre-soldered on WH)</td>
+<td>26 multi-function pins</td>
 </tr>
 <tr>
 <td>USB</td>
-<td>1× micro-USB data, 1× micro-USB power</td>
+<td>Micro-USB 1.1 (power + data)</td>
 </tr>
 <tr>
-<td>Storage</td>
-<td>micro SD</td>
+<td>ADC</td>
+<td>3 external channels (12-bit)</td>
 </tr>
 <tr>
 <td>Dimensions</td>
-<td>65 × 30 × 5mm</td>
+<td>51 × 21 × 3.9mm</td>
+</tr>
+<tr>
+<td>Firmware</td>
+<td>MicroPython (recommended)</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition note">
-<p class="admonition-title">Pi Zero 2 W</p>
-<p>The Zero 2 W (BCM2710, quad-core ARMv8) is a drop-in replacement with significantly more CPU headroom. Everything in this guide applies to both.</p>
-</div>
+<p>Full reference: <a href="../../reference/pico-w/">Pico W Reference</a></p>
 <h3 id="waveshare-213-e-paper-hat-v3">Waveshare 2.13" e-Paper HAT V3<a class="headerlink" href="#waveshare-213-e-paper-hat-v3" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -2095,9 +2149,9 @@
 </table>
 <div class="admonition warning">
 <p class="admonition-title">Version check</p>
-<p>This guide targets the <strong>V3</strong> revision (SSD1680 driver). The V4 revision exists with a different driver IC (SSD1680Z8). Confirm your version before running demo code — V3 and V4 require different driver files.</p>
-<p>To identify: check the PCB silkscreen or the Waveshare product page. The V3 box says "2.13inch e-Paper HAT (C) V3" or similar.</p>
+<p>This guide targets the <strong>V3</strong> revision (SSD1680 driver). Confirm your version by checking the PCB silkscreen on the back of the display board.</p>
 </div>
+<p>Full reference: <a href="../../reference/waveshare-eink/">Waveshare e-Paper Reference</a></p>
 <hr />
 <h2 id="where-to-buy">Where to Buy<a class="headerlink" href="#where-to-buy" title="Permanent link">&para;</a></h2>
 <table>
@@ -2109,16 +2163,20 @@
 </thead>
 <tbody>
 <tr>
+<td><a href="https://www.raspberrypi.com/products/raspberry-pi-pico/">Raspberry Pi official store</a></td>
+<td>Pico W / Pico WH</td>
+</tr>
+<tr>
 <td><a href="https://www.waveshare.com">Waveshare official store</a></td>
-<td>Best for the e-ink display — ensure you get V3 specifically</td>
+<td>Best for the e-ink display</td>
 </tr>
 <tr>
 <td><a href="https://www.amazon.de/-/en/gp/product/B07Q5PZMGT">Amazon DE / UK</a></td>
-<td>Original linked product</td>
+<td>Original linked e-Paper product</td>
 </tr>
 <tr>
 <td><a href="https://shop.pimoroni.com">Pimoroni</a></td>
-<td>Good UK/EU source for Pi Zero WH</td>
+<td>Good UK/EU source for Pico W and accessories</td>
 </tr>
 <tr>
 <td><a href="https://www.adafruit.com">Adafruit</a></td>

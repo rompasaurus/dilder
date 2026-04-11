@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -27,7 +27,7 @@
     
     
       
-        <title>Phase 1: Hardware — Components Ordered, Test Bench Planned - Dilder</title>
+        <title>Phase 1: Hardware — Pico W + E-Ink, Let's Go - Dilder</title>
       
     
     
@@ -90,7 +90,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#phase-1-hardware-components-ordered-test-bench-planned" class="md-skip">
+        <a href="#phase-1-hardware-pico-w-e-ink-lets-go" class="md-skip">
           Skip to content
         </a>
       
@@ -124,7 +124,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Phase 1: Hardware — Components Ordered, Test Bench Planned
+              Phase 1: Hardware — Pico W + E-Ink, Let's Go
             
           </span>
         </div>
@@ -1027,7 +1027,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1252,6 +1252,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../docs/reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../docs/reference/pi-zero-wh/" class="md-nav__link">
         
   
@@ -1259,7 +1287,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1630,10 +1658,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-was-ordered" class="md-nav__link">
+  <a href="#the-hardware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Was Ordered
+        The Hardware
       
     </span>
   </a>
@@ -1663,10 +1691,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#setup-guide" class="md-nav__link">
+  <a href="#setup-guides" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Setup Guide
+        Setup Guides
       
     </span>
   </a>
@@ -1778,105 +1806,98 @@
   
 
 
-<h1 id="phase-1-hardware-components-ordered-test-bench-planned">Phase 1: Hardware — Components Ordered, Test Bench Planned<a class="headerlink" href="#phase-1-hardware-components-ordered-test-bench-planned" title="Permanent link">&para;</a></h1>
-<p>The planning phase is done. The orders are placed. Phase 1 begins when the first package lands.</p>
+<h1 id="phase-1-hardware-pico-w-e-ink-lets-go">Phase 1: Hardware — Pico W + E-Ink, Let's Go<a class="headerlink" href="#phase-1-hardware-pico-w-e-ink-lets-go" title="Permanent link">&para;</a></h1>
+<p>The planning phase is done. We've got hardware on the bench. Phase 1 begins now.</p>
 <!-- more -->
 
-<h2 id="what-was-ordered">What Was Ordered<a class="headerlink" href="#what-was-ordered" title="Permanent link">&para;</a></h2>
+<h2 id="the-hardware">The Hardware<a class="headerlink" href="#the-hardware" title="Permanent link">&para;</a></h2>
+<p>We're starting with what's on hand: a <strong>Raspberry Pi Pico W</strong> and a <strong>Waveshare 2.13" e-Paper HAT V3</strong>. The original plan called for a Pi Zero WH, but the Pico W is cheaper, boots instantly, and is perfect for prototyping the display and input system. The Pi Zero upgrade is planned for Phase 5 when we need Linux.</p>
 <table>
 <thead>
 <tr>
 <th>Item</th>
-<th>Cost</th>
 <th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Raspberry Pi Zero WH</td>
-<td>~€15</td>
-<td>Pre-soldered 40-pin header</td>
+<td>Raspberry Pi Pico W</td>
+<td>RP2040 dual-core, 264KB SRAM, WiFi + BLE, ~€6</td>
 </tr>
 <tr>
 <td>Waveshare 2.13" e-Paper HAT V3</td>
-<td>~€15</td>
-<td>SSD1680 driver, 250×122px</td>
+<td>SSD1680 driver, 250×122px, ~€15</td>
 </tr>
 <tr>
-<td>Micro SD card (32GB)</td>
-<td>~€6</td>
-<td>For Raspberry Pi OS Lite</td>
-</tr>
-<tr>
-<td>Micro-USB power supply (5V 2.5A)</td>
-<td>~€9</td>
-<td>Any decent phone charger</td>
+<td>Micro-USB cable</td>
+<td>Power + data</td>
 </tr>
 <tr>
 <td>Half-size breadboard</td>
-<td>~€4</td>
-<td>Prototyping button wiring</td>
+<td>Prototyping</td>
 </tr>
 <tr>
 <td>Jumper wire kit (M-F, M-M)</td>
-<td>~€4</td>
-<td>Assorted lengths</td>
+<td>Display HAT connects via jumper wires, not the 40-pin header</td>
 </tr>
 <tr>
 <td>6×6mm tactile buttons (×20)</td>
-<td>~€3</td>
 <td>With snap-on caps</td>
-</tr>
-<tr>
-<td><strong>Total</strong></td>
-<td><strong>~€56</strong></td>
-<td></td>
 </tr>
 </tbody>
 </table>
 <h2 id="the-test-bench-plan">The Test Bench Plan<a class="headerlink" href="#the-test-bench-plan" title="Permanent link">&para;</a></h2>
-<p>The test bench is just a Pi Zero WH with the e-ink HAT plugged directly onto the header, and five tactile buttons wired to GPIOs on a half-size breadboard with jumper wires.</p>
+<p>The Pico W sits on a breadboard. The e-ink display connects via 8 jumper wires from the HAT's side header to the Pico W's SPI1 pins. Five tactile buttons wire to GPIOs with internal pull-ups.</p>
 <p>No soldering, no permanent connections. Just enough to confirm everything works before committing to a final layout.</p>
-<p><strong>Display pin mapping:</strong></p>
+<p><strong>Display pin mapping (Pico W SPI1):</strong></p>
 <table>
 <thead>
 <tr>
 <th>E-Paper Pin</th>
-<th>BCM GPIO</th>
+<th>Pico W GPIO</th>
+<th>Pin #</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>VCC</td>
-<td>3.3V (Pin 1)</td>
+<td>3V3(OUT)</td>
+<td>36</td>
 </tr>
 <tr>
 <td>GND</td>
-<td>GND (Pin 6)</td>
+<td>GND</td>
+<td>38</td>
 </tr>
 <tr>
 <td>DIN</td>
-<td>GPIO 10 (MOSI)</td>
+<td>GP11 (SPI1 TX)</td>
+<td>15</td>
 </tr>
 <tr>
 <td>CLK</td>
-<td>GPIO 11 (SCLK)</td>
+<td>GP10 (SPI1 SCK)</td>
+<td>14</td>
 </tr>
 <tr>
 <td>CS</td>
-<td>GPIO 8 (CE0)</td>
+<td>GP9 (SPI1 CSn)</td>
+<td>12</td>
 </tr>
 <tr>
 <td>DC</td>
-<td>GPIO 25</td>
+<td>GP8</td>
+<td>11</td>
 </tr>
 <tr>
 <td>RST</td>
-<td>GPIO 17</td>
+<td>GP12</td>
+<td>16</td>
 </tr>
 <tr>
 <td>BUSY</td>
-<td>GPIO 24</td>
+<td>GP13</td>
+<td>17</td>
 </tr>
 </tbody>
 </table>
@@ -1885,48 +1906,54 @@
 <thead>
 <tr>
 <th>Button</th>
-<th>BCM GPIO</th>
+<th>Pico W GPIO</th>
+<th>Pin #</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Up</td>
-<td>GPIO 5</td>
+<td>GP2</td>
+<td>4</td>
 </tr>
 <tr>
 <td>Down</td>
-<td>GPIO 6</td>
+<td>GP3</td>
+<td>5</td>
 </tr>
 <tr>
 <td>Left</td>
-<td>GPIO 13</td>
+<td>GP4</td>
+<td>6</td>
 </tr>
 <tr>
 <td>Right</td>
-<td>GPIO 19</td>
+<td>GP5</td>
+<td>7</td>
 </tr>
 <tr>
 <td>Center / Select</td>
-<td>GPIO 26</td>
+<td>GP6</td>
+<td>9</td>
 </tr>
 </tbody>
 </table>
 <h2 id="phase-1-goals">Phase 1 Goals<a class="headerlink" href="#phase-1-goals" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] Flash Pi Zero with Raspberry Pi OS Lite (headless)</li>
-<li>[ ] First SSH connection</li>
-<li>[ ] Enable SPI interface</li>
-<li>[ ] Plug HAT onto header, verify display initializes</li>
+<li>[ ] Flash MicroPython firmware onto Pico W</li>
+<li>[ ] Set up VSCode with MicroPico extension on Linux</li>
+<li>[ ] Wire display to Pico W via jumper wires</li>
 <li>[ ] Run Waveshare demo script — confirm display renders</li>
 <li>[ ] Wire 5 buttons on breadboard</li>
 <li>[ ] Write button test script — confirm all 5 inputs register</li>
 <li>[ ] Display a custom image or text as proof-of-life</li>
 </ul>
-<p>When all eight bullets are checked, Phase 1 is complete and Phase 2 (firmware scaffold) begins.</p>
-<h2 id="setup-guide">Setup Guide<a class="headerlink" href="#setup-guide" title="Permanent link">&para;</a></h2>
+<p>When all seven bullets are checked, Phase 1 is complete and Phase 2 (firmware scaffold) begins.</p>
+<h2 id="setup-guides">Setup Guides<a class="headerlink" href="#setup-guides" title="Permanent link">&para;</a></h2>
 <p>The full step-by-step setup process is in the docs:</p>
-<p><a class="md-button" href="../../docs/setup/pi-zero-setup/">Pi Zero Setup Guide <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a>
-<a class="md-button" href="../../docs/setup/display-setup/">Display Setup Guide <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
+<p><a class="md-button" href="../../docs/setup/pi-zero-setup/">Pico W Setup Guide <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a>
+<a class="md-button" href="../../docs/setup/display-setup/">Display Setup Guide <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a>
+<a class="md-button" href="../../docs/setup/dev-environment/">Dev Environment Guide <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
 
 
 

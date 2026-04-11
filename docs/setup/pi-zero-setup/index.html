@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.">
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
       
       
         <meta name="author" content="rompasaurus">
@@ -29,7 +29,7 @@
     
     
       
-        <title>Pi Zero Setup - Dilder</title>
+        <title>Pico W Setup - Dilder</title>
       
     
     
@@ -92,7 +92,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#pi-zero-setup" class="md-skip">
+        <a href="#pico-w-setup" class="md-skip">
           Skip to content
         </a>
       
@@ -126,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Pi Zero Setup
+              Pico W Setup
             
           </span>
         </div>
@@ -1036,7 +1036,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1054,7 +1054,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero Setup
+    Pico W Setup
   
 
     
@@ -1091,22 +1091,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-flash-raspberry-pi-os" class="md-nav__link">
+  <a href="#step-1-download-micropython-firmware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1 — Flash Raspberry Pi OS
+        Step 1 — Download MicroPython Firmware
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 1 — Flash Raspberry Pi OS">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-flash-the-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Flash the Firmware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2 — Flash the Firmware">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#download-raspberry-pi-imager" class="md-nav__link">
+  <a href="#enter-bootsel-mode" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download Raspberry Pi Imager
+        Enter BOOTSEL Mode
       
     </span>
   </a>
@@ -1114,32 +1125,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#choose-the-right-image" class="md-nav__link">
+  <a href="#copy-the-firmware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Choose the Right Image
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#configure-headless-settings" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configure Headless Settings
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#write-the-image" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Write the Image
+        Copy the Firmware
       
     </span>
   </a>
@@ -1152,22 +1141,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-first-boot-and-ssh" class="md-nav__link">
+  <a href="#step-3-verify-micropython-is-running" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2 — First Boot and SSH
+        Step 3 — Verify MicroPython Is Running
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 2 — First Boot and SSH">
+    <nav class="md-nav" aria-label="Step 3 — Verify MicroPython Is Running">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#find-the-pi-on-your-network" class="md-nav__link">
+  <a href="#find-the-serial-port" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Find the Pi on Your Network
+        Find the Serial Port
       
     </span>
   </a>
@@ -1175,10 +1164,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#connect-via-ssh" class="md-nav__link">
+  <a href="#connect-to-the-repl" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Connect via SSH
+        Connect to the REPL
       
     </span>
   </a>
@@ -1186,10 +1175,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#set-up-ssh-keys-recommended" class="md-nav__link">
+  <a href="#quick-smoke-test" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Set Up SSH Keys (Recommended)
+        Quick Smoke Test
       
     </span>
   </a>
@@ -1202,91 +1191,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-system-configuration" class="md-nav__link">
+  <a href="#step-4-test-wi-fi-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3 — System Configuration
+        Step 4 — Test Wi-Fi (Optional)
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Step 3 — System Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#update-the-system" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Update the System
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#enable-spi" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Enable SPI
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#verify-spi-is-active" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verify SPI Is Active
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#set-timezone" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Set Timezone
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-install-dependencies" class="md-nav__link">
+  <a href="#step-5-understand-the-filesystem" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 4 — Install Dependencies
+        Step 5 — Understand the Filesystem
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Step 4 — Install Dependencies">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#create-a-virtual-environment" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Create a Virtual Environment
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1527,6 +1449,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/pi-zero-wh/" class="md-nav__link">
         
   
@@ -1534,7 +1484,7 @@
   <span class="md-ellipsis">
     
   
-    Pi Zero WH
+    Pi Zero WH (future)
   
 
     
@@ -1914,22 +1864,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-flash-raspberry-pi-os" class="md-nav__link">
+  <a href="#step-1-download-micropython-firmware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1 — Flash Raspberry Pi OS
+        Step 1 — Download MicroPython Firmware
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 1 — Flash Raspberry Pi OS">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-flash-the-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Flash the Firmware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2 — Flash the Firmware">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#download-raspberry-pi-imager" class="md-nav__link">
+  <a href="#enter-bootsel-mode" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download Raspberry Pi Imager
+        Enter BOOTSEL Mode
       
     </span>
   </a>
@@ -1937,32 +1898,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#choose-the-right-image" class="md-nav__link">
+  <a href="#copy-the-firmware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Choose the Right Image
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#configure-headless-settings" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configure Headless Settings
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#write-the-image" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Write the Image
+        Copy the Firmware
       
     </span>
   </a>
@@ -1975,22 +1914,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-first-boot-and-ssh" class="md-nav__link">
+  <a href="#step-3-verify-micropython-is-running" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2 — First Boot and SSH
+        Step 3 — Verify MicroPython Is Running
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Step 2 — First Boot and SSH">
+    <nav class="md-nav" aria-label="Step 3 — Verify MicroPython Is Running">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#find-the-pi-on-your-network" class="md-nav__link">
+  <a href="#find-the-serial-port" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Find the Pi on Your Network
+        Find the Serial Port
       
     </span>
   </a>
@@ -1998,10 +1937,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#connect-via-ssh" class="md-nav__link">
+  <a href="#connect-to-the-repl" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Connect via SSH
+        Connect to the REPL
       
     </span>
   </a>
@@ -2009,10 +1948,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#set-up-ssh-keys-recommended" class="md-nav__link">
+  <a href="#quick-smoke-test" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Set Up SSH Keys (Recommended)
+        Quick Smoke Test
       
     </span>
   </a>
@@ -2025,91 +1964,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-system-configuration" class="md-nav__link">
+  <a href="#step-4-test-wi-fi-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3 — System Configuration
+        Step 4 — Test Wi-Fi (Optional)
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Step 3 — System Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#update-the-system" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Update the System
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#enable-spi" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Enable SPI
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#verify-spi-is-active" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verify SPI Is Active
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#set-timezone" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Set Timezone
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-install-dependencies" class="md-nav__link">
+  <a href="#step-5-understand-the-filesystem" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 4 — Install Dependencies
+        Step 5 — Understand the Filesystem
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Step 4 — Install Dependencies">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#create-a-virtual-environment" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Create a Virtual Environment
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -2144,139 +2016,131 @@
   
 
 
-<h1 id="pi-zero-setup">Pi Zero Setup<a class="headerlink" href="#pi-zero-setup" title="Permanent link">&para;</a></h1>
-<p>How to flash Raspberry Pi OS, configure headless access, and prepare the Pi Zero for Dilder development.</p>
-<p>For the complete setup guide including display wiring and development environment, see the full <a href="https://github.com/rompasaurus/dilder/blob/main/docs/setup-guide.md">docs/setup-guide.md</a> in the repo.</p>
+<h1 id="pico-w-setup">Pico W Setup<a class="headerlink" href="#pico-w-setup" title="Permanent link">&para;</a></h1>
+<p>How to flash MicroPython firmware onto the Raspberry Pi Pico W and verify it's working.</p>
 <hr />
 <h2 id="what-you-need">What You Need<a class="headerlink" href="#what-you-need" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Raspberry Pi Zero WH (or Zero 2 WH)</li>
-<li>Micro SD card (16GB+, Class 10)</li>
-<li>A computer with an SD card reader</li>
-<li>Same Wi-Fi network as your development machine</li>
+<li>Raspberry Pi Pico W (or Pico WH)</li>
+<li>Micro-USB cable that supports <strong>data</strong> (not just charging)</li>
+<li>A Linux computer (this guide targets Linux — macOS/Windows steps are similar)</li>
 </ul>
 <hr />
-<h2 id="step-1-flash-raspberry-pi-os">Step 1 — Flash Raspberry Pi OS<a class="headerlink" href="#step-1-flash-raspberry-pi-os" title="Permanent link">&para;</a></h2>
-<h3 id="download-raspberry-pi-imager">Download Raspberry Pi Imager<a class="headerlink" href="#download-raspberry-pi-imager" title="Permanent link">&para;</a></h3>
-<p><a href="https://www.raspberrypi.com/software/">raspberrypi.com/software</a></p>
-<p>Available for macOS, Windows, and Linux.</p>
-<h3 id="choose-the-right-image">Choose the Right Image<a class="headerlink" href="#choose-the-right-image" title="Permanent link">&para;</a></h3>
-<p>Open Imager → <strong>Raspberry Pi OS (other)</strong> → <strong>Raspberry Pi OS Lite (32-bit)</strong></p>
+<h2 id="step-1-download-micropython-firmware">Step 1 — Download MicroPython Firmware<a class="headerlink" href="#step-1-download-micropython-firmware" title="Permanent link">&para;</a></h2>
+<p>Go to the official MicroPython downloads page and grab the latest stable <code>.uf2</code> file for the Pico W:</p>
+<p><a href="https://micropython.org/download/RPI_PICO_W/">micropython.org/download/RPI_PICO_W</a></p>
 <div class="admonition info">
-<p class="admonition-title">Why Lite?</p>
-<p>No desktop. Saves ~1GB, boots faster, uses less RAM. You don't need a GUI — everything is done over SSH.</p>
+<p class="admonition-title">Why MicroPython?</p>
+<p>MicroPython runs directly on the RP2040 with no OS. It gives us a Python REPL, filesystem on flash, and hardware access — all with instant boot. Perfect for prototyping a display + button project.</p>
 </div>
-<h3 id="configure-headless-settings">Configure Headless Settings<a class="headerlink" href="#configure-headless-settings" title="Permanent link">&para;</a></h3>
-<p>Before writing, click the <strong>gear icon</strong> (or press <code>Ctrl+Shift+X</code>) to open the advanced settings:</p>
+<hr />
+<h2 id="step-2-flash-the-firmware">Step 2 — Flash the Firmware<a class="headerlink" href="#step-2-flash-the-firmware" title="Permanent link">&para;</a></h2>
+<h3 id="enter-bootsel-mode">Enter BOOTSEL Mode<a class="headerlink" href="#enter-bootsel-mode" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Hold the BOOTSEL button</strong> on the Pico W (the small white button on the board)</li>
+<li>While holding it, <strong>plug the USB cable</strong> into the Pico W and your computer</li>
+<li><strong>Release BOOTSEL</strong> — the Pico appears as a USB mass storage drive named <code>RPI-RP2</code></li>
+</ol>
+<h3 id="copy-the-firmware">Copy the Firmware<a class="headerlink" href="#copy-the-firmware" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># The drive typically mounts at /run/media/&lt;user&gt;/RPI-RP2 or /media/&lt;user&gt;/RPI-RP2</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># Copy the UF2 file to it</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>cp<span class="w"> </span>~/Downloads/RPI_PICO_W-*.uf2<span class="w"> </span>/run/media/<span class="nv">$USER</span>/RPI-RP2/
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># The Pico reboots automatically — the drive disappears</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># This is normal. The firmware is now installed.</span>
+</span></code></pre></div>
+<p>Or just drag and drop the <code>.uf2</code> file in your file manager.</p>
+<hr />
+<h2 id="step-3-verify-micropython-is-running">Step 3 — Verify MicroPython Is Running<a class="headerlink" href="#step-3-verify-micropython-is-running" title="Permanent link">&para;</a></h2>
+<p>After flashing, the Pico W reboots and appears as a serial device.</p>
+<h3 id="find-the-serial-port">Find the Serial Port<a class="headerlink" href="#find-the-serial-port" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ls<span class="w"> </span>/dev/ttyACM*
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># Expected: /dev/ttyACM0</span>
+</span></code></pre></div>
+<p>If you don't see it, check:</p>
+<ul>
+<li>Is the USB cable a data cable? Charge-only cables won't work.</li>
+<li>Does your user have permission? Add yourself to the <code>dialout</code> group:</li>
+</ul>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>dialout<span class="w"> </span><span class="nv">$USER</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># Log out and back in for this to take effect</span>
+</span></code></pre></div>
+<h3 id="connect-to-the-repl">Connect to the REPL<a class="headerlink" href="#connect-to-the-repl" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Option 1: screen</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>screen<span class="w"> </span>/dev/ttyACM0<span class="w"> </span><span class="m">115200</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Option 2: minicom</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>minicom<span class="w"> </span>-D<span class="w"> </span>/dev/ttyACM0<span class="w"> </span>-b<span class="w"> </span><span class="m">115200</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Option 3: picocom</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>picocom<span class="w"> </span>/dev/ttyACM0<span class="w"> </span>-b<span class="w"> </span><span class="m">115200</span>
+</span></code></pre></div>
+<p>Press <strong>Enter</strong> and you should see the MicroPython prompt:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>MicroPython v1.x.x on 2026-xx-xx; Raspberry Pi Pico W with RP2040
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Type &quot;help()&quot; for more information.
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>&gt;&gt;&gt;
+</span></code></pre></div>
+<h3 id="quick-smoke-test">Quick Smoke Test<a class="headerlink" href="#quick-smoke-test" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">machine</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">led</span> <span class="o">=</span> <span class="n">machine</span><span class="o">.</span><span class="n">Pin</span><span class="p">(</span><span class="s2">&quot;LED&quot;</span><span class="p">,</span> <span class="n">machine</span><span class="o">.</span><span class="n">Pin</span><span class="o">.</span><span class="n">OUT</span><span class="p">)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">led</span><span class="o">.</span><span class="n">on</span><span class="p">()</span>    <span class="c1"># onboard LED turns on</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">led</span><span class="o">.</span><span class="n">off</span><span class="p">()</span>   <span class="c1"># onboard LED turns off</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pico W is alive!&quot;</span><span class="p">)</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">Pico</span> <span class="n">W</span> <span class="ow">is</span> <span class="n">alive</span><span class="err">!</span>
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Exit screen</p>
+<p>Press <code>Ctrl+A</code> then <code>K</code> then <code>Y</code> to exit <code>screen</code>. For minicom: <code>Ctrl+A</code> then <code>X</code>.</p>
+</div>
+<hr />
+<h2 id="step-4-test-wi-fi-optional">Step 4 — Test Wi-Fi (Optional)<a class="headerlink" href="#step-4-test-wi-fi-optional" title="Permanent link">&para;</a></h2>
+<p>The Pico W has onboard Wi-Fi. Verify it can connect to your network:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">network</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">wlan</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">WLAN</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">STA_IF</span><span class="p">)</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">wlan</span><span class="o">.</span><span class="n">active</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">wlan</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;YOUR_SSID&quot;</span><span class="p">,</span> <span class="s2">&quot;YOUR_PASSWORD&quot;</span><span class="p">)</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="o">&gt;&gt;&gt;</span> <span class="c1"># Wait a few seconds</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">wlan</span><span class="o">.</span><span class="n">isconnected</span><span class="p">()</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="kc">True</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">wlan</span><span class="o">.</span><span class="n">ifconfig</span><span class="p">()</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">(</span><span class="s1">&#39;192.168.1.xxx&#39;</span><span class="p">,</span> <span class="s1">&#39;255.255.255.0&#39;</span><span class="p">,</span> <span class="s1">&#39;192.168.1.1&#39;</span><span class="p">,</span> <span class="s1">&#39;8.8.8.8&#39;</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Wi-Fi isn't required for the display prototype, but it's useful to confirm the wireless chip works.</p>
+<hr />
+<h2 id="step-5-understand-the-filesystem">Step 5 — Understand the Filesystem<a class="headerlink" href="#step-5-understand-the-filesystem" title="Permanent link">&para;</a></h2>
+<p>MicroPython provides a small filesystem on the Pico W's 2MB flash. Key files:</p>
 <table>
 <thead>
 <tr>
-<th>Setting</th>
-<th>Value</th>
+<th>File</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Set hostname</td>
-<td><code>dilder.local</code></td>
+<td><code>boot.py</code></td>
+<td>Runs on power-up before anything else. Use for Wi-Fi setup.</td>
 </tr>
 <tr>
-<td>Enable SSH</td>
-<td>✅ (Use password authentication initially)</td>
+<td><code>main.py</code></td>
+<td>Runs automatically after <code>boot.py</code>. Put your application here.</td>
 </tr>
 <tr>
-<td>Set username</td>
-<td><code>pi</code> (or your preferred name)</td>
-</tr>
-<tr>
-<td>Set password</td>
-<td>Choose something secure</td>
-</tr>
-<tr>
-<td>Configure Wi-Fi</td>
-<td>✅ Enter your SSID and password</td>
-</tr>
-<tr>
-<td>Wi-Fi country</td>
-<td>Your country code (e.g., <code>DE</code>, <code>GB</code>, <code>US</code>)</td>
+<td>Other <code>.py</code> files</td>
+<td>Imported as modules. Upload your libraries here.</td>
 </tr>
 </tbody>
 </table>
-<h3 id="write-the-image">Write the Image<a class="headerlink" href="#write-the-image" title="Permanent link">&para;</a></h3>
-<p>Select your SD card → <strong>Write</strong>. Takes 2–5 minutes.</p>
-<hr />
-<h2 id="step-2-first-boot-and-ssh">Step 2 — First Boot and SSH<a class="headerlink" href="#step-2-first-boot-and-ssh" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Insert the SD card into the Pi Zero</li>
-<li>Connect power via micro-USB</li>
-<li>Wait ~60–90 seconds for first boot</li>
-</ol>
-<h3 id="find-the-pi-on-your-network">Find the Pi on Your Network<a class="headerlink" href="#find-the-pi-on-your-network" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># macOS/Linux</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>ping<span class="w"> </span>dilder.local
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># If that fails, check your router&#39;s DHCP client list</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># Or use nmap to scan your local network</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>nmap<span class="w"> </span>-sn<span class="w"> </span><span class="m">192</span>.168.1.0/24<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-A<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="s2">&quot;Raspberry&quot;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="p">[</span><span class="s1">&#39;boot.py&#39;</span><span class="p">]</span>
 </span></code></pre></div>
-<h3 id="connect-via-ssh">Connect via SSH<a class="headerlink" href="#connect-via-ssh" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ssh<span class="w"> </span>pi@dilder.local
-</span></code></pre></div>
-<p>Accept the host key fingerprint on first connect.</p>
-<h3 id="set-up-ssh-keys-recommended">Set Up SSH Keys (Recommended)<a class="headerlink" href="#set-up-ssh-keys-recommended" title="Permanent link">&para;</a></h3>
-<p>Passwordless login speeds up your development workflow significantly:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># On your local machine</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>ssh-copy-id<span class="w"> </span>pi@dilder.local
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Verify it works</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>ssh<span class="w"> </span>pi@dilder.local<span class="w">  </span><span class="c1"># should not ask for password</span>
-</span></code></pre></div>
-<hr />
-<h2 id="step-3-system-configuration">Step 3 — System Configuration<a class="headerlink" href="#step-3-system-configuration" title="Permanent link">&para;</a></h2>
-<h3 id="update-the-system">Update the System<a class="headerlink" href="#update-the-system" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>full-upgrade<span class="w"> </span>-y
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>autoremove<span class="w"> </span>-y
-</span></code></pre></div>
-<p>This takes 5–10 minutes on a Pi Zero. Do it once after first boot.</p>
-<h3 id="enable-spi">Enable SPI<a class="headerlink" href="#enable-spi" title="Permanent link">&para;</a></h3>
-<p>The e-ink display uses SPI. It must be enabled before the display will work.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>raspi-config
-</span></code></pre></div>
-<p>Navigate to: <strong>Interface Options</strong> → <strong>SPI</strong> → <strong>Yes</strong> → <strong>OK</strong></p>
-<p>Then reboot:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>reboot
-</span></code></pre></div>
-<h3 id="verify-spi-is-active">Verify SPI Is Active<a class="headerlink" href="#verify-spi-is-active" title="Permanent link">&para;</a></h3>
-<p>After reboot, reconnect via SSH and check:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ls<span class="w"> </span>/dev/spi*
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># Expected output: /dev/spidev0.0  /dev/spidev0.1</span>
-</span></code></pre></div>
-<p>If you see those devices, SPI is working.</p>
-<h3 id="set-timezone">Set Timezone<a class="headerlink" href="#set-timezone" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>raspi-config
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># Localisation Options → Timezone → select your region</span>
-</span></code></pre></div>
-<hr />
-<h2 id="step-4-install-dependencies">Step 4 — Install Dependencies<a class="headerlink" href="#step-4-install-dependencies" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Python and SPI tools</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-pip<span class="w"> </span>python3-venv<span class="w"> </span>python3-dev<span class="w"> </span>git
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-pil<span class="w"> </span>python3-numpy
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="c1"># SPI library</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-spidev<span class="w"> </span>python3-rpi.gpio
-</span></code></pre></div>
-<h3 id="create-a-virtual-environment">Create a Virtual Environment<a class="headerlink" href="#create-a-virtual-environment" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>mkdir<span class="w"> </span>~/dilder<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~/dilder
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>pip<span class="w"> </span>install<span class="w"> </span>RPi.GPIO<span class="w"> </span>spidev<span class="w"> </span>Pillow
-</span></code></pre></div>
+<p>Files are uploaded from your dev machine using the MicroPico VSCode extension (see <a href="../dev-environment/">Dev Environment</a>).</p>
 <hr />
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../display-setup/">Display Setup</a> — attach the HAT and get pixels on screen</li>
-<li><a href="../dev-environment/">Dev Environment</a> — configure your local machine for remote development</li>
+<li><a href="../display-setup/">Display Setup</a> — wire the e-ink display and get pixels on screen</li>
+<li><a href="../dev-environment/">Dev Environment</a> — set up VSCode with MicroPico for development and debugging</li>
 </ul>
 
 
