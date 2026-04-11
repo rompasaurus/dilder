@@ -1170,6 +1170,791 @@ Bit order:   MSB first
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Connection Utility — USB & Wi-Fi Setup Walkthrough
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ConnectionUtility(ttk.Frame):
+    """
+    Step-by-step walkthrough for connecting the Pico W via USB serial
+    and over Wi-Fi. Includes live status checks at each step.
+    """
+
+    def __init__(self, parent, app):
+        super().__init__(parent)
+        self.app = app
+        self._build_ui()
+
+    def _build_ui(self):
+        # ── Mode selector ──
+        mode_frame = ttk.Frame(self)
+        mode_frame.pack(fill=tk.X, padx=10, pady=(10, 0))
+
+        self.mode_var = tk.StringVar(value="usb")
+        ttk.Radiobutton(mode_frame, text="USB Serial Connection",
+                        variable=self.mode_var, value="usb",
+                        command=self._show_mode).pack(side=tk.LEFT, padx=(0, 20))
+        ttk.Radiobutton(mode_frame, text="Wi-Fi Connection",
+                        variable=self.mode_var, value="wifi",
+                        command=self._show_mode).pack(side=tk.LEFT)
+
+        # ── Content area ──
+        self.content = ttk.Frame(self)
+        self.content.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        self._show_mode()
+
+    def _show_mode(self):
+        for w in self.content.winfo_children():
+            w.destroy()
+        if self.mode_var.get() == "usb":
+            self._build_usb_panel()
+        else:
+            self._build_wifi_panel()
+
+    # ── USB Panel ────────────────────────────────────────────────────────────
+
+    def _build_usb_panel(self):
+        canvas = tk.Canvas(self.content, bg=BG_PANEL, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.content, orient=tk.VERTICAL, command=canvas.yview)
+        scroll_frame = ttk.Frame(canvas)
+
+        scroll_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=scroll_frame, anchor=tk.NW)
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Enable mousewheel scrolling
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        canvas.bind_all("<Button-4>", lambda e: canvas.yview_scroll(-3, "units"))
+        canvas.bind_all("<Button-5>", lambda e: canvas.yview_scroll(3, "units"))
+
+        f = scroll_frame
+
+        # Step 1
+        self._step_header(f, "Step 1", "Plug in the Pico W via USB")
+        self._step_body(f, """\
+Connect the Pico W to your computer using a micro-USB cable.
+
+IMPORTANT: The cable must be a data cable, not a charge-only cable.
+Charge-only cables have no data wires — they physically cannot
+communicate. If in doubt, try a different cable.
+
+The Pico W should NOT be in BOOTSEL mode for serial communication.
+Just plug it in normally with firmware already flashed.""")
+
+        self._step_check_btn(f, "Check: Is a USB device detected?", self._check_usb_device)
+        self.usb_step1_label = ttk.Label(f, text="")
+        self.usb_step1_label.pack(anchor=tk.W, padx=20)
+
+        # Step 2
+        self._step_header(f, "Step 2", "Verify the serial port exists")
+        self._step_body(f, """\
+When the Pico W is running firmware with USB serial enabled
+(stdio_init_all() in C code), it appears as /dev/ttyACM0.
+
+If it does not appear, the Pico W may be:
+  - In BOOTSEL mode (shows as RPI-RP2 drive instead)
+  - Running firmware without USB serial enabled
+  - Connected with a charge-only cable""")
+
+        self._step_check_btn(f, "Check: Is /dev/ttyACM0 present?", self._check_serial_port)
+        self.usb_step2_label = ttk.Label(f, text="")
+        self.usb_step2_label.pack(anchor=tk.W, padx=20)
+
+        # Step 3
+        self._step_header(f, "Step 3", "Verify serial port permissions")
+        self._step_body(f, """\
+Your user must be in the serial port group to access the device.
+
+  Arch / CachyOS / Manjaro:  uucp
+  Ubuntu / Debian:            dialout
+
+If you are not in the group, run:
+  sudo usermod -aG uucp $USER    (Arch)
+  sudo usermod -aG dialout $USER (Debian)
+
+Then log out and back in (a new terminal is not enough).""")
+
+        self._step_check_btn(f, "Check: Do I have serial permissions?", self._check_serial_perms)
+        self.usb_step3_label = ttk.Label(f, text="")
+        self.usb_step3_label.pack(anchor=tk.W, padx=20)
+
+        # Step 4
+        self._step_header(f, "Step 4", "Open the Serial Monitor")
+        self._step_body(f, """\
+Everything looks good — switch to the Serial Monitor tab to connect.
+
+  1. Go to the "Serial Monitor" tab
+  2. Port should auto-select /dev/ttyACM0
+  3. Baud rate: 115200
+  4. Click "Connect"
+
+You should see printf output from your Pico W firmware.""")
+
+        ttk.Button(f, text="Go to Serial Monitor",
+                   command=lambda: self.app.notebook.select(self.app.serial_tab)).pack(
+                       anchor=tk.W, padx=20, pady=(5, 20))
+
+    # ── Wi-Fi Panel ──────────────────────────────────────────────────────────
+
+    def _build_wifi_panel(self):
+        canvas = tk.Canvas(self.content, bg=BG_PANEL, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.content, orient=tk.VERTICAL, command=canvas.yview)
+        scroll_frame = ttk.Frame(canvas)
+
+        scroll_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=scroll_frame, anchor=tk.NW)
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        canvas.bind_all("<Button-4>", lambda e: canvas.yview_scroll(-3, "units"))
+        canvas.bind_all("<Button-5>", lambda e: canvas.yview_scroll(3, "units"))
+
+        f = scroll_frame
+
+        # Overview
+        self._step_header(f, "Overview", "Pico W Wi-Fi Connection")
+        self._step_body(f, """\
+The Pico W has an onboard Infineon CYW43439 Wi-Fi chip
+(802.11n, 2.4 GHz). You can use it to connect the Pico W to
+your local network and communicate with it wirelessly —
+no USB cable needed after initial setup.
+
+This requires firmware that initialises Wi-Fi. The hello world
+examples do not use Wi-Fi. You will need to write or flash
+Wi-Fi-enabled firmware first.""")
+
+        # Step 1
+        self._step_header(f, "Step 1", "Add Wi-Fi credentials to your firmware")
+        self._step_body(f, """\
+In your C code, initialise Wi-Fi and connect to your network:""")
+
+        code_frame = ttk.Frame(f)
+        code_frame.pack(fill=tk.X, padx=20, pady=(0, 10))
+        code_text = tk.Text(code_frame, height=14, wrap=tk.NONE, bg=BG_DARK, fg=FG_TEXT,
+                            font=("JetBrains Mono", 10), state=tk.DISABLED)
+        code_text.pack(fill=tk.X)
+        code_text.configure(state=tk.NORMAL)
+        code_text.insert(tk.END, """\
+#include "pico/cyw43_arch.h"
+#include "lwip/tcp.h"
+
+// Initialise Wi-Fi
+if (cyw43_arch_init_with_country(CYW43_COUNTRY_USA)) {
+    printf("Wi-Fi init failed\\n");
+    return 1;
+}
+cyw43_arch_enable_sta_mode();
+
+// Connect to your network
+if (cyw43_arch_wifi_connect_timeout_ms(
+        "YOUR_SSID", "YOUR_PASSWORD",
+        CYW43_AUTH_WPA2_AES_PSK, 10000)) {
+    printf("Wi-Fi connect failed\\n");
+} else {
+    printf("Wi-Fi connected\\n");
+}""")
+        code_text.configure(state=tk.DISABLED)
+
+        # Step 2
+        self._step_header(f, "Step 2", "Link the Wi-Fi libraries in CMakeLists.txt")
+        self._step_body(f, """\
+Add these libraries to your target_link_libraries():""")
+
+        cmake_frame = ttk.Frame(f)
+        cmake_frame.pack(fill=tk.X, padx=20, pady=(0, 10))
+        cmake_text = tk.Text(cmake_frame, height=6, wrap=tk.NONE, bg=BG_DARK, fg=FG_TEXT,
+                             font=("JetBrains Mono", 10), state=tk.DISABLED)
+        cmake_text.pack(fill=tk.X)
+        cmake_text.configure(state=tk.NORMAL)
+        cmake_text.insert(tk.END, """\
+target_link_libraries(your_project
+    pico_stdlib
+    pico_cyw43_arch_lwip_threadsafe_background
+    hardware_spi
+    hardware_gpio
+)""")
+        cmake_text.configure(state=tk.DISABLED)
+
+        # Step 3
+        self._step_header(f, "Step 3", "Find the Pico W on your network")
+        self._step_body(f, """\
+After the Pico W connects to Wi-Fi, it gets an IP address via DHCP.
+Your firmware should print it:
+
+    printf("IP: %s\\n", ip4addr_ntoa(
+        netif_ip4_addr(netif_list)));
+
+Then you can ping it from your computer:""")
+
+        self._step_check_btn(f, "Scan: Find Pico W on local network", self._scan_network)
+        self.wifi_scan_label = ttk.Label(f, text="")
+        self.wifi_scan_label.pack(anchor=tk.W, padx=20)
+
+        # Step 4
+        self._step_header(f, "Step 4", "Communicate over Wi-Fi")
+        self._step_body(f, """\
+With Wi-Fi working, you have several options:
+
+TCP Socket Server — Run a TCP listener on the Pico W.
+  Your DevTool or any script can connect and send commands
+  or image data over the network instead of USB serial.
+
+HTTP Server — Serve a simple web page from the Pico W.
+  Useful for status dashboards or remote control.
+
+UDP Broadcast — The Pico W can announce itself on the
+  network so the DevTool can auto-discover it.
+
+mDNS — Advertise the Pico W as "dilder.local" on the
+  network so you don't need to know the IP address.
+
+These are firmware features you build in C. The Pico SDK
+includes lwIP (lightweight IP stack) which supports all
+of the above.""")
+
+        # Wi-Fi connection test
+        self._step_header(f, "Quick Connect", "Test a TCP connection to the Pico W")
+        self._step_body(f, """\
+If your firmware is running a TCP server, enter the IP and
+port below to test the connection.""")
+
+        conn_frame = ttk.Frame(f)
+        conn_frame.pack(fill=tk.X, padx=20, pady=(0, 10))
+
+        ttk.Label(conn_frame, text="IP:").pack(side=tk.LEFT)
+        self.wifi_ip_var = tk.StringVar(value="192.168.1.")
+        ttk.Entry(conn_frame, textvariable=self.wifi_ip_var, width=16).pack(side=tk.LEFT, padx=(3, 10))
+
+        ttk.Label(conn_frame, text="Port:").pack(side=tk.LEFT)
+        self.wifi_port_var = tk.StringVar(value="4242")
+        ttk.Entry(conn_frame, textvariable=self.wifi_port_var, width=6).pack(side=tk.LEFT, padx=(3, 10))
+
+        ttk.Button(conn_frame, text="Test Connection", command=self._test_wifi_conn).pack(side=tk.LEFT)
+
+        self.wifi_conn_label = ttk.Label(f, text="")
+        self.wifi_conn_label.pack(anchor=tk.W, padx=20, pady=(0, 20))
+
+    # ── Helpers ──────────────────────────────────────────────────────────────
+
+    def _step_header(self, parent, step, title):
+        frame = ttk.Frame(parent)
+        frame.pack(fill=tk.X, padx=10, pady=(15, 2))
+        lbl = ttk.Label(frame, text=f"{step} — {title}",
+                        font=("JetBrains Mono", 12, "bold"), foreground=FG_ACCENT)
+        lbl.pack(anchor=tk.W)
+        ttk.Separator(frame, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=(3, 0))
+
+    def _step_body(self, parent, text):
+        lbl = ttk.Label(parent, text=text, wraplength=700, justify=tk.LEFT,
+                        font=("JetBrains Mono", 10))
+        lbl.pack(anchor=tk.W, padx=20, pady=(5, 5))
+
+    def _step_check_btn(self, parent, text, command):
+        ttk.Button(parent, text=text, command=command).pack(anchor=tk.W, padx=20, pady=(5, 3))
+
+    # ── USB Checks ───────────────────────────────────────────────────────────
+
+    def _check_usb_device(self):
+        try:
+            result = subprocess.run(["lsusb"], capture_output=True, text=True, timeout=5)
+            pico_lines = [l for l in result.stdout.splitlines()
+                          if "2e8a" in l.lower() or "raspberry pi" in l.lower() or "rpi" in l.lower()]
+            if pico_lines:
+                self.usb_step1_label.config(text=f"  ✓ Pico W detected: {pico_lines[0].strip()}",
+                                            foreground=FG_GREEN)
+                self.app.log("USB check: Pico W detected")
+            else:
+                self.usb_step1_label.config(text="  ✗ No Pico W found on USB. Check cable and connection.",
+                                            foreground=FG_RED)
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            self.usb_step1_label.config(text="  ? lsusb not available — check manually with: lsusb",
+                                        foreground=FG_YELLOW)
+
+    def _check_serial_port(self):
+        tty = Path("/dev/ttyACM0")
+        if tty.exists():
+            self.usb_step2_label.config(text="  ✓ /dev/ttyACM0 exists — Pico W serial is ready",
+                                        foreground=FG_GREEN)
+            self.app.log("Serial port check: /dev/ttyACM0 found")
+        else:
+            # Check for any ttyACM
+            import glob
+            others = glob.glob("/dev/ttyACM*")
+            if others:
+                self.usb_step2_label.config(
+                    text=f"  ~ /dev/ttyACM0 not found, but found: {', '.join(others)}",
+                    foreground=FG_YELLOW)
+            else:
+                self.usb_step2_label.config(
+                    text="  ✗ No /dev/ttyACM* devices found. Is the Pico W plugged in with firmware?",
+                    foreground=FG_RED)
+
+    def _check_serial_perms(self):
+        result = subprocess.run(["groups"], capture_output=True, text=True)
+        groups = result.stdout.strip().split() if result.returncode == 0 else []
+
+        # Check both possible groups
+        in_uucp = "uucp" in groups
+        in_dialout = "dialout" in groups
+
+        if in_uucp or in_dialout:
+            group = "uucp" if in_uucp else "dialout"
+            self.usb_step3_label.config(text=f"  ✓ You are in the '{group}' group — permissions OK",
+                                        foreground=FG_GREEN)
+            self.app.log(f"Permission check: in '{group}' group")
+        else:
+            self.usb_step3_label.config(
+                text="  ✗ Not in 'uucp' or 'dialout'. Run: sudo usermod -aG uucp $USER (then log out/in)",
+                foreground=FG_RED)
+
+    # ── Wi-Fi Checks ─────────────────────────────────────────────────────────
+
+    def _scan_network(self):
+        self.wifi_scan_label.config(text="  Scanning...", foreground=FG_YELLOW)
+        self.update_idletasks()
+
+        def _do_scan():
+            # Try nmap ping scan on common subnets
+            found = []
+            try:
+                # Get local subnet
+                result = subprocess.run(
+                    ["ip", "route", "show", "default"],
+                    capture_output=True, text=True, timeout=3
+                )
+                gateway = None
+                if result.returncode == 0:
+                    parts = result.stdout.split()
+                    if "via" in parts:
+                        gateway = parts[parts.index("via") + 1]
+
+                if gateway:
+                    subnet = ".".join(gateway.split(".")[:3]) + ".0/24"
+                    # Quick arp scan
+                    result = subprocess.run(
+                        ["ip", "neigh", "show"],
+                        capture_output=True, text=True, timeout=5
+                    )
+                    if result.returncode == 0:
+                        for line in result.stdout.splitlines():
+                            if "REACHABLE" in line or "STALE" in line:
+                                ip = line.split()[0]
+                                found.append(ip)
+
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                pass
+
+            def _update():
+                if found:
+                    self.wifi_scan_label.config(
+                        text=f"  Found {len(found)} devices on local network. "
+                             f"Check serial output for Pico W's IP address.",
+                        foreground=FG_GREEN)
+                else:
+                    self.wifi_scan_label.config(
+                        text="  No devices found. Check that Pico W firmware has Wi-Fi enabled.",
+                        foreground=FG_YELLOW)
+
+            self.winfo_toplevel().after(0, _update)
+
+        threading.Thread(target=_do_scan, daemon=True).start()
+
+    def _test_wifi_conn(self):
+        import socket
+        ip = self.wifi_ip_var.get().strip()
+        try:
+            port = int(self.wifi_port_var.get().strip())
+        except ValueError:
+            self.wifi_conn_label.config(text="  ✗ Invalid port number", foreground=FG_RED)
+            return
+
+        self.wifi_conn_label.config(text=f"  Connecting to {ip}:{port}...", foreground=FG_YELLOW)
+        self.update_idletasks()
+
+        def _do_connect():
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(3)
+                sock.connect((ip, port))
+                sock.close()
+                msg = f"  ✓ Connected to {ip}:{port} — Pico W is reachable"
+                colour = FG_GREEN
+                self.app.log(f"Wi-Fi test: connected to {ip}:{port}")
+            except socket.timeout:
+                msg = f"  ✗ Connection timed out. Is the Pico W running a TCP server on port {port}?"
+                colour = FG_RED
+            except ConnectionRefusedError:
+                msg = f"  ✗ Connection refused. The Pico W is reachable but no server on port {port}."
+                colour = FG_YELLOW
+            except OSError as e:
+                msg = f"  ✗ Connection failed: {e}"
+                colour = FG_RED
+
+            self.winfo_toplevel().after(0, lambda: self.wifi_conn_label.config(text=msg, foreground=colour))
+
+        threading.Thread(target=_do_connect, daemon=True).start()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Documentation Tab
+# ─────────────────────────────────────────────────────────────────────────────
+
+class DocumentationTab(ttk.Frame):
+    """Embedded application documentation with searchable text."""
+
+    def __init__(self, parent, app):
+        super().__init__(parent)
+        self.app = app
+        self._build_ui()
+
+    def _build_ui(self):
+        # ── Search bar ──
+        search_frame = ttk.Frame(self)
+        search_frame.pack(fill=tk.X, padx=10, pady=(10, 5))
+
+        ttk.Label(search_frame, text="Search:").pack(side=tk.LEFT, padx=(0, 5))
+        self.search_var = tk.StringVar()
+        self.search_entry = ttk.Entry(search_frame, textvariable=self.search_var, width=30)
+        self.search_entry.pack(side=tk.LEFT, padx=(0, 5))
+        self.search_entry.bind("<Return>", self._search)
+        ttk.Button(search_frame, text="Find", command=self._search).pack(side=tk.LEFT, padx=2)
+        ttk.Button(search_frame, text="Clear", command=self._clear_search).pack(side=tk.LEFT, padx=2)
+
+        # ── TOC + Content ──
+        paned = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
+        paned.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
+
+        # TOC sidebar
+        toc_frame = ttk.Frame(paned)
+        paned.add(toc_frame, weight=1)
+
+        ttk.Label(toc_frame, text="Contents", font=("JetBrains Mono", 11, "bold"),
+                  foreground=FG_ACCENT).pack(anchor=tk.W, pady=(0, 5))
+
+        self.toc_list = tk.Listbox(
+            toc_frame, width=28, bg=BG_DARK, fg=FG_TEXT,
+            selectbackground=FG_ACCENT, selectforeground=BG_DARK,
+            font=("JetBrains Mono", 10), activestyle="none",
+        )
+        self.toc_list.pack(fill=tk.BOTH, expand=True)
+        self.toc_list.bind("<<ListboxSelect>>", self._on_toc_select)
+
+        # Content area
+        content_frame = ttk.Frame(paned)
+        paned.add(content_frame, weight=4)
+
+        self.doc_text = tk.Text(
+            content_frame, wrap=tk.WORD, bg=BG_DARK, fg=FG_TEXT,
+            font=("JetBrains Mono", 10), state=tk.DISABLED,
+            selectbackground=FG_ACCENT, selectforeground=BG_DARK,
+            padx=15, pady=10,
+        )
+        doc_scroll = ttk.Scrollbar(content_frame, command=self.doc_text.yview)
+        self.doc_text.configure(yscrollcommand=doc_scroll.set)
+        doc_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        self.doc_text.pack(fill=tk.BOTH, expand=True)
+
+        # Configure text tags
+        self.doc_text.tag_configure("h1", font=("JetBrains Mono", 16, "bold"),
+                                    foreground=FG_ACCENT, spacing3=10)
+        self.doc_text.tag_configure("h2", font=("JetBrains Mono", 13, "bold"),
+                                    foreground=FG_MAGENTA, spacing1=15, spacing3=5)
+        self.doc_text.tag_configure("body", font=("JetBrains Mono", 10),
+                                    foreground=FG_TEXT, spacing1=2, lmargin1=10, lmargin2=10)
+        self.doc_text.tag_configure("code", font=("JetBrains Mono", 10),
+                                    foreground=FG_GREEN, background="#1a1a2e",
+                                    lmargin1=30, lmargin2=30, spacing1=2)
+        self.doc_text.tag_configure("highlight", background=FG_YELLOW, foreground=BG_DARK)
+        self.doc_text.tag_configure("key", font=("JetBrains Mono", 10, "bold"),
+                                    foreground=FG_YELLOW)
+
+        self._load_docs()
+
+    def _load_docs(self):
+        self.sections = []
+        self.section_indices = {}
+
+        docs = self._get_documentation()
+
+        self.doc_text.configure(state=tk.NORMAL)
+        self.doc_text.delete("1.0", tk.END)
+
+        for section in docs:
+            title = section["title"]
+            self.sections.append(title)
+            self.toc_list.insert(tk.END, title)
+
+            idx = self.doc_text.index(tk.END)
+            self.section_indices[title] = idx
+
+            if section.get("level") == 1:
+                self.doc_text.insert(tk.END, title + "\n", "h1")
+            else:
+                self.doc_text.insert(tk.END, title + "\n", "h2")
+
+            for block in section["content"]:
+                if block["type"] == "text":
+                    self.doc_text.insert(tk.END, block["text"] + "\n", "body")
+                elif block["type"] == "code":
+                    self.doc_text.insert(tk.END, block["text"] + "\n", "code")
+
+            self.doc_text.insert(tk.END, "\n", "body")
+
+        self.doc_text.configure(state=tk.DISABLED)
+
+    def _on_toc_select(self, event=None):
+        sel = self.toc_list.curselection()
+        if not sel:
+            return
+        title = self.toc_list.get(sel[0])
+        if title in self.section_indices:
+            self.doc_text.see(self.section_indices[title])
+
+    def _search(self, event=None):
+        query = self.search_var.get().strip()
+        if not query:
+            return
+
+        self.doc_text.tag_remove("highlight", "1.0", tk.END)
+
+        start = "1.0"
+        first_match = None
+        while True:
+            pos = self.doc_text.search(query, start, stopindex=tk.END, nocase=True)
+            if not pos:
+                break
+            end = f"{pos}+{len(query)}c"
+            self.doc_text.tag_add("highlight", pos, end)
+            if first_match is None:
+                first_match = pos
+            start = end
+
+        if first_match:
+            self.doc_text.see(first_match)
+
+    def _clear_search(self):
+        self.search_var.set("")
+        self.doc_text.tag_remove("highlight", "1.0", tk.END)
+
+    def _get_documentation(self):
+        """Return structured documentation content."""
+        return [
+            {
+                "title": "Dilder DevTool",
+                "level": 1,
+                "content": [
+                    {"type": "text", "text": (
+                        "A development companion for the Pico W + Waveshare 2.13\" "
+                        "e-ink display. Provides tools for drawing display images, "
+                        "monitoring serial output, flashing firmware, managing assets, "
+                        "and connecting over USB or Wi-Fi."
+                    )},
+                ],
+            },
+            {
+                "title": "Display Emulator",
+                "level": 2,
+                "content": [
+                    {"type": "text", "text": (
+                        "A 250x122 pixel canvas that matches the real e-ink display exactly. "
+                        "Everything is 1-bit monochrome — black or white only.\n\n"
+                        "Tools:\n"
+                        "  Pencil — freehand draw in black (click or drag)\n"
+                        "  Eraser — freehand erase to white\n"
+                        "  Line — click start, drag to end, release\n"
+                        "  Rect — draw a rectangle outline\n"
+                        "  Fill Rect — draw a filled rectangle\n"
+                        "  Text — click a position, type text in the dialog\n\n"
+                        "The Size spinner controls brush width and line thickness.\n"
+                        "The Font spinner controls text size (8-48 px)."
+                    )},
+                    {"type": "text", "text": (
+                        "Saving:\n"
+                        "Click Save, enter a name. Three files are created in assets/:\n"
+                        "  name.pbm — PBM binary (standard 1-bit image format)\n"
+                        "  name.bin — raw bytes (direct display buffer for C code)\n"
+                        "  name.png — PNG image (requires Pillow)\n\n"
+                        "Loading:\n"
+                        "Click Load to open any .pbm, .bin, or .png file back into the canvas."
+                    )},
+                    {"type": "text", "text": (
+                        "Send to Pico:\n"
+                        "Transmits the current image to the Pico W over USB serial. "
+                        "Requires firmware that listens for the IMG: protocol."
+                    )},
+                ],
+            },
+            {
+                "title": "Serial Monitor",
+                "level": 2,
+                "content": [
+                    {"type": "text", "text": (
+                        "Live serial terminal for the Pico W USB connection.\n\n"
+                        "1. Select the port (auto-detects /dev/ttyACM0)\n"
+                        "2. Set baud rate to 115200\n"
+                        "3. Click Connect\n"
+                        "4. printf() output from your firmware appears in real time"
+                    )},
+                    {"type": "text", "text": (
+                        "Sending commands:\n"
+                        "Type in the input bar and press Enter. Text is sent with \\r\\n.\n\n"
+                        "Special buttons:\n"
+                        "  Ctrl+C — interrupt running code\n"
+                        "  Reset — soft-reset the Pico W (Ctrl+D)\n\n"
+                        "Save Log saves the full output history to a text file."
+                    )},
+                ],
+            },
+            {
+                "title": "Flash Firmware",
+                "level": 2,
+                "content": [
+                    {"type": "text", "text": (
+                        "Flash .uf2 firmware files to the Pico W.\n\n"
+                        "Steps:\n"
+                        "1. Select a .uf2 file (Browse or Quick Flash buttons)\n"
+                        "2. Put Pico W in BOOTSEL mode:\n"
+                        "   - Unplug USB\n"
+                        "   - Hold BOOTSEL button\n"
+                        "   - Plug in USB while holding\n"
+                        "   - Release after 1 second\n"
+                        "3. Click Detect RPI-RP2\n"
+                        "4. Click Flash\n\n"
+                        "The Pico W reboots automatically after flashing."
+                    )},
+                    {"type": "text", "text": (
+                        "Build buttons:\n"
+                        "Build Hello Serial and Build Hello Display run CMake + Ninja "
+                        "directly. Output appears in the log bar. Requires the ARM "
+                        "toolchain and PICO_SDK_PATH to be set."
+                    )},
+                ],
+            },
+            {
+                "title": "Assets",
+                "level": 2,
+                "content": [
+                    {"type": "text", "text": (
+                        "Browse and manage display images saved in the assets/ folder.\n\n"
+                        "Click a file to preview it at 2x scale. The preview shows "
+                        "exactly how the image will look on the e-ink display.\n\n"
+                        "Supported formats: .pbm, .bin, .png\n\n"
+                        "Delete removes the selected file. Open Folder opens assets/ "
+                        "in your system file manager."
+                    )},
+                ],
+            },
+            {
+                "title": "GPIO Pins",
+                "level": 2,
+                "content": [
+                    {"type": "text", "text": (
+                        "Visual reference of the Pico W 40-pin header with all Dilder "
+                        "project assignments. Shows display SPI1 pins, button pins, "
+                        "power connections, and SPI configuration."
+                    )},
+                ],
+            },
+            {
+                "title": "Connection Utility",
+                "level": 2,
+                "content": [
+                    {"type": "text", "text": (
+                        "Step-by-step walkthrough for connecting the Pico W.\n\n"
+                        "USB Serial:\n"
+                        "Guides you through plugging in, verifying the serial port, "
+                        "checking permissions, and opening the serial monitor. "
+                        "Each step has a Check button that verifies the current state.\n\n"
+                        "Wi-Fi:\n"
+                        "Explains how to add Wi-Fi to your firmware, provides the C "
+                        "code and CMake config, and includes a TCP connection tester. "
+                        "The Pico W supports 802.11n on 2.4 GHz."
+                    )},
+                ],
+            },
+            {
+                "title": "Keyboard Shortcuts",
+                "level": 2,
+                "content": [
+                    {"type": "text", "text": (
+                        "Display Emulator:\n"
+                        "  Left-click — draw/place with current tool\n"
+                        "  Drag — freehand draw or shape preview\n"
+                        "  Release — finalise shape (line/rect)\n\n"
+                        "Serial Monitor:\n"
+                        "  Enter — send command\n"
+                        "  Ctrl+C button — interrupt\n"
+                        "  Reset button — soft-reset (Ctrl+D)"
+                    )},
+                ],
+            },
+            {
+                "title": "File Formats",
+                "level": 2,
+                "content": [
+                    {"type": "text", "text": (
+                        "PBM (P4 Binary):\n"
+                        "Standard 1-bit image. Header + packed binary data.\n"
+                        "Each byte = 8 pixels, MSB = leftmost. 1=black, 0=white."
+                    )},
+                    {"type": "code", "text": (
+                        "P4\n"
+                        "250 122\n"
+                        "<3904 bytes of pixel data>"
+                    )},
+                    {"type": "text", "text": (
+                        "BIN (Raw Display Buffer):\n"
+                        "No header. 32 bytes/row x 122 rows = 3904 bytes.\n"
+                        "Same byte layout as the Waveshare driver framebuffer.\n"
+                        "Can be loaded directly in C code:"
+                    )},
+                    {"type": "code", "text": (
+                        "const uint8_t img[3904] = { /* .bin contents */ };\n"
+                        "EPD_2in13_V3_Display(img);"
+                    )},
+                    {"type": "text", "text": (
+                        "PNG:\n"
+                        "Standard 250x122 1-bit PNG. Requires Pillow to save/load."
+                    )},
+                ],
+            },
+            {
+                "title": "Troubleshooting",
+                "level": 2,
+                "content": [
+                    {"type": "text", "text": (
+                        "tkinter not found:\n"
+                        "  Arch: sudo pacman -S tk\n"
+                        "  Debian: sudo apt install python3-tk\n\n"
+                        "pyserial not found:\n"
+                        "  sudo pacman -S python-pyserial  (Arch)\n"
+                        "  pip install pyserial  (other)\n\n"
+                        "Text tool renders blocks:\n"
+                        "  Install Pillow: pip install Pillow\n\n"
+                        "Serial monitor can't connect:\n"
+                        "  Check USB cable is data-capable\n"
+                        "  Check serial group: groups | grep uucp\n"
+                        "  Check device exists: ls /dev/ttyACM*\n\n"
+                        "Flash button says not detected:\n"
+                        "  Put Pico W in BOOTSEL mode first\n"
+                        "  (Hold BOOTSEL, plug in USB, release)\n\n"
+                        "Canvas is slow with large fills:\n"
+                        "  Tkinter draws individual rectangles per pixel.\n"
+                        "  Brief lag on large operations is normal."
+                    )},
+                ],
+            },
+        ]
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Main Application
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -1231,6 +2016,14 @@ class DilderDevTool(tk.Tk):
         # Tab 5: Pin Viewer
         self.pin_tab = PinViewer(self.notebook, self)
         self.notebook.add(self.pin_tab, text="  GPIO Pins  ")
+
+        # Tab 6: Connection Utility
+        self.conn_tab = ConnectionUtility(self.notebook, self)
+        self.notebook.add(self.conn_tab, text="  Connect  ")
+
+        # Tab 7: Documentation
+        self.docs_tab = DocumentationTab(self.notebook, self)
+        self.notebook.add(self.docs_tab, text="  Docs  ")
 
         # ── Log bar at bottom ──
         log_frame = ttk.Frame(self)

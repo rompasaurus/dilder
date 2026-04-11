@@ -491,3 +491,16 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `DevTool/README.md` (created — 11-section walkthrough with TOC: requirements, installation, all five tabs documented with usage instructions, file formats, architecture overview, class structure, threading model, troubleshooting table)
   - `assets/` (created — empty directory for saved display images)
   - `PromptProgression.md` (modified — added Prompt #36)
+
+---
+
+## Prompt #37
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Add a utility tab to walk through connecting the Pico via USB, and also add a Wi-Fi option as well in the GUI as a tab. Be descriptive and simple as possible. And add a documentation tab to reference how to use the application."
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~25,000
+- **Commit:** *(see below)*
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — added two new tabs: ConnectionUtility with USB serial walkthrough (4 steps with live Check buttons for device detection, serial port, permissions, plus link to Serial Monitor) and Wi-Fi walkthrough (C code examples, CMake config, network scanner, TCP connection tester with IP/port input); DocumentationTab with searchable TOC sidebar, styled headings/code blocks, Find/Clear search with highlight, covers all 7 tabs plus keyboard shortcuts, file formats, and troubleshooting)
+  - `DevTool/README.md` (modified — updated TOC, launch table, and architecture table for 7 tabs; added Section 9 Connection Utility with USB and Wi-Fi step tables; added Section 10 Documentation tab description; renumbered remaining sections)
+  - `PromptProgression.md` (modified — added Prompt #37)

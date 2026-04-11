@@ -1,6 +1,6 @@
 # Dilder DevTool — Pico W Development Companion
 
-A Tkinter GUI application for developing on the Raspberry Pi Pico W with the Waveshare 2.13" e-ink display. Provides a display emulator, serial monitor, firmware flash utility, asset manager, and GPIO reference — all in one window.
+A Tkinter GUI application for developing on the Raspberry Pi Pico W with the Waveshare 2.13" e-ink display. Provides a display emulator, serial monitor, firmware flash utility, asset manager, GPIO reference, USB/Wi-Fi connection walkthrough, and built-in documentation — all in one window.
 
 ---
 
@@ -29,9 +29,13 @@ A Tkinter GUI application for developing on the Raspberry Pi Pico W with the Wav
    - [Previewing](#previewing)
    - [Deleting](#deleting)
 8. [Tab 5 — GPIO Pin Reference](#8-tab-5--gpio-pin-reference)
-9. [File Formats](#9-file-formats)
-10. [Architecture Overview](#10-architecture-overview)
-11. [Troubleshooting](#11-troubleshooting)
+9. [Tab 6 — Connection Utility](#9-tab-6--connection-utility)
+   - [USB Serial Walkthrough](#usb-serial-walkthrough)
+   - [Wi-Fi Walkthrough](#wi-fi-walkthrough)
+10. [Tab 7 — Documentation](#10-tab-7--documentation)
+11. [File Formats](#11-file-formats)
+12. [Architecture Overview](#12-architecture-overview)
+13. [Troubleshooting](#13-troubleshooting)
 
 ---
 
@@ -100,6 +104,8 @@ The application opens with five tabs across the top:
 | **Flash Firmware** | Flash .uf2 files to the Pico W |
 | **Assets** | Browse and manage saved display images |
 | **GPIO Pins** | Visual pin assignment reference |
+| **Connect** | Step-by-step USB serial and Wi-Fi connection walkthrough |
+| **Docs** | Searchable built-in documentation for the entire application |
 
 A log bar at the bottom shows status messages and timestamps.
 
@@ -262,7 +268,63 @@ This tab is a quick reference so you don't need to switch to the documentation w
 
 ---
 
-## 9. File Formats
+## 9. Tab 6 — Connection Utility
+
+A guided walkthrough for connecting the Pico W to your computer. Switch between USB Serial and Wi-Fi modes using the radio buttons at the top.
+
+### USB Serial Walkthrough
+
+Four steps, each with a live **Check** button that verifies the current state:
+
+| Step | What it checks |
+|------|----------------|
+| **Step 1 — Plug in the Pico W** | Runs `lsusb` to detect the Pico W USB device (vendor ID `2e8a`). Confirms the cable is a data cable. |
+| **Step 2 — Verify serial port** | Checks if `/dev/ttyACM0` exists. If not, explains why (BOOTSEL mode, charge-only cable, no firmware). |
+| **Step 3 — Check permissions** | Verifies your user is in the `uucp` (Arch) or `dialout` (Debian) group. Shows the fix command if not. |
+| **Step 4 — Open Serial Monitor** | Links directly to the Serial Monitor tab. One click to switch over and connect. |
+
+Each check button gives a green checkmark, yellow warning, or red error with a specific explanation.
+
+### Wi-Fi Walkthrough
+
+Guides you through adding Wi-Fi support to your Pico W firmware:
+
+| Step | What it covers |
+|------|----------------|
+| **Overview** | Explains the CYW43439 Wi-Fi chip, 802.11n 2.4 GHz capability. |
+| **Step 1 — Add Wi-Fi credentials** | Provides the exact C code to initialise Wi-Fi and connect to a network. Copy-paste ready. |
+| **Step 2 — CMake configuration** | Shows which library to link: `pico_cyw43_arch_lwip_threadsafe_background`. |
+| **Step 3 — Find Pico on network** | Network scan button that checks the ARP table for reachable devices. Shows how to print the IP from firmware. |
+| **Step 4 — Communication options** | Explains TCP sockets, HTTP server, UDP broadcast, and mDNS discovery. |
+| **Quick Connect** | Enter an IP and port to test a live TCP connection to the Pico W. Shows success, timeout, or connection refused. |
+
+---
+
+## 10. Tab 7 — Documentation
+
+Built-in searchable documentation for the entire DevTool application.
+
+**Layout:**
+- **Left sidebar** — Table of contents. Click any section to jump to it.
+- **Right panel** — Full documentation text with syntax-highlighted headings and code blocks.
+- **Search bar** — Type a keyword and press Find. All matches are highlighted in yellow. Click Clear to reset.
+
+**Sections covered:**
+- Display Emulator (all tools, saving, loading, send to Pico)
+- Serial Monitor (connecting, sending, special buttons, log saving)
+- Flash Firmware (BOOTSEL steps, build buttons)
+- Assets (browse, preview, delete)
+- GPIO Pins (pin assignments)
+- Connection Utility (USB and Wi-Fi)
+- Keyboard Shortcuts
+- File Formats (PBM, BIN, PNG with byte layout)
+- Troubleshooting (common errors and fixes)
+
+This tab means you never need to leave the DevTool to look up how something works.
+
+---
+
+## 11. File Formats
 
 ### PBM (Portable Bitmap — P4 Binary)
 
@@ -299,7 +361,7 @@ Standard PNG format, 250x122 pixels, 1-bit depth. Requires Pillow to export. Can
 
 ---
 
-## 10. Architecture Overview
+## 12. Architecture Overview
 
 ```
 DevTool/
@@ -323,6 +385,8 @@ assets/                 # Saved display images (created automatically)
 | `FlashUtility` | `ttk.Frame` | UF2 selection, BOOTSEL detection, flash copy |
 | `AssetManager` | `ttk.Frame` | File list, preview canvas, delete/open |
 | `PinViewer` | `ttk.Frame` | Static GPIO reference text |
+| `ConnectionUtility` | `ttk.Frame` | USB/Wi-Fi setup walkthrough with live checks |
+| `DocumentationTab` | `ttk.Frame` | Searchable built-in documentation with TOC sidebar |
 
 ### Threading
 
@@ -332,7 +396,7 @@ Build operations in the flash utility also run in background threads.
 
 ---
 
-## 11. Troubleshooting
+## 13. Troubleshooting
 
 | Problem | Solution |
 |---------|----------|
