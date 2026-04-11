@@ -2150,6 +2150,12 @@ class DilderDevTool(tk.Tk):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
+    # Ignore SIGTSTP (Ctrl+Z) — prevents the app from suspending into
+    # a frozen background process that eats memory and won't close.
+    # Instead of suspending, Ctrl+Z simply does nothing.
+    import signal
+    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+
     # Ensure pyserial is available
     try:
         import serial
