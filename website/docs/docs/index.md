@@ -18,15 +18,22 @@ Specs, wiring, and physical design.
 
 Getting a working development environment.
 
-- [Pi Zero Setup](setup/pi-zero-setup.md) — OS flash, SSH, SPI, and system config
-- [Display Setup](setup/display-setup.md) — HAT wiring, Waveshare library, hello world
-- [Dev Environment](setup/dev-environment.md) — Python venv, rsync workflow, VS Code Remote-SSH
+- [Pico W Setup](setup/pi-zero-setup.md) — firmware flash, serial REPL, and smoke test
+- [Display Setup](setup/display-setup.md) — jumper wire connection, Waveshare driver, hello world
+- [Dev Environment](setup/dev-environment.md) — VSCode + MicroPico on Linux
 
 ### Software
 
 Code architecture and reference.
 
 - [Project Structure](software/project-structure.md) — directory layout and module overview
+
+### Reference
+
+Official hardware documentation.
+
+- [Pico W](reference/pico-w.md) — RP2040 specs, pinout, MicroPython firmware
+- [Waveshare e-Paper HAT](reference/waveshare-eink.md) — display specs, SPI protocol, driver setup
 
 ---
 

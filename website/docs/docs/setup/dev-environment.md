@@ -1,164 +1,245 @@
 # Dev Environment
 
-How to set up your local machine for editing code and deploying it to the Pi Zero efficiently.
+How to set up VSCode on Linux for Pico W development, debugging, and file management.
 
 ---
 
-## The Problem
+## Overview
 
-You can't comfortably edit code directly on the Pi Zero — no GUI, small RAM, slow SD card I/O. The standard solution is to edit on your local machine and push changes to the Pi for execution.
+The Pico W is a microcontroller, not a Linux computer — you can't SSH into it or run an editor on it. Instead, you edit code on your local machine and upload it to the Pico W over USB.
+
+The recommended workflow:
+
+1. **Edit** code in VSCode on your Linux machine
+2. **Upload** files to the Pico W via the MicroPico extension
+3. **Run** and **debug** directly from VSCode using the serial REPL
 
 ---
 
-## Option A — rsync + SSH (Recommended)
+## Step 1 — Install VSCode
 
-Edit locally, sync to Pi, run on Pi. Simple, works with any editor, no VS Code dependency.
-
-### Workflow
-
-1. Edit files on your local machine
-2. `rsync` the changed files to the Pi
-3. SSH in and run the script
-
-### Setup
-
-On your local machine, add this to your shell profile or create a `Makefile`:
+If you don't already have VSCode installed:
 
 ```bash
-# Sync the project to the Pi
-alias dilder-sync='rsync -avz --exclude=".git" --exclude="venv" \
-    ~/code/dilder/ pi@dilder.local:~/dilder/'
+# Arch Linux / CachyOS
+sudo pacman -S code
 
-# SSH shortcut
-alias dilder='ssh pi@dilder.local'
-```
+# Ubuntu / Debian
+sudo apt install code
 
-### Example Makefile
-
-```makefile
-# ~/code/dilder/Makefile
-
-REMOTE = pi@dilder.local
-REMOTE_DIR = ~/dilder
-
-.PHONY: sync run watch
-
-sync:
-    rsync -avz --exclude=".git" --exclude="venv" ./ $(REMOTE):$(REMOTE_DIR)/
-
-run: sync
-    ssh $(REMOTE) "cd $(REMOTE_DIR) && source venv/bin/activate && python3 main.py"
-
-watch:
-    # Requires: brew install fswatch  (macOS)
-    fswatch -o src/ | xargs -n1 -I{} make sync
-```
-
-Run with:
-
-```bash
-make run       # sync and run
-make watch     # auto-sync on file change
+# Or download from https://code.visualstudio.com/
 ```
 
 ---
 
-## Option B — VS Code Remote-SSH
+## Step 2 — Install the MicroPico Extension
 
-Full IDE experience directly on the Pi. Works best with the **Pi Zero 2 W** — the original Pi Zero W may be too slow for VS Code's language server.
+MicroPico (formerly Pico-W-Go) provides:
 
-### Setup
+- File upload/download to/from the Pico W
+- Integrated MicroPython REPL terminal
+- Run scripts directly on the Pico W
+- Auto-completion for MicroPython APIs
+- Pico W project management
 
-1. Install the **Remote - SSH** extension in VS Code
-2. Open Command Palette → **Remote-SSH: Connect to Host**
-3. Enter `pi@dilder.local`
-4. Open the `~/dilder` folder on the remote
+### Install
 
-You can now edit files, use the integrated terminal, and run scripts — all executing on the Pi.
+1. Open VSCode
+2. Go to **Extensions** (`Ctrl+Shift+X`)
+3. Search for **"MicroPico"**
+4. Install the extension by **paulober**
 
-!!! warning "Pi Zero W performance"
-    The original Pi Zero W (single-core, 512MB) is borderline for VS Code Remote-SSH. Expect slow IntelliSense and occasional timeouts. The rsync workflow is more reliable on the Zero W. The Zero 2 W handles it fine.
+### Configure
+
+After installing, set your project as a MicroPico project:
+
+1. Open your Dilder project folder in VSCode
+2. Open the Command Palette (`Ctrl+Shift+P`)
+3. Run **MicroPico: Configure Project**
+4. This creates a `.micropico` file in your project root
 
 ---
 
-## Option C — Remote Debugging with debugpy
+## Step 3 — Serial Port Permissions (Linux)
 
-Run your script on the Pi with a debugger attached, and connect VS Code's debugger from your local machine.
-
-### On the Pi
+The Pico W appears as `/dev/ttyACM0` when connected. Your user needs permission to access it.
 
 ```bash
-pip install debugpy
+# Add your user to the dialout group
+sudo usermod -aG dialout $USER
 
-# Start your script with debugpy listening on port 5678
-python3 -m debugpy --listen 0.0.0.0:5678 --wait-for-client main.py
+# Log out and back in for the change to take effect
+# Verify:
+groups | grep dialout
 ```
 
-### In VS Code (local machine)
+!!! warning "Common gotcha"
+    If MicroPico can't connect, this is almost always the cause. The group change only takes effect after a full logout/login (not just a new terminal).
 
-Add to `.vscode/launch.json`:
+---
+
+## Step 4 — Connect to the Pico W
+
+1. Plug the Pico W into your computer via USB
+2. In VSCode, the MicroPico status bar should show **"Pico Connected"** at the bottom
+3. If not, open Command Palette → **MicroPico: Connect**
+
+### Open the REPL
+
+- Click the **MicroPico terminal icon** in the bottom panel, or
+- Command Palette → **MicroPico: Toggle REPL**
+
+You should see the MicroPython `>>>` prompt in the VSCode terminal.
+
+---
+
+## Step 5 — Project Structure
+
+Create this structure in your project for the firmware:
+
+```
+dilder/
+├── firmware/              # MicroPython code for the Pico W
+│   ├── main.py            # Entry point (runs on boot)
+│   ├── boot.py            # Pre-boot config (Wi-Fi, etc.)
+│   ├── epd2in13_V3.py     # Waveshare display driver
+│   ├── epdconfig.py       # SPI/GPIO config for driver
+│   ├── core/
+│   │   ├── display.py     # Display wrapper
+│   │   └── input.py       # Button input handler
+│   └── assets/
+│       └── sprites/       # 1-bit images
+├── website/               # MkDocs site (existing)
+├── docs/                  # Research docs (existing)
+└── .micropico             # MicroPico config
+```
+
+### Upload Files to Pico W
+
+- **Upload a single file:** Right-click the file in the explorer → **MicroPico: Upload File to Pico**
+- **Upload the entire project:** Command Palette → **MicroPico: Upload Project to Pico**
+- **Download from Pico:** Command Palette → **MicroPico: Download Project from Pico**
+
+---
+
+## Step 6 — Running Code
+
+### Run the Current File
+
+1. Open a `.py` file in the editor
+2. Click the **Run** button in the MicroPico status bar, or
+3. Command Palette → **MicroPico: Run Current File on Pico**
+
+The script runs on the Pico W and output appears in the REPL terminal.
+
+### Run on Boot
+
+Any code in `main.py` on the Pico W runs automatically when it powers on. Upload your `main.py` and reset the board to test auto-start behavior.
+
+```python
+# Reset the Pico W from REPL
+>>> import machine
+>>> machine.reset()
+```
+
+---
+
+## Step 7 — Debugging
+
+### REPL Debugging
+
+The simplest approach: use `print()` statements and the REPL.
+
+```python
+# In your code
+print(f"Button state: {btn.value()}")
+print(f"Display BUSY: {busy_pin.value()}")
+```
+
+### Interactive Debugging
+
+You can paste code directly into the REPL to test hardware interactively:
+
+```python
+>>> from machine import Pin, SPI
+>>> spi = SPI(1, baudrate=4_000_000, sck=Pin(10), mosi=Pin(11))
+>>> cs = Pin(9, Pin.OUT, value=1)
+>>> cs.value(0)  # select display
+>>> spi.write(b'\x00')  # send a test byte
+>>> cs.value(1)  # deselect
+```
+
+### mpremote (CLI Alternative)
+
+`mpremote` is a command-line tool for managing MicroPython devices. Useful when you want to script uploads or run files without VSCode.
+
+```bash
+# Install
+pip install mpremote
+
+# List connected devices
+mpremote connect list
+
+# Run a file on the Pico W (without uploading)
+mpremote run firmware/hello_display.py
+
+# Upload a file
+mpremote cp firmware/main.py :main.py
+
+# Upload a directory
+mpremote cp -r firmware/ :
+
+# Open the REPL
+mpremote repl
+
+# Reset the board
+mpremote reset
+```
+
+---
+
+## Useful VSCode Settings
+
+Add to your `.vscode/settings.json`:
 
 ```json
 {
-    "type": "python",
-    "request": "attach",
-    "name": "Attach to Pi",
-    "host": "dilder.local",
-    "port": 5678,
-    "pathMappings": [{
-        "localRoot": "${workspaceFolder}",
-        "remoteRoot": "/home/pi/dilder"
-    }]
+    "micropico.syncFolder": "firmware",
+    "micropico.openOnStart": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.extraPaths": [
+        "firmware"
+    ],
+    "files.associations": {
+        "*.py": "python"
+    }
 }
 ```
 
-Press **F5** to connect. You can now set breakpoints locally that trigger on the Pi.
+This tells MicroPico to sync only the `firmware/` folder to the Pico W, and gives Pylance the right paths for autocomplete.
 
 ---
 
-## Run at Boot (systemd)
+## Keyboard Shortcuts
 
-When development is done, run Dilder automatically on boot:
-
-```bash
-# Create a service file
-sudo nano /etc/systemd/system/dilder.service
-```
-
-```ini
-[Unit]
-Description=Dilder virtual pet
-After=network.target
-
-[Service]
-Type=simple
-User=pi
-WorkingDirectory=/home/pi/dilder
-ExecStart=/home/pi/dilder/venv/bin/python3 /home/pi/dilder/main.py
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-```
-
-```bash
-sudo systemctl enable dilder
-sudo systemctl start dilder
-sudo systemctl status dilder
-```
+| Action | Shortcut |
+|--------|----------|
+| Toggle REPL | `Ctrl+Shift+P` → "MicroPico: Toggle REPL" |
+| Run current file | Click status bar **Run** button |
+| Upload file | Right-click → "Upload File to Pico" |
+| Upload project | `Ctrl+Shift+P` → "MicroPico: Upload Project" |
+| Soft reset | Type `Ctrl+D` in the REPL |
+| Interrupt running code | Type `Ctrl+C` in the REPL |
 
 ---
 
-## Useful SSH Aliases
+## Troubleshooting
 
-```bash
-# Add to ~/.ssh/config on your local machine
-Host dilder
-    HostName dilder.local
-    User pi
-    ServerAliveInterval 60
-    ServerAliveCountMax 3
-```
-
-Then you can just `ssh dilder` instead of `ssh pi@dilder.local`.
+| Symptom | Check |
+|---------|-------|
+| MicroPico shows "No Pico connected" | USB cable plugged in? Data cable (not charge-only)? Check `ls /dev/ttyACM*` |
+| Permission denied on `/dev/ttyACM0` | Add user to `dialout` group, then log out and back in |
+| REPL unresponsive | Press `Ctrl+C` to interrupt running code, or `Ctrl+D` to soft-reset |
+| Upload fails | Close any other serial connections (screen, minicom) — only one program can use the serial port |
+| MicroPython autocomplete not working | Install the `micropython-stubs` package and configure `python.analysis.extraPaths` |
+| File not found on Pico after upload | Check `micropico.syncFolder` setting — it may be uploading from the wrong directory |

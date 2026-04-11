@@ -2,7 +2,7 @@
 
 **A real-time build journal for an open-source AI-assisted virtual pet.**
 
-Dilder is a Tamagotchi-style device built on a Raspberry Pi Zero W, a Waveshare 2.13" e-ink display, and a 3D-printed case — developed entirely in the open, one phase at a time.
+Dilder is a Tamagotchi-style device built on a Raspberry Pi Pico W, a Waveshare 2.13" e-ink display, and a 3D-printed case — developed entirely in the open, one phase at a time.
 
 ---
 
@@ -18,8 +18,8 @@ If you've ever wanted to follow a project from "I have an idea" to "here's a wor
 
 ## Current Phase
 
-!!! info "Phase 1 — Hardware Assembly"
-    We have a components list and a test bench plan. The e-ink display and Pi Zero are ordered. Next: power it on and display something.
+!!! info "Phase 1 — Hardware Assembly (Pico W)"
+    We have a Pico W and a Waveshare 2.13" V3 e-ink display on hand. Next: wire them up, flash MicroPython, and get pixels on screen.
 
     [See the hardware docs :material-arrow-right:](docs/hardware/materials-list.md){ .md-button }
 

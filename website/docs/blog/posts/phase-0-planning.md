@@ -28,7 +28,7 @@ The goals for Dilder:
 
 Phase 0 was purely planning. No hardware ordered, no code written. Just research and documentation:
 
-- **Hardware research** — identifying the right display (Waveshare 2.13" e-ink), compute (Pi Zero WH), and input options (tactile buttons)
+- **Hardware research** — identifying the right display (Waveshare 2.13" e-ink), compute (starting with Pico W, Pi Zero WH later), and input options (tactile buttons)
 - **Enclosure concepts** — rough proportions, button layout, display-to-case ratio
 - **Project structure** — phases, documentation format, GitHub repo
 - **Website and community planning** — this site, Discord, Patreon
@@ -44,16 +44,13 @@ E-ink was chosen over a small OLED or TFT LCD for a few reasons:
 - **Aesthetic** — the Tamagotchi style aesthetic benefits from a high-contrast, "paper" look
 - **Tradeoff** — 2-second full refresh, 0.3-second partial refresh. Animation is possible but limited.
 
-### Pi Zero WH
+### Pico W First, Pi Zero Later
 
-The Pi Zero WH was chosen over a custom MCU (Arduino, ESP32) because:
+Development starts on the **Raspberry Pi Pico W** — it's what we have on hand, it's cheap (~€6), and it's ideal for prototyping the display and input system with MicroPython. Instant boot, simple USB workflow, no OS to configure.
 
-- Python ecosystem makes firmware prototyping fast
-- The Waveshare HAT plugs directly onto the 40-pin header
-- WiFi built in for remote development workflow
-- More processing headroom for a future personality/AI system
+The **Pi Zero WH** is planned for Phase 5 when we need Linux, a filesystem, networking features, or more compute for a personality/AI system. The display and button wiring is nearly identical between the two boards.
 
-The "WH" variant is critical — pre-soldered headers. Without it you'd need to solder the 40-pin header yourself.
+### Tactile Buttons Over Capacitive Touch
 
 ### Tactile Buttons Over Capacitive Touch
 
@@ -61,7 +58,7 @@ Five discrete 6×6mm tactile buttons (up, down, left, right, center/select) beat
 
 - Breadboard-friendly — no soldering required for the test bench
 - Tactile feedback matters for a game device
-- Zero additional components needed (Pi's internal pull-ups handle everything)
+- Zero additional components needed (Pico W's internal pull-ups handle everything)
 
 ## Prototype Concept
 
@@ -79,6 +76,6 @@ The enclosure concept settled on an "iPod Nano" style layout — landscape recta
 
 ## What's Next
 
-Phase 1 is hardware assembly. The components are ordered. The goal: power on the Pi, attach the display HAT, wire up buttons on a breadboard, and get something — anything — to show on the screen.
+Phase 1 is hardware assembly. The Pico W and e-ink display are on the bench. The goal: flash MicroPython, wire up the display and buttons on a breadboard, and get something — anything — to show on the screen.
 
 When the display shows its first pixel, Phase 1 is done.

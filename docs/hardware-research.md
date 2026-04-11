@@ -4,20 +4,42 @@ Research compiled during Phase 1 planning for the Dilder prototype test bench.
 
 ---
 
+## Development Platform Strategy
+
+**Phase 1 (current):** Raspberry Pi Pico W — cheap, on hand, great for prototyping the display + input system with MicroPython.
+
+**Future:** Raspberry Pi Zero WH — upgrade when we need Linux, filesystem, networking features, or more compute. The display and button wiring is nearly identical; the firmware port is Phase 5.
+
+---
+
 ## Core Components
 
-### 1. Raspberry Pi Zero WH
+### 1. Raspberry Pi Pico W
 
 | Spec | Detail |
 |------|--------|
-| Model | Pi Zero W or Zero 2 W |
-| Get the "WH" variant | Pre-soldered 2x20 GPIO header (saves soldering for prototyping) |
-| Price | ~$15 |
-| Power | 5V via micro-USB |
+| Chip | RP2040 — dual-core ARM Cortex-M0+ @ 133MHz |
+| RAM | 264KB SRAM |
+| Flash | 2MB onboard (no SD card) |
+| Wi-Fi | 802.11n 2.4GHz (CYW43439) |
+| Bluetooth | BLE 5.2 |
+| GPIO | 26 multi-function pins (GP0–GP28, not all exposed) |
+| ADC | 3 channels (12-bit) |
+| SPI | 2× SPI controllers |
+| USB | Micro-USB (power + data, device/host) |
+| Dimensions | 51 × 21 × 3.9mm |
+| Price | ~$6 |
+| Firmware | MicroPython (recommended) or CircuitPython |
 
-The Pi Zero 2 W is recommended if available -- same form factor but quad-core vs single-core. Either works.
+The Pico WH variant has pre-soldered headers — convenient for breadboard prototyping but either works.
 
-### 2. Waveshare 2.13" E-Paper Display HAT (V4)
+**Resources:**
+- [Pico W Datasheet (PDF)](https://datasheets.raspberrypi.com/picow/pico-w-datasheet.pdf)
+- [RP2040 Datasheet (PDF)](https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf)
+- [MicroPython for Pico W](https://micropython.org/download/RPI_PICO_W/)
+- [Pico W Pinout](https://datasheets.raspberrypi.com/picow/PicoW-A4-Pinout.pdf)
+
+### 2. Waveshare 2.13" E-Paper Display HAT (V3)
 
 **Product:** [Amazon DE - B07Q5PZMGT](https://www.amazon.de/-/en/gp/product/B07Q5PZMGT)
 
@@ -26,7 +48,7 @@ The Pi Zero 2 W is recommended if available -- same form factor but quad-core vs
 | Size | 2.13 inches (48.55mm x 23.71mm active area) |
 | Resolution | 250 x 122 pixels |
 | Colors | Black & White |
-| Driver IC | SSD1680Z8 (V4) |
+| Driver IC | SSD1680 (V3) |
 | Interface | SPI (4-wire, Mode 0) |
 | Operating Voltage | 3.3V / 5V (onboard voltage translator) |
 | Full Refresh | ~2 seconds |
@@ -35,24 +57,25 @@ The Pi Zero 2 W is recommended if available -- same form factor but quad-core vs
 | Refresh Interval | >= 180 seconds recommended between full refreshes |
 | Price | ~$13-18 |
 
-**Pin Connections (BCM GPIO):**
+**Important:** This is the **V3** revision (SSD1680 driver). The HAT is designed for Pi Zero's 40-pin header, but we connect to the Pico W via jumper wires using the 8-pin SPI interface.
 
-| E-Paper Pin | Function | BCM GPIO | Physical Pin |
-|-------------|----------|----------|-------------|
-| VCC | Power 3.3V | 3.3V | 1 |
-| GND | Ground | GND | 6 |
-| DIN | SPI MOSI | GPIO 10 | 19 |
-| CLK | SPI Clock | GPIO 11 | 23 |
-| CS | Chip Select | GPIO 8 (CE0) | 24 |
-| DC | Data/Command | GPIO 25 | 22 |
-| RST | Reset | GPIO 17 | 11 |
-| BUSY | Busy status | GPIO 24 | 18 |
+**Pin Connections to Pico W (via jumper wires):**
 
-**Important:** This is the V4 revision -- it requires V4-specific code. Waveshare provides Python and C examples.
+| E-Paper Pin | Function | Pico W GPIO | Pico W Pin # |
+|-------------|----------|-------------|-------------|
+| VCC | Power 3.3V | 3V3(OUT) | 36 |
+| GND | Ground | GND | 38 |
+| DIN | SPI MOSI | GP11 (SPI1 TX) | 15 |
+| CLK | SPI Clock | GP10 (SPI1 SCK) | 14 |
+| CS | Chip Select | GP9 (SPI1 CSn) | 12 |
+| DC | Data/Command | GP8 | 11 |
+| RST | Reset | GP12 | 16 |
+| BUSY | Busy status | GP13 | 17 |
 
 **Resources:**
 - [Waveshare Wiki](https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT)
-- [V4 Specification PDF](https://files.waveshare.com/upload/4/4e/2.13inch_e-Paper_V4_Specification.pdf)
+- [Waveshare Pico e-Paper Code](https://github.com/waveshare/Pico_ePaper_Code)
+- [V3 Specification PDF](https://files.waveshare.com/upload/4/4e/2.13inch_e-Paper_V3_Specification.pdf)
 - [SSD1680 Datasheet](https://www.orientdisplay.com/wp-content/uploads/2022/08/SSD1680_v0.14.pdf)
 
 ---
@@ -68,44 +91,18 @@ Simple 6x6mm through-hole momentary switches, optionally with colored snap-on ca
 | Size | 6x6mm (various heights: 4.3mm to 9.5mm) |
 | Cost | ~$2-3 for a pack of 20 |
 | GPIO per button | 1 (+ shared ground) |
-| Pull-up resistors | Use Pi's internal software pull-ups -- no external components needed |
+| Pull-up resistors | Use Pico W's internal software pull-ups -- no external components needed |
 | Debounce | Handle in software |
 
-**Why this option:** Cheapest, simplest, breadboard-friendly for prototyping, easy to mount in a 3D-printed case later. The original Tamagotchi used 3 tactile buttons -- this is the authentic approach.
-
-### Option B -- 5-Way Navigation Switch + 2 Action Buttons
-
-Adafruit 5-way nav switch (up/down/left/right/center-press) plus 2 discrete buttons for A/B actions.
-
-| Detail | Value |
-|--------|-------|
-| Nav switch | Adafruit ADA504, ~$2 |
-| Action buttons | 2x 6x6mm tactile, ~$0.50 |
-| GPIO pins | 7 total (5 for nav + 2 for buttons) |
-| Total cost | ~$3 |
-
-**Why this option:** Compact d-pad feel, good for menu navigation. More "game device" than "Tamagotchi."
-
-### Option C -- Pimoroni Button SHIM
-
-5 buttons + RGB LED on a single I2C board that solders directly onto the Pi header.
-
-| Detail | Value |
-|--------|-------|
-| Cost | ~$7 |
-| GPIO pins | 2 (I2C: SDA + SCL) |
-| Pull-ups | Built in |
-| Python library | Official `button-shim` package |
-
-**Why this option:** Cleanest wiring, fewest GPIO pins used. But buttons are side-mounted which limits case design. May be discontinued.
+**Why this option:** Cheapest, simplest, breadboard-friendly for prototyping. The original Tamagotchi used 3 tactile buttons -- this is the authentic approach.
 
 ### Other Considered Options
 
 | Type | Cost | Notes |
 |------|------|-------|
+| 5-Way Nav Switch + 2 buttons | ~$3 | Compact d-pad feel, 7 GPIO pins. More "game device" than "Tamagotchi." |
 | 1x4 Membrane Keypad | ~$2-4 | Very thin, adhesive-backed. Mushy feel, only 4 buttons. |
-| TTP223 Capacitive Touch | ~$1-3/10-pack | No moving parts, can mount behind plastic. No tactile feedback. |
-| Analog Joystick | ~$5-6 | Requires external ADC (Pi has no analog inputs). Overkill for a virtual pet. |
+| TTP223 Capacitive Touch | ~$1-3/10-pack | No moving parts. No tactile feedback. |
 
 ### Decision
 
@@ -113,111 +110,73 @@ Adafruit 5-way nav switch (up/down/left/right/center-press) plus 2 discrete butt
 - Layout: 3 nav buttons (left/select/right) + 2 action buttons (A/B)
 - Total GPIO: 5 pins + shared ground
 - Total cost: ~$2-3
-- Can always swap to a different input method later
 
 ---
 
 ## Test Bench Materials List
 
-### Essential -- Order These First
+### Essential -- On Hand
 
 | Item | Est. Cost | Notes |
 |------|-----------|-------|
-| Raspberry Pi Zero WH | ~$15 | Pre-soldered headers. Zero 2 WH preferred if available. |
-| Waveshare 2.13" e-Paper HAT V3 | ~$15 | [Amazon link](https://www.amazon.de/-/en/gp/product/B07Q5PZMGT). **V3 confirmed purchased.** Uses SSD1680 driver, requires `epd2in13_V3.py` |
-| Micro SD card (16GB+) | ~$5-8 | For Raspberry Pi OS |
-| Micro-USB power supply (5V 2.5A) | ~$8-10 | Any decent phone charger works |
-| Half-size breadboard | ~$3-5 | For prototyping button wiring before soldering to perfboard. Bridges GPIO pins to buttons via jumper wires |
-| Jumper wire kit (M-F and M-M) | ~$3-6 | Assorted lengths |
+| Raspberry Pi Pico W | ~$6 | On hand. Micro-USB for power + data. |
+| Waveshare 2.13" e-Paper HAT V3 | ~$15 | On hand. SSD1680 driver, 250×122px. Connected via jumper wires (not HAT connector). |
+| Micro-USB cable | ~$2 | For Pico W power + programming |
+| Half-size breadboard | ~$3-5 | For prototyping button + display wiring |
+| Jumper wire kit (M-F and M-M) | ~$3-6 | **Required** — the display HAT doesn't plug into the Pico W directly |
 | 6x6mm tactile buttons (pack of 20) | ~$2-3 | Various heights, with snap-on caps |
-| **Subtotal** | **~$51-62** | |
+| **Subtotal** | **~$31-37** | |
 
 ### Nice to Have
 
 | Item | Est. Cost | Notes |
 |------|-----------|-------|
-| GPIO T-Cobbler breakout | ~$6-8 | Labels all pins on the breadboard |
+| Pico WH (pre-soldered headers) | ~$7 | Easier breadboard use than bare Pico W |
 | 10k resistor assortment | ~$2-3 | External pull-ups if needed |
 | Multimeter | ~$10-20 | Debugging wiring |
-| Soldering iron + solder | ~$20-40 | For permanent connections later |
 
-### For Battery Power (Phase 6)
+### For Battery Power (Later Phase)
 
 | Item | Est. Cost | Notes |
 |------|-----------|-------|
+| 3.7V LiPo battery (1200mAh) | ~$8-12 | JST connector |
 | Adafruit PowerBoost 500C | ~$18 | LiPo charger + 5V boost, load-sharing |
-| 3.7V LiPo battery (1200mAh) | ~$8-12 | JST-PH connector |
-| Budget alt: TP4056 + MT3608 | ~$2-3 | Cheaper but more wiring/tuning |
+| Budget alt: TP4056 + boost converter | ~$2-3 | Cheaper but more wiring |
 
 ---
 
-## GPIO Pin Budget
+## GPIO Pin Budget (Pico W)
 
-| Function | Pins Used | Interface | Pins |
-|----------|-----------|-----------|------|
-| E-ink display | 6 | SPI | GPIO 8, 10, 11, 17, 24, 25 |
-| Buttons (5) | 5 | Digital input | GPIO 5, 6, 13, 19, 26 (suggested) |
-| Piezo buzzer (future) | 1 | PWM | GPIO 12 or 18 |
+| Function | Pins Used | Interface | Pico W GPIO |
+|----------|-----------|-----------|-------------|
+| E-ink display | 6 | SPI1 + control | GP8, GP9, GP10, GP11, GP12, GP13 |
+| Buttons (5) | 5 | Digital input | GP2, GP3, GP4, GP5, GP6 |
+| Piezo buzzer (future) | 1 | PWM | GP15 |
 | **Total** | **12** | | **14+ GPIO remaining** |
 
-Note: Buttons are assigned to GPIOs that don't conflict with SPI or other special functions. The specific pins can be changed -- the above are suggestions for clean wiring.
+Note: Button GPIOs are chosen to avoid SPI1 pins and leave SPI0 free for future use. The specific pins can be changed — the above are suggestions for clean wiring.
 
 ---
 
 ## Prototype Enclosure Concept
 
-### Form Factor: "iPod Nano" Style -- Landscape Rectangle with Side D-Pad
+> Enclosure design is deferred until Phase 5/6 when we migrate to the Pi Zero. The Pico W prototype lives on a breadboard.
 
-Concept renders (open in browser to view):
+### Original Form Factor: "iPod Nano" Style -- Landscape Rectangle with Side D-Pad
+
+Concept renders (designed for Pi Zero + HAT form factor):
 - [prototype-v1.svg](concepts/prototype-v1.svg) -- Initial rough layout
-- **[prototype-v2.svg](concepts/prototype-v2.svg)** -- Dimension-accurate revision (current)
+- **[prototype-v2.svg](concepts/prototype-v2.svg)** -- Dimension-accurate revision
 
-### v2 Design Summary
-
-Landscape rectangular slab with display dominating the left ~75% of the face, compact d-pad cluster on the right.
-
-| Metric | Value |
-|--------|-------|
-| Case outer | 88 x 34 x 19mm |
-| Display window | 57 x 27mm |
-| Active pixel area | 48.55 x 23.71mm (250x122 px) |
-| Button cluster | ~22mm wide (d-pad cross, 10mm center-to-center) |
-| Display face coverage | 51% |
-| Button face coverage | 12% |
-| Display-to-button ratio | 4.3 : 1 |
-| Weight (est.) | ~45g (with battery ~65g) |
-| Size reference | Slightly wider than a credit card, ~2/3 the height |
-
-### Component Dimensions (from datasheets)
-
-| Component | Dimension | Source |
-|-----------|-----------|--------|
-| Pi Zero board | 65 x 30 x 5mm | Official spec |
-| Waveshare HAT board | 65 x 30.2mm | Waveshare spec |
-| Display glass outline | 59.2 x 29.2 x 1.05mm | V4 specification PDF |
-| Display active area | 48.55 x 23.71mm | V4 specification PDF |
-| Dot pitch | 0.194 x 0.194mm | V4 specification PDF |
-| Pi + HAT stack height | ~15mm (with GPIO header) | Measured |
-| 6x6mm tactile button | 6 x 6 x 4.3-9.5mm (various stem heights) | Standard |
-
-### Design Constraints
-
-1. **Display cutout:** 57 x 27mm (glass area with 1mm case lip overlap)
-2. **Button holes:** 5x circular, ~7mm diameter, d-pad cross pattern with ~10mm center-to-center
-3. **USB access:** Micro-USB slot on bottom edge
-4. **SD card access:** Slot on left edge
-5. **Ventilation:** 5x slot vents on back panel
-6. **Assembly:** 2-piece shell (top + bottom), 4x M2 corner screws
-7. **Shell seam:** Horizontal split at case midpoint (~9.5mm from each face)
-8. **Battery bay:** Reserved space on right side behind button PCB (30 x 19mm, future)
+These will be revised when the final board (Pico W or Pi Zero) is chosen for the enclosure build.
 
 ---
 
 ## Next Steps
 
-1. Order the essential materials from the test bench list
-2. Set up Pi Zero with headless Raspberry Pi OS
-3. Wire the e-ink display (it's a HAT -- just plugs onto the header)
-4. Wire 5 buttons on a breadboard
-5. Get Waveshare's example Python code running to confirm display works
+1. Flash MicroPython firmware onto Pico W
+2. Set up VSCode with MicroPico extension
+3. Wire the e-ink display to the Pico W via jumper wires
+4. Wire 5 buttons on the breadboard
+5. Get Waveshare's MicroPython example code running to confirm display works
 6. Display a placeholder sprite as proof of life

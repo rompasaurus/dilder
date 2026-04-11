@@ -4,20 +4,27 @@ All components needed to build a Dilder test bench. This list assumes you are bu
 
 ---
 
+## Development Platform
+
+**Phase 1 (current):** Raspberry Pi Pico W with MicroPython. Cheap, fast to iterate, instant boot.
+
+**Future (Phase 5):** Raspberry Pi Zero WH with Linux. Upgrade when you need a filesystem, SSH, or more compute.
+
+---
+
 ## Essential Components
 
 Order these first. Everything else can wait.
 
 | Item | Est. Cost | Notes |
 |------|-----------|-------|
-| Raspberry Pi Zero WH | ~€15 | **Get the "WH" variant** — pre-soldered 40-pin GPIO header. Zero 2 WH preferred if available (quad-core). |
-| Waveshare 2.13" e-Paper HAT V3 | ~€15 | SSD1680 driver, 250×122px, black/white. Plugs directly onto Pi Zero header. |
-| Micro SD card (16GB+) | ~€6 | Class 10 or better. For Raspberry Pi OS Lite. |
-| Micro-USB power supply (5V 2.5A) | ~€9 | Any decent phone charger works during development. |
-| Half-size breadboard | ~€4 | For wiring buttons without soldering. |
-| Jumper wire kit (M-F and M-M) | ~€4 | Assorted lengths. M-F for GPIO to breadboard, M-M for breadboard connections. |
+| Raspberry Pi Pico W | ~€6 | RP2040 dual-core, 264KB SRAM, 2MB flash, WiFi + BLE. Micro-USB for power and programming. |
+| Waveshare 2.13" e-Paper HAT V3 | ~€15 | SSD1680 driver, 250×122px, black/white. Connected to Pico W via **jumper wires** (not HAT connector). |
+| Micro-USB cable | ~€2 | Powers the Pico W and provides serial connection to your dev machine. |
+| Half-size breadboard | ~€4 | For wiring buttons and display connections. |
+| Jumper wire kit (M-F and M-M) | ~€4 | **Required** — the display HAT cannot plug directly into the Pico W. Use F-M wires from the HAT's 8-pin header to the breadboard. |
 | 6×6mm tactile buttons (pack of 20) | ~€3 | Various stem heights. Snap-on colored caps recommended for identifying buttons. |
-| **Subtotal** | **~€56** | |
+| **Subtotal** | **~€34** | |
 
 ---
 
@@ -27,42 +34,43 @@ Not required to get started, but helpful.
 
 | Item | Est. Cost | Notes |
 |------|-----------|-------|
-| GPIO T-Cobbler breakout + ribbon cable | ~€7 | Labels all GPIO pins on the breadboard. Eliminates pin-counting errors. |
+| Pico WH (pre-soldered headers) | ~€7 | Easier breadboard use — no header soldering needed. Either Pico W or WH works. |
 | 10kΩ resistor assortment | ~€2 | External pull-ups as backup if internal GPIO pull-ups cause issues. |
 | Multimeter | ~€12–20 | Debugging wiring continuity and voltage. Useful throughout the build. |
 | Soldering iron + solder | ~€20–40 | Not needed for the test bench, but you'll want it for permanent connections later. |
 
 ---
 
-## Battery Power (Phase 6)
+## Battery Power (Later Phase)
 
 Order these when you're ready to move off USB power.
 
 | Item | Est. Cost | Notes |
 |------|-----------|-------|
-| Adafruit PowerBoost 500C | ~€18 | LiPo charger + 5V boost regulator with load sharing. Best option for clean power. |
-| 3.7V LiPo battery (1200mAh) | ~€10 | JST-PH connector. Fits the battery bay reserved in the enclosure. |
-| Budget alternative: TP4056 + MT3608 | ~€2–3 | More wiring, more tuning, lower cost. Good for experienced builders. |
+| 3.7V LiPo battery (1200mAh) | ~€10 | JST connector. Can power the Pico W via VSYS pin. |
+| Adafruit PowerBoost 500C | ~€18 | LiPo charger + 5V boost regulator with load sharing. |
+| Budget alternative: TP4056 + boost converter | ~€2–3 | More wiring, more tuning, lower cost. |
 
 ---
 
 ## Component Specs Reference
 
-### Raspberry Pi Zero WH
+### Raspberry Pi Pico W
 
 | Spec | Value |
 |------|-------|
-| SoC | BCM2835 (ARMv6, 1GHz single-core) |
-| RAM | 512MB LPDDR2 |
-| Wi-Fi | 802.11 b/g/n 2.4GHz |
-| Bluetooth | 4.1 BLE |
-| GPIO | 40-pin header (pre-soldered on WH) |
-| USB | 1× micro-USB data, 1× micro-USB power |
-| Storage | micro SD |
-| Dimensions | 65 × 30 × 5mm |
+| Chip | RP2040 (dual-core ARM Cortex-M0+ @ 133MHz) |
+| RAM | 264KB SRAM |
+| Flash | 2MB onboard QSPI |
+| Wi-Fi | 802.11n 2.4GHz |
+| Bluetooth | BLE 5.2 |
+| GPIO | 26 multi-function pins |
+| USB | Micro-USB 1.1 (power + data) |
+| ADC | 3 external channels (12-bit) |
+| Dimensions | 51 × 21 × 3.9mm |
+| Firmware | MicroPython (recommended) |
 
-!!! note "Pi Zero 2 W"
-    The Zero 2 W (BCM2710, quad-core ARMv8) is a drop-in replacement with significantly more CPU headroom. Everything in this guide applies to both.
+Full reference: [Pico W Reference](../reference/pico-w.md)
 
 ### Waveshare 2.13" e-Paper HAT V3
 
@@ -82,9 +90,9 @@ Order these when you're ready to move off USB power.
 | Board dimensions | 65 × 30.2mm |
 
 !!! warning "Version check"
-    This guide targets the **V3** revision (SSD1680 driver). The V4 revision exists with a different driver IC (SSD1680Z8). Confirm your version before running demo code — V3 and V4 require different driver files.
+    This guide targets the **V3** revision (SSD1680 driver). Confirm your version by checking the PCB silkscreen on the back of the display board.
 
-    To identify: check the PCB silkscreen or the Waveshare product page. The V3 box says "2.13inch e-Paper HAT (C) V3" or similar.
+Full reference: [Waveshare e-Paper Reference](../reference/waveshare-eink.md)
 
 ---
 
@@ -92,8 +100,9 @@ Order these when you're ready to move off USB power.
 
 | Retailer | Notes |
 |----------|-------|
-| [Waveshare official store](https://www.waveshare.com) | Best for the e-ink display — ensure you get V3 specifically |
-| [Amazon DE / UK](https://www.amazon.de/-/en/gp/product/B07Q5PZMGT) | Original linked product |
-| [Pimoroni](https://shop.pimoroni.com) | Good UK/EU source for Pi Zero WH |
+| [Raspberry Pi official store](https://www.raspberrypi.com/products/raspberry-pi-pico/) | Pico W / Pico WH |
+| [Waveshare official store](https://www.waveshare.com) | Best for the e-ink display |
+| [Amazon DE / UK](https://www.amazon.de/-/en/gp/product/B07Q5PZMGT) | Original linked e-Paper product |
+| [Pimoroni](https://shop.pimoroni.com) | Good UK/EU source for Pico W and accessories |
 | [Adafruit](https://www.adafruit.com) | US source, good component quality |
 | [AliExpress](https://www.aliexpress.com) | Cheapest for breadboards, buttons, and jumper wire kits |

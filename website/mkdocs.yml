@@ -1,6 +1,6 @@
 site_name: Dilder
 site_url: https://dilder.dev
-site_description: An open-source AI-assisted virtual pet built with a Pi Zero, e-ink display, and 3D-printed case. Follow the build in real time.
+site_description: An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.
 site_author: rompasaurus
 repo_url: https://github.com/rompasaurus/dilder
 repo_name: rompasaurus/dilder
@@ -111,13 +111,14 @@ nav:
           - Wiring & Pinout: docs/hardware/wiring-pinout.md
           - Enclosure Design: docs/hardware/enclosure-design.md
       - Setup:
-          - Pi Zero Setup: docs/setup/pi-zero-setup.md
+          - Pico W Setup: docs/setup/pi-zero-setup.md
           - Display Setup: docs/setup/display-setup.md
           - Dev Environment: docs/setup/dev-environment.md
       - Software:
           - Project Structure: docs/software/project-structure.md
       - Reference:
-          - Pi Zero WH: docs/reference/pi-zero-wh.md
+          - Pico W: docs/reference/pico-w.md
+          - Pi Zero WH (future): docs/reference/pi-zero-wh.md
           - Waveshare e-Paper HAT: docs/reference/waveshare-eink.md
   - Community:
       - Overview: community/index.md

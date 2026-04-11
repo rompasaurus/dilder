@@ -1,35 +1,36 @@
 # Wiring & Pinout
 
-GPIO assignments and breadboard wiring for the Dilder test bench.
+GPIO assignments and breadboard wiring for the Dilder test bench (Pico W).
 
 Full official hardware reference docs:
 
-- [Raspberry Pi Zero WH reference](../reference/pi-zero-wh.md)
+- [Raspberry Pi Pico W reference](../reference/pico-w.md)
 - [Waveshare 2.13" e-Paper HAT reference](../reference/waveshare-eink.md)
 
 ---
 
-## Display Wiring (HAT — no jumpers needed)
+## Display Wiring (Jumper Wires)
 
-The Waveshare 2.13" e-Paper HAT plugs directly onto the Pi Zero's 40-pin GPIO header. No jumper wires are needed for the display.
+The Waveshare 2.13" e-Paper HAT is designed for the Pi Zero's 40-pin header, but the Pico W has a different pinout. Connect the display to the Pico W using **female-to-male jumper wires** from the HAT's 8-pin header.
 
-!!! tip "HAT = Header Attachment"
-    Align pin 1 on the HAT with pin 1 on the Pi (the corner nearest the SD card slot), press down firmly until the HAT sits flush. Always power off the Pi before attaching or removing it.
+!!! tip "Finding the 8-pin header"
+    The HAT has an 8-pin 2.54mm pitch header along one edge, labeled: VCC, GND, DIN, CLK, CS, DC, RST, BUSY. Use F-M jumper wires from these pins to the Pico W on your breadboard.
+
+!!! warning "Power off before wiring"
+    Always disconnect USB before connecting or disconnecting jumper wires. The e-ink panel can be damaged by voltage spikes.
 
 ### Display Pin Mapping
 
-Sourced from the [Waveshare official reference](../reference/waveshare-eink.md).
-
-| e-Paper Signal | Function | BCM GPIO | Physical Pin | Direction |
+| e-Paper Signal | Function | Pico W GPIO | Pico W Pin # | Direction |
 |---|---|---|---|---|
-| VCC | 3.3V power | 3.3V rail | 1 | → display |
-| GND | Ground | GND | 6 | → display |
-| DIN | SPI MOSI — pixel data | GPIO 10 | 19 | → display |
-| CLK | SPI clock | GPIO 11 | 23 | → display |
-| CS | Chip select (active LOW) | GPIO 8 (CE0) | 24 | → display |
-| DC | Data / command select | GPIO 25 | 22 | → display |
-| RST | Reset (active LOW) | GPIO 17 | 11 | → display |
-| BUSY | Busy flag (HIGH = refreshing) | GPIO 24 | 18 | ← display |
+| VCC | 3.3V power | 3V3(OUT) | 36 | → display |
+| GND | Ground | GND | 38 | → display |
+| DIN | SPI MOSI — pixel data | GP11 (SPI1 TX) | 15 | → display |
+| CLK | SPI clock | GP10 (SPI1 SCK) | 14 | → display |
+| CS | Chip select (active LOW) | GP9 (SPI1 CSn) | 12 | → display |
+| DC | Data / command select | GP8 | 11 | → display |
+| RST | Reset (active LOW) | GP12 | 16 | → display |
+| BUSY | Busy flag (HIGH = refreshing) | GP13 | 17 | ← display |
 
 #### Signal Quick Reference
 
@@ -44,97 +45,101 @@ Sourced from the [Waveshare official reference](../reference/waveshare-eink.md).
 
 ## Button Wiring (Breadboard)
 
-Five 6×6mm tactile buttons wired to GPIO pins using the Pi's internal pull-up resistors. No external resistors needed.
+Five 6×6mm tactile buttons wired to GPIO pins using the Pico W's internal pull-up resistors. No external resistors needed.
 
 **Per-button wiring:**
 ```
-Pi GPIO pin ──── button leg A
-                 button leg B ──── GND rail
+Pico GPIO pin ──── button leg A
+                   button leg B ──── GND rail
 ```
 
 When the button is pressed it pulls the GPIO line LOW → software reads as pressed.
 
 ### Button GPIO Assignments
 
-Sourced from the [Pi Zero WH GPIO reference](../reference/pi-zero-wh.md) — pins chosen to avoid SPI, I²C, UART, and PWM conflicts.
+Pins chosen to avoid SPI1 (display) and leave SPI0 free for future use.
 
-| Button | BCM GPIO | Physical Pin | Internal pull-up |
-|--------|----------|-------------|-----------------|
-| Up | GPIO 5 | 29 | Enabled in software |
-| Down | GPIO 6 | 31 | Enabled in software |
-| Left | GPIO 13 | 33 | Enabled in software |
-| Right | GPIO 19 | 35 | Enabled in software |
-| Center / Select | GPIO 26 | 37 | Enabled in software |
+| Button | Pico W GPIO | Pico W Pin # | Internal pull-up |
+|--------|-------------|-------------|-----------------|
+| Up | GP2 | 4 | Enabled in software |
+| Down | GP3 | 5 | Enabled in software |
+| Left | GP4 | 6 | Enabled in software |
+| Right | GP5 | 7 | Enabled in software |
+| Center / Select | GP6 | 9 | Enabled in software |
 
 ```python
-import RPi.GPIO as GPIO
-
-GPIO.setmode(GPIO.BCM)
+from machine import Pin
 
 BUTTONS = {
-    'up':     5,
-    'down':   6,
-    'left':   13,
-    'right':  19,
-    'center': 26,
+    'up':     Pin(2, Pin.IN, Pin.PULL_UP),
+    'down':   Pin(3, Pin.IN, Pin.PULL_UP),
+    'left':   Pin(4, Pin.IN, Pin.PULL_UP),
+    'right':  Pin(5, Pin.IN, Pin.PULL_UP),
+    'center': Pin(6, Pin.IN, Pin.PULL_UP),
 }
 
-for pin in BUTTONS.values():
-    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# Read a button (0 = pressed, 1 = released)
+if BUTTONS['center'].value() == 0:
+    print("Center pressed!")
 ```
 
 ---
 
 ## Full GPIO Pin Budget
 
-| Function | BCM GPIO | Physical Pin | Interface |
-|----------|----------|-------------|-----------|
-| e-ink VCC | 3.3V | 1 | Power |
-| e-ink GND | GND | 6 | Ground |
-| e-ink DIN | GPIO 10 | 19 | SPI MOSI |
-| e-ink CLK | GPIO 11 | 23 | SPI SCLK |
-| e-ink CS | GPIO 8 | 24 | SPI CE0 |
-| e-ink DC | GPIO 25 | 22 | Digital out |
-| e-ink RST | GPIO 17 | 11 | Digital out |
-| e-ink BUSY | GPIO 24 | 18 | Digital in |
-| Button UP | GPIO 5 | 29 | Digital in |
-| Button DOWN | GPIO 6 | 31 | Digital in |
-| Button LEFT | GPIO 13 | 33 | Digital in |
-| Button RIGHT | GPIO 19 | 35 | Digital in |
-| Button CENTER | GPIO 26 | 37 | Digital in |
-| Piezo buzzer (future) | GPIO 12 or 18 | 32 / 12 | PWM |
-| **Pins used** | **13** | | |
-| **Pins free** | **13+ general GPIO remaining** | | |
+| Function | Pico W GPIO | Pico W Pin # | Interface |
+|----------|-------------|-------------|-----------|
+| e-ink DC | GP8 | 11 | Digital out |
+| e-ink CS | GP9 | 12 | SPI1 CSn |
+| e-ink CLK | GP10 | 14 | SPI1 SCK |
+| e-ink DIN | GP11 | 15 | SPI1 TX |
+| e-ink RST | GP12 | 16 | Digital out |
+| e-ink BUSY | GP13 | 17 | Digital in |
+| e-ink VCC | 3V3(OUT) | 36 | Power |
+| e-ink GND | GND | 38 | Ground |
+| Button UP | GP2 | 4 | Digital in |
+| Button DOWN | GP3 | 5 | Digital in |
+| Button LEFT | GP4 | 6 | Digital in |
+| Button RIGHT | GP5 | 7 | Digital in |
+| Button CENTER | GP6 | 9 | Digital in |
+| Piezo buzzer (future) | GP15 | 20 | PWM |
+| **Pins used** | **12** | | |
+| **Pins free** | **14+ GPIO remaining** | | |
 
 ---
 
-## Complete 40-Pin Header Map
+## Pico W Pin Map (Visual)
 
-Pins used by this project are highlighted. Full electrical specs in the [Pi Zero WH reference](../reference/pi-zero-wh.md).
+Pins used by this project are highlighted. Full electrical specs in the [Pico W reference](../reference/pico-w.md).
 
 ```
-       3V3  [ 1] [ 2]  5V
-     GPIO2  [ 3] [ 4]  5V
-     GPIO3  [ 5] [ 6]  GND
-     GPIO4  [ 7] [ 8]  GPIO14
-       GND  [ 9] [10]  GPIO15
-▶  GPIO17  [11] [12]  GPIO18      RST  (e-ink)
-    GPIO27  [13] [14]  GND
-    GPIO22  [15] [16]  GPIO23
-       3V3  [17] [18]  GPIO24 ◀   BUSY (e-ink)
-▶  GPIO10  [19] [20]  GND         DIN  (e-ink)
-     GPIO9  [21] [22]  GPIO25 ▶   DC   (e-ink)
-▶  GPIO11  [23] [24]  GPIO8  ▶   CLK / CS (e-ink)
-       GND  [25] [26]  GPIO7
-     GPIO0  [27] [28]  GPIO1
-▶   GPIO5  [29] [30]  GND         UP   (button)
-▶   GPIO6  [31] [32]  GPIO12
-▶  GPIO13  [33] [34]  GND         LEFT (button)
-▶  GPIO19  [35] [36]  GPIO16      RIGHT (button)
-▶  GPIO26  [37] [38]  GPIO20      CENTER (button)
-       GND  [39] [40]  GPIO21
-                                   DOWN = GPIO6 (pin 31)
+               ┌───USB───┐
+   GP0  [ 1]   │         │  [40]  VBUS
+   GP1  [ 2]   │  PICO   │  [39]  VSYS
+   GND  [ 3]   │    W    │  [38]  GND       ◄── e-ink GND
+▶  GP2  [ 4]   │         │  [37]  3V3_EN
+▶  GP3  [ 5]   │         │  [36]  3V3(OUT)  ◄── e-ink VCC
+▶  GP4  [ 6]   │         │  [35]  ADC_VREF
+▶  GP5  [ 7]   │         │  [34]  GP28
+   GND  [ 8]   │         │  [33]  AGND
+▶  GP6  [ 9]   │         │  [32]  GP27
+   GP7  [10]   │         │  [31]  GP26
+▶  GP8  [11]   │         │  [30]  RUN
+▶  GP9  [12]   │         │  [29]  GP22
+   GND  [13]   │         │  [28]  GND
+▶ GP10  [14]   │         │  [27]  GP21
+▶ GP11  [15]   │         │  [26]  GP20
+▶ GP12  [16]   │         │  [25]  GP19
+▶ GP13  [17]   │         │  [24]  GP18
+   GND  [18]   │         │  [23]  GND
+  GP14  [19]   │         │  [22]  GP17
+  GP15  [20]   └─────────┘  [21]  GP16
+
 ▶ = used by Dilder
+
+Left side (pins 4–17):  Buttons (GP2–GP6) + Display SPI (GP8–GP13)
+Right side (pin 36):    3V3 power to display
+Right side (pin 38):    GND to display
 ```
 
 ---
@@ -142,42 +147,44 @@ Pins used by this project are highlighted. Full electrical specs in the [Pi Zero
 ## Wiring Diagram (Text)
 
 ```
-Pi Zero WH
+Pico W (on breadboard)
 │
-├─ Pin 1  (3.3V) ──────────────── HAT VCC
-├─ Pin 6  (GND)  ──────────────── HAT GND ── breadboard GND rail
-├─ Pin 19 (GPIO10 / MOSI) ─────── HAT DIN
-├─ Pin 23 (GPIO11 / SCLK) ─────── HAT CLK
-├─ Pin 24 (GPIO8  / CE0)  ─────── HAT CS
-├─ Pin 22 (GPIO25) ────────────── HAT DC
-├─ Pin 11 (GPIO17) ────────────── HAT RST
-├─ Pin 18 (GPIO24) ────────────── HAT BUSY
+├─ Pin 36 (3V3 OUT) ──────────── e-Paper VCC
+├─ Pin 38 (GND)     ──────────── e-Paper GND ── breadboard GND rail
+├─ Pin 15 (GP11 / SPI1 TX)  ──── e-Paper DIN
+├─ Pin 14 (GP10 / SPI1 SCK) ──── e-Paper CLK
+├─ Pin 12 (GP9  / SPI1 CSn) ──── e-Paper CS
+├─ Pin 11 (GP8)  ─────────────── e-Paper DC
+├─ Pin 16 (GP12) ─────────────── e-Paper RST
+├─ Pin 17 (GP13) ─────────────── e-Paper BUSY
 │
-├─ Pin 29 (GPIO5)  ─── [BTN UP]     ─── GND
-├─ Pin 31 (GPIO6)  ─── [BTN DOWN]   ─── GND
-├─ Pin 33 (GPIO13) ─── [BTN LEFT]   ─── GND
-├─ Pin 35 (GPIO19) ─── [BTN RIGHT]  ─── GND
-└─ Pin 37 (GPIO26) ─── [BTN CENTER] ─── GND
+├─ Pin 4  (GP2)  ─── [BTN UP]     ─── GND
+├─ Pin 5  (GP3)  ─── [BTN DOWN]   ─── GND
+├─ Pin 6  (GP4)  ─── [BTN LEFT]   ─── GND
+├─ Pin 7  (GP5)  ─── [BTN RIGHT]  ─── GND
+└─ Pin 9  (GP6)  ─── [BTN CENTER] ─── GND
 ```
 
 ---
 
 ## SPI Configuration
 
-The e-ink display requires SPI to be enabled before use. See [Pi Zero Setup](../setup/pi-zero-setup.md) for instructions.
+The e-ink display uses SPI1 on the Pico W. No kernel configuration needed — SPI is set up in MicroPython code.
 
 | SPI Parameter | Value |
 |---------------|-------|
-| Bus | SPI0 (`/dev/spidev0.0`) |
+| Controller | SPI1 |
 | Mode | Mode 0 (CPOL=0, CPHA=0) |
 | Bit order | MSB first |
 | Clock speed | 4 MHz (typical) |
 | CS signal | Active LOW |
 
-Verify SPI is active after enabling:
-```bash
-ls /dev/spi*
-# Expected: /dev/spidev0.0   /dev/spidev0.1
+```python
+from machine import Pin, SPI
+
+spi = SPI(1, baudrate=4_000_000, polarity=0, phase=0,
+          sck=Pin(10), mosi=Pin(11))
+cs = Pin(9, Pin.OUT, value=1)   # active LOW, start HIGH
 ```
 
 ---
@@ -186,9 +193,11 @@ ls /dev/spi*
 
 | Symptom | Check |
 |---------|-------|
-| Display shows nothing | SPI enabled? Run `ls /dev/spi*` |
+| Display shows nothing | Wiring correct? VCC on 3V3(OUT) not VBUS? SPI pins correct? |
 | Garbage output | Wrong driver version (V3 vs V4) — check PCB silkscreen |
-| Permission error on `/dev/spidev` | Add user to `spi` group: `sudo usermod -aG spi,gpio pi` |
-| BUSY pin always HIGH | Display stuck in refresh — power cycle and run `epd.Clear()` |
-| Button reads always HIGH | `GPIO.PUD_UP` not set, or button not connected to GND |
+| Display flickers then goes blank | RST or BUSY wired to wrong pins |
+| BUSY pin always HIGH | Display stuck in refresh — disconnect power, reconnect, run `epd.Clear()` |
+| Button reads always HIGH (never pressed) | Pull-up not set, or button not connected to GND |
 | Button reads always LOW | Short to ground — check breadboard wiring |
+| `OSError: [Errno 5] EIO` | SPI misconfigured — check SCK/MOSI pin assignments |
+| No serial connection to Pico | Check USB cable supports data (not charge-only) |

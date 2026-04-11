@@ -311,3 +311,41 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Commit:** `09519b5` — Update PromptProgression with Prompts 20–24
 - **Files Created/Modified:**
   - `PromptProgression.md` (modified — added Prompts #20–24)
+
+---
+
+## Prompt #25
+- **Date/Time:** 2026-04-10
+- **Prompt:** "Let's update this plan and the hardware we are going to use. For now I have a set of Waveshare 2.13 V3 displays and Pico W boards on hand that I would like to use to start this project with instead of the Pi Zero. We'll put the Pi Zero in a later dev phase and start with what we have. Update the documentation to account for this hardware change and pull in the correct documentation for this hardware and setup in the project and on the site. Update everything and replace the Zero with the Pico, and then we need to create a setup document to wire up the Waveshare to the Pico W and begin debugging from VSCode on Linux."
+- **Input Tokens (est):** ~130
+- **Output Tokens (est):** ~45,000
+- **Commit:** *(pending)*
+- **Files Created/Modified:**
+  - `README.md` (modified — Pico W as primary board, Pi Zero deferred to Phase 5, new phase roadmap)
+  - `docs/hardware-research.md` (modified — Pico W specs, SPI1 pin mapping, updated materials list and GPIO budget)
+  - `website/docs/docs/reference/pico-w.md` (created — full Pico W reference: RP2040 specs, pinout, electrical limits, MicroPython firmware, Pico W vs Pi Zero comparison)
+  - `website/docs/docs/reference/waveshare-eink.md` (modified — added Pico W jumper wire mapping, MicroPython driver setup, kept Pi Zero mapping for future)
+  - `website/docs/docs/reference/pi-zero-wh.md` (modified — added "future hardware" banner)
+  - `website/docs/docs/hardware/materials-list.md` (modified — Pico W components, updated costs and specs)
+  - `website/docs/docs/hardware/wiring-pinout.md` (modified — complete rewrite for Pico W GPIO, jumper wire diagrams, MicroPython button code, visual pin map)
+  - `website/docs/docs/hardware/enclosure-design.md` (modified — Pico W dimensions, enclosure deferred note)
+  - `website/docs/docs/setup/pi-zero-setup.md` (modified — rewritten as Pico W setup: MicroPython flash, BOOTSEL, serial REPL, Wi-Fi test)
+  - `website/docs/docs/setup/display-setup.md` (modified — rewritten for Pico W jumper wire connection, Waveshare MicroPython driver, framebuf hello world)
+  - `website/docs/docs/setup/dev-environment.md` (modified — rewritten for VSCode + MicroPico on Linux: serial permissions, project config, file upload, mpremote CLI, debugging)
+  - `website/docs/docs/software/project-structure.md` (modified — updated for MicroPython: framebuf, machine.Pin, flash storage notes)
+  - `website/docs/docs/index.md` (modified — updated section names and descriptions for Pico W)
+  - `website/docs/index.md` (modified — landing page updated for Pico W)
+  - `website/mkdocs.yml` (modified — site description, nav labels, added Pico W reference page)
+  - `website/docs/blog/posts/phase-1-hardware.md` (modified — rewritten for Pico W test bench)
+  - `website/docs/blog/posts/phase-0-planning.md` (modified — hardware decision section updated for Pico W first approach)
+
+---
+
+## Prompt #26
+- **Date/Time:** 2026-04-10
+- **Prompt:** "Update the prompts file and fix grammar a bit. Divide, describe, and commit."
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~1,500
+- **Commit:** *(pending)*
+- **Files Created/Modified:**
+  - `PromptProgression.md` (modified — added Prompts #25–26)

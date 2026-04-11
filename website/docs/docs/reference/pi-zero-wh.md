@@ -1,5 +1,8 @@
 # Raspberry Pi Zero WH — Official Reference
 
+!!! note "Future hardware"
+    The Pi Zero WH is planned for Phase 5 (migration from Pico W). This reference is kept for future use. For the current development board, see [Pico W Reference](pico-w.md).
+
 Source: [raspberrypi.com/documentation](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html)
 
 ---
