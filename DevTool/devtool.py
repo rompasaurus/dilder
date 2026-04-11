@@ -1283,6 +1283,10 @@ Then log out and back in (a new terminal is not enough).""")
         self.usb_step3_label = ttk.Label(f, text="")
         self.usb_step3_label.pack(anchor=tk.W, padx=20)
 
+        self.fix_perms_btn = ttk.Button(f, text="Fix: Add me to serial group (requires sudo password)",
+                                        command=self._fix_serial_perms)
+        self.fix_perms_btn.pack(anchor=tk.W, padx=20, pady=(3, 0))
+
         # Step 4
         self._step_header(f, "Step 4", "Open the Serial Monitor")
         self._step_body(f, """\
@@ -1513,6 +1517,101 @@ port below to test the connection.""")
             self.usb_step3_label.config(
                 text="  ✗ Not in 'uucp' or 'dialout'. Run: sudo usermod -aG uucp $USER (then log out/in)",
                 foreground=FG_RED)
+
+    def _fix_serial_perms(self):
+        """Run sudo usermod to add the user to the serial group, via a terminal."""
+        user = os.environ.get("USER", "")
+        if not user:
+            messagebox.showerror("Error", "Could not determine your username.")
+            return
+
+        # Detect the correct group
+        group = "uucp"  # Arch/CachyOS default
+        try:
+            result = subprocess.run(["getent", "group", "dialout"],
+                                    capture_output=True, text=True, timeout=3)
+            if result.returncode == 0:
+                group = "dialout"
+            else:
+                result = subprocess.run(["getent", "group", "uucp"],
+                                        capture_output=True, text=True, timeout=3)
+                if result.returncode == 0:
+                    group = "uucp"
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            pass
+
+        cmd = f"sudo usermod -aG {group} {user}"
+
+        confirm = messagebox.askyesno(
+            "Add Serial Permissions",
+            f"This will run:\n\n  {cmd}\n\n"
+            f"A terminal window will open asking for your sudo password.\n\n"
+            f"After this completes you must log out and back in.\n\n"
+            f"Continue?"
+        )
+        if not confirm:
+            return
+
+        # Launch in a visible terminal so the user can enter their password
+        terminal_cmds = [
+            # Try common terminal emulators in order
+            ["pkexec", "usermod", "-aG", group, user],
+        ]
+
+        # Try pkexec first (graphical sudo prompt, no terminal needed)
+        try:
+            result = subprocess.run(
+                ["pkexec", "usermod", "-aG", group, user],
+                capture_output=True, text=True, timeout=30
+            )
+            if result.returncode == 0:
+                self.usb_step3_label.config(
+                    text=f"  ✓ Added to '{group}' group. LOG OUT AND BACK IN to apply.",
+                    foreground=FG_GREEN)
+                self.app.log(f"Added {user} to {group} group via pkexec")
+                messagebox.showinfo(
+                    "Success",
+                    f"You have been added to the '{group}' group.\n\n"
+                    f"You MUST log out and back in for this to take effect.\n"
+                    f"A new terminal window is not enough — full logout required."
+                )
+                return
+            else:
+                err = result.stderr.strip()
+                if "dismissed" in err.lower() or "cancel" in err.lower():
+                    self.app.log("Permission fix cancelled by user")
+                    return
+                # pkexec failed for another reason, try terminal fallback
+        except FileNotFoundError:
+            pass  # pkexec not installed, try terminal fallback
+        except subprocess.TimeoutExpired:
+            self.app.log("pkexec timed out")
+
+        # Fallback: open a terminal emulator with the sudo command
+        terminal_attempts = [
+            ["xterm", "-e", f"sudo usermod -aG {group} {user} && echo 'Done — close this window' && read"],
+            ["konsole", "-e", "bash", "-c", f"sudo usermod -aG {group} {user} && echo 'Done — press Enter' && read"],
+            ["gnome-terminal", "--", "bash", "-c", f"sudo usermod -aG {group} {user} && echo 'Done — press Enter' && read"],
+        ]
+
+        for term_cmd in terminal_attempts:
+            try:
+                subprocess.Popen(term_cmd)
+                self.usb_step3_label.config(
+                    text=f"  ⏳ Terminal opened — enter your sudo password there. Then log out/in.",
+                    foreground=FG_YELLOW)
+                self.app.log(f"Opened terminal for sudo usermod -aG {group} {user}")
+                return
+            except FileNotFoundError:
+                continue
+
+        # Nothing worked
+        messagebox.showwarning(
+            "Manual Step Required",
+            f"Could not find a graphical sudo prompt or terminal emulator.\n\n"
+            f"Open a terminal manually and run:\n\n  {cmd}\n\n"
+            f"Then log out and back in."
+        )
 
     # ── Wi-Fi Checks ─────────────────────────────────────────────────────────
 

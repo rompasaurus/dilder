@@ -504,3 +504,15 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `DevTool/devtool.py` (modified — added two new tabs: ConnectionUtility with USB serial walkthrough (4 steps with live Check buttons for device detection, serial port, permissions, plus link to Serial Monitor) and Wi-Fi walkthrough (C code examples, CMake config, network scanner, TCP connection tester with IP/port input); DocumentationTab with searchable TOC sidebar, styled headings/code blocks, Find/Clear search with highlight, covers all 7 tabs plus keyboard shortcuts, file formats, and troubleshooting)
   - `DevTool/README.md` (modified — updated TOC, launch table, and architecture table for 7 tabs; added Section 9 Connection Utility with USB and Wi-Fi step tables; added Section 10 Documentation tab description; renumbered remaining sections)
   - `PromptProgression.md` (modified — added Prompt #37)
+
+---
+
+## Prompt #38
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Allow me to run the sudo for serial permissions in the DevTool."
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~5,000
+- **Commit:** *(see below)*
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — added "Fix: Add me to serial group" button in the Connect tab USB walkthrough; `_fix_serial_perms()` method auto-detects the correct group, tries `pkexec` for a graphical sudo prompt first, falls back to opening a terminal emulator with the command, shows confirmation dialog before running, reports success with logout reminder)
+  - `PromptProgression.md` (modified — added Prompt #38)
