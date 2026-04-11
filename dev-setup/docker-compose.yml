@@ -1,0 +1,9 @@
+services:
+  build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mount the hello-world project into the container
+      - ./hello-world:/project
+    working_dir: /project

@@ -1,2 +1,18 @@
 website/venv/
 website/site/
+
+# Pico SDK build artifacts
+dev-setup/hello-world-serial/build/
+dev-setup/hello-world/build/
+
+# Waveshare library files (clone from repo per setup guide)
+dev-setup/hello-world/lib/
+dev-setup/hello-world/pico_sdk_import.cmake
+dev-setup/hello-world-serial/pico_sdk_import.cmake
+
+# Python
+__pycache__/
+*.pyc
+
+# VSCode workspace settings (user-specific)
+.vscode/

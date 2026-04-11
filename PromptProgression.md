@@ -349,3 +349,130 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Commit:** `604039f` — Migrate from Pi Zero to Pico W as Phase 1 development platform
 - **Files Created/Modified:**
   - `PromptProgression.md` (modified — added Prompts #25–26)
+
+---
+
+## Prompt #27
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Let's make a development setup folder with a Docker Compose file and a step-by-step guide with a table of contents on setting up the Pico W and Waveshare e-ink display — physically connecting the display to the Pico board via GPIO headers, then flashing and connecting the Pico to this computer and running a first Hello World program via VSCode using compiled C. I need all the instructions to set up the hardware, configure VSCode, connect, debug, and run this application. Make this guide as detailed and as simple as possible, step by step. Also update the PromptProgression every time I submit a prompt here — clean up the grammar and spelling though. Make this setup guide the Pico and display first-time setup, and update the dev website too."
+- **Input Tokens (est):** ~150
+- **Output Tokens (est):** ~45,000
+- **Commit:** *(pending)*
+- **Files Created/Modified:**
+  - `dev-setup/pico-and-display-first-time-setup.md` (created — comprehensive 13-section first-time setup guide with TOC: hardware wiring, C SDK toolchain install, VSCode configuration, CMake cross-compilation, build/flash/debug workflow, troubleshooting)
+  - `dev-setup/hello-world/CMakeLists.txt` (created — CMake build config for Pico W with Waveshare e-Paper library, USB serial output, Ninja generator)
+  - `dev-setup/hello-world/main.c` (created — Hello World C program that initializes SPI, draws text on the e-ink display, and prints heartbeat to USB serial)
+  - `dev-setup/Dockerfile` (created — Ubuntu 24.04 container with ARM cross-compiler toolchain and Pico SDK for reproducible builds)
+  - `dev-setup/docker-compose.yml` (created — single-service compose file that mounts the project and runs CMake + Ninja build)
+  - `website/docs/docs/setup/first-time-setup.md` (created — website version of the setup guide with MkDocs Material formatting, tabbed OS instructions, admonitions)
+  - `website/mkdocs.yml` (modified — added "First-Time Setup (C SDK)" to the Setup nav section)
+  - `PromptProgression.md` (modified — added Prompt #27)
+
+---
+
+## Prompt #28
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Let's start planning the hardware enclosure design. Create a new folder labelled hardware-design and document the applicable dimensions of the e-ink display and Pico board, along with viable off-the-shelf button options that can be wired to the Pico easily. Research the web for the best button options and provide a cost breakdown. Then we need to start planning how to model out a 3D-printed prototype case based on the concept images — link the concept images, suggest the best CAD software and company to print the first prototype cases, and provide estimated costs. Put this in a new hardware planning document with a table of contents and step-by-step guide. Also update the PromptProgression with this entry, following the same pattern."
+- **Input Tokens (est):** ~150
+- **Output Tokens (est):** ~25,000
+- **Commit:** *(pending)*
+- **Files Created/Modified:**
+  - `hardware-design/hardware-planning.md` (created — comprehensive enclosure planning document with TOC: component dimensions, button selection with cost breakdown, concept image links, enclosure constraints, CAD software comparison, step-by-step 3D modelling plan, printing service comparison with costs, prototype timeline)
+
+---
+
+## Prompt #29
+- **Date/Time:** 2026-04-11
+- **Prompt:** "I want another Hello World version of the code running in C as well. The intent with this project is to have it running on C code completely for speed and efficiency. Also, for the wiring section, I am using the soldered-on headers and pins to slot the Waveshare directly onto the Pico on its headers, so it just slides in. Update the guide accordingly — I will provide pictures later."
+- **Input Tokens (est):** ~80
+- **Output Tokens (est):** ~30,000
+- **Commit:** *(pending)*
+- **Files Created/Modified:**
+  - `dev-setup/hello-world-serial/main.c` (created — bare-minimum serial-only Hello World in C: LED blink + heartbeat printf, no display wiring needed, verifies toolchain end-to-end)
+  - `dev-setup/hello-world-serial/CMakeLists.txt` (created — minimal CMake config linking only pico_stdlib with USB serial output)
+  - `dev-setup/pico-and-display-first-time-setup.md` (rewritten — restructured as two checkpoints: Checkpoint 1 serial-only, Checkpoint 2 display; added C vs MicroPython rationale; updated wiring section from jumper wires to direct header-on-header connection)
+  - `website/docs/docs/setup/first-time-setup.md` (rewritten — website version updated to match: direct header connection, two-checkpoint flow, C-first rationale)
+  - `PromptProgression.md` (modified — added Prompt #29)
+
+---
+
+## Prompt #30
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Let's take this Pico W & Display First-Time Setup and implement a Python command-line step-by-step interface that sets everything up and explains the process in detail as well. Put the Python script in the root of this project."
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~35,000
+- **Commit:** *(pending)*
+- **Files Created/Modified:**
+  - `setup.py` (created — interactive 14-step CLI walkthrough: prerequisite checks, ARM toolchain install with distro detection, Pico SDK clone, PICO_SDK_PATH configuration, serial port permissions, VSCode extension install, serial hello world build/flash/verify, display connection guidance, Waveshare library download, display hello world build/flash/verify; includes --status, --step N, and --list flags; matches dev.py visual style with ANSI colors, spinners, boxed explanations, and manual-step callouts)
+  - `PromptProgression.md` (modified — added Prompt #30)
+
+---
+
+## Prompt #31
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Failed at step 5 — `usermod: group 'dialout' does not exist`. Does the Pico need to be connected at step 5?"
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~5,000
+- **Commit:** *(pending)*
+- **Files Created/Modified:**
+  - `setup.py` (modified — added `detect_serial_group()` and `user_in_serial_group()` helpers that check for `uucp` first then `dialout`; Arch/CachyOS uses `uucp`, Debian/Ubuntu uses `dialout`; all hardcoded `dialout` references replaced with dynamic detection)
+  - `dev-setup/pico-and-display-first-time-setup.md` (modified — serial permissions section updated with distro-specific group names)
+  - `website/docs/docs/setup/first-time-setup.md` (modified — same distro-specific serial group fix with tabbed instructions)
+  - `PromptProgression.md` (modified — added Prompt #31)
+
+---
+
+## Prompt #32
+- **Date/Time:** 2026-04-11
+- **Prompt:** *(Pasted build failure output from setup.py Step 7 — `PICO_DEFAULT_LED_PIN` undeclared error)*
+- **Input Tokens (est):** ~80
+- **Output Tokens (est):** ~8,000
+- **Commit:** *(pending)*
+- **Files Created/Modified:**
+  - `dev-setup/hello-world-serial/main.c` (modified — replaced `PICO_DEFAULT_LED_PIN` and `gpio_put` with `cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN)` since the Pico W's onboard LED is wired to the CYW43 Wi-Fi chip, not a regular GPIO pin; added `pico/cyw43_arch.h` include and `cyw43_arch_init()` call)
+  - `dev-setup/hello-world-serial/CMakeLists.txt` (modified — added `pico_cyw43_arch_none` to link libraries for CYW43 LED control)
+  - `setup.py` (modified — fixed build error output to show both stdout and stderr since Ninja reports compile errors on stdout)
+  - `PromptProgression.md` (modified — added Prompt #32)
+
+---
+
+## Prompt #33
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Could not find the RPI-RP2 mount despite it showing up in Dolphin file explorer."
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~5,000
+- **Commit:** *(pending)*
+- **Files Created/Modified:**
+  - `setup.py` (modified — added `find_rpi_rp2_mount()` helper that checks static paths, falls back to `findmnt`/`lsblk` for the actual mount point, retries after 1-second delay for automount; both flash steps now loop with retry instead of failing on first miss)
+  - `PromptProgression.md` (modified — added Prompt #33)
+
+---
+
+## Prompt #34
+- **Date/Time:** 2026-04-11
+- **Prompt:** *(Pasted Step 12 build failure — `Debug.h: No such file or directory` and missing `<stdlib.h>` warnings)*
+- **Input Tokens (est):** ~100
+- **Output Tokens (est):** ~5,000
+- **Commit:** *(pending)*
+- **Files Created/Modified:**
+  - `dev-setup/hello-world/main.c` (modified — added missing `#include <stdlib.h>` for `malloc`/`free`)
+  - `dev-setup/hello-world/lib/Config/Debug.h` (added — copied from Waveshare repo, was missing from the initial file list)
+  - `setup.py` (modified — added `Debug.h` to the Waveshare library copy list in Step 11)
+  - `dev-setup/pico-and-display-first-time-setup.md` (modified — added `Debug.h` to the manual copy commands)
+  - `website/docs/docs/setup/first-time-setup.md` (modified — same `Debug.h` fix)
+  - `PromptProgression.md` (modified — added Prompt #34)
+
+---
+
+## Prompt #35
+- **Date/Time:** 2026-04-11
+- **Prompt:** "That worked. Let's update the documentation and provide a step-by-step walkthrough of this script and setup process in the setup document. Also update the prompts doc with all the prompts we used here and the last session, then divide, describe, commit, and push this code."
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~12,000
+- **Commit:** *(see below)*
+- **Files Created/Modified:**
+  - `dev-setup/pico-and-display-first-time-setup.md` (modified — added "Automated Setup Script" section at the top with full walkthrough: command reference, 14-step table with automated/manual flags, example `--status` output, resume instructions)
+  - `website/docs/docs/setup/first-time-setup.md` (modified — added matching setup script walkthrough with MkDocs admonitions and step table)
+  - `.gitignore` (modified — added build artifacts, Waveshare lib files, pico_sdk_import.cmake, `__pycache__/`, `.vscode/`)
+  - `PromptProgression.md` (modified — added Prompts #27–35, updated all pending commit hashes)
+  - All new and modified files committed and pushed to origin/main

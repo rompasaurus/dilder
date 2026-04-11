@@ -111,6 +111,7 @@ nav:
           - Wiring & Pinout: docs/hardware/wiring-pinout.md
           - Enclosure Design: docs/hardware/enclosure-design.md
       - Setup:
+          - First-Time Setup (C SDK): docs/setup/first-time-setup.md
           - Pico W Setup: docs/setup/pi-zero-setup.md
           - Display Setup: docs/setup/display-setup.md
           - Dev Environment: docs/setup/dev-environment.md
