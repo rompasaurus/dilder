@@ -319,7 +319,7 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Prompt:** "Let's update this plan and the hardware we are going to use. For now I have a set of Waveshare 2.13 V3 displays and Pico W boards on hand that I would like to use to start this project with instead of the Pi Zero. We'll put the Pi Zero in a later dev phase and start with what we have. Update the documentation to account for this hardware change and pull in the correct documentation for this hardware and setup in the project and on the site. Update everything and replace the Zero with the Pico, and then we need to create a setup document to wire up the Waveshare to the Pico W and begin debugging from VSCode on Linux."
 - **Input Tokens (est):** ~130
 - **Output Tokens (est):** ~45,000
-- **Commit:** *(pending)*
+- **Commit:** `604039f` — Migrate from Pi Zero to Pico W as Phase 1 development platform
 - **Files Created/Modified:**
   - `README.md` (modified — Pico W as primary board, Pi Zero deferred to Phase 5, new phase roadmap)
   - `docs/hardware-research.md` (modified — Pico W specs, SPI1 pin mapping, updated materials list and GPIO budget)
@@ -346,6 +346,6 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Prompt:** "Update the prompts file and fix grammar a bit. Divide, describe, and commit."
 - **Input Tokens (est):** ~20
 - **Output Tokens (est):** ~1,500
-- **Commit:** *(pending)*
+- **Commit:** `604039f` — Migrate from Pi Zero to Pico W as Phase 1 development platform
 - **Files Created/Modified:**
   - `PromptProgression.md` (modified — added Prompts #25–26)
