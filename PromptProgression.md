@@ -758,7 +758,7 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Prompt:** "Ok update the hardware research with all the details from this research and prompt session. Also update the prompts file and clean grammar and spelling. Commit and push."
 - **Input Tokens (est):** ~30
 - **Output Tokens (est):** ~8,000
-- **Commit:** `pending`
+- **Commit:** `ce2f22b` — Add board and display comparison research to hardware docs
 - **Files Created/Modified:**
   - `docs/hardware-research.md` (modified — added Board Comparison table with 9 boards, Display Comparison section with 4 e-paper displays and 7 LCD/TFT alternatives, trade-off analysis, firmware impact assessments, and recommendations; updated firmware language from MicroPython to C/C++)
   - `PromptProgression.md` (modified — added Prompts #54–59, grammar and spelling cleanup)
