@@ -93,6 +93,22 @@
     color: #cba6f7;
 }
 
+.octo-mode-angry {
+    color: #f38ba8;
+}
+
+.octo-mode-conspiratorial {
+    color: #f9e2af;
+}
+
+.octo-mode-sad {
+    color: #89b4fa;
+}
+
+.octo-mode-chaotic {
+    color: #fab387;
+}
+
 .octo-banner-quote {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.95rem;
