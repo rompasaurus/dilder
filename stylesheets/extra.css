@@ -38,3 +38,107 @@
 .md-nav__item {
     padding: 0.1em 0;
 }
+
+/* ── Octopus Banner ── */
+#octopus-banner {
+    background: #1e1e2e;
+    border: 2px solid #313244;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.octo-banner-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    min-height: 100px;
+}
+
+.octo-banner-canvas {
+    flex-shrink: 0;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.octo-banner-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-width: 0;
+    gap: 0.4rem;
+}
+
+.octo-banner-mode {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    color: #89b4fa;
+}
+
+.octo-mode-supportive {
+    color: #a6e3a1;
+}
+
+.octo-mode-sassy {
+    color: #cba6f7;
+}
+
+.octo-banner-quote {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #cdd6f4;
+    line-height: 1.4;
+    min-height: 2.8em;
+    display: flex;
+    align-items: center;
+}
+
+.octo-banner-quote::after {
+    content: "\2588";
+    animation: octo-blink 0.7s step-end infinite;
+    color: #89b4fa;
+    margin-left: 2px;
+}
+
+@keyframes octo-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Responsive: hide right octopus on smaller screens */
+@media (max-width: 768px) {
+    .octo-banner-canvas-right {
+        display: none;
+    }
+    .octo-banner-quote {
+        font-size: 0.8rem;
+    }
+    .octo-banner-inner {
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+}
+
+/* Hide both octopuses on very small screens, text only */
+@media (max-width: 480px) {
+    .octo-banner-canvas {
+        display: none;
+    }
+    .octo-banner-inner {
+        padding: 0.75rem;
+    }
+    .octo-banner-quote {
+        font-size: 0.75rem;
+    }
+}
