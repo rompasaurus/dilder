@@ -1006,6 +1006,55 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Prompt:** "Perfect. Take all my prompts in this session not in the prompt progression and add them. Fix the grammar and spelling and commit."
 - **Input Tokens (est):** ~25
 - **Output Tokens (est):** ~8,000
-- **Commit:** *(see below)*
+- **Commit:** `608ab92` — Add Prompts #75–78 covering screenshot recapture and prompt log update
 - **Files Created/Modified:**
   - `PromptProgression.md` (modified — added Prompts #75–78, grammar and spelling cleanup)
+
+---
+
+## Prompt #79
+- **Date/Time:** 2026-04-12
+- **Prompt:** "OK I have added pictures of the Pico and display setup. Compress into a smaller JPEG and delete the originals in the folders, then put them in the setup guide in the appropriate locations to give a picture of how the hardware looks and is set up."
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~10,000
+- **Commit:** `a6f174c` — Add hardware photos to setup guide — compressed HEIC to JPG
+- **Files Created/Modified:**
+  - `website/docs/assets/images/hardware/*.jpg` (8 files created — converted from 4096x3072 HEIC to 800px-wide compressed JPG, ~985KB total down from ~21MB)
+  - `docs/pictures/*.heic` (8 files deleted — originals removed after conversion)
+  - `website/docs/docs/setup/first-time-setup.md` (modified — embedded photos at What You Need, Pico W at a Glance, Waveshare HAT, Seat the Display, Checkpoint 2 sections)
+
+---
+
+## Prompt #80
+- **Date/Time:** 2026-04-12
+- **Prompt:** "OK let's update the programs — the sassy and supportive octopuses. I want you to move the octopus and chat bubble down more, center vertically. Then let's add the day's date fully written out and the time without seconds, 12-hour format AM/PM, at the top middle."
+- **Input Tokens (est):** ~60
+- **Output Tokens (est):** ~15,000
+- **Commit:** `2532778` — Add date/time header and vertically center octopus layout
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — added date/time header rendering with `datetime.now().strftime`, centered at top; added Y_OFF=12 vertical offset to all octopus drawing; added y_offset parameter to `_draw_chat_bubble`)
+
+---
+
+## Prompt #81
+- **Date/Time:** 2026-04-12
+- **Prompt:** "The clock and height look good on the preview. I need it to also deploy via the C code as well to the Pico."
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~20,000
+- **Commit:** `2864b14` — Add date/time header and vertical centering to standalone Pico firmware
+- **Files Created/Modified:**
+  - `dev-setup/sassy-octopus/main.c` (modified — added RTC initialization from compile-time `__DATE__`/`__TIME__`, `draw_clock_header()` with month name lookup and 12-hour format, Y_OFF=12 with `px_set_off`/`px_clr_off` helpers, offset applied to all body/eye/mouth/bubble drawing)
+  - `dev-setup/sassy-octopus/CMakeLists.txt` (modified — added `hardware_rtc` to link libraries)
+  - `dev-setup/supportive-octopus/main.c` (modified — same changes as sassy-octopus)
+  - `dev-setup/supportive-octopus/CMakeLists.txt` (modified — added `hardware_rtc`)
+
+---
+
+## Prompt #82
+- **Date/Time:** 2026-04-12
+- **Prompt:** "Perfect. Update the prompts with this and commit."
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~5,000
+- **Commit:** *(see below)*
+- **Files Created/Modified:**
+  - `PromptProgression.md` (modified — added Prompts #79–82, backfilled commit hash for Prompt #78)
