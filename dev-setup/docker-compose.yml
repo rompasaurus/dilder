@@ -4,6 +4,21 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      # Mount the hello-world project into the container
       - ./hello-world:/project
+    working_dir: /project
+
+  build-img-receiver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./img-receiver:/project
+    working_dir: /project
+
+  build-sassy-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./sassy-octopus:/project
     working_dir: /project

@@ -1,6 +1,6 @@
 # Dilder DevTool — Pico W Development Companion
 
-A Tkinter GUI application for developing on the Raspberry Pi Pico W with the Waveshare 2.13" e-ink display. Provides a display emulator, serial monitor, firmware flash utility, asset manager, GPIO reference, USB/Wi-Fi connection walkthrough, and built-in documentation — all in one window.
+A Tkinter GUI application for developing on the Raspberry Pi Pico W with the Waveshare 2.13" e-ink display. Provides a display emulator, serial monitor, firmware flash utility, asset manager, animated programs with standalone deploy, GPIO reference, USB/Wi-Fi connection walkthrough, and built-in documentation — all in one window.
 
 ---
 
@@ -28,11 +28,16 @@ A Tkinter GUI application for developing on the Raspberry Pi Pico W with the Wav
    - [Browsing Assets](#browsing-assets)
    - [Previewing](#previewing)
    - [Deleting](#deleting)
-8. [Tab 5 — GPIO Pin Reference](#8-tab-5--gpio-pin-reference)
-9. [Tab 6 — Connection Utility](#9-tab-6--connection-utility)
-   - [USB Serial Walkthrough](#usb-serial-walkthrough)
-   - [Wi-Fi Walkthrough](#wi-fi-walkthrough)
-10. [Tab 7 — Documentation](#10-tab-7--documentation)
+8. [Tab 5 — Programs](#8-tab-5--programs)
+   - [Previewing Programs](#previewing-programs)
+   - [Deploy to Pico (Streaming)](#deploy-to-pico-streaming)
+   - [Deploy Standalone](#deploy-standalone)
+   - [Sassy Octopus](#sassy-octopus)
+9. [Tab 6 — GPIO Pin Reference](#9-tab-6--gpio-pin-reference)
+10. [Tab 7 — Connection Utility](#10-tab-7--connection-utility)
+    - [USB Serial Walkthrough](#usb-serial-walkthrough)
+    - [Wi-Fi Walkthrough](#wi-fi-walkthrough)
+11. [Tab 8 — Documentation](#11-tab-8--documentation)
 11. [File Formats](#11-file-formats)
 12. [Architecture Overview](#12-architecture-overview)
 13. [Troubleshooting](#13-troubleshooting)
@@ -95,7 +100,7 @@ From the project root:
 python3 DevTool/devtool.py
 ```
 
-The application opens with five tabs across the top:
+The application opens with eight tabs across the top:
 
 | Tab | Purpose |
 |-----|---------|
@@ -103,11 +108,12 @@ The application opens with five tabs across the top:
 | **Serial Monitor** | View live printf output from the Pico W |
 | **Flash Firmware** | Flash .uf2 files to the Pico W |
 | **Assets** | Browse and manage saved display images |
+| **Programs** | Preview, stream, or standalone-deploy animated programs to the Pico |
 | **GPIO Pins** | Visual pin assignment reference |
 | **Connect** | Step-by-step USB serial and Wi-Fi connection walkthrough |
 | **Docs** | Searchable built-in documentation for the entire application |
 
-A log bar at the bottom shows status messages and timestamps.
+A resizable log bar at the bottom shows status messages and timestamps. Drag the sash between the tabs and the log to resize.
 
 ---
 
@@ -255,7 +261,41 @@ Select a file and click **Delete** to remove it. A confirmation dialog appears f
 
 ---
 
-## 8. Tab 5 — GPIO Pin Reference
+## 8. Tab 5 — Programs
+
+Preview, stream, or permanently deploy animated programs to the Pico W display.
+
+### Previewing Programs
+
+Select a program from the list and click **Preview** to run the animation in the emulator canvas. Click **Stop** to halt.
+
+### Deploy to Pico (Streaming)
+
+Click **Deploy to Pico** to stream animation frames over USB serial in real time. This requires the **IMG-receiver firmware** on the Pico — use the **Flash IMG Receiver** button to build and flash it (Pico must be in BOOTSEL mode first).
+
+### Deploy Standalone
+
+Click **Deploy Standalone** to bake the entire animation into the Pico's firmware. The DevTool:
+
+1. Pre-renders all frames in Python (120 frames for Sassy Octopus)
+2. Writes a `frames.h` C header with the pixel data
+3. Builds the firmware via Docker (ARM cross-compiler)
+4. Copies the `.uf2` to the BOOTSEL mount
+
+After flashing, the Pico runs the animation on its own — no PC or USB data connection needed. Just plug into any USB power source.
+
+### Sassy Octopus
+
+The first built-in program. A pixel-art octopus on the left side of the display with:
+
+- **3 mouth expressions** that cycle: sassy smirk (tilted half-circle), open mouth (oval), big smile (wide arc)
+- **30 unhinged quotes** in a speech bubble to the right: conspiracies, jokes, and meme statements rendered in a built-in 5x7 bitmap font
+- **Chat bubble** with rounded corners and a speech tail pointing at the octopus mouth
+- **"~ SASSY OCTOPUS ~"** tagline below the bubble
+
+---
+
+## 9. Tab 6 — GPIO Pin Reference
 
 A read-only visual reference showing the Pico W's 40-pin header with all Dilder project assignments highlighted:
 
@@ -268,7 +308,7 @@ This tab is a quick reference so you don't need to switch to the documentation w
 
 ---
 
-## 9. Tab 6 — Connection Utility
+## 10. Tab 7 — Connection Utility
 
 A guided walkthrough for connecting the Pico W to your computer. Switch between USB Serial and Wi-Fi modes using the radio buttons at the top.
 
@@ -300,7 +340,7 @@ Guides you through adding Wi-Fi support to your Pico W firmware:
 
 ---
 
-## 10. Tab 7 — Documentation
+## 11. Tab 8 — Documentation
 
 Built-in searchable documentation for the entire DevTool application.
 
@@ -324,7 +364,7 @@ This tab means you never need to leave the DevTool to look up how something work
 
 ---
 
-## 11. File Formats
+## 12. File Formats
 
 ### PBM (Portable Bitmap — P4 Binary)
 
@@ -361,11 +401,11 @@ Standard PNG format, 250x122 pixels, 1-bit depth. Requires Pillow to export. Can
 
 ---
 
-## 12. Architecture Overview
+## 13. Architecture Overview
 
 ```
 DevTool/
-    devtool.py          # Single-file application (~950 lines)
+    devtool.py          # Single-file application (~3,000 lines)
     requirements.txt    # Python dependencies
     README.md           # This documentation
 
@@ -373,17 +413,23 @@ assets/                 # Saved display images (created automatically)
     *.pbm               # PBM binary 1-bit images
     *.bin               # Raw display buffer bytes
     *.png               # PNG exports (if Pillow available)
+
+dev-setup/
+    img-receiver/       # Pico firmware: receives IMG: protocol over serial
+    sassy-octopus/      # Pico firmware: standalone animation with baked-in frames
+    docker-compose.yml  # Docker build services for all firmware projects
 ```
 
 ### Class Structure
 
 | Class | Parent | Purpose |
 |-------|--------|---------|
-| `DilderDevTool` | `tk.Tk` | Main application window, notebook tabs, log bar |
+| `DilderDevTool` | `tk.Tk` | Main window, notebook tabs, resizable log panel |
 | `DisplayEmulator` | `ttk.Frame` | E-ink canvas, drawing tools, save/load/send |
 | `SerialMonitor` | `ttk.Frame` | Serial connection, read thread, output display |
 | `FlashUtility` | `ttk.Frame` | UF2 selection, BOOTSEL detection, flash copy |
 | `AssetManager` | `ttk.Frame` | File list, preview canvas, delete/open |
+| `ProgramsTab` | `ttk.Frame` | Program list, preview, deploy streaming/standalone, Docker build |
 | `PinViewer` | `ttk.Frame` | Static GPIO reference text |
 | `ConnectionUtility` | `ttk.Frame` | USB/Wi-Fi setup walkthrough with live checks |
 | `DocumentationTab` | `ttk.Frame` | Searchable built-in documentation with TOC sidebar |
@@ -392,11 +438,11 @@ assets/                 # Saved display images (created automatically)
 
 The serial monitor runs a background daemon thread (`_read_loop`) that continuously reads from the serial port. All UI updates from the thread go through `winfo_toplevel().after(0, callback)` to stay on the Tkinter main thread.
 
-Build operations in the flash utility also run in background threads.
+Program animations, Docker builds, firmware flashing, and serial image sends all run in background threads with non-blocking serial I/O (write timeouts).
 
 ---
 
-## 13. Troubleshooting
+## 14. Troubleshooting
 
 | Problem | Solution |
 |---------|----------|

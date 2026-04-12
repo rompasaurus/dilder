@@ -63,7 +63,7 @@ From the project root:
 python3 DevTool/devtool.py
 ```
 
-The application opens with seven tabs across the top:
+The application opens with eight tabs across the top:
 
 | Tab | Purpose |
 |-----|---------|
@@ -71,6 +71,7 @@ The application opens with seven tabs across the top:
 | **Serial Monitor** | View live printf output from the Pico W |
 | **Flash Firmware** | Flash .uf2 files to the Pico W |
 | **Assets** | Browse and manage saved display images |
+| **Programs** | Preview, stream, or deploy animated programs to the display |
 | **GPIO Pins** | Visual pin assignment reference |
 | **Connect** | Step-by-step USB serial and Wi-Fi connection walkthrough |
 | **Docs** | Searchable built-in documentation for the entire application |
@@ -225,7 +226,45 @@ Select a file and click **Delete** to remove it. A confirmation dialog appears f
 
 ---
 
-## Tab 5 — GPIO Pin Reference
+## Tab 5 — Programs
+
+Preview, stream, or permanently deploy animated programs to the Pico W display.
+
+### Program List
+
+Select a program from the list on the left. The preview canvas on the right shows a static frame.
+
+### Previewing
+
+Click **Preview** to run the animation in the emulator. Click **Stop** to halt.
+
+### Deploy to Pico (Streaming)
+
+Click **Deploy to Pico** to stream frames over USB serial. Requires IMG-receiver firmware — use **Flash IMG Receiver** to build and flash it via Docker.
+
+### Deploy Standalone
+
+Click **Deploy Standalone** to bake the animation into standalone firmware:
+
+1. Pre-renders all frames in Python
+2. Writes `frames.h` C header with pixel data
+3. Builds firmware via Docker ARM cross-compiler
+4. Flashes `.uf2` to Pico BOOTSEL mount
+
+After flashing, the Pico runs independently — no PC needed.
+
+### Sassy Octopus
+
+Built-in program featuring:
+
+- Pixel-art octopus with 3 mouth expressions (smirk, open mouth, big smile)
+- 30 random quotes in a speech bubble (conspiracies, jokes, meme statements)
+- Built-in 5x7 bitmap font with word wrapping
+- Cycles: smirk → open (new quote) → smile → open (new quote)
+
+---
+
+## Tab 6 — GPIO Pin Reference
 
 A read-only visual reference showing the Pico W's 40-pin header with all Dilder project assignments highlighted:
 
@@ -238,7 +277,7 @@ This tab is a quick reference so you don't need to switch to the documentation w
 
 ---
 
-## Tab 6 — Connection Utility
+## Tab 7 — Connection Utility
 
 A guided walkthrough for connecting the Pico W to your computer. Switch between USB Serial and Wi-Fi modes using the radio buttons at the top.
 
@@ -272,7 +311,7 @@ Guides you through adding Wi-Fi support to your Pico W firmware:
 
 ---
 
-## Tab 7 — Documentation
+## Tab 8 — Documentation
 
 Built-in searchable documentation for the entire DevTool application.
 

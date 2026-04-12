@@ -54,12 +54,15 @@ Each phase maps to a section of the blog/YouTube series and can be followed inde
 > *You are here*
 
 - [x] Finalize component list with links/part numbers ([hardware-research.md](docs/hardware-research.md))
-- [ ] Flash MicroPython firmware onto Pico W
-- [ ] Set up VSCode with MicroPico extension for development and debugging
-- [ ] Wire e-ink display to Pico W via jumper wires (SPI)
-- [ ] Run Waveshare demo script — confirm display renders
+- [x] Set up Docker-based C SDK cross-compilation toolchain
+- [x] Wire e-ink display to Pico W via jumper wires (SPI)
+- [x] Flash and run "Hello, Dilder!" on the e-ink display — proof of life
+- [x] Build DevTool GUI — display emulator, serial monitor, firmware flash, asset manager, GPIO reference, connection utility, documentation ([DevTool/](DevTool/))
+- [x] Add Programs tab with Sassy Octopus animation (3 expressions, 30 quotes, chat bubble)
+- [x] Build IMG-receiver firmware — stream images from PC to Pico display via USB serial ([dev-setup/img-receiver/](dev-setup/img-receiver/))
+- [x] Build standalone deploy — bake animation frames into firmware, runs without PC ([dev-setup/sassy-octopus/](dev-setup/sassy-octopus/))
 - [ ] Wire and test button inputs (GPIO)
-- [ ] Display a custom image or text as proof-of-life
+- [ ] Battery power prototype
 
 ### Phase 2 — Software Foundation (MicroPython)
 

@@ -408,3 +408,103 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Input Tokens (est):** ~20
 - **Output Tokens (est):** ~3,000
 - **Files:** `assets/garbage.pbm`, `assets/garbage.bin`, `assets/garbage.png` (added — test images from DevTool), `PromptProgression.md` (modified — added Prompts #39–40)
+
+---
+
+## Prompt #41 — 2026-04-11
+
+**Prompt:** "Update the website with docs for the DevTool and setup CLI, add a blog post about Phase 1 dev tools, and update the prompt log on the site."
+
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~60,000
+- **Files:** `website/docs/docs/tools/devtool.md`, `website/docs/docs/tools/setup-cli.md`, `website/docs/docs/tools/website-dev.md`, `website/docs/blog/posts/phase-1-devtools.md`, `website/mkdocs.yml`, `website/docs/prompts/index.md` (modified)
+
+---
+
+## Prompt #42 — 2026-04-11
+
+**Prompt:** "Divide, describe, and commit. Update the prompts, fix grammar."
+
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~2,000
+- **Files:** `PromptProgression.md` (modified)
+
+---
+
+## Prompt #43 — 2026-04-11
+
+**Prompt:** "Also the software on the site needs the READMEs for the GUI app and a guide on the CLI setup."
+
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~40,000
+- **Files:** `website/docs/docs/tools/devtool.md`, `website/docs/docs/tools/setup-cli.md` (rewritten with full documentation)
+
+---
+
+## Prompt #44 — 2026-04-11
+
+**Prompt:** "Create a sassy octopus program in the DevTool with expressions, chat bubbles, and a Programs tab. Also fix the pencil and line drawing tools."
+
+- **Input Tokens (est):** ~200
+- **Output Tokens (est):** ~80,000
+- **Files:** `DevTool/devtool.py` (fixed drawing bug, added Programs tab, Sassy Octopus program with pixel art, 30 quotes, bitmap font)
+
+---
+
+## Prompt #45–46 — 2026-04-11
+
+**Prompt:** "Redesign the octopus with more legs and curves. Actually, revert to the original — it looked better."
+
+- **Input Tokens (est):** ~60
+- **Output Tokens (est):** ~45,000
+- **Files:** `DevTool/devtool.py` (redesigned then reverted octopus art, added 6 tentacle legs, fixed deploy hang)
+
+---
+
+## Prompt #47–48 — 2026-04-11
+
+**Prompt:** "Put error steps in the status label, make the log resizable, and fix USB port detection."
+
+- **Input Tokens (est):** ~60
+- **Output Tokens (est):** ~15,000
+- **Files:** `DevTool/devtool.py` (resizable log panel, improved port detection with USB VID matching, better error messages)
+
+---
+
+## Prompt #49 — 2026-04-11
+
+**Prompt:** "Add Build & Flash to Pico button in the Programs tab with IMG-receiver firmware."
+
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~40,000
+- **Files:** `dev-setup/img-receiver/main.c`, `dev-setup/img-receiver/CMakeLists.txt` (created), `dev-setup/docker-compose.yml`, `DevTool/devtool.py` (added Docker build + flash, 3 mouth expressions)
+
+---
+
+## Prompt #50–51 — 2026-04-12
+
+**Prompt:** "Add more descriptive Docker build logs. Make windows resizable."
+
+- **Input Tokens (est):** ~55
+- **Output Tokens (est):** ~20,000
+- **Files:** `DevTool/devtool.py` (streaming Docker build output, resizable panels)
+
+---
+
+## Prompt #52 — 2026-04-12
+
+**Prompt:** "Deploy the sassy octopus standalone to the Pico so it runs without USB."
+
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~30,000
+- **Files:** `dev-setup/sassy-octopus/main.c`, `dev-setup/sassy-octopus/CMakeLists.txt` (created), `dev-setup/docker-compose.yml`, `DevTool/devtool.py` (standalone deploy with pre-rendered frames)
+
+---
+
+## Prompt #53 — 2026-04-12
+
+**Prompt:** "Commit everything, update all docs, website, and prompts. Fix spelling."
+
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~50,000
+- **Files:** `PromptProgression.md`, `README.md`, `DevTool/README.md`, `website/docs/docs/tools/devtool.md`, `website/docs/prompts/index.md`, `.gitignore` (all updated)

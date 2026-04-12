@@ -585,3 +585,118 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `website/docs/docs/tools/devtool.md` (rewritten — expanded from summary to full documentation matching DevTool/README.md: all 7 tabs with detailed usage instructions, drawing tools, serial monitor, flash firmware, asset manager, GPIO reference, connection utility with USB/Wi-Fi walkthroughs, documentation tab, file format specifications with byte layouts, class architecture, threading model, troubleshooting table)
   - `website/docs/docs/tools/setup-cli.md` (rewritten — expanded from summary to comprehensive guide matching dev-setup/pico-and-display-first-time-setup.md: 14-step walkthrough table, hardware requirements, software installed, Pico W and Waveshare specs, C vs MicroPython rationale, display connection with side-view diagram and pin mapping, troubleshooting tables for build/flash/serial/display issues, quick reference card)
   - `PromptProgression.md` (modified — added Prompt #43)
+
+---
+
+## Prompt #44
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Ok you made a dev tool where I can create asset via display emulator. First of all the pencil and line don't draw on the window at all, text and rectangle do. Also I want an ability to preview the asset on the Pico display if it's connected — add a button to deploy to Pico. Then we want to create another tab in the dev tool to deploy from a list of programs. For the first program I want you to create a sassy octopus that smiles and alternates between that expression and open-mouth expression with a text chat bubble where it blurts out from a random list of unhinged hilarious conspiracies and jokes and meme statements, alternating between facial expressions. The octopus should be on the left side of the display and the chat bubble to the right of its mouth."
+- **Input Tokens (est):** ~200
+- **Output Tokens (est):** ~80,000
+- **Commit:** *(see below)*
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — fixed `_draw_brush` range bug that broke pencil/line tools; added Programs tab with preview/deploy; added Sassy Octopus program with pixel art, 3 mouth expressions, 30 quotes, tiny bitmap font, chat bubble rendering; made Send to Pico non-blocking with write timeout)
+
+---
+
+## Prompt #45
+- **Date/Time:** 2026-04-11
+- **Prompt:** "The octopus needs more legs and it should have less black and more curvaceous. The display emulator tab should have a preview deploy on the Pico as well."
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~30,000
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — redesigned octopus to outline style with 6 curvy tentacles, then reverted to original chunky style per user preference; added 6 tentacle legs; fixed deploy hang with write_timeout)
+
+---
+
+## Prompt #46
+- **Date/Time:** 2026-04-11
+- **Prompt:** "God the octopus looks awful, use the other octopus you made — it looked way better."
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~15,000
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — reverted to original chunky filled-style octopus with 6 tentacle legs, improved open-mouth with proper white interior and black border)
+
+---
+
+## Prompt #47
+- **Date/Time:** 2026-04-11
+- **Prompt:** "I don't want to see the logs — write the steps in the write-failed message. Also the logs at the bottom need to be resizable."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~10,000
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — moved deploy failure steps to status label; replaced fixed log bar with resizable PanedWindow + scrollbar + Clear button; improved port detection with Raspberry Pi VID 0x2E8A; fixed hardcoded /dev/ttyACM0 references)
+
+---
+
+## Prompt #48
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Also no device found error — I changed USB ports, does that break this? If so check for the correct port in all the utils."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~5,000
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — `find_pico_serial()` now checks Raspberry Pi USB VID 0x2E8A first, then falls back to ttyACM/usbmodem name matching; connection utility uses dynamic detection instead of hardcoded paths)
+
+---
+
+## Prompt #49
+- **Date/Time:** 2026-04-11
+- **Prompt:** "It says to flash the firmware via the flash tab — where is the image, what am I flashing? Can't you do it in the Programs tab when I have the Pico in BOOTSEL mode?"
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~40,000
+- **Files Created/Modified:**
+  - `dev-setup/img-receiver/main.c` (created — Pico W firmware that receives IMG: protocol over USB serial and displays on e-ink, with landscape-to-portrait transpose and partial refresh)
+  - `dev-setup/img-receiver/CMakeLists.txt` (created)
+  - `dev-setup/img-receiver/lib/` (created — copied shared Waveshare/GUI libraries)
+  - `dev-setup/docker-compose.yml` (modified — added build-img-receiver service)
+  - `DevTool/devtool.py` (modified — added Build & Flash button to Programs tab with Docker build + BOOTSEL flash; added 3 mouth expressions: smirk, smile, open; added MOUTH_CYCLE animation; updated all error messages to reference Programs tab)
+
+---
+
+## Prompt #50
+- **Date/Time:** 2026-04-11
+- **Prompt:** "Also give the octopus more mouth expressions — I want a default smile which is a half-circle that's white and slightly off-angle from the normal mouth."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~5,000
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — added smirk expression as default: tilted half-circle with white interior; animation now cycles smirk → open → smile → open)
+
+---
+
+## Prompt #51
+- **Date/Time:** 2026-04-12
+- **Prompt:** "In the build give some more descriptive logs of what Docker is doing. Also can the logs and windows be resized on this GUI?"
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~15,000
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — Docker image build step now streams output line-by-line with `[docker]` prefixed log entries; shows download/install/clone progress in real time; increased timeout to 600s; fixed sidebar panels to allow proper horizontal resizing)
+
+---
+
+## Prompt #52
+- **Date/Time:** 2026-04-12
+- **Prompt:** "I want the ability to deploy the sassy octopus fully to the Pico so I can run it without having the USB connected and it will just boot into this program standalone."
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~30,000
+- **Files Created/Modified:**
+  - `dev-setup/sassy-octopus/main.c` (created — standalone firmware that cycles pre-rendered frames on the e-ink display with partial refresh, no USB needed)
+  - `dev-setup/sassy-octopus/CMakeLists.txt` (created)
+  - `dev-setup/sassy-octopus/lib/` (created — copied shared Waveshare/GUI libraries)
+  - `dev-setup/docker-compose.yml` (modified — added build-sassy-octopus service)
+  - `DevTool/devtool.py` (modified — added Deploy Standalone button that pre-renders all 120 animation frames in Python, writes frames.h C header, Docker-builds the firmware, and flashes to Pico via BOOTSEL)
+
+---
+
+## Prompt #53
+- **Date/Time:** 2026-04-12
+- **Prompt:** "Divide, describe, and commit. Update the prompts, fix spelling, and add documentation on the new features of the tool. Update existing docs and the website and prompts file, and commit and push."
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~50,000
+- **Commit:** *(see below)*
+- **Files Created/Modified:**
+  - `PromptProgression.md` (modified — added Prompts #44–53)
+  - `README.md` (modified — updated Phase 1 checklist, added DevTool and firmware projects)
+  - `DevTool/README.md` (modified — updated for 8 tabs, added Programs tab docs, updated architecture)
+  - `website/docs/docs/tools/devtool.md` (modified — added Programs tab and standalone deploy documentation)
+  - `website/docs/prompts/index.md` (modified — added Prompts #41–53)
+  - `dev-setup/img-receiver/main.c`, `dev-setup/sassy-octopus/main.c` (spelling fixes)

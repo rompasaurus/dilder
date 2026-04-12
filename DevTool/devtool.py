@@ -79,7 +79,17 @@ EINK_BLACK = "#1a1a1a"
 # ─────────────────────────────────────────────────────────────────────────────
 
 def find_pico_serial():
-    """Find the Pico W serial port."""
+    """Find the Pico W serial port.
+
+    Checks all comports for ttyACM / usbmodem devices, or the Raspberry Pi
+    USB vendor ID (2E8A).  Handles port number changes when switching USB
+    ports (ttyACM0 → ttyACM1, etc.).
+    """
+    # First pass: match by Raspberry Pi Pico VID (0x2E8A)
+    for port in serial.tools.list_ports.comports():
+        if port.vid == 0x2E8A:
+            return port.device
+    # Second pass: match by device name pattern (broader)
     for port in serial.tools.list_ports.comports():
         if "ttyACM" in port.device or "usbmodem" in port.device:
             return port.device
@@ -599,7 +609,14 @@ class DisplayEmulator(ttk.Frame):
                     ser.flush()
                 self.app.log(f"Image sent to Pico W ({len(data)} bytes)")
             except serial.SerialTimeoutException:
-                self.app.log("Send timed out — Pico may not be reading serial data")
+                self.after(0, lambda: messagebox.showwarning(
+                    "Send Timed Out",
+                    "Pico needs IMG-receiver firmware to display images.\n\n"
+                    "Steps:\n"
+                    "1) Go to the Programs tab\n"
+                    "2) Put Pico in BOOTSEL mode (hold BOOTSEL + plug in)\n"
+                    "3) Click 'Build & Flash to Pico'\n"
+                    "4) Wait for reboot, then retry Send to Pico"))
             except serial.SerialException as e:
                 self.after(0, lambda: messagebox.showerror("Serial Error", str(e)))
 
@@ -994,7 +1011,7 @@ class AssetManager(ttk.Frame):
     def _build_ui(self):
         # ── File list ──
         list_frame = ttk.Frame(self)
-        list_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=5, pady=5, expand=False)
+        list_frame.pack(side=tk.LEFT, fill=tk.Y, padx=5, pady=5)
 
         ttk.Label(list_frame, text="Assets (assets/)").pack(anchor=tk.W)
 
@@ -1488,22 +1505,23 @@ port below to test the connection.""")
                                         foreground=FG_YELLOW)
 
     def _check_serial_port(self):
-        tty = Path("/dev/ttyACM0")
-        if tty.exists():
-            self.usb_step2_label.config(text="  ✓ /dev/ttyACM0 exists — Pico W serial is ready",
-                                        foreground=FG_GREEN)
-            self.app.log("Serial port check: /dev/ttyACM0 found")
+        port = find_pico_serial()
+        if port:
+            self.usb_step2_label.config(
+                text=f"  ✓ {port} detected — Pico W serial is ready",
+                foreground=FG_GREEN)
+            self.app.log(f"Serial port check: {port} found")
         else:
-            # Check for any ttyACM
-            import glob
-            others = glob.glob("/dev/ttyACM*")
+            # Check for any ttyACM as fallback hint
+            import glob as _glob
+            others = _glob.glob("/dev/ttyACM*")
             if others:
                 self.usb_step2_label.config(
-                    text=f"  ~ /dev/ttyACM0 not found, but found: {', '.join(others)}",
+                    text=f"  ~ Pico not auto-detected, but found: {', '.join(others)}",
                     foreground=FG_YELLOW)
             else:
                 self.usb_step2_label.config(
-                    text="  ✗ No /dev/ttyACM* devices found. Is the Pico W plugged in with firmware?",
+                    text="  ✗ No serial devices found. Is the Pico W plugged in with firmware?",
                     foreground=FG_RED)
 
     def _check_serial_perms(self):
@@ -2064,198 +2082,248 @@ class DocumentationTab(ttk.Frame):
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Sassy Octopus pixel art (drawn on a 250x122 canvas) ──
-# Outline-style curvy octopus with 6 tentacle legs, positioned left side.
+# Chunky filled-style octopus on the left side with chat bubble on the right.
 
-import math
-
-def _draw_ellipse_outline(pixels, cx, cy, rx, ry, thickness=2):
-    """Draw an ellipse outline into pixel buffer."""
-    for angle_deg in range(360):
-        a = math.radians(angle_deg)
-        for t in range(thickness):
-            r_off = t - thickness // 2
-            x = int(cx + (rx + r_off * 0.5) * math.cos(a))
-            y = int(cy + (ry + r_off * 0.5) * math.sin(a))
-            if 0 <= x < DISPLAY_W and 0 <= y < DISPLAY_H:
-                pixels[y][x] = 1
-
-
-def _draw_filled_ellipse(pixels, cx, cy, rx, ry, value=1):
-    """Draw a filled ellipse into pixel buffer."""
-    for y in range(max(0, cy - ry), min(DISPLAY_H, cy + ry + 1)):
-        for x in range(max(0, cx - rx), min(DISPLAY_W, cx + rx + 1)):
-            dx, dy = x - cx, y - cy
-            if rx > 0 and ry > 0 and (dx * dx) / (rx * rx) + (dy * dy) / (ry * ry) <= 1.0:
-                pixels[y][x] = value
-
-
-def _draw_curve(pixels, points, thickness=2):
-    """Draw a smooth curve through a list of (x, y) points using line segments."""
-    for i in range(len(points) - 1):
-        x0, y0 = points[i]
-        x1, y1 = points[i + 1]
-        dist = max(1, int(math.hypot(x1 - x0, y1 - y0)))
-        for step in range(dist + 1):
-            t = step / dist
-            x = int(x0 + t * (x1 - x0))
-            y = int(y0 + t * (y1 - y0))
-            half = thickness // 2
-            for dy in range(-half, -half + thickness):
-                for dx in range(-half, -half + thickness):
-                    px, py = x + dx, y + dy
-                    if 0 <= px < DISPLAY_W and 0 <= py < DISPLAY_H:
-                        pixels[py][px] = 1
-
-
-def _draw_octopus(pixels, mouth_open=False):
-    """Draw the outline-style curvy octopus on the left side of the display."""
-    # Head — large oval, outline only
-    head_cx, head_cy = 35, 25
-    head_rx, head_ry = 24, 20
-    _draw_ellipse_outline(pixels, head_cx, head_cy, head_rx, head_ry, thickness=2)
-
-    # Clear inside of head to white (so it's just an outline)
-    _draw_filled_ellipse(pixels, head_cx, head_cy, head_rx - 2, head_ry - 2, value=0)
-
-    # Eyes — oval outlines with pupils
-    for ex in [24, 46]:
-        # Eye outline
-        _draw_ellipse_outline(pixels, ex, 23, 6, 7, thickness=2)
-        _draw_filled_ellipse(pixels, ex, 23, 4, 5, value=0)
-        # Pupil (solid dot, slightly off-center down)
-        _draw_filled_ellipse(pixels, ex + 1, 25, 2, 3, value=1)
-        # Highlight (white dot top-left of pupil)
-        if 0 <= 23 - 2 < DISPLAY_H and 0 <= ex - 1 < DISPLAY_W:
-            pixels[21][ex - 1] = 0
-            pixels[21][ex] = 0
-            pixels[22][ex - 1] = 0
-
-    # Eyebrows — cute little arcs above each eye
-    brow_l = [(16, 13), (19, 11), (22, 10), (25, 11), (27, 12)]
-    brow_r = [(43, 12), (45, 11), (48, 10), (51, 11), (54, 13)]
-    _draw_curve(pixels, brow_l, thickness=1)
-    _draw_curve(pixels, brow_r, thickness=1)
-
-    # Mouth
-    if mouth_open:
-        # Open mouth — oval outline
-        _draw_ellipse_outline(pixels, 35, 37, 6, 4, thickness=2)
-        _draw_filled_ellipse(pixels, 35, 37, 4, 2, value=0)
-    else:
-        # Smile — curved arc
-        smile = []
-        for i in range(20):
-            t = i / 19.0
-            x = int(26 + t * 18)
-            y = int(35 + 6 * math.sin(t * math.pi))
-            smile.append((x, y))
-        _draw_curve(pixels, smile, thickness=2)
-
-    # Cheeks — small circles for blush marks
-    for cx_blush in [16, 54]:
-        for dx in range(-2, 3):
-            for dy in range(-1, 2):
-                px, py = cx_blush + dx, 34 + dy
-                if 0 <= px < DISPLAY_W and 0 <= py < DISPLAY_H:
-                    if abs(dx) + abs(dy) <= 2:
-                        pixels[py][px] = 1
-
-    # Body transition — slight curve below head connecting to tentacles
-    body_l = [(11, 42), (9, 46), (8, 50), (9, 54)]
-    body_r = [(59, 42), (61, 46), (62, 50), (61, 54)]
-    _draw_curve(pixels, body_l, thickness=2)
-    _draw_curve(pixels, body_r, thickness=2)
-
-    # 6 curvy tentacle legs hanging down from the body
-    tentacle_starts = [
-        (9, 54),   # leftmost
-        (19, 52),  # inner-left
-        (30, 53),  # center-left
-        (40, 53),  # center-right
-        (51, 52),  # inner-right
-        (61, 54),  # rightmost
+def _octo_body():
+    """Return octopus body as list of (y, [(x0,x1), ...]) run-length pairs."""
+    rows = []
+    # Head dome (y 10..54)
+    head = [
+        (10, [(22, 48)]),
+        (11, [(18, 52)]),
+        (12, [(16, 54)]),
+        (13, [(14, 56)]),
+        (14, [(13, 57)]),
+        (15, [(12, 58)]),
+        (16, [(11, 59)]),
+        (17, [(10, 60)]),
+        (18, [(10, 60)]),
+        (19, [(9, 61)]),
+        (20, [(9, 61)]),
+        (21, [(9, 61)]),
+        (22, [(9, 61)]),
+        (23, [(9, 61)]),
+        (24, [(9, 61)]),
+        (25, [(9, 61)]),
+        (26, [(9, 61)]),
+        (27, [(9, 61)]),
+        (28, [(10, 60)]),
+        (29, [(10, 60)]),
+        (30, [(10, 60)]),
+        (31, [(10, 60)]),
+        (32, [(10, 60)]),
+        (33, [(10, 60)]),
+        (34, [(10, 60)]),
+        (35, [(10, 60)]),
+        (36, [(10, 60)]),
+        (37, [(10, 60)]),
+        (38, [(10, 60)]),
+        (39, [(10, 60)]),
+        (40, [(10, 60)]),
+        (41, [(11, 59)]),
+        (42, [(11, 59)]),
+        (43, [(12, 58)]),
+        (44, [(13, 57)]),
+        (45, [(14, 56)]),
+        # Cheeks bulge
+        (46, [(12, 58)]),
+        (47, [(11, 59)]),
+        (48, [(10, 60)]),
+        (49, [(10, 60)]),
+        (50, [(11, 59)]),
+        (51, [(12, 58)]),
+        (52, [(13, 57)]),
+        (53, [(14, 56)]),
+        (54, [(15, 55)]),
     ]
+    rows.extend(head)
 
-    # Each tentacle is a wavy curve going downward
-    for i, (sx, sy) in enumerate(tentacle_starts):
-        pts = []
-        wave_dir = 1 if i % 2 == 0 else -1
-        amplitude = 6 + (i % 3) * 2
-        for step in range(30):
-            t = step / 29.0
-            x = sx + wave_dir * amplitude * math.sin(t * math.pi * 2.5)
-            y = sy + t * 50
-            pts.append((int(x), int(y)))
-        # Clip to display bounds
-        pts = [(x, y) for x, y in pts if 0 <= y < DISPLAY_H]
-        if len(pts) > 1:
-            _draw_curve(pixels, pts, thickness=2)
+    # 6 tentacle legs (y 55..85) — wavy appendages
+    tentacles = [
+        (55, [(10, 17), (21, 28), (32, 39), (43, 50), (54, 61)]),
+        (56, [(8, 15), (19, 26), (30, 37), (45, 52), (56, 63)]),
+        (57, [(7, 14), (18, 24), (29, 35), (47, 53), (58, 64)]),
+        (58, [(6, 12), (19, 25), (31, 37), (46, 52), (57, 63)]),
+        (59, [(7, 13), (21, 27), (33, 39), (44, 50), (55, 61)]),
+        (60, [(8, 14), (20, 26), (31, 37), (43, 49), (54, 60)]),
+        (61, [(9, 14), (18, 24), (30, 36), (44, 50), (56, 62)]),
+        (62, [(8, 13), (17, 22), (31, 37), (46, 52), (57, 63)]),
+        (63, [(7, 12), (18, 23), (33, 38), (45, 51), (55, 61)]),
+        (64, [(8, 13), (20, 25), (32, 37), (43, 48), (54, 59)]),
+        (65, [(9, 14), (19, 24), (30, 35), (44, 49), (55, 60)]),
+        (66, [(10, 14), (17, 22), (31, 36), (46, 51), (57, 62)]),
+        (67, [(9, 13), (18, 22), (33, 37), (45, 50), (56, 61)]),
+        (68, [(8, 12), (19, 23), (32, 36), (43, 48), (54, 59)]),
+        (69, [(9, 13), (21, 25), (30, 34), (44, 48), (55, 59)]),
+        (70, [(10, 14), (20, 24), (31, 35), (46, 50), (57, 61)]),
+        (71, [(11, 14), (18, 22), (33, 37), (45, 49), (56, 60)]),
+        (72, [(10, 13), (19, 22), (32, 35), (43, 47), (54, 58)]),
+        (73, [(9, 12), (20, 23), (30, 33), (44, 47), (55, 58)]),
+        (74, [(10, 13), (21, 24), (31, 34), (46, 49), (57, 60)]),
+        (75, [(11, 14), (20, 23), (33, 36), (45, 48), (56, 59)]),
+        (76, [(12, 14), (19, 22), (32, 35), (43, 46), (54, 57)]),
+        (77, [(11, 13), (20, 22), (30, 33), (44, 46), (55, 57)]),
+        (78, [(10, 12), (21, 23), (31, 33), (45, 47), (56, 58)]),
+        (79, [(11, 13), (22, 24), (32, 34), (44, 46), (55, 57)]),
+        (80, [(12, 14), (21, 23), (33, 35), (43, 45), (54, 56)]),
+    ]
+    rows.extend(tentacles)
+    return rows
 
-        # Suction cups — small dots along the tentacle
-        for j in range(2, len(pts) - 1, 4):
-            cx_cup, cy_cup = pts[j]
-            # Offset cup to the inside of the curve
-            if j + 1 < len(pts):
-                nx, ny = pts[j + 1]
-                off_x = 1 if nx > cx_cup else -1
-                cup_x = cx_cup + off_x * 2
-                if 0 <= cup_x < DISPLAY_W and 0 <= cy_cup < DISPLAY_H:
-                    pixels[cy_cup][cup_x] = 1
-                    if 0 <= cy_cup + 1 < DISPLAY_H:
-                        pixels[cy_cup + 1][cup_x] = 1
 
-    # Redraw head outline on top (tentacles may overlap)
-    _draw_ellipse_outline(pixels, head_cx, head_cy, head_rx, head_ry, thickness=2)
+def _octo_eyes():
+    """Return eye pixel coords — two round white eyes."""
+    eyes = []
+    # Left eye (around x=22, y=25), Right eye (around x=48, y=25)
+    for ecx in [22, 48]:
+        for dy in range(-4, 5):
+            for dx in range(-4, 5):
+                if dx * dx + dy * dy <= 16:
+                    eyes.append((ecx + dx, 25 + dy))
+    return eyes
 
 
-def _draw_chat_bubble(pixels, text, mouth_open=False):
+def _octo_pupils():
+    """Return pupil pixel coords — solid black dots offset down-right."""
+    pupils = []
+    for ecx in [23, 49]:
+        for dy in range(-2, 3):
+            for dx in range(-2, 3):
+                if dx * dx + dy * dy <= 4:
+                    pupils.append((ecx + dx, 26 + dy))
+    return pupils
+
+
+def _octo_highlights():
+    """Return highlight pixel coords — white sparkle top-left of each pupil."""
+    whites = []
+    for ecx in [20, 46]:
+        for dy in range(-1, 1):
+            for dx in range(-1, 1):
+                if dx * dx + dy * dy <= 1:
+                    whites.append((ecx + dx, 23 + dy))
+    return whites
+
+
+def _octo_smirk():
+    """Default smirk — a tilted half-circle smile, slightly off-angle.
+
+    White interior with black outline, giving a sassy lopsided grin.
+    Left side sits higher, right side dips lower.
+    """
+    outline = []
+    interior = []
+    cx, cy = 35, 39
+    # Tilted arc: left side y-2, right side y+2
+    for x in range(28, 44):
+        t = (x - 28) / 15.0  # 0..1 across mouth
+        # Tilt: left is higher, right is lower
+        tilt = -2 + t * 4
+        # Arc curve (half-circle shape)
+        arc = 5 * (1.0 - (2 * t - 1) ** 2) ** 0.5 if abs(2 * t - 1) < 1 else 0
+        y_center = cy + tilt + arc
+        y_top = int(y_center - 1)
+        y_bot = int(y_center + 1)
+        # Outline (top and bottom of the arc band)
+        outline.append((x, y_top))
+        outline.append((x, y_bot))
+        # Interior (white fill between)
+        interior.append((x, int(y_center)))
+    return outline, interior
+
+
+def _octo_smile():
+    """Big smile — a wide curved arc."""
+    mouth = []
+    for x in range(26, 45):
+        cy = 38 + ((x - 35) ** 2) // 25
+        mouth.append((x, cy))
+        mouth.append((x, cy + 1))
+    return mouth
+
+
+def _octo_open_mouth():
+    """Open mouth — an oval opening (border pixels only)."""
+    cx, cy = 35, 40
+    rx, ry = 7, 5
+    border = []
+    for dy in range(-ry, ry + 1):
+        for dx in range(-rx, rx + 1):
+            inside = (dx * dx) * (ry * ry) + (dy * dy) * (rx * rx) <= (rx * rx) * (ry * ry)
+            if inside:
+                is_edge = False
+                for ndx, ndy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    nx, ny = dx + ndx, dy + ndy
+                    if (nx * nx) * (ry * ry) + (ny * ny) * (rx * rx) > (rx * rx) * (ry * ry):
+                        is_edge = True
+                        break
+                if is_edge:
+                    border.append((cx + dx, cy + dy))
+    return border
+
+
+def _octo_open_mouth_interior():
+    """Interior of open mouth (white fill)."""
+    cx, cy = 35, 40
+    rx, ry = 6, 4
+    interior = []
+    for dy in range(-ry, ry + 1):
+        for dx in range(-rx, rx + 1):
+            if (dx * dx) * (ry * ry) + (dy * dy) * (rx * rx) <= (rx * rx) * (ry * ry):
+                interior.append((cx + dx, cy + dy))
+    return interior
+
+
+# Mouth expression names used by the animation
+MOUTH_SMIRK = "smirk"       # default: tilted half-circle, sassy
+MOUTH_SMILE = "smile"       # big wide grin
+MOUTH_OPEN  = "open"        # oval open mouth (talking)
+
+# Cycle order for the animation
+MOUTH_CYCLE = [MOUTH_SMIRK, MOUTH_OPEN, MOUTH_SMILE, MOUTH_OPEN]
+
+
+def _draw_chat_bubble(pixels, text):
     """Draw a speech bubble to the right of the octopus with wrapped text."""
-    bx, by = 75, 3
-    bw, bh = 170, 72
+    bx, by = 75, 5
+    bw, bh = 170, 70
 
-    # Rounded rectangle outline
-    r = 5  # corner radius
-    # Top and bottom edges
-    for x in range(bx + r, bx + bw - r):
-        for t in range(2):
-            pixels[by + t][x] = 1
-            pixels[by + bh - 1 - t][x] = 1
-    # Left and right edges
-    for y in range(by + r, by + bh - r):
-        for t in range(2):
-            pixels[y][bx + t] = 1
-            pixels[y][bx + bw - 1 - t] = 1
-    # Rounded corners (quarter circles)
-    corners = [(bx + r, by + r), (bx + bw - 1 - r, by + r),
-               (bx + r, by + bh - 1 - r), (bx + bw - 1 - r, by + bh - 1 - r)]
-    for ccx, ccy in corners:
-        for angle_deg in range(360):
-            a = math.radians(angle_deg)
-            for t in range(2):
-                x = int(ccx + (r - t) * math.cos(a))
-                y = int(ccy + (r - t) * math.sin(a))
-                if 0 <= x < DISPLAY_W and 0 <= y < DISPLAY_H:
-                    # Only draw if in the corner quadrant
-                    if (bx <= x <= bx + bw - 1) and (by <= y <= by + bh - 1):
-                        pixels[y][x] = 1
+    # Bubble outline (double-thick)
+    for x in range(bx + 3, bx + bw - 3):
+        pixels[by][x] = 1
+        pixels[by + 1][x] = 1
+        pixels[by + bh - 1][x] = 1
+        pixels[by + bh - 2][x] = 1
+    for y in range(by + 3, by + bh - 3):
+        pixels[y][bx] = 1
+        pixels[y][bx + 1] = 1
+        pixels[y][bx + bw - 1] = 1
+        pixels[y][bx + bw - 2] = 1
+    # Rounded corners
+    for cx, cy in [(bx + 2, by + 2), (bx + bw - 3, by + 2),
+                   (bx + 2, by + bh - 3), (bx + bw - 3, by + bh - 3)]:
+        for dx in range(-1, 2):
+            for dy in range(-1, 2):
+                if abs(dx) + abs(dy) <= 1:
+                    if 0 <= cy + dy < DISPLAY_H and 0 <= cx + dx < DISPLAY_W:
+                        pixels[cy + dy][cx + dx] = 1
 
-    # Speech tail — triangle pointing left toward octopus mouth
-    tail_tip_x, tail_tip_y = 68, 38  # tip near mouth
-    tail_base_top = (bx, 33)
-    tail_base_bot = (bx, 43)
-    # Draw two lines forming the tail
-    _draw_curve(pixels, [tail_base_top, (tail_tip_x, tail_tip_y)], thickness=1)
-    _draw_curve(pixels, [(tail_tip_x, tail_tip_y), tail_base_bot], thickness=1)
-    # Clear the bubble wall between the tail base points
-    for y in range(34, 43):
-        pixels[y][bx] = 0
-        pixels[y][bx + 1] = 0
+    # Speech tail pointing left toward octopus mouth
+    tail_points = [
+        (bx, 35), (bx - 1, 36), (bx - 2, 37), (bx - 3, 38),
+        (bx - 4, 39), (bx - 5, 40), (bx - 6, 41), (bx - 7, 42),
+        (bx - 6, 43), (bx - 5, 43), (bx - 4, 43), (bx - 3, 42),
+        (bx - 2, 41), (bx - 1, 40), (bx, 39),
+    ]
+    for tx, ty in tail_points:
+        if 0 <= ty < DISPLAY_H and 0 <= tx < DISPLAY_W:
+            pixels[ty][tx] = 1
 
-    # Render text inside bubble
-    _render_tiny_text(pixels, bx + 8, by + 8, text, bw - 16)
+    # Render text inside bubble using built-in bitmap font
+    _render_tiny_text(pixels, bx + 6, by + 6, text, bw - 12)
 
-    # Tagline below bubble
-    _render_tiny_text(pixels, bx + 8, by + bh + 6, "~ SASSY OCTOPUS ~", bw)
+    # Tagline at bottom
+    _render_tiny_text(pixels, bx + 6, by + bh + 8, "~ SASSY OCTOPUS ~", bw)
 
 
 # Tiny 5x7 bitmap font for rendering text without Pillow
@@ -2396,11 +2464,60 @@ SASSY_QUOTES = [
 ]
 
 
-def _generate_octopus_frame(mouth_open, quote):
-    """Generate a full 250x122 frame with the octopus and chat bubble."""
+def _generate_octopus_frame(mouth_expr, quote):
+    """Generate a full 250x122 frame with the octopus and chat bubble.
+
+    mouth_expr: one of MOUTH_SMIRK, MOUTH_SMILE, MOUTH_OPEN
+    """
     pixels = [[0] * DISPLAY_W for _ in range(DISPLAY_H)]
-    _draw_octopus(pixels, mouth_open)
-    _draw_chat_bubble(pixels, quote, mouth_open)
+
+    # Draw body (filled)
+    for y, runs in _octo_body():
+        if 0 <= y < DISPLAY_H:
+            for x0, x1 in runs:
+                for x in range(max(0, x0), min(x1 + 1, DISPLAY_W)):
+                    pixels[y][x] = 1
+
+    # White eye sockets
+    for ex, ey in _octo_eyes():
+        if 0 <= ey < DISPLAY_H and 0 <= ex < DISPLAY_W:
+            pixels[ey][ex] = 0
+
+    # Black pupils
+    for px, py in _octo_pupils():
+        if 0 <= py < DISPLAY_H and 0 <= px < DISPLAY_W:
+            pixels[py][px] = 1
+
+    # White highlights
+    for hx, hy in _octo_highlights():
+        if 0 <= hy < DISPLAY_H and 0 <= hx < DISPLAY_W:
+            pixels[hy][hx] = 0
+
+    # Mouth expression
+    if mouth_expr == MOUTH_OPEN:
+        for mx, my in _octo_open_mouth_interior():
+            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
+                pixels[my][mx] = 0
+        for mx, my in _octo_open_mouth():
+            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
+                pixels[my][mx] = 1
+    elif mouth_expr == MOUTH_SMILE:
+        for mx, my in _octo_smile():
+            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
+                pixels[my][mx] = 1
+    else:
+        # Default: smirk
+        outline, interior = _octo_smirk()
+        for mx, my in interior:
+            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
+                pixels[my][mx] = 0
+        for mx, my in outline:
+            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
+                pixels[my][mx] = 1
+
+    # Chat bubble with text
+    _draw_chat_bubble(pixels, quote)
+
     return pixels
 
 
@@ -2438,7 +2555,7 @@ class ProgramsTab(ttk.Frame):
     def _build_ui(self):
         # ── Program list (left) ──
         list_frame = ttk.Frame(self)
-        list_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=5, pady=5, expand=False)
+        list_frame.pack(side=tk.LEFT, fill=tk.Y, padx=5, pady=5)
 
         ttk.Label(list_frame, text="Programs", font=("JetBrains Mono", 12, "bold")).pack(anchor=tk.W)
 
@@ -2465,6 +2582,27 @@ class ProgramsTab(ttk.Frame):
 
         self.stop_btn = ttk.Button(btn_frame, text="Stop", command=self._stop_program, state=tk.DISABLED)
         self.stop_btn.pack(side=tk.LEFT, padx=2)
+
+        # Firmware flash section
+        flash_frame = ttk.LabelFrame(list_frame, text="Pico Firmware", padding=4)
+        flash_frame.pack(fill=tk.X, pady=(8, 0))
+
+        self.flash_btn = ttk.Button(flash_frame, text="Flash IMG Receiver",
+                                     command=self._build_and_flash)
+        self.flash_btn.pack(fill=tk.X, pady=2)
+
+        ttk.Separator(flash_frame, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=4)
+
+        self.standalone_btn = ttk.Button(flash_frame, text="Deploy Standalone",
+                                          command=self._deploy_standalone)
+        self.standalone_btn.pack(fill=tk.X, pady=2)
+
+        self.flash_status = ttk.Label(flash_frame, text="IMG Receiver: stream from PC\n"
+                                       "Standalone: runs without PC\n"
+                                       "Put Pico in BOOTSEL mode first.",
+                                       wraplength=200, foreground=FG_DIM,
+                                       font=("JetBrains Mono", 8))
+        self.flash_status.pack(fill=tk.X)
 
         # ── Preview area (right) ──
         preview_frame = ttk.LabelFrame(self, text="Preview", padding=5)
@@ -2505,7 +2643,7 @@ class ProgramsTab(ttk.Frame):
     def _show_static_preview(self, prog_key):
         """Show a single frame on the preview canvas."""
         if prog_key == "sassy_octopus":
-            pixels = _generate_octopus_frame(False, random.choice(SASSY_QUOTES))
+            pixels = _generate_octopus_frame(MOUTH_SMIRK, random.choice(SASSY_QUOTES))
             self._render_preview(pixels)
 
     def _render_preview(self, pixels, scale=3):
@@ -2579,19 +2717,17 @@ class ProgramsTab(ttk.Frame):
                     self._finish_program()
                     return
 
-        mouth_open = False
         quote = random.choice(SASSY_QUOTES)
         frame_count = 0
 
         try:
             while not self._stop_event.is_set():
-                # Switch expression and quote every other frame
-                if frame_count % 2 == 0:
-                    mouth_open = not mouth_open
-                    if mouth_open:
-                        quote = random.choice(SASSY_QUOTES)
+                # Cycle through mouth expressions, new quote on each open mouth
+                mouth_expr = MOUTH_CYCLE[frame_count % len(MOUTH_CYCLE)]
+                if mouth_expr == MOUTH_OPEN and frame_count > 0:
+                    quote = random.choice(SASSY_QUOTES)
 
-                pixels = _generate_octopus_frame(mouth_open, quote)
+                pixels = _generate_octopus_frame(mouth_expr, quote)
 
                 # Update preview canvas
                 self.after(0, lambda p=pixels: self._render_preview(p))
@@ -2606,9 +2742,12 @@ class ProgramsTab(ttk.Frame):
                         ser.flush()
                         self.after(0, lambda fc=frame_count: self.status_label.config(
                             text=f"Frame {fc} sent to Pico", foreground=FG_GREEN))
-                    except (serial.SerialException, serial.SerialTimeoutException) as e:
+                    except (serial.SerialException, serial.SerialTimeoutException):
                         self.after(0, lambda: self.status_label.config(
-                            text="Pico write failed — check connection", foreground=FG_RED))
+                            text="Pico write failed — needs IMG-receiver firmware.\n"
+                                 "Use 'Build & Flash to Pico' below the program list\n"
+                                 "(put Pico in BOOTSEL mode first, then retry deploy).",
+                            foreground=FG_RED))
                         # Don't kill ser — try again next frame
                 elif deploy_to_pico and ser is None:
                     # Pico wasn't found, just preview locally
@@ -2626,6 +2765,400 @@ class ProgramsTab(ttk.Frame):
             if ser:
                 ser.close()
             self._finish_program()
+
+    def _build_and_flash(self):
+        """Build the img-receiver firmware via Docker and flash to Pico in BOOTSEL mode."""
+        # Check for BOOTSEL mount first
+        mount = find_rpi_rp2_mount()
+        if not mount:
+            self.flash_status.config(
+                text="Pico not in BOOTSEL mode.\n"
+                     "1) Unplug Pico\n"
+                     "2) Hold BOOTSEL button\n"
+                     "3) Plug in USB (keep holding)\n"
+                     "4) Release BOOTSEL\n"
+                     "5) Click this button again",
+                foreground=FG_YELLOW)
+            return
+
+        self.flash_btn.config(state=tk.DISABLED)
+        self.flash_status.config(text="Building firmware...", foreground=FG_ACCENT)
+
+        t = threading.Thread(target=self._do_build_and_flash, args=(mount,), daemon=True)
+        t.start()
+
+    def _log_build(self, msg):
+        """Log a build message to both the flash status and the app log."""
+        self.after(0, lambda: self.flash_status.config(text=msg, foreground=FG_ACCENT))
+        self.after(0, lambda: self.app.log(f"[build] {msg}"))
+
+    def _do_build_and_flash(self, mount):
+        """Background thread: docker build + copy .uf2 to BOOTSEL mount."""
+        img_receiver_dir = DEV_SETUP / "img-receiver"
+        uf2_path = img_receiver_dir / "build" / "img_receiver.uf2"
+
+        try:
+            # Step 1: Check Docker is available
+            self._log_build("Checking Docker is available...")
+            docker_check = subprocess.run(
+                ["docker", "info"], capture_output=True, timeout=10)
+            if docker_check.returncode != 0:
+                self.after(0, lambda: self.flash_status.config(
+                    text="Docker not running.\nStart Docker and try again.",
+                    foreground=FG_RED))
+                self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
+                return
+
+            # Step 2: Pull/build the Docker image (streams progress)
+            self._log_build("Building Docker image (ARM toolchain)...\n"
+                            "First time downloads ~500MB — be patient.")
+
+            img_proc = subprocess.Popen(
+                ["docker", "compose", "build", "--progress=plain",
+                 "build-img-receiver"],
+                cwd=str(DEV_SETUP),
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True,
+            )
+
+            img_last_lines = []
+            for line in img_proc.stdout:
+                line = line.rstrip()
+                if line:
+                    img_last_lines.append(line)
+                    img_last_lines = img_last_lines[-10:]
+                    lower = line.lower()
+                    # Log download/install/build progress
+                    if any(kw in lower for kw in [
+                        "pulling", "download", "extract", "install",
+                        "apt", "clone", "step", "run", "copy",
+                        "cached", "done", "error", "warning",
+                        "get:", "setting up", "unpacking",
+                    ]):
+                        self.after(0, lambda l=line: self.app.log(f"[docker] {l}"))
+                    # Show latest line in status
+                    short = line[:80]
+                    self.after(0, lambda s=short: self.flash_status.config(
+                        text=f"Docker image build...\n{s}"))
+
+            img_proc.wait(timeout=600)
+
+            if img_proc.returncode != 0:
+                err = "\n".join(img_last_lines[-5:])
+                self.after(0, lambda: self.flash_status.config(
+                    text=f"Docker image build failed:\n{err[:200]}",
+                    foreground=FG_RED))
+                self.after(0, lambda: self.app.log(
+                    "[docker] FAILED:\n" + "\n".join(img_last_lines)))
+                self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
+                return
+
+            self._log_build("Docker image ready.")
+
+            # Step 3: Run cmake + ninja inside container
+            self._log_build("Compiling img-receiver firmware...\n"
+                            "Running cmake + ninja in container.")
+
+            proc = subprocess.Popen(
+                ["docker", "compose", "run", "--rm", "build-img-receiver"],
+                cwd=str(DEV_SETUP),
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True,
+            )
+
+            # Stream build output to the log
+            last_lines = []
+            for line in proc.stdout:
+                line = line.rstrip()
+                if line:
+                    last_lines.append(line)
+                    last_lines = last_lines[-10:]
+                    lower = line.lower()
+                    if any(kw in lower for kw in [
+                        "building", "compiling", "linking", "generating",
+                        "error", "warning", "ninja", "cmake", ".uf2",
+                        "scanning", "creating", "built target",
+                    ]):
+                        self.after(0, lambda l=line: self.app.log(f"[build] {l}"))
+                    self.after(0, lambda l=line: self.flash_status.config(
+                        text=f"Compiling...\n{l[:60]}"))
+
+            proc.wait(timeout=300)
+
+            if proc.returncode != 0:
+                err = "\n".join(last_lines[-5:])
+                self.after(0, lambda: self.flash_status.config(
+                    text=f"Build failed (exit {proc.returncode}):\n{err[:200]}",
+                    foreground=FG_RED))
+                self.after(0, lambda: self.app.log(
+                    f"[build] FAILED. Last output:\n" + "\n".join(last_lines)))
+                self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
+                return
+
+            self._log_build("Build complete. Checking for .uf2 file...")
+
+            if not uf2_path.exists():
+                self.after(0, lambda: self.flash_status.config(
+                    text="Build succeeded but .uf2 not found.\n"
+                         "Check build output in logs.",
+                    foreground=FG_RED))
+                self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
+                return
+
+            uf2_size = uf2_path.stat().st_size
+            self._log_build(f"Firmware ready: img_receiver.uf2 ({uf2_size:,} bytes)")
+
+            # Step 4: Flash to Pico
+            self._log_build("Copying .uf2 to Pico BOOTSEL mount...")
+
+            # Re-check mount (user might have unplugged)
+            mount = find_rpi_rp2_mount()
+            if not mount:
+                self.after(0, lambda: self.flash_status.config(
+                    text="Pico left BOOTSEL mode.\n"
+                         "Put it back in BOOTSEL and try again.\n"
+                         "(firmware is built, just needs flashing)",
+                    foreground=FG_YELLOW))
+                self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
+                return
+
+            shutil.copy2(str(uf2_path), str(mount / "img_receiver.uf2"))
+
+            self._log_build(f"Flashed img_receiver.uf2 to {mount}")
+            self.after(0, lambda: self.flash_status.config(
+                text="Flashed! Pico will reboot.\n"
+                     "Wait 3 seconds, then Deploy.",
+                foreground=FG_GREEN))
+
+        except subprocess.TimeoutExpired:
+            self.after(0, lambda: self.flash_status.config(
+                text="Build timed out (5 min).",
+                foreground=FG_RED))
+            self.after(0, lambda: self.app.log("[build] Timed out after 5 minutes."))
+        except FileNotFoundError:
+            self.after(0, lambda: self.flash_status.config(
+                text="Docker not found.\nInstall Docker to build firmware.",
+                foreground=FG_RED))
+        except Exception as e:
+            self.after(0, lambda: self.flash_status.config(
+                text=f"Error: {str(e)[:150]}",
+                foreground=FG_RED))
+            self.after(0, lambda: self.app.log(f"[build] Error: {e}"))
+        finally:
+            self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
+
+    def _deploy_standalone(self):
+        """Build standalone firmware with baked-in frames and flash to Pico."""
+        key = self._get_selected_key()
+        if not key:
+            messagebox.showinfo("Select Program", "Select a program from the list first.")
+            return
+
+        mount = find_rpi_rp2_mount()
+        if not mount:
+            self.flash_status.config(
+                text="Pico not in BOOTSEL mode.\n"
+                     "1) Unplug Pico\n"
+                     "2) Hold BOOTSEL button\n"
+                     "3) Plug in USB (keep holding)\n"
+                     "4) Release BOOTSEL\n"
+                     "5) Click this button again",
+                foreground=FG_YELLOW)
+            return
+
+        self.standalone_btn.config(state=tk.DISABLED)
+        self.flash_btn.config(state=tk.DISABLED)
+        self.flash_status.config(text="Generating frames...", foreground=FG_ACCENT)
+
+        t = threading.Thread(target=self._do_deploy_standalone,
+                             args=(key, mount), daemon=True)
+        t.start()
+
+    def _generate_frames_header(self, prog_key):
+        """Pre-render all animation frames and write frames.h for the C firmware.
+
+        Returns the path to frames.h or None on failure.
+        """
+        if prog_key != "sassy_octopus":
+            return None
+
+        header_path = DEV_SETUP / "sassy-octopus" / "frames.h"
+        self._log_build("Rendering animation frames...")
+
+        # Generate all frames: cycle through MOUTH_CYCLE for each quote
+        frames_data = []
+        for qi, quote in enumerate(SASSY_QUOTES):
+            for ci, expr in enumerate(MOUTH_CYCLE):
+                pixels = _generate_octopus_frame(expr, quote)
+                packed = _pixels_to_packed(pixels)
+                frames_data.append(packed)
+
+                if (qi * len(MOUTH_CYCLE) + ci) % 20 == 0:
+                    total = len(SASSY_QUOTES) * len(MOUTH_CYCLE)
+                    done = qi * len(MOUTH_CYCLE) + ci + 1
+                    self.after(0, lambda d=done, t=total: self.flash_status.config(
+                        text=f"Rendering frames... {d}/{t}"))
+
+        total_frames = len(frames_data)
+        total_bytes = total_frames * len(frames_data[0])
+        self._log_build(f"Rendered {total_frames} frames ({total_bytes:,} bytes)")
+
+        # Write C header
+        with open(header_path, "w") as f:
+            f.write("/* Auto-generated by Dilder DevTool — do not edit */\n")
+            f.write(f"#ifndef FRAMES_H\n#define FRAMES_H\n\n")
+            f.write(f"#include <stdint.h>\n\n")
+            f.write(f"#define FRAME_COUNT {total_frames}\n")
+            f.write(f"#define FRAME_BYTES {len(frames_data[0])}\n\n")
+
+            # Write each frame as a const array
+            for i, data in enumerate(frames_data):
+                f.write(f"static const uint8_t frame_{i}[FRAME_BYTES] = {{\n")
+                for row_start in range(0, len(data), 16):
+                    row = data[row_start:row_start + 16]
+                    hex_vals = ", ".join(f"0x{b:02x}" for b in row)
+                    f.write(f"    {hex_vals},\n")
+                f.write(f"}};\n\n")
+
+            # Write the frame pointer array
+            f.write(f"static const uint8_t *frames[FRAME_COUNT] = {{\n")
+            for i in range(total_frames):
+                comma = "," if i < total_frames - 1 else ""
+                f.write(f"    frame_{i}{comma}\n")
+            f.write(f"}};\n\n")
+            f.write(f"#endif /* FRAMES_H */\n")
+
+        size_kb = header_path.stat().st_size / 1024
+        self._log_build(f"Wrote frames.h ({size_kb:.0f} KB, {total_frames} frames)")
+        return header_path
+
+    def _do_deploy_standalone(self, prog_key, mount):
+        """Background thread: generate frames, docker build, flash."""
+        try:
+            # Step 1: Generate frames.h
+            header = self._generate_frames_header(prog_key)
+            if not header:
+                self.after(0, lambda: self.flash_status.config(
+                    text="Frame generation failed.", foreground=FG_RED))
+                return
+
+            # Step 2: Check Docker
+            self._log_build("Checking Docker...")
+            docker_check = subprocess.run(
+                ["docker", "info"], capture_output=True, timeout=10)
+            if docker_check.returncode != 0:
+                self.after(0, lambda: self.flash_status.config(
+                    text="Docker not running.\nStart Docker and try again.",
+                    foreground=FG_RED))
+                return
+
+            # Step 3: Build Docker image
+            self._log_build("Building Docker image...")
+
+            img_proc = subprocess.Popen(
+                ["docker", "compose", "build", "--progress=plain",
+                 "build-sassy-octopus"],
+                cwd=str(DEV_SETUP),
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True,
+            )
+            for line in img_proc.stdout:
+                line = line.rstrip()
+                if line:
+                    lower = line.lower()
+                    if any(kw in lower for kw in [
+                        "pulling", "download", "install", "cached",
+                        "done", "error", "step", "run",
+                    ]):
+                        self.after(0, lambda l=line: self.app.log(f"[docker] {l}"))
+                    self.after(0, lambda l=line: self.flash_status.config(
+                        text=f"Docker build...\n{l[:60]}"))
+            img_proc.wait(timeout=600)
+
+            if img_proc.returncode != 0:
+                self.after(0, lambda: self.flash_status.config(
+                    text="Docker image build failed.\nCheck logs.",
+                    foreground=FG_RED))
+                return
+
+            # Step 4: Compile firmware
+            self._log_build("Compiling standalone firmware...")
+
+            proc = subprocess.Popen(
+                ["docker", "compose", "run", "--rm", "build-sassy-octopus"],
+                cwd=str(DEV_SETUP),
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True,
+            )
+
+            last_lines = []
+            for line in proc.stdout:
+                line = line.rstrip()
+                if line:
+                    last_lines.append(line)
+                    last_lines = last_lines[-10:]
+                    lower = line.lower()
+                    if any(kw in lower for kw in [
+                        "building", "compiling", "linking", "error",
+                        "warning", "ninja", "cmake", ".uf2", "built target",
+                    ]):
+                        self.after(0, lambda l=line: self.app.log(f"[build] {l}"))
+                    self.after(0, lambda l=line: self.flash_status.config(
+                        text=f"Compiling...\n{l[:60]}"))
+
+            proc.wait(timeout=300)
+
+            if proc.returncode != 0:
+                err = "\n".join(last_lines[-5:])
+                self.after(0, lambda: self.flash_status.config(
+                    text=f"Build failed:\n{err[:200]}", foreground=FG_RED))
+                self.after(0, lambda: self.app.log(
+                    "[build] FAILED:\n" + "\n".join(last_lines)))
+                return
+
+            uf2_path = DEV_SETUP / "sassy-octopus" / "build" / "sassy_octopus.uf2"
+            if not uf2_path.exists():
+                self.after(0, lambda: self.flash_status.config(
+                    text="Build OK but .uf2 not found.", foreground=FG_RED))
+                return
+
+            uf2_size = uf2_path.stat().st_size
+            self._log_build(f"Firmware ready: sassy_octopus.uf2 ({uf2_size:,} bytes)")
+
+            # Step 5: Flash
+            mount = find_rpi_rp2_mount()
+            if not mount:
+                self.after(0, lambda: self.flash_status.config(
+                    text="Pico left BOOTSEL mode.\n"
+                         "Firmware is built — put Pico\n"
+                         "back in BOOTSEL and retry.",
+                    foreground=FG_YELLOW))
+                return
+
+            self._log_build(f"Copying .uf2 to {mount}...")
+            shutil.copy2(str(uf2_path), str(mount / "sassy_octopus.uf2"))
+
+            self._log_build("Standalone firmware flashed!")
+            self.after(0, lambda: self.flash_status.config(
+                text="Standalone flashed!\n"
+                     "Pico will reboot and run\n"
+                     "Sassy Octopus on its own.",
+                foreground=FG_GREEN))
+
+        except subprocess.TimeoutExpired:
+            self.after(0, lambda: self.flash_status.config(
+                text="Build timed out.", foreground=FG_RED))
+        except FileNotFoundError:
+            self.after(0, lambda: self.flash_status.config(
+                text="Docker not found.\nInstall Docker first.",
+                foreground=FG_RED))
+        except Exception as e:
+            self.after(0, lambda: self.flash_status.config(
+                text=f"Error: {str(e)[:150]}", foreground=FG_RED))
+            self.after(0, lambda: self.app.log(f"[build] Error: {e}"))
+        finally:
+            self.after(0, lambda: self.standalone_btn.config(state=tk.NORMAL))
+            self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
 
     def _finish_program(self):
         """Reset UI after program stops."""
@@ -2676,9 +3209,15 @@ class DilderDevTool(tk.Tk):
         self._build_ui()
 
     def _build_ui(self):
+        # ── Vertical PanedWindow (notebook on top, log on bottom, resizable) ──
+        paned = tk.PanedWindow(
+            self, orient=tk.VERTICAL, sashwidth=6, sashrelief=tk.RAISED,
+            bg=BG_PANEL, opaqueresize=True,
+        )
+        paned.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
         # ── Notebook (tabs) ──
-        self.notebook = ttk.Notebook(self)
-        self.notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.notebook = ttk.Notebook(paned)
 
         # Tab 1: Display Emulator
         self.display_tab = DisplayEmulator(self.notebook, self)
@@ -2712,15 +3251,28 @@ class DilderDevTool(tk.Tk):
         self.docs_tab = DocumentationTab(self.notebook, self)
         self.notebook.add(self.docs_tab, text="  Docs  ")
 
-        # ── Log bar at bottom ──
-        log_frame = ttk.Frame(self)
-        log_frame.pack(fill=tk.X, padx=5, pady=(0, 5))
+        paned.add(self.notebook, stretch="always")
+
+        # ── Resizable log panel at bottom ──
+        log_frame = ttk.Frame(paned)
+
+        log_header = ttk.Frame(log_frame)
+        log_header.pack(fill=tk.X)
+        ttk.Label(log_header, text="Log", foreground=FG_DIM,
+                  font=("JetBrains Mono", 8)).pack(side=tk.LEFT, padx=4)
+        ttk.Button(log_header, text="Clear",
+                   command=lambda: self._clear_log()).pack(side=tk.RIGHT, padx=4)
 
         self.log_text = tk.Text(
             log_frame, height=3, wrap=tk.WORD, state=tk.DISABLED,
             bg=BG_DARK, fg=FG_DIM, font=("JetBrains Mono", 9),
         )
-        self.log_text.pack(fill=tk.X)
+        log_scroll = ttk.Scrollbar(log_frame, command=self.log_text.yview)
+        self.log_text.configure(yscrollcommand=log_scroll.set)
+        log_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        self.log_text.pack(fill=tk.BOTH, expand=True)
+
+        paned.add(log_frame, minsize=40, stretch="never")
 
     def log(self, msg):
         """Append a message to the bottom log bar."""
@@ -2731,6 +3283,12 @@ class DilderDevTool(tk.Tk):
             self.log_text.see(tk.END)
             self.log_text.configure(state=tk.DISABLED)
         self.after(0, _do)
+
+    def _clear_log(self):
+        """Clear all log messages."""
+        self.log_text.configure(state=tk.NORMAL)
+        self.log_text.delete("1.0", tk.END)
+        self.log_text.configure(state=tk.DISABLED)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
