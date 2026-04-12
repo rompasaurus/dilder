@@ -738,3 +738,93 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Input Tokens (est):** ~30
 - **Output Tokens (est):** ~30,000
 - **Files:** `PromptProgression.md`, `website/docs/prompts/index.md`, `website/docs/docs/tools/devtool.md` (all updated)
+
+---
+
+## Prompt #93 — 2026-04-12
+
+**Prompt:** "Export the octopus and its facial expressions into the assets folder, label and map all available combinations, plan for body movement per emotional state. Give an MD document with checkmarks and notes per state."
+
+- **Input Tokens (est):** ~100
+- **Output Tokens (est):** ~15,000
+- **Files:** `assets/octopus-emotion-states.md` (comprehensive tracker with all 13 states, per-feature tables, body motion priority matrix, implementation plan)
+
+---
+
+## Prompt #94 — 2026-04-12
+
+**Prompt:** "What would it take to map keyboard actions to the Pico for interactive octopus control? Create an MD in docs with the options."
+
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~20,000
+- **Files:** `docs/keyboard-to-pico-input.md` (3 input options: Serial Command Mode, GPIO Buttons, Hybrid; full key mapping for 30+ commands; C code snippets; GPIO pinout diagram; 10-step implementation plan)
+
+---
+
+## Prompt #95 — 2026-04-12
+
+**Prompt:** "The fat and lazy octopus legs are hard to differentiate. Make fat octopus fat up top with thicker legs. Make lazy octopus lounge on its side like a French woman with a tentacle on its belly."
+
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~40,000
+- **Files:** `dev-setup/fat-octopus/main.c` (custom wider body RLE: +5px/side dome, no waist, thicker tentacles), `dev-setup/lazy-octopus/main.c` (reclining body with belly tentacle), `DevTool/devtool.py` (matching Python body variants)
+
+---
+
+## Prompt #96 — 2026-04-12
+
+**Prompt:** "Use the C implementation of the animations and produce accurately a set of images in the assets folder to compare against the Python."
+
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~50,000
+- **Files:** `assets/render_c_previews.py` (1:1 port of all C drawing functions), `assets/c-render/*.png` (16 moods + grid), `assets/py-render/*.png` (16 Python renders), `assets/c-vs-python-*.png` (comparison images)
+
+---
+
+## Prompt #97 — 2026-04-12
+
+**Prompt:** "Lazy octopus looks weird. Just have him fold sit on his side with his legs draped to the right."
+
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~15,000
+- **Files:** `dev-setup/lazy-octopus/main.c` (redesigned: standard body, cheeks taper right, all 5 tentacles drape rightward; removed belly tentacle), `DevTool/devtool.py` (matching update), `assets/render_c_previews.py` (updated lazy body)
+
+---
+
+## Prompt #98 — 2026-04-12
+
+**Prompt:** "Compare the C renders with the Python images and make sure they line up. Split each octopus into its own image file named like the emotion previews."
+
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~10,000
+- **Files:** `assets/render_c_previews.py` (added full `setup_body_transform()` with dx/dy/x_expand/wobble), `assets/emotion-previews/*.png` (34 files regenerated from C-faithful renderer), pixel comparison verified (10/16 pixel-perfect, rest within sinf rounding)
+
+---
+
+## Prompt #99 — 2026-04-12
+
+**Prompt:** "C renders need to be generated now too."
+
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~500
+- **Files:** `assets/c-render/*.png` (16 PNGs + grid regenerated)
+
+---
+
+## Prompt #100 — 2026-04-12
+
+**Prompt:** "The C renders don't have as many as the emotion preview though."
+
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~5,000
+- **Files:** `assets/c-render/*-anim.png` (17 animation strips added), `assets/c-render/supportive*` (aliased from normal), `assets/py-render/*-anim.png` (17 strips + supportive added); all 3 folders now 34 files each
+
+---
+
+## Prompt #101 — 2026-04-12
+
+**Prompt:** "Go through session history, find all new prompts, update the prompt document, commit and push. Be as descriptive as possible. Update docs and the website."
+
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~40,000
+- **Files:** `PromptProgression.md` (#96–104), `website/docs/prompts/index.md` (#93–101), `assets/octopus-emotion-states.md` (updated Fat/Lazy body descriptions)

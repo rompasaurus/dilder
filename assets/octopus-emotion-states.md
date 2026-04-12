@@ -2,7 +2,7 @@
 
 All 16 octopus emotional states with facial features, body animations, and rendered previews.
 
-**Canvas:** 250x122px, 1-bit monochrome | **Animation:** 4-frame cycle per mood with body transforms
+**Canvas:** 250x122px, 1-bit monochrome | **Animation:** 4-frame cycle per mood with body transforms | **Previews:** C-firmware-accurate renders (4x scale)
 
 ---
 
@@ -152,7 +152,7 @@ All 16 octopus emotional states with facial features, body animations, and rende
 |---------|-------------|
 | Eyes | Nearly shut (tiny slit), barely visible dots |
 | Mouth | Flat horizontal line, Flat, Flat, Open |
-| Body | Melted flat: 3px down, 3px wider (pancaked) |
+| Body | Sitting on side — standard head, cheeks taper right, all 5 tentacles drape rightward |
 
 ---
 
@@ -167,7 +167,7 @@ All 16 octopus emotional states with facial features, body animations, and rende
 |---------|-------------|
 | Eyes | Wide content happy pupils (r=9) |
 | Mouth | Satisfied smile + cheek puffs, Open, Smile, Smile |
-| Body | 3px wider (rounder), slight jiggle bob |
+| Body | Custom fat body — wider dome (+5px/side, starts 2 rows higher), no waist, thicker tentacles (+1px/side), belly jiggle |
 
 ---
 

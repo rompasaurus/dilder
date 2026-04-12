@@ -152,47 +152,48 @@ static inline void px_clr_off(int x, int y) {
     px_clr(x + body_dx + row_wobble(y), y + Y_OFF + body_dy);
 }
 
-/* ─── Octopus body (RLE: y, num_spans, x0, x1, ...) terminated by 0xFF ─── */
+/* ─── Lazy octopus body — sitting on side, legs draped right ───
+ *  Standard head dome + body (face features line up).
+ *  Tentacles all sweep to the right instead of hanging straight
+ *  down — like the octopus folded onto its side. ─── */
 static const uint8_t body_rle[] = {
+    /* ── Head dome — standard ── */
     10,1, 22,48,  11,1, 18,52,  12,1, 16,54,  13,1, 14,56,
     14,1, 13,57,  15,1, 12,58,  16,1, 11,59,  17,1, 10,60,
     18,1, 10,60,  19,1,  9,61,  20,1,  9,61,  21,1,  9,61,
     22,1,  9,61,  23,1,  9,61,  24,1,  9,61,  25,1,  9,61,
-    26,1,  9,61,  27,1,  9,61,  28,1, 10,60,  29,1, 10,60,
-    30,1, 10,60,  31,1, 10,60,  32,1, 10,60,  33,1, 10,60,
-    34,1, 10,60,  35,1, 10,60,  36,1, 10,60,  37,1, 10,60,
-    38,1, 10,60,  39,1, 10,60,  40,1, 10,60,  41,1, 11,59,
-    42,1, 11,59,  43,1, 12,58,  44,1, 13,57,  45,1, 14,56,
-    46,1, 12,58,  47,1, 11,59,  48,1, 10,60,  49,1, 10,60,
-    50,1, 11,59,  51,1, 12,58,  52,1, 13,57,  53,1, 14,56,
-    54,1, 15,55,
-    /* Tentacles */
-    55,5, 10,17, 21,28, 32,39, 43,50, 54,61,
-    56,5,  8,15, 19,26, 30,37, 45,52, 56,63,
-    57,5,  7,14, 18,24, 29,35, 47,53, 58,64,
-    58,5,  6,12, 19,25, 31,37, 46,52, 57,63,
-    59,5,  7,13, 21,27, 33,39, 44,50, 55,61,
-    60,5,  8,14, 20,26, 31,37, 43,49, 54,60,
-    61,5,  9,14, 18,24, 30,36, 44,50, 56,62,
-    62,5,  8,13, 17,22, 31,37, 46,52, 57,63,
-    63,5,  7,12, 18,23, 33,38, 45,51, 55,61,
-    64,5,  8,13, 20,25, 32,37, 43,48, 54,59,
-    65,5,  9,14, 19,24, 30,35, 44,49, 55,60,
-    66,5, 10,14, 17,22, 31,36, 46,51, 57,62,
-    67,5,  9,13, 18,22, 33,37, 45,50, 56,61,
-    68,5,  8,12, 19,23, 32,36, 43,48, 54,59,
-    69,5,  9,13, 21,25, 30,34, 44,48, 55,59,
-    70,5, 10,14, 20,24, 31,35, 46,50, 57,61,
-    71,5, 11,14, 18,22, 33,37, 45,49, 56,60,
-    72,5, 10,13, 19,22, 32,35, 43,47, 54,58,
-    73,5,  9,12, 20,23, 30,33, 44,47, 55,58,
-    74,5, 10,13, 21,24, 31,34, 46,49, 57,60,
-    75,5, 11,14, 20,23, 33,36, 45,48, 56,59,
-    76,5, 12,14, 19,22, 32,35, 43,46, 54,57,
-    77,5, 11,13, 20,22, 30,33, 44,46, 55,57,
-    78,5, 10,12, 21,23, 31,33, 45,47, 56,58,
-    79,5, 11,13, 22,24, 32,34, 44,46, 55,57,
-    80,5, 12,14, 21,23, 33,35, 43,45, 54,56,
+    26,1,  9,61,  27,1,  9,61,
+    /* ── Body — standard with slight rightward lean at bottom ── */
+    28,1, 10,60,  29,1, 10,60,  30,1, 10,60,  31,1, 10,60,
+    32,1, 10,60,  33,1, 10,60,  34,1, 10,60,  35,1, 10,60,
+    36,1, 10,60,  37,1, 10,60,  38,1, 10,60,  39,1, 10,60,
+    40,1, 10,60,  41,1, 11,59,  42,1, 11,59,  43,1, 12,58,
+    44,1, 13,57,  45,1, 14,56,
+    /* ── Cheeks taper toward the right ── */
+    46,1, 13,59,  47,1, 14,60,  48,1, 14,61,  49,1, 15,61,
+    50,1, 16,61,  51,1, 17,60,  52,1, 18,59,  53,1, 19,58,
+    54,1, 20,57,
+    /* ── Tentacles — all 5 drape to the right ── */
+    55,5, 14,21, 25,32, 34,41, 42,49, 53,60,
+    56,5, 15,21, 26,32, 34,40, 43,49, 55,61,
+    57,5, 17,23, 26,32, 34,40, 45,51, 57,63,
+    58,5, 18,24, 27,33, 35,41, 47,53, 58,64,
+    59,5, 19,25, 27,33, 37,43, 49,55, 59,65,
+    60,5, 19,25, 28,34, 39,45, 50,56, 60,66,
+    61,5, 19,25, 29,35, 41,47, 52,58, 60,66,
+    62,5, 20,26, 30,36, 42,48, 52,58, 60,66,
+    63,5, 21,27, 32,38, 44,50, 52,58, 61,67,
+    64,5, 22,28, 34,40, 45,51, 53,59, 62,68,
+    65,5, 24,30, 36,42, 45,51, 53,59, 64,70,
+    66,4, 26,31, 37,42, 45,50, 54,59,
+    67,4, 28,33, 38,43, 46,51, 56,61,
+    68,4, 29,34, 38,43, 46,51, 57,62,
+    69,4, 30,35, 38,43, 48,53, 59,64,
+    70,4, 31,36, 39,44, 49,54, 61,66,
+    71,4, 31,36, 40,45, 51,56, 63,68,
+    72,4, 31,36, 41,46, 53,58, 63,68,
+    73,4, 32,37, 43,48, 55,60, 64,69,
+    74,4, 33,38, 45,50, 56,61, 64,69,
     0xFF /* terminator */
 };
 
@@ -639,6 +640,43 @@ static void draw_mouth_lazy(void) {
     }
 }
 
+static void draw_belly_tentacle_lazy(void) {
+    /* One tentacle draped languidly across the belly — the "French woman" arm.
+       Curves from the left side of the body at ~y=30, arcs across the belly
+       bulge, ending on the right side around y=38. Drawn as a thick (3px)
+       sinuous stroke on top of the body. Uses px_clr then px_set to carve
+       a visible white-outlined tentacle over the black body fill. */
+
+    /* White outline (clear a 5px-wide path first) */
+    for (int i = 0; i < 30; i++) {
+        float t = i / 29.0f;
+        int x = 15 + (int)(t * 42);           /* x: 15 → 57 across the belly */
+        float wave = 2.0f * sinf(t * 3.14159f * 1.5f);
+        int y = (int)(30 + t * 8 + wave);     /* y: 30 → ~38 with sine wave */
+        for (int dy = -2; dy <= 2; dy++)
+            for (int dx = -1; dx <= 1; dx++)
+                px_clr_off(x + dx, y + dy);
+    }
+    /* Black tentacle stroke (3px thick) */
+    for (int i = 0; i < 30; i++) {
+        float t = i / 29.0f;
+        int x = 15 + (int)(t * 42);
+        float wave = 2.0f * sinf(t * 3.14159f * 1.5f);
+        int y = (int)(30 + t * 8 + wave);
+        for (int dy = -1; dy <= 1; dy++)
+            px_set_off(x, y + dy);
+        px_set_off(x + 1, y);
+    }
+    /* Tentacle tip curl — small loop at the end */
+    for (int i = 0; i < 6; i++) {
+        float t = i / 5.0f;
+        int x = 57 + (int)(3 * sinf(t * 3.14159f));
+        int y = 38 + i;
+        px_set_off(x, y);
+        px_set_off(x + 1, y);
+    }
+}
+
 /* ─── Fat: content wide pupils, smile with cheek puffs ─── */
 
 static void draw_pupils_fat(void) {
@@ -973,7 +1011,10 @@ static void setup_body_transform(uint8_t mood, uint32_t f) {
             wobble_amp = 2; wobble_freq = 0.1f; wobble_phase = f * 1.2f;
             break;
         case MOOD_LAZY:
-            body_dy = 3; body_x_expand = 3;
+            /* Reclining body shape is baked into the RLE — just a slow
+               lazy breathing heave and very subtle horizontal drift */
+            body_dy = (int)(0.5f * sinf(f * 0.3f));
+            body_dx = (int)(0.5f * sinf(f * 0.15f));
             break;
         case MOOD_FAT:
             body_x_expand = 3; body_dy = (int)sinf(f * 1.8f);

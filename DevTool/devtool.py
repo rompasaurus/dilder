@@ -2258,6 +2258,158 @@ def _octo_body():
     return rows
 
 
+def _octo_body_fat():
+    """Return fat octopus body — wider dome, no waist taper, thicker tentacles."""
+    rows = []
+    # Fat head dome — starts 2 rows higher, widens faster
+    head = [
+        (8, [(25, 45)]),  (9, [(21, 49)]),
+        (10, [(18, 52)]), (11, [(15, 55)]), (12, [(13, 57)]), (13, [(11, 59)]),
+        (14, [(10, 60)]), (15, [(9, 61)]),  (16, [(8, 62)]),  (17, [(7, 63)]),
+        (18, [(6, 64)]),  (19, [(5, 65)]),  (20, [(5, 65)]),  (21, [(5, 65)]),
+        (22, [(5, 65)]),  (23, [(5, 65)]),  (24, [(5, 65)]),  (25, [(5, 65)]),
+        (26, [(5, 65)]),  (27, [(5, 65)]),
+        # Fat body — stays wide, barely any waist
+        (28, [(5, 65)]),  (29, [(5, 65)]),  (30, [(5, 65)]),  (31, [(6, 64)]),
+        (32, [(6, 64)]),  (33, [(6, 64)]),  (34, [(6, 64)]),  (35, [(6, 64)]),
+        (36, [(6, 64)]),  (37, [(6, 64)]),  (38, [(6, 64)]),  (39, [(6, 64)]),
+        (40, [(6, 64)]),  (41, [(7, 63)]),  (42, [(7, 63)]),  (43, [(8, 62)]),
+        (44, [(9, 61)]),  (45, [(10, 60)]),
+        # Fat cheek bulge
+        (46, [(8, 62)]),  (47, [(7, 63)]),  (48, [(6, 64)]),  (49, [(6, 64)]),
+        (50, [(7, 63)]),  (51, [(8, 62)]),  (52, [(10, 60)]), (53, [(11, 59)]),
+        (54, [(12, 58)]),
+    ]
+    rows.extend(head)
+    # Fat tentacles — each span widened +1px per side
+    tentacles = [
+        (55, [(9, 18), (20, 29), (31, 40), (42, 51), (53, 62)]),
+        (56, [(7, 16), (18, 27), (29, 38), (44, 53), (55, 64)]),
+        (57, [(6, 15), (17, 25), (28, 36), (46, 54), (57, 65)]),
+        (58, [(5, 13), (18, 26), (30, 38), (45, 53), (56, 64)]),
+        (59, [(6, 14), (20, 28), (32, 40), (43, 51), (54, 62)]),
+        (60, [(7, 15), (19, 27), (30, 38), (42, 50), (53, 61)]),
+        (61, [(8, 15), (17, 25), (29, 37), (43, 51), (55, 63)]),
+        (62, [(7, 14), (16, 23), (30, 38), (45, 53), (56, 64)]),
+        (63, [(6, 13), (17, 24), (32, 39), (44, 52), (54, 62)]),
+        (64, [(7, 14), (19, 26), (31, 38), (42, 49), (53, 60)]),
+        (65, [(8, 15), (18, 25), (29, 36), (43, 50), (54, 61)]),
+        (66, [(9, 15), (16, 23), (30, 37), (45, 52), (56, 63)]),
+        (67, [(8, 14), (17, 23), (32, 38), (44, 51), (55, 62)]),
+        (68, [(7, 13), (18, 24), (31, 37), (42, 49), (53, 60)]),
+        (69, [(8, 14), (20, 26), (29, 35), (43, 49), (54, 60)]),
+        (70, [(9, 15), (19, 25), (30, 36), (45, 51), (56, 62)]),
+        (71, [(10, 15), (17, 23), (32, 38), (44, 50), (55, 61)]),
+        (72, [(9, 14), (18, 23), (31, 36), (42, 48), (53, 59)]),
+        (73, [(8, 13), (19, 24), (29, 34), (43, 48), (54, 59)]),
+        (74, [(9, 14), (20, 25), (30, 35), (45, 50), (56, 61)]),
+        (75, [(10, 15), (19, 24), (32, 37), (44, 49), (55, 60)]),
+        (76, [(11, 15), (18, 23), (31, 36), (42, 47), (53, 58)]),
+        (77, [(10, 14), (19, 23), (29, 34), (43, 47), (54, 58)]),
+        (78, [(9, 13), (20, 24), (30, 34), (44, 48), (55, 59)]),
+        (79, [(10, 14), (21, 25), (31, 35), (43, 47), (54, 58)]),
+        (80, [(11, 15), (20, 24), (32, 36), (42, 46), (53, 57)]),
+    ]
+    rows.extend(tentacles)
+    return rows
+
+
+def _octo_body_lazy():
+    """Return lazy octopus body — sitting on side, legs draped right.
+
+    Standard head dome + body (face features line up).
+    Tentacles all sweep to the right instead of hanging straight down.
+    """
+    rows = []
+    # Head dome — standard
+    head = [
+        (10, [(22, 48)]), (11, [(18, 52)]), (12, [(16, 54)]), (13, [(14, 56)]),
+        (14, [(13, 57)]), (15, [(12, 58)]), (16, [(11, 59)]), (17, [(10, 60)]),
+        (18, [(10, 60)]), (19, [(9, 61)]),  (20, [(9, 61)]),  (21, [(9, 61)]),
+        (22, [(9, 61)]),  (23, [(9, 61)]),  (24, [(9, 61)]),  (25, [(9, 61)]),
+        (26, [(9, 61)]),  (27, [(9, 61)]),
+    ]
+    rows.extend(head)
+    # Body — standard with slight rightward lean at bottom
+    body = [
+        (28, [(10, 60)]), (29, [(10, 60)]), (30, [(10, 60)]), (31, [(10, 60)]),
+        (32, [(10, 60)]), (33, [(10, 60)]), (34, [(10, 60)]), (35, [(10, 60)]),
+        (36, [(10, 60)]), (37, [(10, 60)]), (38, [(10, 60)]), (39, [(10, 60)]),
+        (40, [(10, 60)]), (41, [(11, 59)]), (42, [(11, 59)]), (43, [(12, 58)]),
+        (44, [(13, 57)]), (45, [(14, 56)]),
+    ]
+    rows.extend(body)
+    # Cheeks taper toward the right
+    cheeks = [
+        (46, [(13, 59)]), (47, [(14, 60)]), (48, [(14, 61)]), (49, [(15, 61)]),
+        (50, [(16, 61)]), (51, [(17, 60)]), (52, [(18, 59)]), (53, [(19, 58)]),
+        (54, [(20, 57)]),
+    ]
+    rows.extend(cheeks)
+    # Tentacles — all 5 drape to the right
+    tentacles = [
+        (55, [(14, 21), (25, 32), (34, 41), (42, 49), (53, 60)]),
+        (56, [(15, 21), (26, 32), (34, 40), (43, 49), (55, 61)]),
+        (57, [(17, 23), (26, 32), (34, 40), (45, 51), (57, 63)]),
+        (58, [(18, 24), (27, 33), (35, 41), (47, 53), (58, 64)]),
+        (59, [(19, 25), (27, 33), (37, 43), (49, 55), (59, 65)]),
+        (60, [(19, 25), (28, 34), (39, 45), (50, 56), (60, 66)]),
+        (61, [(19, 25), (29, 35), (41, 47), (52, 58), (60, 66)]),
+        (62, [(20, 26), (30, 36), (42, 48), (52, 58), (60, 66)]),
+        (63, [(21, 27), (32, 38), (44, 50), (52, 58), (61, 67)]),
+        (64, [(22, 28), (34, 40), (45, 51), (53, 59), (62, 68)]),
+        (65, [(24, 30), (36, 42), (45, 51), (53, 59), (64, 70)]),
+        (66, [(26, 31), (37, 42), (45, 50), (54, 59)]),
+        (67, [(28, 33), (38, 43), (46, 51), (56, 61)]),
+        (68, [(29, 34), (38, 43), (46, 51), (57, 62)]),
+        (69, [(30, 35), (38, 43), (48, 53), (59, 64)]),
+        (70, [(31, 36), (39, 44), (49, 54), (61, 66)]),
+        (71, [(31, 36), (40, 45), (51, 56), (63, 68)]),
+        (72, [(31, 36), (41, 46), (53, 58), (63, 68)]),
+        (73, [(32, 37), (43, 48), (55, 60), (64, 69)]),
+        (74, [(33, 38), (45, 50), (56, 61), (64, 69)]),
+    ]
+    rows.extend(tentacles)
+    return rows
+
+
+def _octo_belly_tentacle_lazy():
+    """Return pixels for the tentacle draped across the lazy octopus belly.
+
+    Returns (clear_pixels, set_pixels) — clear first for white outline,
+    then set for the black tentacle stroke.
+    """
+    import math
+    clear_px = []
+    set_px = []
+    # White outline (clear a 5px-wide path)
+    for i in range(30):
+        t = i / 29.0
+        x = 15 + int(t * 42)
+        wave = 2.0 * math.sin(t * math.pi * 1.5)
+        y = int(30 + t * 8 + wave)
+        for dy in range(-2, 3):
+            for dx in range(-1, 2):
+                clear_px.append((x + dx, y + dy))
+    # Black tentacle stroke (3px thick)
+    for i in range(30):
+        t = i / 29.0
+        x = 15 + int(t * 42)
+        wave = 2.0 * math.sin(t * math.pi * 1.5)
+        y = int(30 + t * 8 + wave)
+        for dy in range(-1, 2):
+            set_px.append((x, y + dy))
+        set_px.append((x + 1, y))
+    # Tip curl
+    for i in range(6):
+        t = i / 5.0
+        x = 57 + int(3 * math.sin(t * math.pi))
+        y = 38 + i
+        set_px.append((x, y))
+        set_px.append((x + 1, y))
+    return clear_px, set_px
+
+
 def _octo_eyes():
     """Return eye pixel coords — two round white eyes."""
     eyes = []
@@ -4159,12 +4311,11 @@ def _body_transform(mood, frame_count):
         return (int(3 * sin(f * 1.2)), 0, 0,
                 lambda y: int(2 * sin(y * 0.1 + f * 1.2)))
     elif mood == "lazy":
-        # Melted flat: squished down, wider
-        return (0, 3, 3, no_wobble)
+        # Reclining body baked into RLE — slow lazy breathing heave
+        return (int(0.5 * sin(f * 0.15)), int(0.5 * sin(f * 0.3)), 0, no_wobble)
     elif mood == "fat":
-        # Wider and rounder, slight jiggle
-        jig = int(sin(f * 1.8))
-        return (0, jig, 3, no_wobble)
+        # Body RLE is already fat — gentle belly jiggle
+        return (0, int(1.5 * sin(f * 1.8)), 0, no_wobble)
     elif mood == "chill":
         # Slight lean back, very subtle
         return (int(sin(f * 0.4)), 1, 0, no_wobble)
@@ -4216,8 +4367,14 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
         if 0 <= wx < DISPLAY_W and 0 <= wy < DISPLAY_H:
             pixels[wy][wx] = val
 
-    # Draw body (filled) with span expansion
-    for y, runs in _octo_body():
+    # Draw body (filled) with span expansion — use mood-specific body if available
+    if mood == "fat":
+        body_data = _octo_body_fat()
+    elif mood == "lazy":
+        body_data = _octo_body_lazy()
+    else:
+        body_data = _octo_body()
+    for y, runs in body_data:
         for x0, x1 in runs:
             ax0 = max(0, x0 - x_expand)
             ax1 = min(DISPLAY_W - 1, x1 + x_expand)
@@ -4469,6 +4626,11 @@ class ProgramsTab(ttk.Frame):
             "desc": "Watery eyes with tear drops, wobbly mouth. Missing home,\n"
                     "longing for the deep ocean, bittersweet displacement.",
         },
+        "mood_selector": {
+            "name": "Mood Selector",
+            "desc": "All 16 emotional states in one program! Use serial input\n"
+                    "to browse moods with [ ] keys. Shows < MOOD > at bottom.",
+        },
     }
 
     DISPLAY_VARIANTS = [
@@ -4619,6 +4781,13 @@ class ProgramsTab(ttk.Frame):
         "excited_octopus":        (EXCITED_QUOTES,        "~ EXCITED OCTOPUS ~",        "excited"),
         "nostalgic_octopus":      (NOSTALGIC_QUOTES,      "~ NOSTALGIC OCTOPUS ~",      "nostalgic"),
         "homesick_octopus":       (HOMESICK_QUOTES,       "~ HOMESICK OCTOPUS ~",       "homesick"),
+        "mood_selector":          (SASSY_QUOTES + SUPPORTIVE_QUOTES + ANGRY_QUOTES +
+                                   CONSPIRATORIAL_QUOTES + SAD_QUOTES + CHAOTIC_QUOTES +
+                                   HUNGRY_QUOTES + TIRED_QUOTES + SLAPHAPPY_QUOTES +
+                                   LAZY_QUOTES + FAT_QUOTES + CHILL_QUOTES +
+                                   HORNY_QUOTES + EXCITED_QUOTES + NOSTALGIC_QUOTES +
+                                   HOMESICK_QUOTES,
+                                   "~ MOOD SELECTOR ~", None),
     }
 
     def _show_static_preview(self, prog_key):
@@ -4969,6 +5138,7 @@ class ProgramsTab(ttk.Frame):
         "excited_octopus":        "excited-octopus",
         "nostalgic_octopus":      "nostalgic-octopus",
         "homesick_octopus":       "homesick-octopus",
+        "mood_selector":          "mood-selector",
     }
 
     def _generate_quotes_header(self, prog_key):

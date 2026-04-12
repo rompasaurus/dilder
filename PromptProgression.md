@@ -1218,3 +1218,113 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `PromptProgression.md` (modified — added Prompts #88–95, backfilled commit hash for Prompt #87)
   - `website/docs/prompts/index.md` (modified — added Prompts #88–95)
   - `website/docs/docs/tools/devtool.md` (modified — updated Programs tab section for 16 programs, added body animation documentation)
+
+---
+
+## Prompt #96
+- **Date/Time:** 2026-04-12
+- **Prompt:** "OK let's export the octopus and its facial expressions and animations into the assets folder, label and map all the available combinations, and then plan for new implementation. For every emotional state of the octopus planned we need to start moving the body according to its state as well. Give me a nice exhaustive combination of assets that eventually can be put into the C program upon approval. Give me an MD document to outline each state and provide a check mark and notes option for each state for improvements later in Claude."
+- **Input Tokens (est):** ~100
+- **Output Tokens (est):** ~15,000
+- **Files Created/Modified:**
+  - `assets/octopus-emotion-states.md` (created — comprehensive tracker doc with all 13 emotional states, per-feature tables, body motion priority matrix, implementation approach for RLE body transforms, animation cycle reference, and source file reference)
+
+---
+
+## Prompt #97
+- **Date/Time:** 2026-04-12
+- **Prompt:** "What would it take to map the keyboard actions for the time being to the Pico so that I can play around with user actions on the octopus? Create an MD in the docs and dive into the options."
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~20,000
+- **Files Created/Modified:**
+  - `docs/keyboard-to-pico-input.md` (created — explores 3 options: Serial Command Mode over existing USB CDC, GPIO Button Array on free pins GP0-GP4, and Hybrid; includes full key mapping table for 30+ commands covering mood selection, expression override, animation control, body motion, quote control, and system commands; provides C code snippets for handle_command(), polling main loop, and state variables; GPIO pinout diagram; DevTool integration mockup; 10-step implementation plan)
+
+---
+
+## Prompt #98
+- **Date/Time:** 2026-04-12
+- **Prompt:** "The fat and lazy octopus legs are hard to differentiate between which leg is which. Perhaps for the fat one make the octopus fat up top with a bit thicker legs, and with the lazy one make it lounge on its side with a tentacle on its belly lying like a French woman."
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~40,000
+- **Files Created/Modified:**
+  - `dev-setup/fat-octopus/main.c` (modified — replaced `body_rle[]` with custom wider body: dome starts 2 rows higher, +5px per side at peak, no waist taper, tentacles widened +1px per side; updated `setup_body_transform` to remove `body_x_expand=3` since body is inherently fat)
+  - `dev-setup/lazy-octopus/main.c` (modified — replaced `body_rle[]` with reclining pose: asymmetric body sloping rightward, belly tentacle overlay function, sprawling tentacles; updated `setup_body_transform`)
+  - `DevTool/devtool.py` (modified — added `_octo_body_fat()`, `_octo_body_lazy()`, `_octo_belly_tentacle_lazy()`, updated `_body_transform()` and `_generate_octopus_frame()` to use mood-specific bodies)
+
+---
+
+## Prompt #99
+- **Date/Time:** 2026-04-12
+- **Prompt:** "Use the C implementation of the animations and produce accurately a set of images in the assets folder to compare against the Python."
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~50,000
+- **Files Created/Modified:**
+  - `assets/render_c_previews.py` (created — standalone Python script that is a 1:1 port of every C firmware drawing function: `fill_circle`, all `draw_pupils_*`, `draw_brows_*`, `draw_lids_*`, `draw_mouth_*`, body RLE decode, chat bubble, body transforms, and row wobble; renders all 16 moods to PNG at 4x scale plus a comparison grid)
+  - `assets/c-render/*.png` (16 individual mood PNGs + `_grid_all_moods.png` generated)
+  - `assets/py-render/*.png` (16 Python devtool renders regenerated for comparison)
+  - `assets/c-vs-python-key-comparison.png` (created — side-by-side Normal/Fat/Lazy comparison)
+  - `assets/c-vs-python-comparison.png` (created — side-by-side all 16 moods)
+
+---
+
+## Prompt #100
+- **Date/Time:** 2026-04-12
+- **Prompt:** "Lazy octopus looks weird. Just have him fold sit on his side with his legs draped to the right."
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~15,000
+- **Files Created/Modified:**
+  - `dev-setup/lazy-octopus/main.c` (modified — replaced reclining body_rle with simpler design: standard head dome + body, cheeks taper rightward, all 5 tentacles sweep diagonally to the right with organic sine wobble; removed `draw_belly_tentacle_lazy()` call from render_frame)
+  - `DevTool/devtool.py` (modified — updated `_octo_body_lazy()` to match new tentacles-draped-right design, removed belly tentacle from frame builder)
+  - `assets/render_c_previews.py` (modified — updated `BODY_RLE_LAZY` and removed belly tentacle from `MOOD_CONFIG`)
+  - All preview PNGs regenerated
+
+---
+
+## Prompt #101
+- **Date/Time:** 2026-04-12
+- **Prompt:** "Compare the C renders with the Python images and make sure they line up. Also with the C render, split up each octopus into its own image file named like the emotion previews."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~10,000
+- **Files Created/Modified:**
+  - `assets/render_c_previews.py` (modified — added full `setup_body_transform()` with body_dx/dy/x_expand/wobble matching C firmware, added `body_x_expand` to `draw_body()`, added `row_wobble()` to `px_set_off`/`px_clr_off`)
+  - `assets/emotion-previews/*.png` (all 34 files regenerated — 17 statics + 17 anim strips from C-faithful renderer)
+  - `assets/c-render/*.png` (regenerated with body transforms applied)
+  - `assets/py-render/*.png` (regenerated for comparison)
+  - Pixel comparison: 10/16 moods pixel-perfect match, remaining 6 within 256 pixels (sinf rounding)
+
+---
+
+## Prompt #102
+- **Date/Time:** 2026-04-12
+- **Prompt:** "C renders need to be generated now too."
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~500
+- **Files Created/Modified:**
+  - `assets/c-render/*.png` (regenerated — 16 individual PNGs + grid)
+
+---
+
+## Prompt #103
+- **Date/Time:** 2026-04-12
+- **Prompt:** "The C renders don't have as many as the emotion preview though."
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~5,000
+- **Files Created/Modified:**
+  - `assets/c-render/*-anim.png` (17 animation strips generated to match emotion-previews)
+  - `assets/c-render/supportive.png` and `assets/c-render/supportive-anim.png` (copied from normal)
+  - `assets/py-render/*-anim.png` (17 animation strips generated)
+  - `assets/py-render/supportive.png` and `assets/py-render/supportive-anim.png` (copied from normal)
+  - All three folders now contain matching 34-file sets
+
+---
+
+## Prompt #104
+- **Date/Time:** 2026-04-12
+- **Prompt:** "OK go through session history, find all my new prompts, update the prompt document, commit and push the change. Be as descriptive as possible. Update docs and the website as well."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~40,000
+- **Files Created/Modified:**
+  - `PromptProgression.md` (modified — added Prompts #96–104)
+  - `website/docs/prompts/index.md` (modified — added Prompts #93–104)
+  - `assets/octopus-emotion-states.md` (modified — updated Fat and Lazy body descriptions)
+  - All changes committed and pushed

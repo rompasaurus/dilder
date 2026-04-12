@@ -327,8 +327,8 @@ The DevTool ships with 16 octopus programs, each with unique facial expressions,
 | Hungry | Looking up | Drooling oval | Lean upward | 30 |
 | Tired | Half-closed lids | Yawn | Sagging, melting | 30 |
 | Slap Happy | One squint, one manic | Wobbly grin | Sway side to side | 30 |
-| Lazy | Nearly shut | Flat line | Melted flat | 30 |
-| Fat | Wide happy | Smile + cheek puffs | Wider, jiggle | 30 |
+| Lazy | Nearly shut | Flat line | Custom body: tentacles draped right | 30 |
+| Fat | Wide happy | Smile + cheek puffs | Custom body: wider dome, thicker tentacles | 30 |
 | Chill | Side-glancing | Half-smile | Subtle lean | 30 |
 | Horny | Heart-shaped | Tongue out | Rhythmic pulse | 30 |
 | Excited | Sparkle crosses | Wide grin | Bouncing | 30 |
