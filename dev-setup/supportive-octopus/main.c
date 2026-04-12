@@ -1,163 +1,569 @@
 /**
- * Supportive Octopus — Standalone e-ink animation
+ * Sassy Octopus — Runtime-rendered e-ink animation
  *
- * Same octopus, aggressively supportive energy. Boots directly into
- * the animation with no USB connection required.  Frames are
- * pre-rendered by the DevTool and baked into frames.h at build time.
- *
- * The display cycles through expressions (smirk, open mouth,
- * big smile) while showing random supportive quotes in a chat bubble.
- *
- * Uses partial refresh after the first frame for faster animation.
- * Each frame displays for ~4 seconds (e-ink friendly).
+ * Instead of pre-baking every frame, this firmware renders each frame
+ * on the fly: composites the octopus body, eyes, mouth expression,
+ * chat bubble, and text at display time.  This means ALL quotes fit
+ * in flash (~10KB of strings vs ~4MB of bitmaps).
  *
  * Wiring (same as all Dilder firmware):
- *   VCC  -> 3V3(OUT) pin 36
- *   GND  -> GND      pin 38
- *   DIN  -> GP11     pin 15  (SPI1 TX)
- *   CLK  -> GP10     pin 14  (SPI1 SCK)
- *   CS   -> GP9      pin 12  (SPI1 CSn)
- *   DC   -> GP8      pin 11
- *   RST  -> GP12     pin 16
- *   BUSY -> GP13     pin 17
+ *   VCC  -> 3V3(OUT) pin 36    GND  -> GND      pin 38
+ *   DIN  -> GP11     pin 15    CLK  -> GP10     pin 14
+ *   CS   -> GP9      pin 12    DC   -> GP8      pin 11
+ *   RST  -> GP12     pin 16    BUSY -> GP13     pin 17
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "pico/stdlib.h"
+#include "hardware/adc.h"
 #include "DEV_Config.h"
 
-/*
- * Display variant selection — set via -DDISPLAY_VARIANT=X at build time.
- * Supported: V2, V3 (default), V3a, V4
- */
+/* Display variant selection */
 #if defined(DISPLAY_V2)
   #include "EPD_2in13_V2.h"
-  #define DISP_W          EPD_2in13_V2_WIDTH
-  #define DISP_H          EPD_2in13_V2_HEIGHT
-  #define EPD_Init()      EPD_2in13_V2_Init()
-  #define EPD_Clear()     EPD_2in13_V2_Clear()
-  #define EPD_Display(b)  EPD_2in13_V2_Display(b)
-  #define EPD_Partial(b)  EPD_2in13_V2_Display_Partial(b)
-  #define EPD_Sleep()     EPD_2in13_V2_Sleep()
-  #define DISPLAY_NAME    "V2"
+  #define DISP_W EPD_2in13_V2_WIDTH
+  #define DISP_H EPD_2in13_V2_HEIGHT
+  #define EPD_Init()     EPD_2in13_V2_Init()
+  #define EPD_Clear()    EPD_2in13_V2_Clear()
+  #define EPD_Display(b) EPD_2in13_V2_Display(b)
+  #define EPD_Partial(b) EPD_2in13_V2_Display_Partial(b)
+  #define EPD_Sleep()    EPD_2in13_V2_Sleep()
+  #define DISPLAY_NAME   "V2"
 #elif defined(DISPLAY_V3A)
   #include "EPD_2in13_V3a.h"
-  #define DISP_W          EPD_2in13_V3a_WIDTH
-  #define DISP_H          EPD_2in13_V3a_HEIGHT
-  #define EPD_Init()      EPD_2in13_V3a_Init()
-  #define EPD_Clear()     EPD_2in13_V3a_Clear()
-  #define EPD_Display(b)  EPD_2in13_V3a_Display(b)
-  #define EPD_Partial(b)  EPD_2in13_V3a_Display_Partial(b)
-  #define EPD_Sleep()     EPD_2in13_V3a_Sleep()
-  #define DISPLAY_NAME    "V3a"
+  #define DISP_W EPD_2in13_V3a_WIDTH
+  #define DISP_H EPD_2in13_V3a_HEIGHT
+  #define EPD_Init()     EPD_2in13_V3a_Init()
+  #define EPD_Clear()    EPD_2in13_V3a_Clear()
+  #define EPD_Display(b) EPD_2in13_V3a_Display(b)
+  #define EPD_Partial(b) EPD_2in13_V3a_Display_Partial(b)
+  #define EPD_Sleep()    EPD_2in13_V3a_Sleep()
+  #define DISPLAY_NAME   "V3a"
 #elif defined(DISPLAY_V4)
   #include "EPD_2in13_V4.h"
-  #define DISP_W          EPD_2in13_V4_WIDTH
-  #define DISP_H          EPD_2in13_V4_HEIGHT
-  #define EPD_Init()      EPD_2in13_V4_Init()
-  #define EPD_Clear()     EPD_2in13_V4_Clear()
-  #define EPD_Display(b)  EPD_2in13_V4_Display(b)
-  #define EPD_Partial(b)  EPD_2in13_V4_Display_Partial(b)
-  #define EPD_Sleep()     EPD_2in13_V4_Sleep()
-  #define DISPLAY_NAME    "V4"
+  #define DISP_W EPD_2in13_V4_WIDTH
+  #define DISP_H EPD_2in13_V4_HEIGHT
+  #define EPD_Init()     EPD_2in13_V4_Init()
+  #define EPD_Clear()    EPD_2in13_V4_Clear()
+  #define EPD_Display(b) EPD_2in13_V4_Display(b)
+  #define EPD_Partial(b) EPD_2in13_V4_Display_Partial(b)
+  #define EPD_Sleep()    EPD_2in13_V4_Sleep()
+  #define DISPLAY_NAME   "V4"
 #else
   #include "EPD_2in13_V3.h"
-  #define DISP_W          EPD_2in13_V3_WIDTH
-  #define DISP_H          EPD_2in13_V3_HEIGHT
-  #define EPD_Init()      EPD_2in13_V3_Init()
-  #define EPD_Clear()     EPD_2in13_V3_Clear()
-  #define EPD_Display(b)  EPD_2in13_V3_Display(b)
-  #define EPD_Partial(b)  EPD_2in13_V3_Display_Partial(b)
-  #define EPD_Sleep()     EPD_2in13_V3_Sleep()
-  #define DISPLAY_NAME    "V3"
+  #define DISP_W EPD_2in13_V3_WIDTH
+  #define DISP_H EPD_2in13_V3_HEIGHT
+  #define EPD_Init()     EPD_2in13_V3_Init()
+  #define EPD_Clear()    EPD_2in13_V3_Clear()
+  #define EPD_Display(b) EPD_2in13_V3_Display(b)
+  #define EPD_Partial(b) EPD_2in13_V3_Display_Partial(b)
+  #define EPD_Sleep()    EPD_2in13_V3_Sleep()
+  #define DISPLAY_NAME   "V3"
 #endif
 
-/* Landscape dimensions (what DevTool renders) */
-#define IMG_W    250
-#define IMG_H    122
-#define IMG_ROW_BYTES  ((IMG_W + 7) / 8)   /* 32 */
-#define IMG_TOTAL      (IMG_ROW_BYTES * IMG_H)  /* 3904 */
+/* Auto-generated quotes + tagline */
+#include "quotes.h"
 
-/* Pre-rendered frames (generated by DevTool) */
-#include "frames.h"
+/* ─── Canvas constants ─── */
+#define IMG_W         250
+#define IMG_H         122
+#define IMG_ROW_BYTES ((IMG_W + 7) / 8)  /* 32 */
 
-/* Display buffer (native portrait orientation) */
+/* Mood values (match quotes.h) */
+#define MOOD_NORMAL   0
+#define MOOD_WEIRD    1
+#define MOOD_UNHINGED 2
+
+/* Mouth expressions */
+#define EXPR_SMIRK    0
+#define EXPR_OPEN     1
+#define EXPR_SMILE    2
+#define EXPR_WEIRD    3
+#define EXPR_UNHINGED 4
+
+/* Landscape frame buffer (1 = black pixel, packed MSB-first) */
+static uint8_t frame[IMG_ROW_BYTES * IMG_H];
+
+/* Display buffer (portrait orientation for e-ink driver) */
 static uint8_t display_buf[((DISP_W + 7) / 8) * DISP_H];
 
-/**
- * Transpose a landscape frame (250x122, DevTool format) into the
- * native display orientation (122x250, portrait) for the e-ink driver.
- *
- * DevTool: pixel(x,y) where x=[0..249], y=[0..121], 1=black, MSB first
- * Display: pixel(y, 249-x), 0=black (inverted), MSB first
- */
-static void transpose_to_display(const uint8_t *src) {
-    uint16_t dst_row_bytes = (DISP_W + 7) / 8;  /* 16 */
-    memset(display_buf, 0xFF, sizeof(display_buf));  /* white */
+/* ─── Pixel helpers ─── */
+static inline void px_set(int x, int y) {
+    if (x >= 0 && x < IMG_W && y >= 0 && y < IMG_H)
+        frame[y * IMG_ROW_BYTES + x / 8] |= (0x80 >> (x & 7));
+}
+static inline void px_clr(int x, int y) {
+    if (x >= 0 && x < IMG_W && y >= 0 && y < IMG_H)
+        frame[y * IMG_ROW_BYTES + x / 8] &= ~(0x80 >> (x & 7));
+}
+
+/* ─── Octopus body (RLE: y, num_spans, x0, x1, ...) terminated by 0xFF ─── */
+static const uint8_t body_rle[] = {
+    10,1, 22,48,  11,1, 18,52,  12,1, 16,54,  13,1, 14,56,
+    14,1, 13,57,  15,1, 12,58,  16,1, 11,59,  17,1, 10,60,
+    18,1, 10,60,  19,1,  9,61,  20,1,  9,61,  21,1,  9,61,
+    22,1,  9,61,  23,1,  9,61,  24,1,  9,61,  25,1,  9,61,
+    26,1,  9,61,  27,1,  9,61,  28,1, 10,60,  29,1, 10,60,
+    30,1, 10,60,  31,1, 10,60,  32,1, 10,60,  33,1, 10,60,
+    34,1, 10,60,  35,1, 10,60,  36,1, 10,60,  37,1, 10,60,
+    38,1, 10,60,  39,1, 10,60,  40,1, 10,60,  41,1, 11,59,
+    42,1, 11,59,  43,1, 12,58,  44,1, 13,57,  45,1, 14,56,
+    46,1, 12,58,  47,1, 11,59,  48,1, 10,60,  49,1, 10,60,
+    50,1, 11,59,  51,1, 12,58,  52,1, 13,57,  53,1, 14,56,
+    54,1, 15,55,
+    /* Tentacles */
+    55,5, 10,17, 21,28, 32,39, 43,50, 54,61,
+    56,5,  8,15, 19,26, 30,37, 45,52, 56,63,
+    57,5,  7,14, 18,24, 29,35, 47,53, 58,64,
+    58,5,  6,12, 19,25, 31,37, 46,52, 57,63,
+    59,5,  7,13, 21,27, 33,39, 44,50, 55,61,
+    60,5,  8,14, 20,26, 31,37, 43,49, 54,60,
+    61,5,  9,14, 18,24, 30,36, 44,50, 56,62,
+    62,5,  8,13, 17,22, 31,37, 46,52, 57,63,
+    63,5,  7,12, 18,23, 33,38, 45,51, 55,61,
+    64,5,  8,13, 20,25, 32,37, 43,48, 54,59,
+    65,5,  9,14, 19,24, 30,35, 44,49, 55,60,
+    66,5, 10,14, 17,22, 31,36, 46,51, 57,62,
+    67,5,  9,13, 18,22, 33,37, 45,50, 56,61,
+    68,5,  8,12, 19,23, 32,36, 43,48, 54,59,
+    69,5,  9,13, 21,25, 30,34, 44,48, 55,59,
+    70,5, 10,14, 20,24, 31,35, 46,50, 57,61,
+    71,5, 11,14, 18,22, 33,37, 45,49, 56,60,
+    72,5, 10,13, 19,22, 32,35, 43,47, 54,58,
+    73,5,  9,12, 20,23, 30,33, 44,47, 55,58,
+    74,5, 10,13, 21,24, 31,34, 46,49, 57,60,
+    75,5, 11,14, 20,23, 33,36, 45,48, 56,59,
+    76,5, 12,14, 19,22, 32,35, 43,46, 54,57,
+    77,5, 11,13, 20,22, 30,33, 44,46, 55,57,
+    78,5, 10,12, 21,23, 31,33, 45,47, 56,58,
+    79,5, 11,13, 22,24, 32,34, 44,46, 55,57,
+    80,5, 12,14, 21,23, 33,35, 43,45, 54,56,
+    0xFF /* terminator */
+};
+
+/* ─── 5×7 bitmap font ─── */
+/* Index: A=0..Z=25, 0=26..9=35, ' '=36, .=37, ,=38, !=39, ?=40,
+   '=41, -=42, ~=43, /=44, :=45, (=46, )=47, %=48 */
+static const uint8_t font5x7[][7] = {
+    {0x0e,0x11,0x11,0x1f,0x11,0x11,0x11}, /* A */
+    {0x1e,0x11,0x11,0x1e,0x11,0x11,0x1e}, /* B */
+    {0x0e,0x11,0x10,0x10,0x10,0x11,0x0e}, /* C */
+    {0x1e,0x11,0x11,0x11,0x11,0x11,0x1e}, /* D */
+    {0x1f,0x10,0x10,0x1e,0x10,0x10,0x1f}, /* E */
+    {0x1f,0x10,0x10,0x1e,0x10,0x10,0x10}, /* F */
+    {0x0e,0x11,0x10,0x17,0x11,0x11,0x0e}, /* G */
+    {0x11,0x11,0x11,0x1f,0x11,0x11,0x11}, /* H */
+    {0x1f,0x04,0x04,0x04,0x04,0x04,0x1f}, /* I */
+    {0x07,0x02,0x02,0x02,0x02,0x12,0x0c}, /* J */
+    {0x11,0x12,0x14,0x18,0x14,0x12,0x11}, /* K */
+    {0x10,0x10,0x10,0x10,0x10,0x10,0x1f}, /* L */
+    {0x11,0x1b,0x15,0x15,0x11,0x11,0x11}, /* M */
+    {0x11,0x11,0x19,0x15,0x13,0x11,0x11}, /* N */
+    {0x0e,0x11,0x11,0x11,0x11,0x11,0x0e}, /* O */
+    {0x1e,0x11,0x11,0x1e,0x10,0x10,0x10}, /* P */
+    {0x0e,0x11,0x11,0x11,0x15,0x12,0x0d}, /* Q */
+    {0x1e,0x11,0x11,0x1e,0x14,0x12,0x11}, /* R */
+    {0x0e,0x11,0x10,0x0e,0x01,0x11,0x0e}, /* S */
+    {0x1f,0x04,0x04,0x04,0x04,0x04,0x04}, /* T */
+    {0x11,0x11,0x11,0x11,0x11,0x11,0x0e}, /* U */
+    {0x11,0x11,0x11,0x11,0x0a,0x0a,0x04}, /* V */
+    {0x11,0x11,0x11,0x15,0x15,0x15,0x0a}, /* W */
+    {0x11,0x11,0x0a,0x04,0x0a,0x11,0x11}, /* X */
+    {0x11,0x11,0x0a,0x04,0x04,0x04,0x04}, /* Y */
+    {0x1f,0x01,0x02,0x04,0x08,0x10,0x1f}, /* Z */
+    {0x0e,0x11,0x13,0x15,0x19,0x11,0x0e}, /* 0 */
+    {0x04,0x0c,0x04,0x04,0x04,0x04,0x0e}, /* 1 */
+    {0x0e,0x11,0x01,0x06,0x08,0x10,0x1f}, /* 2 */
+    {0x0e,0x11,0x01,0x06,0x01,0x11,0x0e}, /* 3 */
+    {0x02,0x06,0x0a,0x12,0x1f,0x02,0x02}, /* 4 */
+    {0x1f,0x10,0x1e,0x01,0x01,0x11,0x0e}, /* 5 */
+    {0x0e,0x11,0x10,0x1e,0x11,0x11,0x0e}, /* 6 */
+    {0x1f,0x01,0x02,0x04,0x08,0x08,0x08}, /* 7 */
+    {0x0e,0x11,0x11,0x0e,0x11,0x11,0x0e}, /* 8 */
+    {0x0e,0x11,0x11,0x0f,0x01,0x11,0x0e}, /* 9 */
+    {0x00,0x00,0x00,0x00,0x00,0x00,0x00}, /* ' ' */
+    {0x00,0x00,0x00,0x00,0x00,0x0c,0x0c}, /* . */
+    {0x00,0x00,0x00,0x00,0x04,0x04,0x08}, /* , */
+    {0x04,0x04,0x04,0x04,0x04,0x00,0x04}, /* ! */
+    {0x0e,0x11,0x01,0x06,0x04,0x00,0x04}, /* ? */
+    {0x04,0x04,0x08,0x00,0x00,0x00,0x00}, /* ' */
+    {0x00,0x00,0x00,0x1f,0x00,0x00,0x00}, /* - */
+    {0x00,0x00,0x08,0x15,0x02,0x00,0x00}, /* ~ */
+    {0x01,0x02,0x02,0x04,0x08,0x08,0x10}, /* / */
+    {0x00,0x0c,0x0c,0x00,0x0c,0x0c,0x00}, /* : */
+    {0x02,0x04,0x08,0x08,0x08,0x04,0x02}, /* ( */
+    {0x08,0x04,0x02,0x02,0x02,0x04,0x08}, /* ) */
+    {0x19,0x1a,0x02,0x04,0x08,0x0b,0x13}, /* % */
+};
+
+static const char font_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?'-~/:()\%";
+
+static int font_index(char c) {
+    for (int i = 0; font_chars[i]; i++)
+        if (font_chars[i] == c) return i;
+    return 36; /* space fallback */
+}
+
+/* ─── Drawing primitives ─── */
+
+static void fill_circle(int cx, int cy, int r_sq, int set) {
+    int r = 5;
+    for (int dy = -r; dy <= r; dy++)
+        for (int dx = -r; dx <= r; dx++)
+            if (dx * dx + dy * dy <= r_sq) {
+                if (set) px_set(cx + dx, cy + dy);
+                else     px_clr(cx + dx, cy + dy);
+            }
+}
+
+static void draw_body(void) {
+    const uint8_t *p = body_rle;
+    while (*p != 0xFF) {
+        int y = *p++;
+        int n = *p++;
+        for (int i = 0; i < n; i++) {
+            int x0 = *p++;
+            int x1 = *p++;
+            for (int x = x0; x <= x1; x++)
+                px_set(x, y);
+        }
+    }
+}
+
+static void draw_eyes(void) {
+    /* White eye sockets: two circles r²=16 at (22,25) and (48,25) */
+    fill_circle(22, 25, 16, 0);
+    fill_circle(48, 25, 16, 0);
+}
+
+static void draw_pupils_normal(void) {
+    /* Black pupils: r²=4 at (23,26) and (49,26) */
+    fill_circle(23, 26, 4, 1);
+    fill_circle(49, 26, 4, 1);
+    /* White highlights: r²=1 at (20,23) and (46,23) */
+    fill_circle(20, 23, 1, 0);
+    fill_circle(46, 23, 1, 0);
+}
+
+static void draw_pupils_weird(void) {
+    /* Misaligned: left up-left (21,24), right down-right (50,28) */
+    fill_circle(21, 24, 4, 1);
+    fill_circle(50, 28, 4, 1);
+    fill_circle(20, 23, 1, 0);
+    fill_circle(46, 23, 1, 0);
+}
+
+static void draw_pupils_unhinged(void) {
+    /* Tiny pinprick pupils, no highlights */
+    px_set(22, 25); px_set(23, 25); px_set(22, 26); px_set(23, 26);
+    px_set(48, 25); px_set(49, 25); px_set(48, 26); px_set(49, 26);
+}
+
+/* ─── Mouth expressions ─── */
+
+static void draw_mouth_smirk(void) {
+    for (int x = 28; x < 44; x++) {
+        float t = (x - 28) / 15.0f;
+        float tilt = -2.0f + t * 4.0f;
+        float v = 2.0f * t - 1.0f;
+        float arc = (fabsf(v) < 1.0f) ? 5.0f * sqrtf(1.0f - v * v) : 0.0f;
+        int yc = (int)(39.0f + tilt + arc);
+        px_clr(x, yc);       /* white interior */
+        px_set(x, yc - 1);   /* black outline */
+        px_set(x, yc + 1);
+    }
+}
+
+static void draw_mouth_smile(void) {
+    for (int x = 26; x < 45; x++) {
+        int cy = 38 + ((x - 35) * (x - 35)) / 25;
+        px_set(x, cy);
+        px_set(x, cy + 1);
+    }
+}
+
+static void draw_mouth_open(void) {
+    int cx = 35, cy = 40, rx = 7, ry = 5;
+    /* White interior (smaller ellipse) */
+    for (int dy = -4; dy <= 4; dy++)
+        for (int dx = -6; dx <= 6; dx++)
+            if (dx*dx*16 + dy*dy*36 <= 36*16)
+                px_clr(cx + dx, cy + dy);
+    /* Black border */
+    for (int dy = -ry; dy <= ry; dy++)
+        for (int dx = -rx; dx <= rx; dx++) {
+            if (dx*dx*ry*ry + dy*dy*rx*rx > rx*rx*ry*ry) continue;
+            /* Check if any neighbor is outside */
+            for (int nd = 0; nd < 4; nd++) {
+                int nx = dx + ((nd==0)?-1:(nd==1)?1:0);
+                int ny = dy + ((nd==2)?-1:(nd==3)?1:0);
+                if (nx*nx*ry*ry + ny*ny*rx*rx > rx*rx*ry*ry) {
+                    px_set(cx + dx, cy + dy);
+                    break;
+                }
+            }
+        }
+}
+
+static void draw_mouth_weird(void) {
+    for (int x = 24; x < 48; x++) {
+        float t = (x - 24) / 23.0f;
+        int yc = 39 + (int)(3.5f * sinf(t * 3.14159f * 3.0f));
+        px_clr(x, yc);
+        px_set(x, yc - 1);
+        px_set(x, yc + 1);
+    }
+}
+
+static void draw_mouth_unhinged(void) {
+    int cx = 35, cy = 41, rx = 10, ry = 7;
+    /* White interior */
+    for (int dy = -6; dy <= 6; dy++)
+        for (int dx = -9; dx <= 9; dx++)
+            if (dx*dx*36 + dy*dy*81 <= 81*36)
+                px_clr(cx + dx, cy + dy);
+    /* Black border */
+    for (int dy = -ry; dy <= ry; dy++)
+        for (int dx = -rx; dx <= rx; dx++) {
+            if (dx*dx*ry*ry + dy*dy*rx*rx > rx*rx*ry*ry) continue;
+            for (int nd = 0; nd < 4; nd++) {
+                int nx = dx + ((nd==0)?-1:(nd==1)?1:0);
+                int ny = dy + ((nd==2)?-1:(nd==3)?1:0);
+                if (nx*nx*ry*ry + ny*ny*rx*rx > rx*rx*ry*ry) {
+                    px_set(cx + dx, cy + dy);
+                    break;
+                }
+            }
+        }
+    /* Jagged teeth */
+    for (int x = cx - 7; x <= cx + 7; x += 3) {
+        px_set(x, cy - 5);
+        px_set(x, cy - 4);
+        px_set(x + 1, cy - 4);
+    }
+}
+
+/* ─── Chat bubble ─── */
+
+static void draw_bubble(void) {
+    int bx = 75, by = 5, bw = 170, bh = 70;
+    /* Top/bottom edges (double thick) */
+    for (int x = bx + 3; x < bx + bw - 3; x++) {
+        px_set(x, by); px_set(x, by + 1);
+        px_set(x, by + bh - 1); px_set(x, by + bh - 2);
+    }
+    /* Left/right edges */
+    for (int y = by + 3; y < by + bh - 3; y++) {
+        px_set(bx, y); px_set(bx + 1, y);
+        px_set(bx + bw - 1, y); px_set(bx + bw - 2, y);
+    }
+    /* Rounded corners */
+    int corners[][2] = {{bx+2,by+2},{bx+bw-3,by+2},{bx+2,by+bh-3},{bx+bw-3,by+bh-3}};
+    for (int c = 0; c < 4; c++)
+        for (int dy = -1; dy <= 1; dy++)
+            for (int dx = -1; dx <= 1; dx++)
+                if (abs(dx) + abs(dy) <= 1)
+                    px_set(corners[c][0]+dx, corners[c][1]+dy);
+    /* Speech tail */
+    static const int8_t tail[][2] = {
+        {0,35},{-1,36},{-2,37},{-3,38},{-4,39},{-5,40},{-6,41},{-7,42},
+        {-6,43},{-5,43},{-4,43},{-3,42},{-2,41},{-1,40},{0,39}
+    };
+    for (int i = 0; i < 15; i++)
+        px_set(bx + tail[i][0], tail[i][1]);
+}
+
+/* ─── Text rendering ─── */
+
+static void draw_char(int x0, int y0, int idx) {
+    for (int row = 0; row < 7; row++) {
+        uint8_t bits = font5x7[idx][row];
+        for (int col = 0; col < 5; col++)
+            if (bits & (0x10 >> col))
+                px_set(x0 + col, y0 + row);
+    }
+}
+
+static void draw_text(int x0, int y0, const char *text, int max_w) {
+    int cx = x0, cy = y0;
+    int char_w = 6; /* 5px + 1px gap */
+
+    /* Simple word-wrap */
+    const char *p = text;
+    while (*p) {
+        /* Measure next word */
+        const char *word_start = p;
+        int wlen = 0;
+        while (p[wlen] && p[wlen] != ' ') wlen++;
+
+        int word_px = wlen * char_w;
+
+        /* Wrap if this word won't fit on current line */
+        if (cx > x0 && (cx - x0) + word_px > max_w) {
+            cx = x0;
+            cy += 9; /* 7px + 2px line gap */
+        }
+
+        /* Render the word */
+        for (int i = 0; i < wlen; i++) {
+            char c = p[i];
+            if (c >= 'a' && c <= 'z') c -= 32; /* uppercase */
+            draw_char(cx, cy, font_index(c));
+            cx += char_w;
+        }
+
+        p += wlen;
+        /* Skip spaces */
+        if (*p == ' ') {
+            cx += char_w;
+            p++;
+        }
+    }
+}
+
+/* ─── Frame composition ─── */
+
+static void render_frame(const Quote *q, int expr) {
+    /* Clear to white */
+    memset(frame, 0, sizeof(frame));
+
+    /* 1. Body */
+    draw_body();
+
+    /* 2. Eyes (white sockets) */
+    draw_eyes();
+
+    /* 3. Pupils (mood-specific) */
+    switch (q->mood) {
+        case MOOD_WEIRD:    draw_pupils_weird();    break;
+        case MOOD_UNHINGED: draw_pupils_unhinged(); break;
+        default:            draw_pupils_normal();   break;
+    }
+
+    /* 4. Mouth expression */
+    switch (expr) {
+        case EXPR_OPEN:     draw_mouth_open();     break;
+        case EXPR_SMILE:    draw_mouth_smile();    break;
+        case EXPR_WEIRD:    draw_mouth_weird();    break;
+        case EXPR_UNHINGED: draw_mouth_unhinged(); break;
+        default:            draw_mouth_smirk();    break;
+    }
+
+    /* 5. Chat bubble outline */
+    draw_bubble();
+
+    /* 6. Quote text inside bubble */
+    draw_text(81, 11, q->text, 158);
+
+    /* 7. Tagline below bubble */
+    draw_text(81, 83, TAGLINE, 170);
+}
+
+/* ─── Transpose landscape → portrait for e-ink driver ─── */
+
+static void transpose_to_display(void) {
+    uint16_t dst_row_bytes = (DISP_W + 7) / 8;
+    memset(display_buf, 0xFF, sizeof(display_buf));
 
     for (int y = 0; y < IMG_H; y++) {
         for (int x = 0; x < IMG_W; x++) {
-            /* Read source pixel */
             int src_byte = y * IMG_ROW_BYTES + x / 8;
-            int src_bit  = 7 - (x % 8);
-            int pixel    = (src[src_byte] >> src_bit) & 1;
-
-            if (pixel) {  /* 1 = black in DevTool format */
+            int src_bit  = 7 - (x & 7);
+            if ((frame[src_byte] >> src_bit) & 1) {
                 int dx = y;
                 int dy = 249 - x;
                 int dst_byte = dy * dst_row_bytes + dx / 8;
-                int dst_bit  = 7 - (dx % 8);
-                display_buf[dst_byte] &= ~(1 << dst_bit);  /* 0 = black for e-ink */
+                int dst_bit  = 7 - (dx & 7);
+                display_buf[dst_byte] &= ~(1 << dst_bit);
             }
         }
     }
 }
 
+/* ─── Simple PRNG (seeded from ADC noise) ─── */
+
+static uint32_t rng_state;
+
+static void rng_seed(void) {
+    adc_init();
+    adc_gpio_init(26);
+    adc_select_input(0);
+    uint32_t seed = 0;
+    for (int i = 0; i < 32; i++)
+        seed = (seed << 1) | (adc_read() & 1);
+    seed ^= time_us_32();
+    rng_state = seed ? seed : 0xDEADBEEF;
+}
+
+static uint32_t rng_next(void) {
+    rng_state ^= rng_state << 13;
+    rng_state ^= rng_state >> 17;
+    rng_state ^= rng_state << 5;
+    return rng_state;
+}
+
+/* ─── Expression cycles per mood ─── */
+
+static const uint8_t cycle_normal[]   = {EXPR_SMIRK, EXPR_OPEN, EXPR_SMILE, EXPR_OPEN};
+static const uint8_t cycle_weird[]    = {EXPR_WEIRD, EXPR_OPEN, EXPR_WEIRD, EXPR_SMILE};
+static const uint8_t cycle_unhinged[] = {EXPR_UNHINGED, EXPR_OPEN, EXPR_UNHINGED, EXPR_OPEN};
+
+static const uint8_t *mood_cycle(uint8_t mood) {
+    switch (mood) {
+        case MOOD_WEIRD:    return cycle_weird;
+        case MOOD_UNHINGED: return cycle_unhinged;
+        default:            return cycle_normal;
+    }
+}
+
+/* ─── Main ─── */
+
 int main(void) {
-    /* Initialize USB serial (optional, for debug) */
     stdio_init_all();
     sleep_ms(1000);
+    printf("%s starting (display: %s, %d quotes)...\n", TAGLINE, DISPLAY_NAME, QUOTE_COUNT);
 
-    printf("Supportive Octopus starting (display: %s)...\n", DISPLAY_NAME);
-
-    /* Initialize hardware */
     if (DEV_Module_Init() != 0) {
         printf("ERROR: Hardware init failed.\n");
         return 1;
     }
 
-    /* Initialize display */
     EPD_Init();
     EPD_Clear();
-    printf("Display ready. %d frames loaded.\n", FRAME_COUNT);
 
-    /* Animation loop — runs forever */
+    rng_seed();
+
     uint32_t frame_idx = 0;
+    int qi = rng_next() % QUOTE_COUNT;
 
     while (true) {
-        /* Get the current frame data */
-        const uint8_t *frame = frames[frame_idx % FRAME_COUNT];
+        const Quote *q = &quotes[qi];
+        const uint8_t *cycle = mood_cycle(q->mood);
+        uint8_t expr = cycle[frame_idx % 4];
 
-        /* Transpose landscape -> portrait */
-        transpose_to_display(frame);
+        /* Pick new quote on every OPEN mouth frame */
+        if (expr == EXPR_OPEN && frame_idx > 0)
+            qi = rng_next() % QUOTE_COUNT;
 
-        /* Display the frame */
-        if (frame_idx == 0) {
-            /* First frame: full refresh (clean baseline) */
+        /* Render */
+        render_frame(&quotes[qi], expr);
+        transpose_to_display();
+
+        if (frame_idx == 0)
             EPD_Display(display_buf);
-        } else {
-            /* Subsequent: partial refresh (much faster, ~0.3s) */
+        else
             EPD_Partial(display_buf);
-        }
 
-        printf("Frame %lu/%d displayed.\n",
-               (unsigned long)(frame_idx % FRAME_COUNT) + 1, FRAME_COUNT);
+        printf("Frame %lu: [%s] %s\n",
+               (unsigned long)frame_idx,
+               q->mood == MOOD_WEIRD ? "weird" :
+               q->mood == MOOD_UNHINGED ? "unhinged" : "normal",
+               q->text);
 
         frame_idx++;
-
-        /* Wait between frames (e-ink friendly interval) */
         sleep_ms(4000);
     }
 

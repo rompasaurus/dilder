@@ -8,9 +8,9 @@ dev-setup/img-receiver/build/
 dev-setup/sassy-octopus/build/
 dev-setup/supportive-octopus/build/
 
-# Generated frame data
-dev-setup/sassy-octopus/frames.h
-dev-setup/supportive-octopus/frames.h
+# Generated quote data (DevTool generates at build time)
+dev-setup/sassy-octopus/quotes.h
+dev-setup/supportive-octopus/quotes.h
 
 # Waveshare library files (copied from hello-world per setup guide)
 dev-setup/hello-world/lib/

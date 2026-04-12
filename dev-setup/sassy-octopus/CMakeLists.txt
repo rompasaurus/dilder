@@ -37,12 +37,6 @@ add_executable(sassy_octopus
     main.c
     lib/Config/DEV_Config.c
     ${EPD_SOURCE}
-    lib/GUI/GUI_Paint.c
-    lib/Fonts/font8.c
-    lib/Fonts/font12.c
-    lib/Fonts/font16.c
-    lib/Fonts/font20.c
-    lib/Fonts/font24.c
 )
 
 if(EPD_DEFINE)
@@ -53,14 +47,14 @@ target_include_directories(sassy_octopus PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/Config
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/e-Paper
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/GUI
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/Fonts
 )
 
 target_link_libraries(sassy_octopus
     pico_stdlib
     hardware_spi
     hardware_gpio
+    hardware_adc
+    m
 )
 
 pico_enable_stdio_usb(sassy_octopus 1)
