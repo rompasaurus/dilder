@@ -121,6 +121,7 @@ nav:
           - Dev Environment: docs/setup/dev-environment.md
       - Software:
           - Project Structure: docs/software/project-structure.md
+          - Emotion States: docs/software/emotion-states.md
       - Tools:
           - DevTool (GUI): docs/tools/devtool.md
           - Setup CLI: docs/tools/setup-cli.md

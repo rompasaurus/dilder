@@ -25,7 +25,7 @@ If you've ever wanted to follow a project from "I have an idea" to "here's a wor
 
     [Setup Guide :material-arrow-right:](docs/setup/first-time-setup.md){ .md-button }
     [DevTool :material-arrow-right:](docs/tools/devtool.md){ .md-button }
-    [Emotion States :material-arrow-right:](../assets/octopus-emotion-states.md){ .md-button }
+    [Emotion States :material-arrow-right:](docs/software/emotion-states.md){ .md-button }
 
 ---
 
