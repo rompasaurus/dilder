@@ -2460,25 +2460,48 @@ def _octo_unhinged_eyes():
 
 
 def _octo_angry_eyes():
-    """Angry slanted eyebrows — two angled lines above the eyes pointing inward.
+    """Angry slanted half-circle eyebrows above the eyes.
 
-    Returns (eyebrows, pupils) where eyebrows are extra black pixels to draw
-    ON TOP of the normal eye sockets, creating angry V-shaped brows.
-    Pupils are normal but shifted slightly inward (glaring).
+    Each brow is a thick curved arc that slopes inward — outer edge high,
+    inner edge low, creating a classic angry V-furrowed look. The arcs are
+    half-ellipses tilted at an angle, 3px thick.
     """
+    import math
     brows = []
-    # Left eyebrow: slants from top-left down to inner-right  (/ shape)
-    for i in range(10):
-        x = 15 + i
-        y = 17 - i * 4 // 10  # gentle slope inward
-        brows.append((x, y))
-        brows.append((x, y + 1))
-    # Right eyebrow: slants from inner-left down to top-right (\ shape)
-    for i in range(10):
-        x = 45 + i
-        y = 15 + i * 4 // 10
-        brows.append((x, y))
-        brows.append((x, y + 1))
+
+    # Brows sit across the TOP of the white eye sockets (eyes are at y=25,
+    # sockets extend from ~y=21 to ~y=29). We draw thick arcs from y=19 to y=22
+    # that cut across the top of the white area so they're clearly visible
+    # against the white eye background.
+
+    # Brows cut across the white eye sockets. Eyes are circles at y=25
+    # with radius 4, so white area is y=21..29.  We draw thick slanted
+    # arcs from y=21 to y=24 so they're bold across the top of the whites.
+
+    # Left eyebrow: outer high (y=20), inner low (y=25) — angry V slope
+    for i in range(18):
+        t = i / 17.0
+        x = 14 + t * 16      # x: 14 → 30  (spans full eye width + overhang)
+        arc = 2.5 * math.sin(t * math.pi)
+        slant_y = 20 + t * 5  # baseline: 20 → 25
+        y = slant_y - arc
+        ix, iy = int(x), int(y)
+        for dy in range(3):  # 3px thick
+            brows.append((ix, iy + dy))
+        brows.append((ix + 1, iy + 1))  # extra width
+
+    # Right eyebrow: mirror — inner low (y=25), outer high (y=20)
+    for i in range(18):
+        t = i / 17.0
+        x = 40 + t * 16      # x: 40 → 56
+        arc = 2.5 * math.sin(t * math.pi)
+        slant_y = 25 - t * 5  # baseline: 25 → 20
+        y = slant_y - arc
+        ix, iy = int(x), int(y)
+        for dy in range(3):
+            brows.append((ix, iy + dy))
+        brows.append((ix + 1, iy + 1))
+
     return brows
 
 
