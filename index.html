@@ -463,10 +463,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-dilder" class="md-nav__link">
+  <a href="#meet-the-octopus" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What is Dilder?
+        Meet the Octopus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Hardware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-emotions-one-octopus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16 Emotions, One Octopus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-devtool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The DevTool
       
     </span>
   </a>
@@ -478,17 +511,6 @@
     <span class="md-ellipsis">
       
         Current Phase
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#latest-update" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Latest Update
       
     </span>
   </a>
@@ -2121,10 +2143,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-dilder" class="md-nav__link">
+  <a href="#meet-the-octopus" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What is Dilder?
+        Meet the Octopus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Hardware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-emotions-one-octopus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16 Emotions, One Octopus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-devtool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The DevTool
       
     </span>
   </a>
@@ -2136,17 +2191,6 @@
     <span class="md-ellipsis">
       
         Current Phase
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#latest-update" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Latest Update
       
     </span>
   </a>
@@ -2201,22 +2245,90 @@
 <p><strong>A real-time build journal for an open-source AI-assisted virtual pet.</strong></p>
 <p>Dilder is a Tamagotchi-style device built on a Raspberry Pi Pico W, a Waveshare 2.13" e-ink display, and a 3D-printed case — developed entirely in the open, one phase at a time.</p>
 <hr />
-<h2 id="what-is-dilder">What is Dilder?<a class="headerlink" href="#what-is-dilder" title="Permanent link">&para;</a></h2>
-<p>Dilder is part hardware project, part learning experiment, part documentation exercise.</p>
-<p>The goal is to build a functional pocket virtual pet from scratch — and document every decision, mistake, and breakthrough along the way. Hardware selection, enclosure design, firmware, animations, personality systems — all of it is public, with every AI prompt and design iteration logged.</p>
-<p>If you've ever wanted to follow a project from "I have an idea" to "here's a working device," this is that.</p>
+<h2 id="meet-the-octopus">Meet the Octopus<a class="headerlink" href="#meet-the-octopus" title="Permanent link">&para;</a></h2>
+<div class="grid">
+<figure>
+  <img alt="Sassy Octopus running on e-ink" loading="lazy" src="assets/images/hardware/sassy-octopus-running.jpg" width="400" />
+<br />
+<figcaption>"MATTRESSES ARE BODY SHELVES." — actual device output</figcaption>
+</figure>
+<p>A tiny octopus lives on a 250x122 pixel e-ink display. It has <strong>16 emotional states</strong>, each with unique eyes, mouth expressions, body animations, and themed quotes. It's sassy. It's opinionated. It runs on 100KB of firmware and a coin cell's worth of ambition.</p>
+<p>Pick a personality, flash it to the Pico W, and you've got a desk companion that judges your life choices in ALL CAPS.</p>
+</div>
+<hr />
+<h2 id="the-hardware">The Hardware<a class="headerlink" href="#the-hardware" title="Permanent link">&para;</a></h2>
+<p>Two components. Eight wires. Under $25.</p>
+<div class="grid">
+<figure>
+  <img alt="Pico W and e-ink display" loading="lazy" src="assets/images/hardware/pico-w-and-display-separated.jpg" width="380" />
+<br />
+<figcaption>Raspberry Pi Pico W + Waveshare 2.13" e-Paper V3</figcaption>
+</figure>
+<figure>
+  <img alt="Hello Dilder — first pixels" loading="lazy" src="assets/images/hardware/hello-dilder-running.jpg" width="380" />
+<br />
+<figcaption>First boot — "Hello, Dilder!" on real e-ink</figcaption>
+</figure>
+</div>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Price</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Raspberry Pi Pico W</td>
+<td>~$6</td>
+<td>2MB flash, WiFi + BLE, boots instantly, no OS needed</td>
+</tr>
+<tr>
+<td>Waveshare 2.13" e-Paper V3</td>
+<td>~$15</td>
+<td>250x122px, paper-like readability, near-zero standby current</td>
+</tr>
+<tr>
+<td>Jumper wires + breadboard</td>
+<td>~$3</td>
+<td>No soldering required for prototyping</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="16-emotions-one-octopus">16 Emotions, One Octopus<a class="headerlink" href="#16-emotions-one-octopus" title="Permanent link">&para;</a></h2>
+<p>Every mood changes the face, the body, and the attitude.</p>
+<div class="grid">
+<p><img alt="Normal" src="docs/software/emotion-previews/normal.png" width="220" />
+<img alt="Angry" src="docs/software/emotion-previews/angry.png" width="220" />
+<img alt="Sad" src="docs/software/emotion-previews/sad.png" width="220" /></p>
+<p><img alt="Excited" src="docs/software/emotion-previews/excited.png" width="220" />
+<img alt="Lazy" src="docs/software/emotion-previews/lazy.png" width="220" />
+<img alt="Fat" src="docs/software/emotion-previews/fat.png" width="220" /></p>
+</div>
+<p>Normal. Angry. Sad. Excited. Lazy (tentacles draped to the right, naturally). Fat (thicc dome, no waist, proud of it). Plus Weird, Unhinged, Chaotic, Hungry, Tired, Slap Happy, Chill, Horny, Nostalgic, and Homesick.</p>
+<p>Each personality has 30-196 themed quotes, a 4-frame mouth animation cycle, and per-mood body movement — breathing bobs, angry trembles, chaotic distortion, lazy lounging.</p>
+<p><a class="md-button" href="docs/software/emotion-states/">See all 16 emotion states <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
+<hr />
+<h2 id="the-devtool">The DevTool<a class="headerlink" href="#the-devtool" title="Permanent link">&para;</a></h2>
+<p>A custom Tkinter GUI for designing, previewing, and deploying octopus firmware — without touching a terminal.</p>
+<figure>
+  <img alt="DevTool Programs tab" loading="lazy" src="assets/images/devtool/devtool_tab_programs.png" width="700" />
+<br />
+<figcaption>Programs tab — pick a personality, preview it, flash it to the Pico</figcaption>
+</figure>
+<p><strong>7 tabs:</strong> Display Emulator (pixel art tools) | Serial Monitor | Flash Firmware | Asset Manager | Programs (17 octopus personalities) | GPIO Pin Reference | Connection Utility</p>
+<p>Select a program and you get a live preview, estimated firmware size (~100KB), how much of the Pico's 2MB flash you'll use (~5%), and one-click deploy.</p>
+<p><a class="md-button" href="docs/tools/devtool/">DevTool docs <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
 <hr />
 <h2 id="current-phase">Current Phase<a class="headerlink" href="#current-phase" title="Permanent link">&para;</a></h2>
 <div class="admonition info">
 <p class="admonition-title">Phase 2 — Firmware Foundation (C on Pico W)</p>
-<p>Phase 1 (hardware + tooling) is complete. The octopus now has 16 emotional states with unique faces, body animations, and custom body shapes — all rendered mathematically at runtime in ~100KB of firmware. 17 standalone programs are ready to flash, with 823 total quotes across all personalities. Next up: user input (serial commands and GPIO buttons) and the pet state machine.</p>
-<p><a class="md-button" href="docs/setup/first-time-setup/">Setup Guide <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a>
-<a class="md-button" href="docs/tools/devtool/">DevTool <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a>
-<a class="md-button" href="docs/software/emotion-states/">Emotion States <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
+<p>Phase 1 (hardware + tooling) is complete. The octopus has 16 emotional states, 17 standalone firmware programs, custom body shapes, and runtime math-based rendering — all in ~100KB. Next up: user input (serial commands and GPIO buttons) and the pet state machine.</p>
+<p><strong>Done:</strong> Runtime rendering engine | 16 emotions | Body animations | Custom fat/lazy bodies | 823 quotes | C-faithful preview renderer | DevTool with firmware size estimation</p>
+<p><strong>Next:</strong> Serial command input | GPIO buttons | Game loop with state machine</p>
 </div>
-<hr />
-<h2 id="latest-update">Latest Update<a class="headerlink" href="#latest-update" title="Permanent link">&para;</a></h2>
-<p>Check the <a href="blog/">build journal</a> for the most recent post.</p>
 <hr />
 <h2 id="quick-links">Quick Links<a class="headerlink" href="#quick-links" title="Permanent link">&para;</a></h2>
 <div class="grid cards">
@@ -2230,7 +2342,7 @@
 <li>
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 3v18h18V3zm15 15H6v-1h12zm0-2H6v-1h12zm0-4H6V6h12z"/></svg></span> <strong>Blog</strong></p>
 <hr />
-<p>Chronological build journal. Every phase, every milestone.</p>
+<p>9 build journal posts — from planning to body animations.</p>
 <p><a href="blog/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Read the Blog</a></p>
 </li>
 <li>
@@ -2251,19 +2363,29 @@
 <p>Support the project and get early access to content and files.</p>
 <p><a href="community/support/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Support on Patreon</a></p>
 </li>
+<li>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg></span> <strong>Source</strong></p>
+<hr />
+<p>All firmware, tools, and docs. 104+ AI prompts logged.</p>
+<p><a href="https://github.com/rompasaurus/dilder"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> GitHub Repo</a></p>
+</li>
 </ul>
 </div>
 <hr />
 <h2 id="how-this-project-works">How This Project Works<a class="headerlink" href="#how-this-project-works" title="Permanent link">&para;</a></h2>
 <p>The entire development process is public:</p>
 <ul>
-<li><strong>Every prompt</strong> submitted to the AI assistant is logged in the <a href="prompts/">Prompt Log</a></li>
+<li><strong>Every prompt</strong> submitted to the AI assistant is logged in the <a href="prompts/">Prompt Log</a> — 104+ and counting</li>
 <li><strong>Every hardware decision</strong> is documented in the <a href="docs/">Docs</a></li>
-<li><strong>Every build step</strong> is written up in the <a href="blog/">Blog</a></li>
-<li><strong>All dev tools</strong> are documented in the <a href="docs/tools/devtool/">Tools section</a></li>
+<li><strong>Every build step</strong> is written up in the <a href="blog/">Blog</a> — 9 posts so far</li>
+<li><strong>Every drawing function</strong> is verified pixel-by-pixel between C firmware and Python DevTool</li>
 <li><strong>All source files</strong> are on <a href="https://github.com/rompasaurus/dilder">GitHub</a></li>
 </ul>
-<p>This is learn-in-public taken to its logical extreme.</p>
+<p>This is learn-in-public taken to its logical extreme. No hidden steps, no "just trust me" — if it happened, it's documented.</p>
+<hr />
+<div style="text-align: center; opacity: 0.6; font-style: italic; margin-top: 2rem;">
+Built with patience, a Pico W, and an unreasonable fondness for virtual pets.
+</div>
 
 
 
