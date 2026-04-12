@@ -121,6 +121,34 @@
     color: #94e2d5;
 }
 
+.octo-mode-lazy {
+    color: #9399b2;
+}
+
+.octo-mode-fat {
+    color: #fab387;
+}
+
+.octo-mode-chill {
+    color: #74c7ec;
+}
+
+.octo-mode-horny {
+    color: #f38ba8;
+}
+
+.octo-mode-excited {
+    color: #f9e2af;
+}
+
+.octo-mode-nostalgic {
+    color: #cba6f7;
+}
+
+.octo-mode-homesick {
+    color: #89b4fa;
+}
+
 .octo-banner-quote {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.95rem;
