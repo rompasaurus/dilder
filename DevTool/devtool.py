@@ -4113,39 +4113,115 @@ HOMESICK_QUOTES = [
 ]
 
 
+def _body_transform(mood, frame_count):
+    """Return body transform parameters for a mood and frame.
+
+    Returns (dx, dy, x_expand, row_wobble_fn) where:
+      dx, dy: global pixel offset for the whole octopus
+      x_expand: number of pixels to expand/shrink each body span (+ = wider)
+      row_wobble_fn: function(row_y) -> extra x_offset per row (for wavy effects)
+    """
+    import math
+    f = frame_count
+    sin = math.sin
+    pi = math.pi
+
+    def no_wobble(y):
+        return 0
+
+    if mood == "angry":
+        # Puffed up, slight tremble
+        return (0, -1, 2, lambda y: int(0.5 * sin(f * pi + y * 0.3)))
+    elif mood == "sad":
+        # Drooped down, deflated narrower
+        return (0, 3, -1, no_wobble)
+    elif mood == "unhinged":
+        # Rapid jitter
+        jx = int(1.5 * sin(f * 7.3))
+        jy = int(1.5 * sin(f * 5.1 + 1))
+        return (jx, jy, 0, no_wobble)
+    elif mood == "weird":
+        # Lean to one side
+        lean = int(3 * sin(f * 0.8))
+        return (lean, 0, 0, lambda y: int(sin(y * 0.15 + f) * 1.5))
+    elif mood == "chaotic":
+        # Wild wavy distortion
+        return (int(2 * sin(f * 2.1)), int(2 * sin(f * 1.7)),
+                0, lambda y: int(3 * sin(y * 0.25 + f * 2)))
+    elif mood == "hungry":
+        # Lean upward, reaching for food
+        return (0, -2 + int(sin(f * 1.5)), 0, no_wobble)
+    elif mood == "tired":
+        # Sagging down, melting
+        return (0, 2 + int(sin(f * 0.5)), -1, no_wobble)
+    elif mood == "slaphappy":
+        # Sway side to side
+        return (int(3 * sin(f * 1.2)), 0, 0,
+                lambda y: int(2 * sin(y * 0.1 + f * 1.2)))
+    elif mood == "lazy":
+        # Melted flat: squished down, wider
+        return (0, 3, 3, no_wobble)
+    elif mood == "fat":
+        # Wider and rounder, slight jiggle
+        jig = int(sin(f * 1.8))
+        return (0, jig, 3, no_wobble)
+    elif mood == "chill":
+        # Slight lean back, very subtle
+        return (int(sin(f * 0.4)), 1, 0, no_wobble)
+    elif mood == "horny":
+        # Rhythmic pulse (expand/contract)
+        pulse = int(2 * sin(f * 2.0))
+        return (0, 0, pulse, no_wobble)
+    elif mood == "excited":
+        # Bouncing up and down rapidly
+        return (0, int(3 * sin(f * 3.0)), 0, no_wobble)
+    elif mood == "nostalgic":
+        # Gentle slow sway
+        return (int(2 * sin(f * 0.5)), int(sin(f * 0.3)), 0, no_wobble)
+    elif mood == "homesick":
+        # Curled inward, smaller
+        return (0, 1, -2, no_wobble)
+    else:
+        # Normal: gentle breathing bob
+        return (0, int(sin(f * 0.8)), 0, no_wobble)
+
+
 def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
-                            mood=None):
+                            mood=None, frame_count=0):
     """Generate a full 250x122 frame with the octopus and chat bubble.
 
-    mouth_expr: one of MOUTH_SMIRK, MOUTH_SMILE, MOUTH_OPEN, MOUTH_WEIRD,
-                MOUTH_UNHINGED
-    mood: None, "weird", or "unhinged" — affects eye rendering
+    mouth_expr: one of the MOUTH_* constants
+    mood: emotional state string — affects eyes, mouth, and body animation
+    frame_count: animation frame index — drives body movement timing
     """
     pixels = [[0] * DISPLAY_W for _ in range(DISPLAY_H)]
 
     # ── Date & time header at top center ──
     now = datetime.now()
-    date_str = now.strftime("%B %d, %Y").upper()         # e.g. "APRIL 12, 2026"
-    time_str = now.strftime("%I:%M %p").lstrip("0").upper()  # e.g. "3:47 PM"
+    date_str = now.strftime("%B %d, %Y").upper()
+    time_str = now.strftime("%I:%M %p").lstrip("0").upper()
     header = f"{date_str}  {time_str}"
-    # Center the header text (6px per char)
     header_w = len(header) * 6
     header_x = max(0, (DISPLAY_W - header_w) // 2)
     _render_tiny_text(pixels, header_x, 1, header, DISPLAY_W)
 
-    # ── Vertical offset to push octopus + bubble down below the header ──
-    Y_OFF = 12  # shift everything down to center vertically with header
+    # ── Vertical offset + body animation transform ──
+    Y_OFF = 12
+    body_dx, body_dy, x_expand, row_wobble = _body_transform(mood, frame_count)
 
-    # Helper to set a pixel with y-offset applied
+    # Helper to set a pixel with y-offset + body transform applied
     def _set(x, y, val):
-        yy = y + Y_OFF
-        if 0 <= x < DISPLAY_W and 0 <= yy < DISPLAY_H:
-            pixels[yy][x] = val
+        wx = x + body_dx + row_wobble(y)
+        wy = y + Y_OFF + body_dy
+        if 0 <= wx < DISPLAY_W and 0 <= wy < DISPLAY_H:
+            pixels[wy][wx] = val
 
-    # Draw body (filled)
+    # Draw body (filled) with span expansion
     for y, runs in _octo_body():
         for x0, x1 in runs:
-            for x in range(max(0, x0), min(x1 + 1, DISPLAY_W)):
+            ax0 = max(0, x0 - x_expand)
+            ax1 = min(DISPLAY_W - 1, x1 + x_expand)
+            for x in range(ax0, ax1 + 1):
                 _set(x, y, 1)
 
     # White eye sockets
@@ -4644,7 +4720,8 @@ class ProgramsTab(ttk.Frame):
                     mood = mood or default_mood
                     cycle = _mood_cycle(mood)
 
-                pixels = _generate_octopus_frame(mouth_expr, text, tagline, mood)
+                pixels = _generate_octopus_frame(mouth_expr, text, tagline, mood,
+                                                 frame_count=frame_count)
 
                 # Update preview canvas
                 self.after(0, lambda p=pixels: self._render_preview(p))

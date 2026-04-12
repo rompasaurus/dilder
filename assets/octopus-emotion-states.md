@@ -1,8 +1,8 @@
 # Octopus Emotion States
 
-All 16 octopus emotional states with their facial features, expression cycles, and preview renders.
+All 16 octopus emotional states with facial features, body animations, and rendered previews.
 
-**Canvas:** 250x122px, 1-bit monochrome | **Rendering:** On-the-fly math (circles, parabolas, sine arcs) | **Animation:** 4-frame mouth cycle per mood
+**Canvas:** 250x122px, 1-bit monochrome | **Animation:** 4-frame cycle per mood with body transforms
 
 ---
 
@@ -10,10 +10,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Normal](emotion-previews/normal.png)
 
+**Animation strip** (4 frames, octopus only):
+![Normal animation](emotion-previews/normal-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | White sockets r=16, centered pupils r=4, white highlights r=1 |
-| Mouth cycle | Smirk, Open, Smile, Open |
+| Eyes | Centered pupils r=4, white highlights |
+| Mouth | Smirk, Open, Smile, Open |
+| Body | Gentle breathing bob (1px vertical oscillation) |
 
 ---
 
@@ -21,10 +25,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Weird](emotion-previews/weird.png)
 
+**Animation strip:**
+![Weird animation](emotion-previews/weird-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Misaligned pupils: left shifted up-left (21,24), right shifted down-right (50,28) |
-| Mouth cycle | Wobbly sine-wave, Open, Wobbly, Smile |
+| Eyes | Misaligned pupils: left up-left, right down-right |
+| Mouth | Wobbly sine-wave, Open, Wobbly, Smile |
+| Body | Lean to one side + subtle wavy row distortion |
 
 ---
 
@@ -32,10 +40,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Unhinged](emotion-previews/unhinged.png)
 
+**Animation strip:**
+![Unhinged animation](emotion-previews/unhinged-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Tiny pinprick pupils (2x2 pixels), no highlights |
-| Mouth cycle | Giant jagged scream-mouth with teeth, Open, Scream, Open |
+| Eyes | Tiny pinprick pupils (2x2), no highlights |
+| Mouth | Giant scream-mouth with teeth, Open, Scream, Open |
+| Body | Rapid jitter (1-2px random offset per frame) |
 
 ---
 
@@ -43,11 +55,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Angry](emotion-previews/angry.png)
 
+**Animation strip:**
+![Angry animation](emotion-previews/angry-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Pupils shifted inward + down (glaring toward nose) |
-| Eyebrows | Thick slanted half-circle arcs, outer high / inner low (angry V shape) |
-| Mouth cycle | Tight inverted frown, Open, Frown, Frown |
+| Eyes | Pupils shifted inward + down (glaring), V-shaped brow arcs |
+| Mouth | Tight inverted frown, Open, Frown, Frown |
+| Body | Puffed up 2px wider, slight tremble |
 
 ---
 
@@ -55,11 +70,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Sad](emotion-previews/sad.png)
 
+**Animation strip:**
+![Sad animation](emotion-previews/sad-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Pupils shifted downward (looking at floor) |
-| Eyebrows | Droopy arcs, inner high / outer low (inverse of angry) |
-| Mouth cycle | Gentle downward curve, Open, Frown, Smile |
+| Eyes | Downward-looking pupils, droopy brow arcs |
+| Mouth | Gentle frown, Open, Frown, Smile |
+| Body | Drooped down 3px, deflated 1px narrower |
 
 ---
 
@@ -67,10 +85,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Chaotic](emotion-previews/chaotic.png)
 
+**Animation strip:**
+![Chaotic animation](emotion-previews/chaotic-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Spiral ring pupils (concentric circles + center dot) |
-| Mouth cycle | Zigzag lightning-bolt, Open, Unhinged scream, Wobbly |
+| Eyes | Spiral ring pupils (concentric circles) |
+| Mouth | Zigzag lightning-bolt, Open, Unhinged, Wobbly |
+| Body | Wild wavy distortion (3px sine per row, shifting offset) |
 
 ---
 
@@ -78,10 +100,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Hungry](emotion-previews/hungry.png)
 
+**Animation strip:**
+![Hungry animation](emotion-previews/hungry-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Pupils shifted upward (staring at imaginary food) |
-| Mouth cycle | Drooling wide oval with drip drops, Open, Drool, Smile |
+| Eyes | Pupils shifted upward (staring at food) |
+| Mouth | Drooling wide oval with drip drops, Open, Drool, Smile |
+| Body | Lean upward 2px, bobbing toward food |
 
 ---
 
@@ -89,10 +115,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Tired](emotion-previews/tired.png)
 
+**Animation strip:**
+![Tired animation](emotion-previews/tired-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Half-closed eyelids (top half of sockets filled black), tiny sleepy pupils low |
-| Mouth cycle | Tall vertical yawn oval, Open, Yawn, Yawn |
+| Eyes | Half-closed lids (top half black), tiny low pupils |
+| Mouth | Tall vertical yawn, Open, Yawn, Yawn |
+| Body | Sagging down 2-3px, melting, 1px narrower |
 
 ---
 
@@ -100,10 +130,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Slap Happy](emotion-previews/slaphappy.png)
 
+**Animation strip:**
+![Slap Happy animation](emotion-previews/slaphappy-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Left eye squinted shut (slit), right eye oversized manic pupil |
-| Mouth cycle | Wide wobbly sine-wave grin, Open, Wobbly grin, Smile |
+| Eyes | Left squinted shut (slit), right oversized manic pupil |
+| Mouth | Wide wobbly sine grin, Open, Wobbly, Smile |
+| Body | Swaying side to side (3px sine), wavy row distortion |
 
 ---
 
@@ -111,10 +145,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Lazy](emotion-previews/lazy.png)
 
+**Animation strip:**
+![Lazy animation](emotion-previews/lazy-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Nearly shut eyelids (only tiny slit open at bottom), barely visible dots |
-| Mouth cycle | Flat horizontal line, Flat, Flat, Open |
+| Eyes | Nearly shut (tiny slit), barely visible dots |
+| Mouth | Flat horizontal line, Flat, Flat, Open |
+| Body | Melted flat: 3px down, 3px wider (pancaked) |
 
 ---
 
@@ -122,10 +160,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Fat](emotion-previews/fat.png)
 
+**Animation strip:**
+![Fat animation](emotion-previews/fat-anim.png)
+
 | Feature | Description |
 |---------|-------------|
 | Eyes | Wide content happy pupils (r=9) |
-| Mouth cycle | Satisfied wide smile + cheek puff circles, Open, Smile, Smile |
+| Mouth | Satisfied smile + cheek puffs, Open, Smile, Smile |
+| Body | 3px wider (rounder), slight jiggle bob |
 
 ---
 
@@ -133,10 +175,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Chill](emotion-previews/chill.png)
 
+**Animation strip:**
+![Chill animation](emotion-previews/chill-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Pupils shifted to the side (cool/unbothered side-glance) |
-| Mouth cycle | Relaxed asymmetric half-smile, Open, Half-smile, Smile |
+| Eyes | Pupils shifted to the side (cool side-glance) |
+| Mouth | Relaxed asymmetric half-smile, Open, Half-smile, Smile |
+| Body | Slight lean back (1px down), very subtle sway |
 
 ---
 
@@ -144,10 +190,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Horny](emotion-previews/horny.png)
 
+**Animation strip:**
+![Horny animation](emotion-previews/horny-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Heart-shaped pupils (diamond/V shapes in each socket) |
-| Mouth cycle | Wide smile with tongue sticking out, Open, Tongue, Smile |
+| Eyes | Heart-shaped pupils (diamond shapes) |
+| Mouth | Wide smile with tongue out, Open, Tongue, Smile |
+| Body | Rhythmic pulse (expand/contract 2px, throbbing) |
 
 ---
 
@@ -155,10 +205,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Excited](emotion-previews/excited.png)
 
+**Animation strip:**
+![Excited animation](emotion-previews/excited-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Star/sparkle cross-shaped pupils (plus sign in each socket) |
-| Mouth cycle | Wide open grin, Open, Wide grin, Smile |
+| Eyes | Star/sparkle cross pupils (plus sign) |
+| Mouth | Wide open grin, Open, Wide grin, Smile |
+| Body | Bouncing up and down rapidly (3px vertical) |
 
 ---
 
@@ -166,10 +220,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Nostalgic](emotion-previews/nostalgic.png)
 
+**Animation strip:**
+![Nostalgic animation](emotion-previews/nostalgic-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Pupils looking up and to the right (remembering) |
-| Mouth cycle | Gentle wistful closed half-smile, Open, Wistful, Smile |
+| Eyes | Pupils looking up-right (remembering) |
+| Mouth | Gentle wistful half-smile, Open, Wistful, Smile |
+| Body | Gentle slow sway (2px horizontal, 1px vertical) |
 
 ---
 
@@ -177,10 +235,14 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Homesick](emotion-previews/homesick.png)
 
+**Animation strip:**
+![Homesick animation](emotion-previews/homesick-anim.png)
+
 | Feature | Description |
 |---------|-------------|
-| Eyes | Slightly watery with tear drop pixels below each eye socket |
-| Mouth cycle | Wobbly trying-not-to-cry line, Open, Wobbly, Smile |
+| Eyes | Teary with tear drop pixels below sockets |
+| Mouth | Wobbly trying-not-to-cry line, Open, Wobbly, Smile |
+| Body | Curled inward: 1px down, 2px narrower (shrinking) |
 
 ---
 
@@ -188,7 +250,11 @@ All 16 octopus emotional states with their facial features, expression cycles, a
 
 ![Supportive](emotion-previews/supportive.png)
 
+**Animation strip:**
+![Supportive animation](emotion-previews/supportive-anim.png)
+
 | Feature | Description |
 |---------|-------------|
 | Eyes | Normal (same as Sassy) |
-| Mouth cycle | Smirk, Open, Smile, Open |
+| Mouth | Smirk, Open, Smile, Open |
+| Body | Gentle breathing bob (same as Normal) |

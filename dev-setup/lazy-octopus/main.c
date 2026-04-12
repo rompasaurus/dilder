@@ -121,6 +121,20 @@ static uint8_t display_buf[((DISP_W + 7) / 8) * DISP_H];
 /* Vertical offset — pushes octopus + bubble down to make room for clock */
 #define Y_OFF 12
 
+/* ─── Body animation transform (set per-frame before rendering) ─── */
+static int body_dx = 0;     /* global x shift */
+static int body_dy = 0;     /* global y shift */
+static int body_x_expand = 0; /* expand/shrink body spans (+ = wider) */
+/* Per-row wobble amplitude and phase (for wavy effects) */
+static float wobble_amp = 0;
+static float wobble_freq = 0;
+static float wobble_phase = 0;
+
+static int row_wobble(int y) {
+    if (wobble_amp == 0) return 0;
+    return (int)(wobble_amp * sinf(y * wobble_freq + wobble_phase));
+}
+
 /* ─── Pixel helpers ─── */
 static inline void px_set(int x, int y) {
     if (x >= 0 && x < IMG_W && y >= 0 && y < IMG_H)
@@ -130,9 +144,13 @@ static inline void px_clr(int x, int y) {
     if (x >= 0 && x < IMG_W && y >= 0 && y < IMG_H)
         frame[y * IMG_ROW_BYTES + x / 8] &= ~(0x80 >> (x & 7));
 }
-/* Offset versions — add Y_OFF to y before drawing */
-static inline void px_set_off(int x, int y) { px_set(x, y + Y_OFF); }
-static inline void px_clr_off(int x, int y) { px_clr(x, y + Y_OFF); }
+/* Offset versions — add Y_OFF + body transform before drawing */
+static inline void px_set_off(int x, int y) {
+    px_set(x + body_dx + row_wobble(y), y + Y_OFF + body_dy);
+}
+static inline void px_clr_off(int x, int y) {
+    px_clr(x + body_dx + row_wobble(y), y + Y_OFF + body_dy);
+}
 
 /* ─── Octopus body (RLE: y, num_spans, x0, x1, ...) terminated by 0xFF ─── */
 static const uint8_t body_rle[] = {
@@ -262,6 +280,25 @@ static void draw_body(void) {
             int x0 = *p++;
             int x1 = *p++;
             for (int x = x0; x <= x1; x++)
+                px_set_off(x, y);
+        }
+    }
+}
+
+/* Body with span expansion applied (uses body_x_expand global) */
+static void draw_body_transformed(void) {
+    const uint8_t *p = body_rle;
+    while (*p != 0xFF) {
+        int y = *p++;
+        int n = *p++;
+        for (int i = 0; i < n; i++) {
+            int x0 = *p++;
+            int x1 = *p++;
+            int ax0 = x0 - body_x_expand;
+            int ax1 = x1 + body_x_expand;
+            if (ax0 < 0) ax0 = 0;
+            if (ax1 >= IMG_W) ax1 = IMG_W - 1;
+            for (int x = ax0; x <= ax1; x++)
                 px_set_off(x, y);
         }
     }
@@ -898,15 +935,83 @@ static void draw_clock_header(void) {
     draw_text(header_x, 1, buf, IMG_W);
 }
 
-static void render_frame(const Quote *q, int expr) {
+static void setup_body_transform(uint8_t mood, uint32_t f) {
+    /* Reset */
+    body_dx = 0; body_dy = 0; body_x_expand = 0;
+    wobble_amp = 0; wobble_freq = 0; wobble_phase = 0;
+
+    float pi = 3.14159f;
+    switch (mood) {
+        case MOOD_ANGRY:
+            body_dy = -1; body_x_expand = 2;
+            wobble_amp = 0.5f; wobble_freq = 0.3f; wobble_phase = f * pi;
+            break;
+        case MOOD_SAD:
+            body_dy = 3; body_x_expand = -1;
+            break;
+        case MOOD_UNHINGED:
+            body_dx = (int)(1.5f * sinf(f * 7.3f));
+            body_dy = (int)(1.5f * sinf(f * 5.1f + 1));
+            break;
+        case MOOD_WEIRD:
+            body_dx = (int)(3 * sinf(f * 0.8f));
+            wobble_amp = 1.5f; wobble_freq = 0.15f; wobble_phase = (float)f;
+            break;
+        case MOOD_CHAOTIC:
+            body_dx = (int)(2 * sinf(f * 2.1f));
+            body_dy = (int)(2 * sinf(f * 1.7f));
+            wobble_amp = 3; wobble_freq = 0.25f; wobble_phase = f * 2.0f;
+            break;
+        case MOOD_HUNGRY:
+            body_dy = -2 + (int)sinf(f * 1.5f);
+            break;
+        case MOOD_TIRED:
+            body_dy = 2 + (int)sinf(f * 0.5f); body_x_expand = -1;
+            break;
+        case MOOD_SLAPHAPPY:
+            body_dx = (int)(3 * sinf(f * 1.2f));
+            wobble_amp = 2; wobble_freq = 0.1f; wobble_phase = f * 1.2f;
+            break;
+        case MOOD_LAZY:
+            body_dy = 3; body_x_expand = 3;
+            break;
+        case MOOD_FAT:
+            body_x_expand = 3; body_dy = (int)sinf(f * 1.8f);
+            break;
+        case MOOD_CHILL:
+            body_dx = (int)sinf(f * 0.4f); body_dy = 1;
+            break;
+        case MOOD_HORNY:
+            body_x_expand = (int)(2 * sinf(f * 2.0f));
+            break;
+        case MOOD_EXCITED:
+            body_dy = (int)(3 * sinf(f * 3.0f));
+            break;
+        case MOOD_NOSTALGIC:
+            body_dx = (int)(2 * sinf(f * 0.5f));
+            body_dy = (int)sinf(f * 0.3f);
+            break;
+        case MOOD_HOMESICK:
+            body_dy = 1; body_x_expand = -2;
+            break;
+        default: /* NORMAL: gentle breathing */
+            body_dy = (int)sinf(f * 0.8f);
+            break;
+    }
+}
+
+static void render_frame(const Quote *q, int expr, uint32_t frame_idx) {
     /* Clear to white */
     memset(frame, 0, sizeof(frame));
 
     /* 0. Date & time header at top center (no Y offset) */
     draw_clock_header();
 
-    /* 1. Body (with Y_OFF) */
-    draw_body();
+    /* 0b. Set up body animation transform for this frame */
+    setup_body_transform(q->mood, frame_idx);
+
+    /* 1. Body (with Y_OFF + body transform) */
+    draw_body_transformed();
 
     /* 2. Eyes (white sockets, with Y_OFF) */
     draw_eyes();
@@ -1121,7 +1226,7 @@ int main(void) {
             qi = rng_next() % QUOTE_COUNT;
 
         /* Render */
-        render_frame(&quotes[qi], expr);
+        render_frame(&quotes[qi], expr, frame_idx);
         transpose_to_display();
 
         if (frame_idx == 0)
