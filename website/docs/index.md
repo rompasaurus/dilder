@@ -8,30 +8,98 @@ Dilder is a Tamagotchi-style device built on a Raspberry Pi Pico W, a Waveshare 
 
 ---
 
-## What is Dilder?
+## Meet the Octopus
 
-Dilder is part hardware project, part learning experiment, part documentation exercise.
+<div class="grid" markdown>
 
-The goal is to build a functional pocket virtual pet from scratch — and document every decision, mistake, and breakthrough along the way. Hardware selection, enclosure design, firmware, animations, personality systems — all of it is public, with every AI prompt and design iteration logged.
+<figure markdown="span">
+  ![Sassy Octopus running on e-ink](assets/images/hardware/sassy-octopus-running.jpg){ width="400" loading=lazy }
+  <figcaption>"MATTRESSES ARE BODY SHELVES." — actual device output</figcaption>
+</figure>
 
-If you've ever wanted to follow a project from "I have an idea" to "here's a working device," this is that.
+A tiny octopus lives on a 250x122 pixel e-ink display. It has **16 emotional states**, each with unique eyes, mouth expressions, body animations, and themed quotes. It's sassy. It's opinionated. It runs on 100KB of firmware and a coin cell's worth of ambition.
+
+Pick a personality, flash it to the Pico W, and you've got a desk companion that judges your life choices in ALL CAPS.
+
+</div>
+
+---
+
+## The Hardware
+
+Two components. Eight wires. Under $25.
+
+<div class="grid" markdown>
+
+<figure markdown="span">
+  ![Pico W and e-ink display](assets/images/hardware/pico-w-and-display-separated.jpg){ width="380" loading=lazy }
+  <figcaption>Raspberry Pi Pico W + Waveshare 2.13" e-Paper V3</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Hello Dilder — first pixels](assets/images/hardware/hello-dilder-running.jpg){ width="380" loading=lazy }
+  <figcaption>First boot — "Hello, Dilder!" on real e-ink</figcaption>
+</figure>
+
+</div>
+
+| Component | Price | Why |
+|-----------|-------|-----|
+| Raspberry Pi Pico W | ~$6 | 2MB flash, WiFi + BLE, boots instantly, no OS needed |
+| Waveshare 2.13" e-Paper V3 | ~$15 | 250x122px, paper-like readability, near-zero standby current |
+| Jumper wires + breadboard | ~$3 | No soldering required for prototyping |
+
+---
+
+## 16 Emotions, One Octopus
+
+Every mood changes the face, the body, and the attitude.
+
+<div class="grid" markdown>
+
+![Normal](docs/software/emotion-previews/normal.png){ width="220" }
+![Angry](docs/software/emotion-previews/angry.png){ width="220" }
+![Sad](docs/software/emotion-previews/sad.png){ width="220" }
+
+![Excited](docs/software/emotion-previews/excited.png){ width="220" }
+![Lazy](docs/software/emotion-previews/lazy.png){ width="220" }
+![Fat](docs/software/emotion-previews/fat.png){ width="220" }
+
+</div>
+
+Normal. Angry. Sad. Excited. Lazy (tentacles draped to the right, naturally). Fat (thicc dome, no waist, proud of it). Plus Weird, Unhinged, Chaotic, Hungry, Tired, Slap Happy, Chill, Horny, Nostalgic, and Homesick.
+
+Each personality has 30-196 themed quotes, a 4-frame mouth animation cycle, and per-mood body movement — breathing bobs, angry trembles, chaotic distortion, lazy lounging.
+
+[See all 16 emotion states :material-arrow-right:](docs/software/emotion-states.md){ .md-button }
+
+---
+
+## The DevTool
+
+A custom Tkinter GUI for designing, previewing, and deploying octopus firmware — without touching a terminal.
+
+<figure markdown="span">
+  ![DevTool Programs tab](assets/images/devtool/devtool_tab_programs.png){ width="700" loading=lazy }
+  <figcaption>Programs tab — pick a personality, preview it, flash it to the Pico</figcaption>
+</figure>
+
+**7 tabs:** Display Emulator (pixel art tools) | Serial Monitor | Flash Firmware | Asset Manager | Programs (17 octopus personalities) | GPIO Pin Reference | Connection Utility
+
+Select a program and you get a live preview, estimated firmware size (~100KB), how much of the Pico's 2MB flash you'll use (~5%), and one-click deploy.
+
+[DevTool docs :material-arrow-right:](docs/tools/devtool.md){ .md-button }
 
 ---
 
 ## Current Phase
 
 !!! info "Phase 2 — Firmware Foundation (C on Pico W)"
-    Phase 1 (hardware + tooling) is complete. The octopus now has 16 emotional states with unique faces, body animations, and custom body shapes — all rendered mathematically at runtime in ~100KB of firmware. 17 standalone programs are ready to flash, with 823 total quotes across all personalities. Next up: user input (serial commands and GPIO buttons) and the pet state machine.
+    Phase 1 (hardware + tooling) is complete. The octopus has 16 emotional states, 17 standalone firmware programs, custom body shapes, and runtime math-based rendering — all in ~100KB. Next up: user input (serial commands and GPIO buttons) and the pet state machine.
 
-    [Setup Guide :material-arrow-right:](docs/setup/first-time-setup.md){ .md-button }
-    [DevTool :material-arrow-right:](docs/tools/devtool.md){ .md-button }
-    [Emotion States :material-arrow-right:](docs/software/emotion-states.md){ .md-button }
+    **Done:** Runtime rendering engine | 16 emotions | Body animations | Custom fat/lazy bodies | 823 quotes | C-faithful preview renderer | DevTool with firmware size estimation
 
----
-
-## Latest Update
-
-Check the [build journal](blog/index.md) for the most recent post.
+    **Next:** Serial command input | GPIO buttons | Game loop with state machine
 
 ---
 
@@ -51,7 +119,7 @@ Check the [build journal](blog/index.md) for the most recent post.
 
     ---
 
-    Chronological build journal. Every phase, every milestone.
+    9 build journal posts — from planning to body animations.
 
     [:octicons-arrow-right-24: Read the Blog](blog/index.md)
 
@@ -79,6 +147,14 @@ Check the [build journal](blog/index.md) for the most recent post.
 
     [:octicons-arrow-right-24: Support on Patreon](community/support.md)
 
+-   :fontawesome-brands-github: **Source**
+
+    ---
+
+    All firmware, tools, and docs. 104+ AI prompts logged.
+
+    [:octicons-arrow-right-24: GitHub Repo](https://github.com/rompasaurus/dilder)
+
 </div>
 
 ---
@@ -87,10 +163,16 @@ Check the [build journal](blog/index.md) for the most recent post.
 
 The entire development process is public:
 
-- **Every prompt** submitted to the AI assistant is logged in the [Prompt Log](prompts/index.md)
+- **Every prompt** submitted to the AI assistant is logged in the [Prompt Log](prompts/index.md) — 104+ and counting
 - **Every hardware decision** is documented in the [Docs](docs/index.md)
-- **Every build step** is written up in the [Blog](blog/index.md)
-- **All dev tools** are documented in the [Tools section](docs/tools/devtool.md)
+- **Every build step** is written up in the [Blog](blog/index.md) — 9 posts so far
+- **Every drawing function** is verified pixel-by-pixel between C firmware and Python DevTool
 - **All source files** are on [GitHub](https://github.com/rompasaurus/dilder)
 
-This is learn-in-public taken to its logical extreme.
+This is learn-in-public taken to its logical extreme. No hidden steps, no "just trust me" — if it happened, it's documented.
+
+---
+
+<div style="text-align: center; opacity: 0.6; font-style: italic; margin-top: 2rem;">
+Built with patience, a Pico W, and an unreasonable fondness for virtual pets.
+</div>
