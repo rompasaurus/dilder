@@ -7,10 +7,13 @@ dev-setup/hello-world/build/
 dev-setup/img-receiver/build/
 dev-setup/sassy-octopus/build/
 dev-setup/supportive-octopus/build/
+dev-setup/angry-octopus/build/
+dev-setup/conspiratorial-octopus/build/
+dev-setup/sad-octopus/build/
+dev-setup/chaotic-octopus/build/
 
 # Generated quote data (DevTool generates at build time)
-dev-setup/sassy-octopus/quotes.h
-dev-setup/supportive-octopus/quotes.h
+dev-setup/*/quotes.h
 
 # Waveshare library files (copied from hello-world per setup guide)
 dev-setup/hello-world/lib/
@@ -22,6 +25,14 @@ dev-setup/sassy-octopus/lib/
 dev-setup/sassy-octopus/pico_sdk_import.cmake
 dev-setup/supportive-octopus/lib/
 dev-setup/supportive-octopus/pico_sdk_import.cmake
+dev-setup/angry-octopus/lib/
+dev-setup/angry-octopus/pico_sdk_import.cmake
+dev-setup/conspiratorial-octopus/lib/
+dev-setup/conspiratorial-octopus/pico_sdk_import.cmake
+dev-setup/sad-octopus/lib/
+dev-setup/sad-octopus/pico_sdk_import.cmake
+dev-setup/chaotic-octopus/lib/
+dev-setup/chaotic-octopus/pico_sdk_import.cmake
 
 # Python
 __pycache__/

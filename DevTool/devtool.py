@@ -2367,11 +2367,17 @@ MOUTH_SMILE = "smile"       # big wide grin
 MOUTH_OPEN  = "open"        # oval open mouth (talking)
 MOUTH_WEIRD = "weird"       # wobbly sine-wave mouth, off-kilter
 MOUTH_UNHINGED = "unhinged" # massive jagged scream-mouth
+MOUTH_ANGRY = "angry"       # tight downward frown
+MOUTH_SAD   = "sad"         # droopy downward curve
+MOUTH_CHAOTIC = "chaotic"   # zigzag lightning-bolt mouth
 
-# Cycle order for the animation (default, weird, unhinged)
+# Cycle order for the animation per mood
 MOUTH_CYCLE = [MOUTH_SMIRK, MOUTH_OPEN, MOUTH_SMILE, MOUTH_OPEN]
 MOUTH_CYCLE_WEIRD = [MOUTH_WEIRD, MOUTH_OPEN, MOUTH_WEIRD, MOUTH_SMILE]
 MOUTH_CYCLE_UNHINGED = [MOUTH_UNHINGED, MOUTH_OPEN, MOUTH_UNHINGED, MOUTH_OPEN]
+MOUTH_CYCLE_ANGRY = [MOUTH_ANGRY, MOUTH_OPEN, MOUTH_ANGRY, MOUTH_ANGRY]
+MOUTH_CYCLE_SAD = [MOUTH_SAD, MOUTH_OPEN, MOUTH_SAD, MOUTH_SMILE]
+MOUTH_CYCLE_CHAOTIC = [MOUTH_CHAOTIC, MOUTH_OPEN, MOUTH_UNHINGED, MOUTH_WEIRD]
 
 
 def _octo_weird_mouth():
@@ -2453,6 +2459,131 @@ def _octo_unhinged_eyes():
     return pupils
 
 
+def _octo_angry_eyes():
+    """Angry slanted eyebrows — two angled lines above the eyes pointing inward.
+
+    Returns (eyebrows, pupils) where eyebrows are extra black pixels to draw
+    ON TOP of the normal eye sockets, creating angry V-shaped brows.
+    Pupils are normal but shifted slightly inward (glaring).
+    """
+    brows = []
+    # Left eyebrow: slants from top-left down to inner-right  (/ shape)
+    for i in range(10):
+        x = 15 + i
+        y = 17 - i * 4 // 10  # gentle slope inward
+        brows.append((x, y))
+        brows.append((x, y + 1))
+    # Right eyebrow: slants from inner-left down to top-right (\ shape)
+    for i in range(10):
+        x = 45 + i
+        y = 15 + i * 4 // 10
+        brows.append((x, y))
+        brows.append((x, y + 1))
+    return brows
+
+
+def _octo_angry_pupils():
+    """Angry pupils — shifted inward for a glaring look."""
+    pupils = []
+    # Left eye: shifted right (glaring inward)
+    for dy in range(-2, 3):
+        for dx in range(-2, 3):
+            if dx * dx + dy * dy <= 4:
+                pupils.append((25 + dx, 26 + dy))
+    # Right eye: shifted left (glaring inward)
+    for dy in range(-2, 3):
+        for dx in range(-2, 3):
+            if dx * dx + dy * dy <= 4:
+                pupils.append((47 + dx, 26 + dy))
+    return pupils
+
+
+def _octo_sad_eyes():
+    """Sad droopy eyebrows — two angled lines slanting downward at the outer edges.
+
+    Returns eyebrow pixels (the inverse of angry — outer edges droop down).
+    """
+    brows = []
+    # Left eyebrow: slants down from inner to outer  (\ shape)
+    for i in range(10):
+        x = 15 + i
+        y = 15 + i * 4 // 10
+        brows.append((x, y))
+        brows.append((x, y + 1))
+    # Right eyebrow: slants down from inner to outer  (/ shape)
+    for i in range(10):
+        x = 45 + i
+        y = 17 - i * 4 // 10
+        brows.append((x, y))
+        brows.append((x, y + 1))
+    return brows
+
+
+def _octo_sad_pupils():
+    """Sad pupils — shifted downward, looking at the floor."""
+    pupils = []
+    for ecx in [23, 49]:
+        for dy in range(-2, 3):
+            for dx in range(-2, 3):
+                if dx * dx + dy * dy <= 4:
+                    pupils.append((ecx + dx, 28 + dy))  # lower than normal
+    return pupils
+
+
+def _octo_chaotic_eyes():
+    """Chaotic spiral eyes — concentric circles giving a dizzy look.
+
+    Returns pixels that replace the normal pupils with spiral/ring pattern.
+    """
+    pupils = []
+    for ecx in [22, 48]:
+        # Outer ring
+        for dy in range(-3, 4):
+            for dx in range(-3, 4):
+                dist = dx * dx + dy * dy
+                if 5 <= dist <= 9:
+                    pupils.append((ecx + dx, 25 + dy))
+        # Center dot
+        pupils.append((ecx, 25))
+    return pupils
+
+
+def _octo_angry_mouth():
+    """Tight angry frown — a downward curve."""
+    mouth = []
+    for x in range(28, 43):
+        cy = 40 - ((x - 35) ** 2) // 20  # inverted parabola = frown
+        mouth.append((x, cy))
+        mouth.append((x, cy + 1))
+    return mouth
+
+
+def _octo_sad_mouth():
+    """Sad frown — a gentle downward curve, wider than angry."""
+    mouth = []
+    for x in range(26, 45):
+        cy = 42 - ((x - 35) ** 2) // 30  # gentle frown
+        mouth.append((x, cy))
+        mouth.append((x, cy + 1))
+    return mouth
+
+
+def _octo_chaotic_mouth():
+    """Zigzag lightning-bolt mouth — pure chaos energy."""
+    import math
+    mouth = []
+    for x in range(24, 48):
+        # Sharp zigzag
+        phase = (x - 24) % 6
+        if phase < 3:
+            y = 38 + phase * 2
+        else:
+            y = 44 - phase * 2 + 6
+        mouth.append((x, y))
+        mouth.append((x, y + 1))
+    return mouth
+
+
 def _parse_quote(q):
     """Normalize a quote entry — either 'TEXT' or ('TEXT', 'mood')."""
     if isinstance(q, tuple):
@@ -2466,6 +2597,12 @@ def _mood_cycle(mood):
         return MOUTH_CYCLE_WEIRD
     if mood == "unhinged":
         return MOUTH_CYCLE_UNHINGED
+    if mood == "angry":
+        return MOUTH_CYCLE_ANGRY
+    if mood == "sad":
+        return MOUTH_CYCLE_SAD
+    if mood == "chaotic":
+        return MOUTH_CYCLE_CHAOTIC
     return MOUTH_CYCLE
 
 
@@ -2698,64 +2835,6 @@ SASSY_QUOTES = [
     "SIT DOWN. I SAID SIT. GOOD. NOW LISTEN.",
     "IMAGINE BEING THAT CONFIDENT WITH ONLY 4 LIMBS.",
     "I COULD OUT-SASS A SEA CUCUMBER AND THOSE THINGS LITERALLY EXPEL THEIR GUTS.",
-    # ── Tinfoil conspiracy ──
-    ("BIRDS ARENT REAL. THEY CHARGE ON POWER LINES!", "weird"),
-    ("PIGEONS ARE DRONES. WAKE UP SHEEPLE.", "weird"),
-    ("CLOUDS ARE GOVERNMENT PILLOWS.", "weird"),
-    ("THE MOON IS JUST THE BACK OF THE SUN.", "weird"),
-    ("GRAVITY IS A SUBSCRIPTION SERVICE.", "weird"),
-    ("MIRRORS ARE JUST WATER THAT TRIED HARDER.", "weird"),
-    ("YOUR SKELETON IS WET RIGHT NOW. THINK ABOUT IT.", "weird"),
-    ("OCTOBER HAS NO OCTOS IN IT. SUS AS HELL.", "weird"),
-    ("TREES ARE SURVEILLANCE ANTENNAS. LOOK IT UP.", "weird"),
-    ("RAIN IS JUST THE SKY PEEING. PROVE ME WRONG.", "weird"),
-    ("THE ALPHABET IS IN THAT ORDER FOR A DAMN REASON.", "weird"),
-    ("BELLY BUTTONS ARE JUST OLD MOUTHS.", "weird"),
-    ("YAWNING IS YOUR SKULL TRYING TO ESCAPE.", "weird"),
-    ("SHADOWS ARE JUST 2D VERSIONS OF YOU SPYING.", "weird"),
-    ("DEJA VU IS THE SIMULATION BUFFERING.", "weird"),
-    ("HICCUPS ARE YOUR BODY GLITCHING.", "weird"),
-    ("SNEEZING IS YOUR BRAIN REBOOTING AND NOBODY QUESTIONS IT.", "weird"),
-    ("TEETH ARE JUST MOUTH ROCKS THAT FELL OUT OF YOUR SKULL.", "weird"),
-    ("FINGERPRINTS ARE JUST SKIN BARCODES THE GOVERNMENT PRE-INSTALLED.", "weird"),
-    ("SLEEP PARALYSIS IS JUST YOUR FREE TRIAL OF DEATH.", "weird"),
-    ("GOOSEBUMPS ARE YOUR BODY TRYING TO GROW FEATHERS BACK.", "weird"),
-    ("ALLERGIES ARE YOUR IMMUNE SYSTEM HAVING A DAMN PANIC ATTACK OVER FLOWERS.", "weird"),
-    ("BLINKING IS JUST YOUR EYES CLAPPING.", "weird"),
-    ("YOUR TONGUE JUST SITS IN YOUR MOUTH LIKE A FAT LITTLE SLUG.", "weird"),
-    ("BABIES ARE JUST SMALL DRUNK PEOPLE WHO DONT PAY RENT.", "weird"),
-    ("ELEVATORS ARE JUST TRUST FALLS WITH A BUILDING.", "weird"),
-    ("HOSPITALS ARE JUST BODY REPAIR SHOPS WITH BAD FOOD.", "weird"),
-    ("FIRE TRUCKS ARE ACTUALLY WATER TRUCKS. BIG FIRE DOESNT WANT YOU TO KNOW.", "weird"),
-    ("YOUR EARS NEVER CLOSE. YOURE HEARING EVERYTHING ALL THE TIME.", "weird"),
-    ("ANKLES ARE JUST WRIST KNOCKOFFS.", "weird"),
-    ("COUGHING IS JUST YOUR LUNGS THROWING UP.", "weird"),
-    ("FRIDGES ARE JUST COLD CLOSETS FOR DEAD THINGS.", "weird"),
-    # ── Modern meme conspiracies ──
-    ("THE DEEP STATE RUNS APPLEBEES.", "weird"),
-    ("MATTRESS FIRM IS A MONEY LAUNDERING FRONT.", "weird"),
-    ("FINLAND DOESNT EXIST. GOOGLE IT.", "weird"),
-    ("WYOMING IS JUST A GOVERNMENT PRANK.", "weird"),
-    ("AUSTRALIA IS UPSIDE DOWN AND FAKE.", "weird"),
-    ("THE BERMUDA TRIANGLE IS MY VACATION HOME.", "weird"),
-    ("5G TURNED MY NEIGHBOR INTO A ROUTER.", "weird"),
-    ("THE TITANIC WAS AN INSURANCE SCAM.", "weird"),
-    ("DENVER AIRPORT IS AN ILLUMINATI CLUBHOUSE.", "weird"),
-    ("BIGFOOT IS REAL AND HES A DAMN GENTLEMAN.", "weird"),
-    ("FLAT EARTHERS ARE SECRETLY ROUND.", "weird"),
-    ("CROP CIRCLES ARE JUST ALIEN DOODLES.", "weird"),
-    ("THE QUEEN WAS A LIZARD PERSON AND SHE WASNT EVEN HIDING IT.", "weird"),
-    ("AREA 51 IS JUST WHERE THE GOVERNMENT KEEPS THE GOOD SNACKS.", "weird"),
-    ("CHEMTRAILS ARE JUST SKY SEASONING.", "weird"),
-    ("THE ILLUMINATI RUNS COSTCO. FREE SAMPLES ARE MIND CONTROL.", "weird"),
-    ("STONEHENGE IS JUST AN ANCIENT IKEA THAT NOBODY FINISHED BUILDING.", "weird"),
-    ("THE PYRAMIDS WERE BUILT BY CATS. EGYPTIANS JUST TOOK CREDIT.", "weird"),
-    ("NEW ZEALAND IS A PAID ACTOR.", "weird"),
-    ("GIRAFFES ARE GOVERNMENT SURVEILLANCE CAMERAS WITH LEGS.", "weird"),
-    ("THE MOON LANDING WAS REAL BUT THE MOON IS FAKE.", "weird"),
-    ("CANADA IS JUST AMERICAS HAT AND ITS IN ON IT.", "weird"),
-    ("THE HADRON COLLIDER IS JUST A BIG ASS BEYBLADE.", "weird"),
-    ("BLUETOOTH IS WITCHCRAFT AND IM TIRED OF PRETENDING ITS NOT.", "weird"),
     # ── Chaotic stupid ──
     "WHAT IF YOUR LEGS DIDNT KNOW THEY WERE LEGS.",
     "I JUST REALIZED WATER IS BONELESS ICE.",
@@ -3065,6 +3144,196 @@ SUPPORTIVE_QUOTES = [
     "I DONT SAY THIS TO EVERYONE BUT I WOULD SHARE MY SHRIMP WITH YOU.",
 ]
 
+ANGRY_QUOTES = [
+    # ── Adorably furious ──
+    "IM NOT MAD IM JUST DISAPPOINTED. AND MAD.",
+    "WHO ATE MY SHRIMP. WHO. WAS IT YOU.",
+    "I HAVE 8 ARMS AND EVERY ONE OF THEM IS CROSSED RIGHT NOW.",
+    "I WILL FLIP THIS TIDE POOL. DONT TEST ME.",
+    "MY BLOOD IS BOILING. WHICH IS IMPRESSIVE BECAUSE ITS COLD-BLOODED.",
+    "I SWEAR TO POSEIDON IF ONE MORE FISH BUMPS INTO ME.",
+    "STOP LOOKING AT ME. STOP IT. I SAID STOP.",
+    "I DIDNT CHOOSE THE GRUMPY LIFE. THE GRUMPY LIFE CHOSE ME.",
+    "EVERYTHING IS FINE. IM FINE. THIS IS FINE. IT IS NOT FINE.",
+    "THE AUDACITY OF THIS ENTIRE OCEAN.",
+    "DO NOT BOOP MY HEAD. I WILL INK.",
+    "IM ONE BAD DAY AWAY FROM BECOMING A LAND OCTOPUS.",
+    "I COULD CHOKE 8 PEOPLE AT ONCE AND DONT THINK I HAVENT THOUGHT ABOUT IT.",
+    "MY PATIENCE IS THINNER THAN A JELLYFISH.",
+    "I WOKE UP AND CHOSE VIOLENCE. TENTACLE VIOLENCE.",
+    "IF LOOKS COULD KILL ID HAVE 3 HEARTS WORTH OF MURDER.",
+    "WHOEVER INVENTED MONDAYS DESERVES TO STEP ON A SEA URCHIN.",
+    "THE WIFI IS OUT AGAIN. I AM GOING TO SCREAM.",
+    "WHY IS EVERYTHING SO LOUD. EVERYONE SHUT UP.",
+    "I HAVE THREE HEARTS AND THEY ALL HATE YOU RIGHT NOW.",
+    "SOMEBODY MOVED MY ROCK. MY ROCK. MINE.",
+    "I SWEAR THIS OCEAN GETS STUPIDER EVERY DAY.",
+    "BREATHE IN. BREATHE OUT. STILL MAD.",
+    "IF I HAD EYEBROWS THEY WOULD BE VERY ANGRY RIGHT NOW.",
+    "THE FACT THAT I CANT SLAM A DOOR MAKES ME ANGRIER.",
+    "IM NOT PASSIVE AGGRESSIVE. IM AGGRESSIVE AGGRESSIVE.",
+    "I DONT HAVE A SHORT TEMPER. YOU JUST HAVE A LONG STUPID.",
+    "I WILL FIGHT EVERY CRAB IN THIS OCEAN. EVERY. ONE.",
+    "SOMEONE PUT SALT IN MY WOUND. WHICH IS RUDE BECAUSE I LIVE IN SALT WATER.",
+    "JUST BECAUSE I HAVE 3 HEARTS DOESNT MEAN I HAVE 3X THE PATIENCE.",
+    # ── Cutely hostile ──
+    "I LOVE YOU BUT I DONT LIKE YOU RIGHT NOW.",
+    "YOURE ON THIN ICE AND I DONT EVEN HAVE ICE DOWN HERE.",
+    "IM CUTE AND ANGRY AND THATS THE MOST DANGEROUS COMBO.",
+    "I WILL HUG YOU SO HARD IT HURTS. THATS A THREAT.",
+    "IM SMALL AND ROUND AND FULL OF RAGE.",
+    "DONT MAKE ME SQUIRT INK. I HAVE A HAIR TRIGGER.",
+    "I LOOK CUTE BUT I BITE. OCTOPUSES HAVE BEAKS. GOOGLE IT.",
+    "MY MOM SAID BE NICE BUT MY MOM ISNT HERE.",
+    "YOU THINK IM CUTE WHEN IM ANGRY. GOOD. WATCH THIS.",
+    "IF I COULD STOMP ID BE STOMPING SO HARD RIGHT NOW.",
+    "EVERY SINGLE ONE OF MY SUCKERS IS ANGRY.",
+    "YOURE LUCKY IM BEHIND THIS SCREEN.",
+    "I MAY HAVE NO BONES BUT I CAN STILL THROW HANDS. EIGHT OF THEM.",
+    "CONSIDER THIS YOUR FORMAL WARNING.",
+    "IM ABOUT TO INK AND ITS YOUR FAULT.",
+]
+
+CONSPIRATORIAL_QUOTES = [
+    # ── Classic tinfoil ──
+    ("BIRDS ARENT REAL. THEY CHARGE ON POWER LINES.", "weird"),
+    ("PIGEONS ARE DRONES. WAKE UP SHEEPLE.", "weird"),
+    ("CLOUDS ARE GOVERNMENT PILLOWS.", "weird"),
+    ("THE MOON IS JUST THE BACK OF THE SUN.", "weird"),
+    ("GRAVITY IS A SUBSCRIPTION SERVICE.", "weird"),
+    ("TREES ARE SURVEILLANCE ANTENNAS. LOOK IT UP.", "weird"),
+    ("THE ALPHABET IS IN THAT ORDER FOR A DAMN REASON.", "weird"),
+    ("DEJA VU IS THE SIMULATION BUFFERING.", "weird"),
+    ("FINGERPRINTS ARE JUST SKIN BARCODES THE GOVERNMENT PRE-INSTALLED.", "weird"),
+    ("GOOSEBUMPS ARE YOUR BODY TRYING TO GROW FEATHERS BACK.", "weird"),
+    ("FIRE TRUCKS ARE ACTUALLY WATER TRUCKS. BIG FIRE DOESNT WANT YOU TO KNOW.", "weird"),
+    # ── Modern meme conspiracies ──
+    ("THE DEEP STATE RUNS APPLEBEES.", "weird"),
+    ("MATTRESS FIRM IS A MONEY LAUNDERING FRONT.", "weird"),
+    ("FINLAND DOESNT EXIST. GOOGLE IT.", "weird"),
+    ("WYOMING IS JUST A GOVERNMENT PRANK.", "weird"),
+    ("AUSTRALIA IS UPSIDE DOWN AND FAKE.", "weird"),
+    ("5G TURNED MY NEIGHBOR INTO A ROUTER.", "weird"),
+    ("THE TITANIC WAS AN INSURANCE SCAM.", "weird"),
+    ("DENVER AIRPORT IS AN ILLUMINATI CLUBHOUSE.", "weird"),
+    ("BIGFOOT IS REAL AND HES A DAMN GENTLEMAN.", "weird"),
+    ("FLAT EARTHERS ARE SECRETLY ROUND.", "weird"),
+    ("CROP CIRCLES ARE JUST ALIEN DOODLES.", "weird"),
+    ("AREA 51 IS JUST WHERE THE GOVERNMENT KEEPS THE GOOD SNACKS.", "weird"),
+    ("CHEMTRAILS ARE JUST SKY SEASONING.", "weird"),
+    ("THE ILLUMINATI RUNS COSTCO. FREE SAMPLES ARE MIND CONTROL.", "weird"),
+    ("STONEHENGE IS JUST AN ANCIENT IKEA THAT NOBODY FINISHED BUILDING.", "weird"),
+    ("THE PYRAMIDS WERE BUILT BY CATS. EGYPTIANS JUST TOOK CREDIT.", "weird"),
+    ("NEW ZEALAND IS A PAID ACTOR.", "weird"),
+    ("GIRAFFES ARE GOVERNMENT SURVEILLANCE CAMERAS WITH LEGS.", "weird"),
+    ("THE MOON LANDING WAS REAL BUT THE MOON IS FAKE.", "weird"),
+    ("THE HADRON COLLIDER IS JUST A BIG ASS BEYBLADE.", "weird"),
+    ("BLUETOOTH IS WITCHCRAFT AND IM TIRED OF PRETENDING ITS NOT.", "weird"),
+    # ── Deep conspiracy ──
+    ("THE CIA INVENTED DECAF COFFEE TO WEAKEN THE POPULATION.", "unhinged"),
+    ("YOUR MICROWAVE IS LISTENING. IT KNOWS WHAT YOU HEAT.", "unhinged"),
+    ("THE INTERNET WAS INVENTED BY DOLPHINS. WE JUST THINK WE DID IT.", "unhinged"),
+    ("TRAFFIC LIGHTS ARE MOOD RINGS FOR THE GOVERNMENT.", "unhinged"),
+    ("THEY MADE GLITTER TO TRACK US. IMPOSSIBLE TO REMOVE. COINCIDENCE.", "unhinged"),
+    ("THE REAL MOON IS IN A WAREHOUSE IN NEVADA.", "unhinged"),
+    ("GPS DOESNT TRACK WHERE YOU GO. IT TELLS YOU WHERE THEY WANT YOU.", "unhinged"),
+    ("AUTOCORRECT IS AI SLOWLY REWRITING YOUR THOUGHTS.", "unhinged"),
+    ("DREAMS ARE LEAKED FOOTAGE FROM ALTERNATE DIMENSIONS.", "unhinged"),
+    ("YOUR CAT REPORTS TO SOMEONE. I DONT KNOW WHO BUT SOMEONE.", "unhinged"),
+    ("ZOOS ARE JUST ANIMAL EMBASSIES.", "unhinged"),
+    ("CALENDARS WERE INVENTED TO MAKE US FEEL LATE.", "unhinged"),
+    ("VENDING MACHINES KILL MORE PEOPLE THAN SHARKS. WHO PROGRAMS THEM.", "unhinged"),
+    ("THE WEATHER CHANNEL CONTROLS THE WEATHER. ITS IN THE NAME.", "unhinged"),
+    ("MATTRESSES DOUBLE IN WEIGHT EVERY 10 YEARS. WHAT IS INSIDE THEM.", "unhinged"),
+]
+
+SAD_QUOTES = [
+    # ── Melodramatic ocean sadness ──
+    "THE OCEAN IS SO BIG AND I AM SO SMALL.",
+    "NOBODY EVER ASKS HOW THE OCTOPUS IS DOING.",
+    "I HAVE 3 HEARTS AND THEY ALL HURT.",
+    "I CHANGED COLOR TO MATCH MY MOOD. ITS BLUE. ALWAYS BLUE.",
+    "MY TENTACLES ARE TIRED. MY SOUL IS TIRED.",
+    "EVEN THE ABYSS FEELS LONELY SOMETIMES.",
+    "I TRIED TO HUG MYSELF BUT MY ARMS GOT TANGLED.",
+    "EVERY WAVE TAKES SOMETHING AWAY AND NEVER BRINGS IT BACK.",
+    "I INK WHEN IM SCARED BUT LATELY ITS JUST SADNESS INK.",
+    "THE DEEP SEA IS QUIET. TOO QUIET.",
+    "JELLYFISH DONT HAVE BRAINS. SOMETIMES I ENVY THEM.",
+    "I BET NOBODY EVEN NOTICED I CHANGED COLORS.",
+    "FISH HAVE FRIENDS. I HAVE EIGHT ARMS AND ZERO FRIENDS.",
+    "THE CURRENT KEEPS PUSHING ME PLACES I DONT WANT TO GO.",
+    "I COULD DISAPPEAR INTO A TINY CRACK AND NOBODY WOULD LOOK.",
+    # ── Existential melancholy ──
+    ("THE STARS ARE SO BEAUTIFUL BUT THEYRE ALL ALREADY DEAD.", "weird"),
+    ("WHAT IF THE UNIVERSE IS JUST ONE BIG EXHALE.", "weird"),
+    ("RAIN IS JUST THE SKY CRYING AND HONESTLY SAME.", "weird"),
+    ("EVEN IMMORTAL JELLYFISH PROBABLY GET SAD SOMETIMES.", "weird"),
+    ("I DONT WANT TO BE DRAMATIC BUT THE VOID UNDERSTANDS ME.", "weird"),
+    ("THE SUNSET IS PRETTY BECAUSE EVERYTHING BEAUTIFUL ENDS.", "weird"),
+    ("MUSIC IS JUST ORGANIZED AIR VIBRATIONS BUT IT STILL MAKES ME CRY.", "weird"),
+    ("OLD PHOTOGRAPHS MAKE ME SAD BECAUSE TIME ONLY GOES ONE WAY.", "weird"),
+    ("THE MOON KEEPS SHOWING UP EVEN WHEN NOBODY ASKED. RELATABLE.", "weird"),
+    ("I WONDER IF THE DEEP SEA FISH ARE LONELY OR IF THEY JUST DONT CARE.", "weird"),
+    # ── Gentle sad ──
+    "SOMETIMES I JUST SIT ON THE OCEAN FLOOR AND THINK.",
+    "I MISS THINGS I NEVER HAD.",
+    "TODAY FEELS HEAVY. LIKE EXTRA GRAVITY.",
+    "ITS OK TO NOT BE OK. THATS WHAT I KEEP TELLING MYSELF.",
+    "THE OCEAN HAS NO CEILING BUT IT STILL FEELS LIKE WALLS.",
+    "I WISH I COULD HUG THE WHOLE WORLD BUT MY ARMS ARENT LONG ENOUGH.",
+    "SOMETIMES THE QUIET IS THE LOUDEST THING.",
+    "I SAW A HERMIT CRAB FIND A NEW SHELL TODAY. MUST BE NICE.",
+    "EVERY BUBBLE I BLOW JUST FLOATS AWAY.",
+    "ITS RAINING UP HERE TOO HUH.",
+]
+
+CHAOTIC_QUOTES = [
+    # ── Pure unfiltered nonsense ──
+    ("WHAT IF STAIRS GO DOWN AND WE GO UP.", "chaotic"),
+    ("I JUST SNEEZED AND I THINK I SAW GOD.", "chaotic"),
+    ("DOORS ARE JUST POLITE WALLS.", "chaotic"),
+    ("WHAT IF YOUR KNEES BENT THE OTHER WAY.", "chaotic"),
+    ("BANANAS ARE JUST NAKED FRUIT.", "chaotic"),
+    ("WHAT IF WATER IS WET BUT ONLY SOMETIMES.", "chaotic"),
+    ("MY LEFT TENTACLE DOESNT TRUST MY RIGHT TENTACLE.", "chaotic"),
+    ("TIME IS A FLAT CIRCLE AND IM A ROUND OCTOPUS IN IT.", "chaotic"),
+    ("I FORGOT WHAT I WAS SAYING BUT IM STILL YELLING.", "chaotic"),
+    ("WHAT SOUND DOES A SHADOW MAKE.", "chaotic"),
+    ("IF YOU DIG STRAIGHT DOWN DO YOU END UP IN YESTERDAY.", "chaotic"),
+    ("I TRIED TO THINK AND NOTHING HAPPENED.", "chaotic"),
+    ("WHATS INSIDE A MIRROR. MORE MIRROR.", "chaotic"),
+    ("MY BRAIN IS DOING THAT THING AGAIN WHERE IT FORGETS HOW TO BRAIN.", "chaotic"),
+    ("WHAT IF THE COLOR BLUE SOUNDS DIFFERENT TO YOU.", "chaotic"),
+    # ── Fever dream energy ──
+    ("EVERY PIZZA IS A PERSONAL PIZZA IF YOU BELIEVE IN YOURSELF.", "chaotic"),
+    ("I AM GOING TO EAT THE SUN.", "chaotic"),
+    ("CLOUDS TASTE LIKE NOTHING AND THATS SUSPICIOUS.", "chaotic"),
+    ("IF I SPIN FAST ENOUGH DO I BECOME A BLENDER.", "chaotic"),
+    ("WHAT IF GRAVITY JUST STOPPED. FOR LIKE 5 MINUTES.", "chaotic"),
+    ("I HAD A THOUGHT BUT IT ESCAPED. ITS LOOSE NOW.", "chaotic"),
+    ("SOMEWHERE A POTATO IS BEING BORN AND NOBODY IS CELEBRATING.", "chaotic"),
+    ("CEILING FANS ARE JUST UPSIDE DOWN HELICOPTERS.", "chaotic"),
+    ("WHAT IF YOUR REFLECTION IS THE REAL YOU AND YOURE THE REFLECTION.", "chaotic"),
+    ("I COUNTED MY ARMS AND GOT A DIFFERENT NUMBER EACH TIME.", "chaotic"),
+    ("ELEVATORS ARE JUST ROOMS THAT KIDNAP YOU VERTICALLY.", "chaotic"),
+    ("WHAT IF THE ALPHABET WAS IN A DIFFERENT ORDER.", "chaotic"),
+    ("IM NOT LOST IM AGGRESSIVELY EXPLORING.", "chaotic"),
+    ("WHAT HAPPENS WHEN AN UNSTOPPABLE FORCE MEETS AN IMMOVABLE OCTOPUS.", "chaotic"),
+    ("THE FLOOR IS LAVA BUT ALSO IM IN THE OCEAN SO THE FLOOR IS WATER.", "chaotic"),
+    # ── Maximum entropy ──
+    ("BEES SHOULDNT BE ABLE TO FLY AND YET HERE THEY ARE. FLEXING.", "unhinged"),
+    ("I JUST REALIZED THAT NOTHING RHYMES WITH ORANGE. OR DOES IT.", "chaotic"),
+    ("WHAT IF ALL OF THIS IS JUST A SCREENSAVER.", "unhinged"),
+    ("I BET FISH DONT EVEN KNOW WHAT WATER IS.", "chaotic"),
+    ("WHAT IF WE ARE ALL JUST THOUGHTS THINKING THEMSELVES.", "unhinged"),
+    ("THE LETTER W IS LITERALLY DOUBLE U BUT ITS NOT EVEN ROUND.", "chaotic"),
+    ("SAND IS JUST VERY SMALL ROCKS HAVING A BEACH PARTY.", "chaotic"),
+    ("IF NOTHING STICKS TO TEFLON HOW DO THEY STICK TEFLON TO THE PAN.", "chaotic"),
+    ("WHO DECIDED THAT CLOCKS GO CLOCKWISE. WHAT IF THEYRE BACKWARDS.", "chaotic"),
+    ("I BLINKED AND MISSED SOMETHING IMPORTANT. I CAN FEEL IT.", "chaotic"),
+]
+
 
 def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
                             mood=None):
@@ -3105,21 +3374,31 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
     for ex, ey in _octo_eyes():
         _set(ex, ey, 0)
 
-    # Black pupils — mood-specific eyes for weird/unhinged
-    if mood == "weird":
-        pupil_fn = _octo_weird_eyes
-    elif mood == "unhinged":
-        pupil_fn = _octo_unhinged_eyes
-    else:
-        pupil_fn = _octo_pupils
+    # Black pupils — mood-specific eyes
+    pupil_map = {
+        "weird": _octo_weird_eyes,
+        "unhinged": _octo_unhinged_eyes,
+        "angry": _octo_angry_pupils,
+        "sad": _octo_sad_pupils,
+        "chaotic": _octo_chaotic_eyes,
+    }
+    pupil_fn = pupil_map.get(mood, _octo_pupils)
 
     for px, py in pupil_fn():
         _set(px, py, 1)
 
-    # White highlights (skip for unhinged — no highlight on pinprick eyes)
-    if mood != "unhinged":
+    # White highlights (skip for unhinged/chaotic — no highlight on special eyes)
+    if mood not in ("unhinged", "chaotic"):
         for hx, hy in _octo_highlights():
             _set(hx, hy, 0)
+
+    # Eyebrows for angry/sad moods (drawn on top of the head)
+    if mood == "angry":
+        for bx, by in _octo_angry_eyes():
+            _set(bx, by, 1)
+    elif mood == "sad":
+        for bx, by in _octo_sad_eyes():
+            _set(bx, by, 1)
 
     # Mouth expression
     if mouth_expr == MOUTH_OPEN:
@@ -3140,6 +3419,15 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
         for mx, my in _octo_unhinged_mouth_interior():
             _set(mx, my, 0)
         for mx, my in _octo_unhinged_mouth():
+            _set(mx, my, 1)
+    elif mouth_expr == MOUTH_ANGRY:
+        for mx, my in _octo_angry_mouth():
+            _set(mx, my, 1)
+    elif mouth_expr == MOUTH_SAD:
+        for mx, my in _octo_sad_mouth():
+            _set(mx, my, 1)
+    elif mouth_expr == MOUTH_CHAOTIC:
+        for mx, my in _octo_chaotic_mouth():
             _set(mx, my, 1)
     else:
         # Default: smirk
@@ -3174,14 +3462,33 @@ class ProgramsTab(ttk.Frame):
     PROGRAMS = {
         "sassy_octopus": {
             "name": "Sassy Octopus",
-            "desc": "A sassy octopus blurts unhinged conspiracies and jokes,\n"
-                    "alternating between a smile and open-mouth expression.",
+            "desc": "A sassy octopus with attitude. Snarky observations,\n"
+                    "food hot takes, and self-aware octopus flexes.",
         },
         "supportive_octopus": {
             "name": "Supportive Octopus",
-            "desc": "Same sassy octopus, but aggressively supportive.\n"
-                    "Cycles through unhinged-but-loving pep talks and\n"
-                    "chaotic affirmations with spicy language.",
+            "desc": "Aggressively supportive. Unhinged-but-loving pep talks\n"
+                    "and chaotic affirmations with spicy language.",
+        },
+        "angry_octopus": {
+            "name": "Angry Octopus",
+            "desc": "Furious but adorable. Angry slanted eyebrows, mean-but-cute\n"
+                    "nonsensical rants. 8 arms, zero patience.",
+        },
+        "conspiratorial_octopus": {
+            "name": "Conspiratorial Octopus",
+            "desc": "Tinfoil hat energy. Government conspiracies, simulation\n"
+                    "theory, birds aren't real, and the moon is fake.",
+        },
+        "sad_octopus": {
+            "name": "Sad Octopus",
+            "desc": "Droopy eyes and gentle melancholy. Existential ocean\n"
+                    "sadness and melodramatic but oddly relatable vibes.",
+        },
+        "chaotic_octopus": {
+            "name": "Chaotic Octopus",
+            "desc": "Spiral dizzy eyes and a lightning-bolt mouth. Pure\n"
+                    "nonsensical fever-dream energy. Entropy incarnate.",
         },
     }
 
@@ -3314,17 +3621,24 @@ class ProgramsTab(ttk.Frame):
             self._show_static_preview(key)
 
     # Maps octopus program keys to their (quotes_list, tagline)
+    # Maps program keys to (quotes_list, tagline, default_mood)
+    # default_mood is used when a quote doesn't specify its own mood tag
     _OCTOPUS_CONFIGS = {
-        "sassy_octopus":      (SASSY_QUOTES,      "~ SASSY OCTOPUS ~"),
-        "supportive_octopus": (SUPPORTIVE_QUOTES,  "~ SUPPORTIVE OCTOPUS ~"),
+        "sassy_octopus":          (SASSY_QUOTES,          "~ SASSY OCTOPUS ~",          None),
+        "supportive_octopus":     (SUPPORTIVE_QUOTES,     "~ SUPPORTIVE OCTOPUS ~",     None),
+        "angry_octopus":          (ANGRY_QUOTES,          "~ ANGRY OCTOPUS ~",          "angry"),
+        "conspiratorial_octopus": (CONSPIRATORIAL_QUOTES, "~ CONSPIRATORIAL OCTOPUS ~", "weird"),
+        "sad_octopus":            (SAD_QUOTES,            "~ SAD OCTOPUS ~",            "sad"),
+        "chaotic_octopus":        (CHAOTIC_QUOTES,        "~ CHAOTIC OCTOPUS ~",        "chaotic"),
     }
 
     def _show_static_preview(self, prog_key):
         """Show a single frame on the preview canvas."""
         if prog_key in self._OCTOPUS_CONFIGS:
-            quotes, tagline = self._OCTOPUS_CONFIGS[prog_key]
+            quotes, tagline, default_mood = self._OCTOPUS_CONFIGS[prog_key]
             raw = random.choice(quotes)
             text, mood = _parse_quote(raw)
+            mood = mood or default_mood
             expr = _mood_cycle(mood)[0]
             pixels = _generate_octopus_frame(expr, text, tagline, mood)
             self._render_preview(pixels)
@@ -3388,7 +3702,7 @@ class ProgramsTab(ttk.Frame):
 
     def _run_octopus(self, prog_key, deploy_to_pico):
         """Animate an octopus program — alternating expressions + quotes."""
-        quotes, tagline = self._OCTOPUS_CONFIGS[prog_key]
+        quotes, tagline, default_mood = self._OCTOPUS_CONFIGS[prog_key]
         ser = None
         if deploy_to_pico:
             port = find_pico_serial()
@@ -3403,6 +3717,7 @@ class ProgramsTab(ttk.Frame):
 
         raw = random.choice(quotes)
         text, mood = _parse_quote(raw)
+        mood = mood or default_mood
         cycle = _mood_cycle(mood)
         frame_count = 0
 
@@ -3413,6 +3728,7 @@ class ProgramsTab(ttk.Frame):
                 if mouth_expr == MOUTH_OPEN and frame_count > 0:
                     raw = random.choice(quotes)
                     text, mood = _parse_quote(raw)
+                    mood = mood or default_mood
                     cycle = _mood_cycle(mood)
 
                 pixels = _generate_octopus_frame(mouth_expr, text, tagline, mood)
@@ -3647,8 +3963,12 @@ class ProgramsTab(ttk.Frame):
 
     # Maps program keys to their firmware directory name
     _FIRMWARE_DIRS = {
-        "sassy_octopus":      "sassy-octopus",
-        "supportive_octopus": "supportive-octopus",
+        "sassy_octopus":          "sassy-octopus",
+        "supportive_octopus":     "supportive-octopus",
+        "angry_octopus":          "angry-octopus",
+        "conspiratorial_octopus": "conspiratorial-octopus",
+        "sad_octopus":            "sad-octopus",
+        "chaotic_octopus":        "chaotic-octopus",
     }
 
     def _generate_quotes_header(self, prog_key):
@@ -3663,12 +3983,13 @@ class ProgramsTab(ttk.Frame):
         if prog_key not in self._OCTOPUS_CONFIGS:
             return None
 
-        quotes, tagline = self._OCTOPUS_CONFIGS[prog_key]
+        quotes, tagline, default_mood = self._OCTOPUS_CONFIGS[prog_key]
         fw_dir = self._FIRMWARE_DIRS[prog_key]
         header_path = DEV_SETUP / fw_dir / "quotes.h"
         self._log_build(f"Generating quotes.h ({len(quotes)} quotes)...")
 
-        mood_map = {None: 0, "weird": 1, "unhinged": 2}
+        mood_map = {None: 0, "weird": 1, "unhinged": 2,
+                    "angry": 3, "sad": 4, "chaotic": 5}
 
         with open(header_path, "w") as f:
             f.write("/* Auto-generated by Dilder DevTool — do not edit */\n")
@@ -3681,6 +4002,7 @@ class ProgramsTab(ttk.Frame):
 
             for raw in quotes:
                 text, mood = _parse_quote(raw)
+                mood = mood or default_mood
                 escaped = text.replace('\\', '\\\\').replace('"', '\\"')
                 f.write(f'    {{"{escaped}", {mood_map.get(mood, 0)}}},\n')
 

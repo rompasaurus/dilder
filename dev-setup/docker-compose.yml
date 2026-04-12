@@ -32,3 +32,39 @@ services:
       - ./supportive-octopus:/project
       - ./hello-world/lib:/project/lib
     working_dir: /project
+
+  build-angry-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./angry-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
+
+  build-conspiratorial-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./conspiratorial-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
+
+  build-sad-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./sad-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
+
+  build-chaotic-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./chaotic-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
