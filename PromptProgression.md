@@ -1055,6 +1055,69 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Prompt:** "Perfect. Update the prompts with this and commit."
 - **Input Tokens (est):** ~10
 - **Output Tokens (est):** ~5,000
-- **Commit:** *(see below)*
+- **Commit:** `17d0953` — Add Prompts #79–82 covering hardware photos, clock header, and Pico deploy
 - **Files Created/Modified:**
   - `PromptProgression.md` (modified — added Prompts #79–82, backfilled commit hash for Prompt #78)
+
+---
+
+## Prompt #83
+- **Date/Time:** 2026-04-12
+- **Prompt:** "OK let's make an angry octopus program. We need to change its eyes to be two slanted half-circles angled in an angry way, then compile a list of nonsensical wacky kind-of-mean quotes but still cute. Then we also want to split out the sassy octopus and pull out the conspiratorial crazy statements into a conspiratorial octopus program. And if there are other emotional states we can map into a program, let's create those as well. Get fun and weird with the quotes and make sure they match the emotion state."
+- **Input Tokens (est):** ~100
+- **Output Tokens (est):** ~60,000
+- **Commit:** `d0cc8fb` — Add Angry, Conspiratorial, Sad, and Chaotic octopus programs
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — added MOUTH_ANGRY/SAD/CHAOTIC expressions with pixel art, angry slanted half-circle eyebrows, sad droopy brows, chaotic spiral eyes, angry frown mouth, sad frown, chaotic zigzag mouth, per-program default_mood, ANGRY_QUOTES 45 entries, CONSPIRATORIAL_QUOTES 47 entries split from sassy, SAD_QUOTES 35 entries, CHAOTIC_QUOTES 40 entries, 6 programs registered in PROGRAMS/_OCTOPUS_CONFIGS/_FIRMWARE_DIRS)
+  - `dev-setup/angry-octopus/main.c`, `dev-setup/angry-octopus/CMakeLists.txt` (created)
+  - `dev-setup/conspiratorial-octopus/main.c`, `dev-setup/conspiratorial-octopus/CMakeLists.txt` (created)
+  - `dev-setup/sad-octopus/main.c`, `dev-setup/sad-octopus/CMakeLists.txt` (created)
+  - `dev-setup/chaotic-octopus/main.c`, `dev-setup/chaotic-octopus/CMakeLists.txt` (created)
+  - `dev-setup/docker-compose.yml` (modified — added 4 new build services)
+  - `.gitignore` (modified — added new firmware build/lib/quote artifacts)
+
+---
+
+## Prompt #84
+- **Date/Time:** 2026-04-12
+- **Prompt:** "That's pretty great. Let's fix the angry one's eyes — they should look like slanted half-circles."
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~8,000
+- **Commit:** `cba64b2` — Fix angry octopus eyebrows — thick slanted half-circle arcs
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — rewrote `_octo_angry_eyes()` with proper thick curved arcs using sine-wave sweep across the eye socket width, 3px thick with extra fill, outer high / inner low for V-furrowed brow look)
+
+---
+
+## Prompt #85
+- **Date/Time:** 2026-04-12
+- **Prompt:** "The angry eyes look good on the preview but the C program eyes don't match — the pupils should be close to the nose and downward."
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~20,000
+- **Commit:** `db5d6cd` — Add angry/sad/chaotic expressions to standalone Pico firmware
+- **Files Created/Modified:**
+  - `dev-setup/sassy-octopus/main.c` (modified — added MOOD_ANGRY/SAD/CHAOTIC constants, EXPR_ANGRY/SAD/CHAOTIC, `draw_pupils_angry()` with inward+down shifted pupils, `draw_brows_angry()` with matching half-circle arcs, `draw_pupils_sad()` with downward pupils, `draw_brows_sad()` with droopy arcs, `draw_pupils_chaotic()` with spiral ring eyes, `draw_mouth_angry/sad/chaotic()`, updated expression cycles and render_frame switch)
+  - All 5 other octopus firmware main.c files updated with same changes
+
+---
+
+## Prompt #86
+- **Date/Time:** 2026-04-12
+- **Prompt:** "OK update the webpage implementation as well with the new quotes and emotion states."
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~15,000
+- **Commit:** `038ba93` — Add all 6 octopus emotion states to website banner
+- **Files Created/Modified:**
+  - `website/docs/javascripts/octopus-banner.js` (modified — added ANGRY, CONSPIRATORIAL, SAD, CHAOTIC quote arrays with 25 entries each, updated `buildPool()` to include all 6 pools, updated `updateMode()` with labels and CSS classes for all 6 modes)
+  - `website/docs/stylesheets/extra.css` (modified — added `.octo-mode-angry` red, `.octo-mode-conspiratorial` yellow, `.octo-mode-sad` blue, `.octo-mode-chaotic` orange accent colors)
+
+---
+
+## Prompt #87
+- **Date/Time:** 2026-04-12
+- **Prompt:** "Update the prompts with the latest ones not added and fix grammar and push."
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~8,000
+- **Commit:** *(see below)*
+- **Files Created/Modified:**
+  - `PromptProgression.md` (modified — added Prompts #83–87, backfilled commit hash for Prompt #82)
