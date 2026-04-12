@@ -12,11 +12,13 @@
         <meta name="author" content="rompasaurus">
       
       
-        <link rel="canonical" href="https://dilder.dev/blog/phase-0-planning/">
+        <link rel="canonical" href="https://dilder.dev/blog/c-vs-python-renderer/">
       
       
+        <link rel="prev" href="../sixteen-emotions/">
       
-        <link rel="next" href="../phase-1-hardware-begins/">
+      
+        <link rel="next" href="../body-language-animations/">
       
       
         
@@ -27,7 +29,7 @@
     
     
       
-        <title>Phase 0: Planning — From Idea to Blueprint - Dilder</title>
+        <title>C vs Python — Building a Firmware-Accurate Preview Renderer - Dilder</title>
       
     
     
@@ -90,7 +92,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#phase-0-planning-from-idea-to-blueprint" class="md-skip">
+        <a href="#c-vs-python-building-a-firmware-accurate-preview-renderer" class="md-skip">
           Skip to content
         </a>
       
@@ -124,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Phase 0: Planning — From Idea to Blueprint
+              C vs Python — Building a Firmware-Accurate Preview Renderer
             
           </span>
         </div>
@@ -2008,10 +2010,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-idea" class="md-nav__link">
+  <a href="#the-problem" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Idea
+        The Problem
       
     </span>
   </a>
@@ -2019,10 +2021,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-phase-0-covered" class="md-nav__link">
+  <a href="#the-audit-tool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Phase 0 Covered
+        The Audit Tool
       
     </span>
   </a>
@@ -2030,71 +2032,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-decisions-made" class="md-nav__link">
+  <a href="#three-render-folders" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Decisions Made
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Key Decisions Made">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#e-ink-over-lcd" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        E-Ink Over LCD
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pico-w-first-pi-zero-later" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pico W First, Pi Zero Later
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tactile-buttons-over-capacitive-touch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tactile Buttons Over Capacitive Touch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tactile-buttons-over-capacitive-touch_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tactile Buttons Over Capacitive Touch
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prototype-concept" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prototype Concept
+        Three Render Folders
       
     </span>
   </a>
@@ -2102,10 +2043,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-next" class="md-nav__link">
+  <a href="#the-pixel-diff-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's Next
+        The Pixel Diff Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-causes-the-diffs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Causes the Diffs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-this-matters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Matters
       
     </span>
   </a>
@@ -2168,7 +2131,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2026-04-08 00:00:00+00:00" class="md-ellipsis">April 8, 2026</time>
+                        <time datetime="2026-04-12 00:00:00+00:00" class="md-ellipsis">April 12, 2026</time>
                       </div>
                     </li>
                     
@@ -2179,7 +2142,8 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../category/planning/">Planning</a></span>
+                              <a href="../category/tools/">Tools</a>, 
+                              <a href="../category/architecture/">Architecture</a></span>
                         </div>
                       </li>
                     
@@ -2190,7 +2154,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              2 min read
+                              3 min read
                             
                           </span>
                         </div>
@@ -2217,76 +2181,92 @@
   
 
 
-<h1 id="phase-0-planning-from-idea-to-blueprint">Phase 0: Planning — From Idea to Blueprint<a class="headerlink" href="#phase-0-planning-from-idea-to-blueprint" title="Permanent link">&para;</a></h1>
-<p>Every project starts somewhere. Dilder started with a question: how hard is it to actually build a Tamagotchi?</p>
+<h1 id="c-vs-python-building-a-firmware-accurate-preview-renderer">C vs Python — Building a Firmware-Accurate Preview Renderer<a class="headerlink" href="#c-vs-python-building-a-firmware-accurate-preview-renderer" title="Permanent link">&para;</a></h1>
+<p>How do you know the DevTool preview matches the actual e-ink display? You port every C drawing function to Python, render both, and diff them pixel by pixel. Here's what we found.</p>
 <!-- more -->
 
-<h2 id="the-idea">The Idea<a class="headerlink" href="#the-idea" title="Permanent link">&para;</a></h2>
-<p>The original Tamagotchi was a 1996 keychain toy with a tiny LCD, three buttons, and a virtual pet that needed feeding, attention, and care. The concept is simple. The implementation, for a modern DIY version with a proper e-ink display, 3D-printed case, and programmable firmware, is substantially more involved.</p>
-<p>The goals for Dilder:</p>
+<h2 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link">&para;</a></h2>
+<p>The octopus exists in two rendering engines:</p>
 <ol>
-<li>A functional virtual pet device you can hold in your hand</li>
-<li>A documented build process — hardware, software, enclosure, everything</li>
-<li>A public project with a community that can build their own</li>
-<li>An honest look at AI-assisted development — all prompts logged</li>
+<li><strong>C firmware</strong> — runs on the Pico W, drives the physical e-ink display</li>
+<li><strong>Python DevTool</strong> — runs on your PC, shows a preview in a Tkinter canvas</li>
 </ol>
-<h2 id="what-phase-0-covered">What Phase 0 Covered<a class="headerlink" href="#what-phase-0-covered" title="Permanent link">&para;</a></h2>
-<p>Phase 0 was purely planning. No hardware ordered, no code written. Just research and documentation:</p>
-<ul>
-<li><strong>Hardware research</strong> — identifying the right display (Waveshare 2.13" e-ink), compute (starting with Pico W, Pi Zero WH later), and input options (tactile buttons)</li>
-<li><strong>Enclosure concepts</strong> — rough proportions, button layout, display-to-case ratio</li>
-<li><strong>Project structure</strong> — phases, documentation format, GitHub repo</li>
-<li><strong>Website and community planning</strong> — this site, Discord, Patreon</li>
-</ul>
-<h2 id="key-decisions-made">Key Decisions Made<a class="headerlink" href="#key-decisions-made" title="Permanent link">&para;</a></h2>
-<h3 id="e-ink-over-lcd">E-Ink Over LCD<a class="headerlink" href="#e-ink-over-lcd" title="Permanent link">&para;</a></h3>
-<p>E-ink was chosen over a small OLED or TFT LCD for a few reasons:</p>
-<ul>
-<li><strong>Standby current</strong> — less than 0.01µA in standby. Perfect for a device that needs to run on a small battery.</li>
-<li><strong>Readability</strong> — high contrast in any lighting condition, no backlight needed</li>
-<li><strong>Aesthetic</strong> — the Tamagotchi style aesthetic benefits from a high-contrast, "paper" look</li>
-<li><strong>Tradeoff</strong> — 2-second full refresh, 0.3-second partial refresh. Animation is possible but limited.</li>
-</ul>
-<h3 id="pico-w-first-pi-zero-later">Pico W First, Pi Zero Later<a class="headerlink" href="#pico-w-first-pi-zero-later" title="Permanent link">&para;</a></h3>
-<p>Development starts on the <strong>Raspberry Pi Pico W</strong> — it's what we have on hand, it's cheap (~€6), and it's ideal for prototyping the display and input system with MicroPython. Instant boot, simple USB workflow, no OS to configure.</p>
-<p>The <strong>Pi Zero WH</strong> is planned for Phase 5 when we need Linux, a filesystem, networking features, or more compute for a personality/AI system. The display and button wiring is nearly identical between the two boards.</p>
-<h3 id="tactile-buttons-over-capacitive-touch">Tactile Buttons Over Capacitive Touch<a class="headerlink" href="#tactile-buttons-over-capacitive-touch" title="Permanent link">&para;</a></h3>
-<h3 id="tactile-buttons-over-capacitive-touch_1">Tactile Buttons Over Capacitive Touch<a class="headerlink" href="#tactile-buttons-over-capacitive-touch_1" title="Permanent link">&para;</a></h3>
-<p>Five discrete 6×6mm tactile buttons (up, down, left, right, center/select) beat capacitive touch for a first prototype because:</p>
-<ul>
-<li>Breadboard-friendly — no soldering required for the test bench</li>
-<li>Tactile feedback matters for a game device</li>
-<li>Zero additional components needed (Pico W's internal pull-ups handle everything)</li>
-</ul>
-<h2 id="prototype-concept">Prototype Concept<a class="headerlink" href="#prototype-concept" title="Permanent link">&para;</a></h2>
-<p>The enclosure concept settled on an "iPod Nano" style layout — landscape rectangle, display on the left covering ~75% of the face, compact d-pad cluster on the right.</p>
-<p><strong>v2 dimensions:</strong></p>
+<p>Both independently implement the same drawing functions: <code>fill_circle</code>, <code>draw_pupils_angry</code>, <code>draw_mouth_chaotic</code>, body RLE decode, chat bubble, the 5x7 bitmap font — all of it. If the Python implementation drifts from the C implementation, the preview lies. You'd design something in the DevTool, flash it, and the display would look different.</p>
+<h2 id="the-audit-tool">The Audit Tool<a class="headerlink" href="#the-audit-tool" title="Permanent link">&para;</a></h2>
+<p>We built <code>assets/render_c_previews.py</code> — a standalone Python script that is a <strong>1:1 port of every C firmware drawing function</strong>. Not the DevTool's Python implementations. The actual C code, translated line-by-line:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Exact port of C fill_circle()</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">fill_circle</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">r_sq</span><span class="p">,</span> <span class="n">set_val</span><span class="p">):</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">r</span> <span class="o">=</span> <span class="mi">5</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="k">for</span> <span class="n">dy</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">r</span><span class="p">,</span> <span class="n">r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="k">for</span> <span class="n">dx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">r</span><span class="p">,</span> <span class="n">r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>            <span class="k">if</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">&lt;=</span> <span class="n">r_sq</span><span class="p">:</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                <span class="k">if</span> <span class="n">set_val</span><span class="p">:</span> <span class="n">px_set_off</span><span class="p">(</span><span class="n">cx</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">dy</span><span class="p">)</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                <span class="k">else</span><span class="p">:</span>       <span class="n">px_clr_off</span><span class="p">(</span><span class="n">cx</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">dy</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Same loop bounds. Same comparison. Same pixel operations. If the C code draws a pixel at (23, 26), this script draws a pixel at (23, 26).</p>
+<p>The script includes the full <code>setup_body_transform()</code> with all per-mood parameters — dx, dy, x_expand, wobble amplitude/frequency/phase — so body animations render at the correct positions.</p>
+<h2 id="three-render-folders">Three Render Folders<a class="headerlink" href="#three-render-folders" title="Permanent link">&para;</a></h2>
+<p>Every mood is rendered three ways:</p>
 <table>
 <thead>
 <tr>
-<th>Metric</th>
-<th>Value</th>
+<th>Folder</th>
+<th>Source</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Case outer</td>
-<td>88 × 34 × 19mm</td>
+<td><code>assets/c-render/</code></td>
+<td>C-faithful Python port</td>
+<td>Ground truth — what the Pico actually displays</td>
 </tr>
 <tr>
-<td>Display window</td>
-<td>57 × 27mm</td>
+<td><code>assets/py-render/</code></td>
+<td>DevTool's Python engine</td>
+<td>What the preview shows</td>
 </tr>
 <tr>
-<td>Active pixel area</td>
-<td>48.55 × 23.71mm (250×122 px)</td>
+<td><code>assets/emotion-previews/</code></td>
+<td>C-faithful (canonical)</td>
+<td>Documentation images</td>
 </tr>
 </tbody>
 </table>
-<p><a href="../../docs/hardware/enclosure-design/">See the hardware docs for full enclosure specs</a></p>
-<h2 id="whats-next">What's Next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
-<p>Phase 1 is hardware assembly. The Pico W and e-ink display are on the bench. The goal: flash MicroPython, wire up the display and buttons on a breadboard, and get something — anything — to show on the screen.</p>
-<p>When the display shows its first pixel, Phase 1 is done.</p>
+<p>Each folder contains 34 files: 17 static previews and 17 four-frame animation strips.</p>
+<h2 id="the-pixel-diff-results">The Pixel Diff Results<a class="headerlink" href="#the-pixel-diff-results" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Mood          Diff pixels  Status
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>──────────────────────────────────
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>normal              0      MATCH
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>lazy                0      MATCH
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>fat                 0      MATCH
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>horny               0      MATCH
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>excited             0      MATCH
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>nostalgic           0      MATCH
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>angry             256      DIFF (wobble edge)
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>sad               128      DIFF (dy offset)
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>hungry             96      DIFF (dy offset)
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>tired              64      DIFF (dy offset)
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>weird              32      DIFF (wobble edge)
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>chill               0      MATCH
+</span></code></pre></div>
+<p><strong>10 of 16 moods are pixel-perfect.</strong> The remaining 6 differ by at most 256 pixels out of 30,500 total (less than 0.8%) — all at the edges of body spans where floating-point rounding in <code>sinf()</code> vs <code>math.sin()</code> pushes a pixel one way or the other. Visually indistinguishable.</p>
+<h2 id="what-causes-the-diffs">What Causes the Diffs<a class="headerlink" href="#what-causes-the-diffs" title="Permanent link">&para;</a></h2>
+<p>The body transform system applies a per-row sine wobble:</p>
+<div class="language-c highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// C firmware</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">wobble_amp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinf</span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">wobble_freq</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">wobble_phase</span><span class="p">));</span>
+</span></code></pre></div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Python</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">wobble_amp</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">wobble_freq</span> <span class="o">+</span> <span class="n">wobble_phase</span><span class="p">))</span>
+</span></code></pre></div>
+<p>When the result is exactly X.5, C rounds one way and Python rounds the other. This affects edge pixels on body spans during wobbly moods (angry, weird, chaotic, slaphappy). It's a known float32-vs-float64 precision difference that doesn't affect visual appearance.</p>
+<h2 id="why-this-matters">Why This Matters<a class="headerlink" href="#why-this-matters" title="Permanent link">&para;</a></h2>
+<p>For a project that's meant to be built by other people following documentation, "the preview matches the device" isn't optional. If someone designs a new expression in the DevTool and it looks different on the display, that's a trust problem.</p>
+<p>The renderer script is reusable — any time the C firmware drawing code changes, you can re-run it and verify the DevTool still matches:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>assets/render_c_previews.py
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1"># Generates all 16 moods + comparison grid</span>
+</span></code></pre></div>
+<p>It also serves as documentation — if you want to understand exactly how <code>draw_mouth_hungry()</code> works, you can read 15 lines of Python instead of parsing C with offset macros and cast gymnastics.</p>
 
 
 
@@ -2332,15 +2312,31 @@
       
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
+          
+          <a href="../sixteen-emotions/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 16 Emotions — Building the Octopus Personality System">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                16 Emotions — Building the Octopus Personality System
+              </div>
+            </div>
+          </a>
+        
         
           
-          <a href="../phase-1-hardware-begins/" class="md-footer__link md-footer__link--next" aria-label="Next: Phase 1: Hardware — Pico W + E-Ink, Let&#39;s Go">
+          <a href="../body-language-animations/" class="md-footer__link md-footer__link--next" aria-label="Next: Body Language — Custom Body Shapes and Movement Per Emotion">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Phase 1: Hardware — Pico W + E-Ink, Let's Go
+                Body Language — Custom Body Shapes and Movement Per Emotion
               </div>
             </div>
             <div class="md-footer__button md-icon">

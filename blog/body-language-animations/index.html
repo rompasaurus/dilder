@@ -12,11 +12,11 @@
         <meta name="author" content="rompasaurus">
       
       
-        <link rel="canonical" href="https://dilder.dev/blog/phase-0-planning/">
+        <link rel="canonical" href="https://dilder.dev/blog/body-language-animations/">
       
       
+        <link rel="prev" href="../c-vs-python-renderer/">
       
-        <link rel="next" href="../phase-1-hardware-begins/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Phase 0: Planning — From Idea to Blueprint - Dilder</title>
+        <title>Body Language — Custom Body Shapes and Movement Per Emotion - Dilder</title>
       
     
     
@@ -90,7 +90,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#phase-0-planning-from-idea-to-blueprint" class="md-skip">
+        <a href="#body-language-custom-body-shapes-and-movement-per-emotion" class="md-skip">
           Skip to content
         </a>
       
@@ -124,7 +124,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Phase 0: Planning — From Idea to Blueprint
+              Body Language — Custom Body Shapes and Movement Per Emotion
             
           </span>
         </div>
@@ -2008,10 +2008,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-idea" class="md-nav__link">
+  <a href="#the-transform-system" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Idea
+        The Transform System
       
     </span>
   </a>
@@ -2019,10 +2019,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-phase-0-covered" class="md-nav__link">
+  <a href="#what-each-mood-does" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Phase 0 Covered
+        What Each Mood Does
       
     </span>
   </a>
@@ -2030,22 +2030,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-decisions-made" class="md-nav__link">
+  <a href="#custom-bodies-fat-and-lazy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Decisions Made
+        Custom Bodies: Fat and Lazy
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Key Decisions Made">
+    <nav class="md-nav" aria-label="Custom Bodies: Fat and Lazy">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#e-ink-over-lcd" class="md-nav__link">
+  <a href="#fat-octopus" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E-Ink Over LCD
+        Fat Octopus
       
     </span>
   </a>
@@ -2053,32 +2053,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pico-w-first-pi-zero-later" class="md-nav__link">
+  <a href="#lazy-octopus" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pico W First, Pi Zero Later
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tactile-buttons-over-capacitive-touch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tactile Buttons Over Capacitive Touch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tactile-buttons-over-capacitive-touch_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tactile Buttons Over Capacitive Touch
+        Lazy Octopus
       
     </span>
   </a>
@@ -2091,10 +2069,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#prototype-concept" class="md-nav__link">
+  <a href="#the-rle-format" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Prototype Concept
+        The RLE Format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verifying-across-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifying Across Implementations
       
     </span>
   </a>
@@ -2168,7 +2157,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2026-04-08 00:00:00+00:00" class="md-ellipsis">April 8, 2026</time>
+                        <time datetime="2026-04-12 00:00:00+00:00" class="md-ellipsis">April 12, 2026</time>
                       </div>
                     </li>
                     
@@ -2179,7 +2168,8 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../category/planning/">Planning</a></span>
+                              <a href="../category/firmware/">Firmware</a>, 
+                              <a href="../category/design/">Design</a></span>
                         </div>
                       </li>
                     
@@ -2190,7 +2180,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              2 min read
+                              3 min read
                             
                           </span>
                         </div>
@@ -2217,76 +2207,150 @@
   
 
 
-<h1 id="phase-0-planning-from-idea-to-blueprint">Phase 0: Planning — From Idea to Blueprint<a class="headerlink" href="#phase-0-planning-from-idea-to-blueprint" title="Permanent link">&para;</a></h1>
-<p>Every project starts somewhere. Dilder started with a question: how hard is it to actually build a Tamagotchi?</p>
+<h1 id="body-language-custom-body-shapes-and-movement-per-emotion">Body Language — Custom Body Shapes and Movement Per Emotion<a class="headerlink" href="#body-language-custom-body-shapes-and-movement-per-emotion" title="Permanent link">&para;</a></h1>
+<p>The face was done. 16 distinct expressions. But the body was the same for every mood — a static black blob. Today the octopus learned to move, and two moods got entirely new body shapes. Fat is fat. Lazy lounges. Angry trembles. Chaotic distorts. The body finally matches the face.</p>
 <!-- more -->
 
-<h2 id="the-idea">The Idea<a class="headerlink" href="#the-idea" title="Permanent link">&para;</a></h2>
-<p>The original Tamagotchi was a 1996 keychain toy with a tiny LCD, three buttons, and a virtual pet that needed feeding, attention, and care. The concept is simple. The implementation, for a modern DIY version with a proper e-ink display, 3D-printed case, and programmable firmware, is substantially more involved.</p>
-<p>The goals for Dilder:</p>
-<ol>
-<li>A functional virtual pet device you can hold in your hand</li>
-<li>A documented build process — hardware, software, enclosure, everything</li>
-<li>A public project with a community that can build their own</li>
-<li>An honest look at AI-assisted development — all prompts logged</li>
-</ol>
-<h2 id="what-phase-0-covered">What Phase 0 Covered<a class="headerlink" href="#what-phase-0-covered" title="Permanent link">&para;</a></h2>
-<p>Phase 0 was purely planning. No hardware ordered, no code written. Just research and documentation:</p>
+<h2 id="the-transform-system">The Transform System<a class="headerlink" href="#the-transform-system" title="Permanent link">&para;</a></h2>
+<p>Every frame, before drawing anything, the firmware calls <code>setup_body_transform(mood, frame_idx)</code>. This function sets four global parameters that affect every subsequent pixel operation:</p>
 <ul>
-<li><strong>Hardware research</strong> — identifying the right display (Waveshare 2.13" e-ink), compute (starting with Pico W, Pi Zero WH later), and input options (tactile buttons)</li>
-<li><strong>Enclosure concepts</strong> — rough proportions, button layout, display-to-case ratio</li>
-<li><strong>Project structure</strong> — phases, documentation format, GitHub repo</li>
-<li><strong>Website and community planning</strong> — this site, Discord, Patreon</li>
+<li><strong>body_dx / body_dy</strong> — shifts the entire octopus horizontally or vertically</li>
+<li><strong>body_x_expand</strong> — widens or narrows every body span (positive = fatter, negative = thinner)</li>
+<li><strong>wobble_amp / wobble_freq / wobble_phase</strong> — applies a per-row sinusoidal horizontal offset (makes the body wavy)</li>
 </ul>
-<h2 id="key-decisions-made">Key Decisions Made<a class="headerlink" href="#key-decisions-made" title="Permanent link">&para;</a></h2>
-<h3 id="e-ink-over-lcd">E-Ink Over LCD<a class="headerlink" href="#e-ink-over-lcd" title="Permanent link">&para;</a></h3>
-<p>E-ink was chosen over a small OLED or TFT LCD for a few reasons:</p>
-<ul>
-<li><strong>Standby current</strong> — less than 0.01µA in standby. Perfect for a device that needs to run on a small battery.</li>
-<li><strong>Readability</strong> — high contrast in any lighting condition, no backlight needed</li>
-<li><strong>Aesthetic</strong> — the Tamagotchi style aesthetic benefits from a high-contrast, "paper" look</li>
-<li><strong>Tradeoff</strong> — 2-second full refresh, 0.3-second partial refresh. Animation is possible but limited.</li>
-</ul>
-<h3 id="pico-w-first-pi-zero-later">Pico W First, Pi Zero Later<a class="headerlink" href="#pico-w-first-pi-zero-later" title="Permanent link">&para;</a></h3>
-<p>Development starts on the <strong>Raspberry Pi Pico W</strong> — it's what we have on hand, it's cheap (~€6), and it's ideal for prototyping the display and input system with MicroPython. Instant boot, simple USB workflow, no OS to configure.</p>
-<p>The <strong>Pi Zero WH</strong> is planned for Phase 5 when we need Linux, a filesystem, networking features, or more compute for a personality/AI system. The display and button wiring is nearly identical between the two boards.</p>
-<h3 id="tactile-buttons-over-capacitive-touch">Tactile Buttons Over Capacitive Touch<a class="headerlink" href="#tactile-buttons-over-capacitive-touch" title="Permanent link">&para;</a></h3>
-<h3 id="tactile-buttons-over-capacitive-touch_1">Tactile Buttons Over Capacitive Touch<a class="headerlink" href="#tactile-buttons-over-capacitive-touch_1" title="Permanent link">&para;</a></h3>
-<p>Five discrete 6×6mm tactile buttons (up, down, left, right, center/select) beat capacitive touch for a first prototype because:</p>
-<ul>
-<li>Breadboard-friendly — no soldering required for the test bench</li>
-<li>Tactile feedback matters for a game device</li>
-<li>Zero additional components needed (Pico W's internal pull-ups handle everything)</li>
-</ul>
-<h2 id="prototype-concept">Prototype Concept<a class="headerlink" href="#prototype-concept" title="Permanent link">&para;</a></h2>
-<p>The enclosure concept settled on an "iPod Nano" style layout — landscape rectangle, display on the left covering ~75% of the face, compact d-pad cluster on the right.</p>
-<p><strong>v2 dimensions:</strong></p>
+<p>These transforms are baked into <code>px_set_off()</code> and <code>px_clr_off()</code>, so they affect the body, eyes, mouth — everything moves together. No separate animation system needed.</p>
+<div class="language-c highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">px_set_off</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">px_set</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">body_dx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">row_wobble</span><span class="p">(</span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Y_OFF</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">body_dy</span><span class="p">);</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="what-each-mood-does">What Each Mood Does<a class="headerlink" href="#what-each-mood-does" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Metric</th>
-<th>Value</th>
+<th>Mood</th>
+<th>dx</th>
+<th>dy</th>
+<th>x_expand</th>
+<th>Wobble</th>
+<th>Visual Effect</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Case outer</td>
-<td>88 × 34 × 19mm</td>
+<td>Normal</td>
+<td>0</td>
+<td>sin(f)</td>
+<td>0</td>
+<td>none</td>
+<td>Gentle breathing bob</td>
 </tr>
 <tr>
-<td>Display window</td>
-<td>57 × 27mm</td>
+<td>Angry</td>
+<td>0</td>
+<td>-1</td>
+<td>+2</td>
+<td>0.5 amp</td>
+<td>Puffed up, slight tremble</td>
 </tr>
 <tr>
-<td>Active pixel area</td>
-<td>48.55 × 23.71mm (250×122 px)</td>
+<td>Sad</td>
+<td>0</td>
+<td>+3</td>
+<td>-1</td>
+<td>none</td>
+<td>Drooped down, deflated</td>
+</tr>
+<tr>
+<td>Chaotic</td>
+<td>sin</td>
+<td>sin</td>
+<td>0</td>
+<td>3 amp</td>
+<td>Wild wavy distortion</td>
+</tr>
+<tr>
+<td>Weird</td>
+<td>sin</td>
+<td>0</td>
+<td>0</td>
+<td>1.5 amp</td>
+<td>Lean + body wave</td>
+</tr>
+<tr>
+<td>Tired</td>
+<td>0</td>
+<td>+2</td>
+<td>-1</td>
+<td>none</td>
+<td>Sagging, melting</td>
+</tr>
+<tr>
+<td>Slap Happy</td>
+<td>sin</td>
+<td>0</td>
+<td>0</td>
+<td>2 amp</td>
+<td>Drunk sway</td>
+</tr>
+<tr>
+<td>Excited</td>
+<td>0</td>
+<td>3*sin</td>
+<td>0</td>
+<td>none</td>
+<td>Bouncing up and down</td>
+</tr>
+<tr>
+<td>Horny</td>
+<td>0</td>
+<td>0</td>
+<td>2*sin</td>
+<td>none</td>
+<td>Rhythmic expand/contract</td>
+</tr>
+<tr>
+<td>Homesick</td>
+<td>0</td>
+<td>+1</td>
+<td>-2</td>
+<td>none</td>
+<td>Curled inward, smaller</td>
 </tr>
 </tbody>
 </table>
-<p><a href="../../docs/hardware/enclosure-design/">See the hardware docs for full enclosure specs</a></p>
+<p>The <code>f</code> value is <code>frame_idx * PI / 2</code>, so each frame steps the sine by 90 degrees. Over 4 frames you get one full oscillation.</p>
+<h2 id="custom-bodies-fat-and-lazy">Custom Bodies: Fat and Lazy<a class="headerlink" href="#custom-bodies-fat-and-lazy" title="Permanent link">&para;</a></h2>
+<p>Two moods needed more than transforms — they needed entirely different body silhouettes.</p>
+<h3 id="fat-octopus">Fat Octopus<a class="headerlink" href="#fat-octopus" title="Permanent link">&para;</a></h3>
+<p>The standard body has a head dome ~52px wide that tapers to a waist before the tentacles. The fat body:</p>
+<ul>
+<li>Starts 2 rows higher (bigger dome)</li>
+<li>Widens to 60px at peak (+5px per side)</li>
+<li>Has <strong>no waist taper</strong> — stays wide all the way through</li>
+<li>Tentacles are each 2px wider (barely any gap between them)</li>
+</ul>
+<p>The visual difference is immediate. Standard octopus has visible space between tentacles and a defined waist. Fat octopus is a continuous mass of chonk.</p>
+<h3 id="lazy-octopus">Lazy Octopus<a class="headerlink" href="#lazy-octopus" title="Permanent link">&para;</a></h3>
+<p>This one went through two iterations. The first attempt was a "French woman reclining" pose — asymmetric body sloping rightward with a tentacle draped across the belly. It looked weird. Overcomplicated. Hard to read at 1-bit resolution.</p>
+<p>The second iteration (the one that shipped) is much simpler: <strong>same head and body, but all 5 tentacles sweep to the right</strong> instead of hanging straight down. The cheek area tapers rightward to smooth the transition. It reads immediately as "sitting on its side, legs draped over."</p>
+<p>Sometimes the clever solution is just the simple one.</p>
+<h2 id="the-rle-format">The RLE Format<a class="headerlink" href="#the-rle-format" title="Permanent link">&para;</a></h2>
+<p>The body is stored as run-length encoded spans:</p>
+<div class="language-c highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">body_rle</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">22</span><span class="p">,</span><span class="mi">48</span><span class="p">,</span><span class="w">   </span><span class="c1">// y=10: 1 span from x=22 to x=48</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="mi">11</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">,</span><span class="mi">52</span><span class="p">,</span><span class="w">   </span><span class="c1">// y=11: 1 span from x=18 to x=52</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="c1">// ... head rows ...</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="mi">55</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="w"> </span><span class="mi">21</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="mi">39</span><span class="p">,</span><span class="w"> </span><span class="mi">43</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="mi">54</span><span class="p">,</span><span class="mi">61</span><span class="p">,</span><span class="w">  </span><span class="c1">// y=55: 5 tentacle spans</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="c1">// ... tentacle rows zigzag ...</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="mh">0xFF</span><span class="w">           </span><span class="c1">// terminator</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">};</span>
+</span></code></pre></div>
+<p>Standard body: 197 bytes. Fat body: 215 bytes. Lazy body: 220 bytes. Three entirely different silhouettes for less data than a single tweet.</p>
+<h2 id="verifying-across-implementations">Verifying Across Implementations<a class="headerlink" href="#verifying-across-implementations" title="Permanent link">&para;</a></h2>
+<p>The body rendering exists in three places: the C firmware (runs on the Pico), the Python DevTool (preview emulator), and the C-faithful preview renderer (generates static PNGs). All three need to match pixel-for-pixel, or what you see in the DevTool won't match what appears on the device.</p>
+<p>We built a comparison pipeline that renders all 16 moods from both C and Python logic, then diffs them pixel-by-pixel. 10 of 16 match exactly. The other 6 differ by fewer than 256 pixels — all at wobble boundaries where Python's <code>math.sin()</code> and C's <code>sinf()</code> round differently. Visually identical.</p>
 <h2 id="whats-next">What's Next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
-<p>Phase 1 is hardware assembly. The Pico W and e-ink display are on the bench. The goal: flash MicroPython, wire up the display and buttons on a breadboard, and get something — anything — to show on the screen.</p>
-<p>When the display shows its first pixel, Phase 1 is done.</p>
+<p>The octopus has a face, a body, and personality. It can emote, animate, and speak. What it can't do yet is <em>react</em>. Phase 2 will add user input — buttons or serial commands that let you interact with the octopus and trigger emotional state changes. The keyboard input mapping is already planned. The octopus is ready to listen.</p>
 
 
 
@@ -2332,22 +2396,22 @@
       
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
-        
           
-          <a href="../phase-1-hardware-begins/" class="md-footer__link md-footer__link--next" aria-label="Next: Phase 1: Hardware — Pico W + E-Ink, Let&#39;s Go">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                Phase 1: Hardware — Pico W + E-Ink, Let's Go
-              </div>
-            </div>
+          <a href="../c-vs-python-renderer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: C vs Python — Building a Firmware-Accurate Preview Renderer">
             <div class="md-footer__button md-icon">
               
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                C vs Python — Building a Firmware-Accurate Preview Renderer
+              </div>
             </div>
           </a>
+        
         
       </nav>
     

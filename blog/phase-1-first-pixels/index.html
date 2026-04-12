@@ -12,11 +12,13 @@
         <meta name="author" content="rompasaurus">
       
       
-        <link rel="canonical" href="https://dilder.dev/blog/phase-0-planning/">
+        <link rel="canonical" href="https://dilder.dev/blog/phase-1-first-pixels/">
       
       
+        <link rel="prev" href="../phase-1-hardware-begins/">
       
-        <link rel="next" href="../phase-1-hardware-begins/">
+      
+        <link rel="next" href="../sassy-octopus-born/">
       
       
         
@@ -27,7 +29,7 @@
     
     
       
-        <title>Phase 0: Planning — From Idea to Blueprint - Dilder</title>
+        <title>First Pixels — Hello World on the E-Ink Display - Dilder</title>
       
     
     
@@ -90,7 +92,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#phase-0-planning-from-idea-to-blueprint" class="md-skip">
+        <a href="#first-pixels-hello-world-on-the-e-ink-display" class="md-skip">
           Skip to content
         </a>
       
@@ -124,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Phase 0: Planning — From Idea to Blueprint
+              First Pixels — Hello World on the E-Ink Display
             
           </span>
         </div>
@@ -2008,10 +2010,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-idea" class="md-nav__link">
+  <a href="#the-moment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Idea
+        The Moment
       
     </span>
   </a>
@@ -2019,10 +2021,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-phase-0-covered" class="md-nav__link">
+  <a href="#what-it-took-to-get-here" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Phase 0 Covered
+        What It Took to Get Here
       
     </span>
   </a>
@@ -2030,71 +2032,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-decisions-made" class="md-nav__link">
+  <a href="#the-serial-heartbeat" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Decisions Made
+        The Serial Heartbeat
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Key Decisions Made">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#e-ink-over-lcd" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        E-Ink Over LCD
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pico-w-first-pi-zero-later" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pico W First, Pi Zero Later
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tactile-buttons-over-capacitive-touch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tactile Buttons Over Capacitive Touch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tactile-buttons-over-capacitive-touch_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tactile Buttons Over Capacitive Touch
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#prototype-concept" class="md-nav__link">
+  <a href="#flash-efficiency" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Prototype Concept
+        Flash Efficiency
       
     </span>
   </a>
@@ -2168,7 +2120,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2026-04-08 00:00:00+00:00" class="md-ellipsis">April 8, 2026</time>
+                        <time datetime="2026-04-10 00:00:00+00:00" class="md-ellipsis">April 10, 2026</time>
                       </div>
                     </li>
                     
@@ -2179,7 +2131,8 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../category/planning/">Planning</a></span>
+                              <a href="../category/hardware/">Hardware</a>, 
+                              <a href="../category/firmware/">Firmware</a></span>
                         </div>
                       </li>
                     
@@ -2217,76 +2170,31 @@
   
 
 
-<h1 id="phase-0-planning-from-idea-to-blueprint">Phase 0: Planning — From Idea to Blueprint<a class="headerlink" href="#phase-0-planning-from-idea-to-blueprint" title="Permanent link">&para;</a></h1>
-<p>Every project starts somewhere. Dilder started with a question: how hard is it to actually build a Tamagotchi?</p>
+<h1 id="first-pixels-hello-world-on-the-e-ink-display">First Pixels — Hello World on the E-Ink Display<a class="headerlink" href="#first-pixels-hello-world-on-the-e-ink-display" title="Permanent link">&para;</a></h1>
+<p>We got pixels. Real, physical, black-on-white pixels on the Waveshare 2.13" e-ink display, driven by C firmware on the Pico W. Phase 1's proof-of-life is alive.</p>
 <!-- more -->
 
-<h2 id="the-idea">The Idea<a class="headerlink" href="#the-idea" title="Permanent link">&para;</a></h2>
-<p>The original Tamagotchi was a 1996 keychain toy with a tiny LCD, three buttons, and a virtual pet that needed feeding, attention, and care. The concept is simple. The implementation, for a modern DIY version with a proper e-ink display, 3D-printed case, and programmable firmware, is substantially more involved.</p>
-<p>The goals for Dilder:</p>
-<ol>
-<li>A functional virtual pet device you can hold in your hand</li>
-<li>A documented build process — hardware, software, enclosure, everything</li>
-<li>A public project with a community that can build their own</li>
-<li>An honest look at AI-assisted development — all prompts logged</li>
-</ol>
-<h2 id="what-phase-0-covered">What Phase 0 Covered<a class="headerlink" href="#what-phase-0-covered" title="Permanent link">&para;</a></h2>
-<p>Phase 0 was purely planning. No hardware ordered, no code written. Just research and documentation:</p>
-<ul>
-<li><strong>Hardware research</strong> — identifying the right display (Waveshare 2.13" e-ink), compute (starting with Pico W, Pi Zero WH later), and input options (tactile buttons)</li>
-<li><strong>Enclosure concepts</strong> — rough proportions, button layout, display-to-case ratio</li>
-<li><strong>Project structure</strong> — phases, documentation format, GitHub repo</li>
-<li><strong>Website and community planning</strong> — this site, Discord, Patreon</li>
-</ul>
-<h2 id="key-decisions-made">Key Decisions Made<a class="headerlink" href="#key-decisions-made" title="Permanent link">&para;</a></h2>
-<h3 id="e-ink-over-lcd">E-Ink Over LCD<a class="headerlink" href="#e-ink-over-lcd" title="Permanent link">&para;</a></h3>
-<p>E-ink was chosen over a small OLED or TFT LCD for a few reasons:</p>
-<ul>
-<li><strong>Standby current</strong> — less than 0.01µA in standby. Perfect for a device that needs to run on a small battery.</li>
-<li><strong>Readability</strong> — high contrast in any lighting condition, no backlight needed</li>
-<li><strong>Aesthetic</strong> — the Tamagotchi style aesthetic benefits from a high-contrast, "paper" look</li>
-<li><strong>Tradeoff</strong> — 2-second full refresh, 0.3-second partial refresh. Animation is possible but limited.</li>
-</ul>
-<h3 id="pico-w-first-pi-zero-later">Pico W First, Pi Zero Later<a class="headerlink" href="#pico-w-first-pi-zero-later" title="Permanent link">&para;</a></h3>
-<p>Development starts on the <strong>Raspberry Pi Pico W</strong> — it's what we have on hand, it's cheap (~€6), and it's ideal for prototyping the display and input system with MicroPython. Instant boot, simple USB workflow, no OS to configure.</p>
-<p>The <strong>Pi Zero WH</strong> is planned for Phase 5 when we need Linux, a filesystem, networking features, or more compute for a personality/AI system. The display and button wiring is nearly identical between the two boards.</p>
-<h3 id="tactile-buttons-over-capacitive-touch">Tactile Buttons Over Capacitive Touch<a class="headerlink" href="#tactile-buttons-over-capacitive-touch" title="Permanent link">&para;</a></h3>
-<h3 id="tactile-buttons-over-capacitive-touch_1">Tactile Buttons Over Capacitive Touch<a class="headerlink" href="#tactile-buttons-over-capacitive-touch_1" title="Permanent link">&para;</a></h3>
-<p>Five discrete 6×6mm tactile buttons (up, down, left, right, center/select) beat capacitive touch for a first prototype because:</p>
-<ul>
-<li>Breadboard-friendly — no soldering required for the test bench</li>
-<li>Tactile feedback matters for a game device</li>
-<li>Zero additional components needed (Pico W's internal pull-ups handle everything)</li>
-</ul>
-<h2 id="prototype-concept">Prototype Concept<a class="headerlink" href="#prototype-concept" title="Permanent link">&para;</a></h2>
-<p>The enclosure concept settled on an "iPod Nano" style layout — landscape rectangle, display on the left covering ~75% of the face, compact d-pad cluster on the right.</p>
-<p><strong>v2 dimensions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Metric</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Case outer</td>
-<td>88 × 34 × 19mm</td>
-</tr>
-<tr>
-<td>Display window</td>
-<td>57 × 27mm</td>
-</tr>
-<tr>
-<td>Active pixel area</td>
-<td>48.55 × 23.71mm (250×122 px)</td>
-</tr>
-</tbody>
-</table>
-<p><a href="../../docs/hardware/enclosure-design/">See the hardware docs for full enclosure specs</a></p>
+<h2 id="the-moment">The Moment<a class="headerlink" href="#the-moment" title="Permanent link">&para;</a></h2>
+<p>There's a specific feeling when hardware you've been researching and wiring actually does the thing. You flash the UF2, the Pico reboots, the BUSY pin goes low, and then — text appears on the display. No Python interpreter, no OS, no abstraction layers. Just C talking SPI to a display controller pushing pixels into electrophoretic ink.</p>
+<p>The <code>hello-world</code> firmware is 106KB compiled. It initializes SPI1 at 4MHz, configures the SSD1680 display controller, clears the screen, and renders "HELLO DILDER" using the Waveshare paint library. Takes about 3 seconds for the full refresh. Partial refresh drops that to under a second.</p>
+<h2 id="what-it-took-to-get-here">What It Took to Get Here<a class="headerlink" href="#what-it-took-to-get-here" title="Permanent link">&para;</a></h2>
+<p>More than you'd think. The Pico SDK's build system is CMake + Ninja, which is powerful but unforgiving if your environment isn't set up exactly right. On Arch Linux (my daily driver), the ARM cross-compiler is <code>arm-none-eabi-gcc</code> from the AUR, and the SDK needs <code>PICO_SDK_PATH</code> exported before CMake will even configure.</p>
+<p>The wiring was straightforward — 8 jumper wires from the e-Paper HAT's side header to the Pico W's SPI1 pins. No level shifters needed since both run at 3.3V. The only gotcha: the display's BUSY pin is active-high during refresh, and you have to poll it before sending the next command or you'll corrupt the frame.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Pico W SPI1 → Waveshare 2.13&quot; V3:
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  GP11 (TX)  → DIN     GP10 (SCK) → CLK
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  GP9  (CSn) → CS      GP8        → DC
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  GP12       → RST     GP13       → BUSY
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  3V3        → VCC     GND        → GND
+</span></code></pre></div>
+<h2 id="the-serial-heartbeat">The Serial Heartbeat<a class="headerlink" href="#the-serial-heartbeat" title="Permanent link">&para;</a></h2>
+<p>Before touching the display, I flashed <code>hello-world-serial</code> — a minimal firmware that blinks the onboard LED and prints "Heartbeat" over USB serial at 115200 baud. This verified the entire toolchain end-to-end: compiler, linker, UF2 generation, BOOTSEL flashing, and USB CDC enumeration.</p>
+<p>Watching <code>minicom</code> print heartbeat messages while the LED blinks is boring. But it's the kind of boring that means everything downstream is going to work.</p>
+<h2 id="flash-efficiency">Flash Efficiency<a class="headerlink" href="#flash-efficiency" title="Permanent link">&para;</a></h2>
+<p>The compiled <code>hello_dilder.uf2</code> is 106KB. The Pico W has 2MB (2048KB) of flash. That's 5.2% used for a program that initializes the full SPI display stack and renders text. This confirmed what the hardware research suggested — we have enormous headroom for the actual pet firmware, quote databases, sprite data, and whatever else Phase 2 brings.</p>
+<p>For comparison, MicroPython's firmware alone uses ~700KB before you write a single line of code. Going C-first was the right call.</p>
 <h2 id="whats-next">What's Next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
-<p>Phase 1 is hardware assembly. The Pico W and e-ink display are on the bench. The goal: flash MicroPython, wire up the display and buttons on a breadboard, and get something — anything — to show on the screen.</p>
-<p>When the display shows its first pixel, Phase 1 is done.</p>
+<p>The display works. Serial works. The toolchain is solid. Now we need proper tooling — a setup CLI so others can replicate this environment, and a DevTool GUI for day-to-day development. That's the next post.</p>
+<p>But right now? Right now we're staring at text on e-ink and it feels real.</p>
 
 
 
@@ -2332,15 +2240,31 @@
       
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
+          
+          <a href="../phase-1-hardware-begins/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Phase 1: Hardware — Pico W + E-Ink, Let&#39;s Go">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Phase 1: Hardware — Pico W + E-Ink, Let's Go
+              </div>
+            </div>
+          </a>
+        
         
           
-          <a href="../phase-1-hardware-begins/" class="md-footer__link md-footer__link--next" aria-label="Next: Phase 1: Hardware — Pico W + E-Ink, Let&#39;s Go">
+          <a href="../sassy-octopus-born/" class="md-footer__link md-footer__link--next" aria-label="Next: The Sassy Octopus is Born">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Phase 1: Hardware — Pico W + E-Ink, Let's Go
+                The Sassy Octopus is Born
               </div>
             </div>
             <div class="md-footer__button md-icon">

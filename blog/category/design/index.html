@@ -12,29 +12,31 @@
         <meta name="author" content="rompasaurus">
       
       
-        <link rel="canonical" href="https://dilder.dev/blog/phase-0-planning/">
+        <link rel="canonical" href="https://dilder.dev/blog/category/design/">
       
       
+        <link rel="prev" href="../architecture/">
       
-        <link rel="next" href="../phase-1-hardware-begins/">
+      
+        <link rel="next" href="../firmware/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Phase 0: Planning — From Idea to Blueprint - Dilder</title>
+        <title>Design - Dilder</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,9 +55,9 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -90,7 +92,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#phase-0-planning-from-idea-to-blueprint" class="md-skip">
+        <a href="#design" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +106,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Dilder" class="md-header__button md-logo" aria-label="Dilder" data-md-component="logo">
+    <a href="../../.." title="Dilder" class="md-header__button md-logo" aria-label="Dilder" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73A2 2 0 1 0 10 4c0 .74.4 1.39 1 1.73V7h-1c-3.87 0-7 3.13-7 7H2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h1v1a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2v-1h1c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1M9.7 15.45l-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45m9 0-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45"/></svg>
@@ -124,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Phase 0: Planning — From Idea to Blueprint
+              Design
             
           </span>
         </div>
@@ -237,7 +239,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   
@@ -260,7 +262,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+        <a href="../../" class="md-tabs__link">
           
   
   
@@ -280,7 +282,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../docs/" class="md-tabs__link">
+        <a href="../../../docs/" class="md-tabs__link">
           
   
   
@@ -300,7 +302,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../community/" class="md-tabs__link">
+        <a href="../../../community/" class="md-tabs__link">
           
   
   
@@ -320,7 +322,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../about/" class="md-tabs__link">
+        <a href="../../../about/" class="md-tabs__link">
           
   
   
@@ -338,7 +340,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../prompts/" class="md-tabs__link">
+      <a href="../../../prompts/" class="md-tabs__link">
         
   
   
@@ -362,9 +364,7 @@
           
             
               
-                
-              
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
@@ -375,7 +375,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Dilder" class="md-nav__button md-logo" aria-label="Dilder" data-md-component="logo">
+    <a href="../../.." title="Dilder" class="md-nav__button md-logo" aria-label="Dilder" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73A2 2 0 1 0 10 4c0 .74.4 1.39 1 1.73V7h-1c-3.87 0-7 3.13-7 7H2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h1v1a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2v-1h1c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1M9.7 15.45l-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45m9 0-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45"/></svg>
@@ -405,7 +405,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -486,14 +486,12 @@
                 
   
   
-    
-  
   
     
   
   
-    <li class="md-nav__item md-nav__item--active">
-      <a href="../" class="md-nav__link">
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
         
   
   
@@ -578,7 +576,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../archive/2026/" class="md-nav__link">
+      <a href="../../archive/2026/" class="md-nav__link">
         
   
   
@@ -611,6 +609,8 @@
                 
   
   
+    
+  
   
   
     
@@ -626,11 +626,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
         
           
           <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
@@ -651,7 +651,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -671,7 +671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../category/architecture/" class="md-nav__link">
+      <a href="../architecture/" class="md-nav__link">
         
   
   
@@ -696,12 +696,23 @@
                 
   
   
-  
     
   
   
-    <li class="md-nav__item">
-      <a href="../category/design/" class="md-nav__link">
+    
+      
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -717,6 +728,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -731,7 +743,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../category/firmware/" class="md-nav__link">
+      <a href="../firmware/" class="md-nav__link">
         
   
   
@@ -761,7 +773,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../category/hardware/" class="md-nav__link">
+      <a href="../hardware/" class="md-nav__link">
         
   
   
@@ -791,7 +803,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../category/planning/" class="md-nav__link">
+      <a href="../planning/" class="md-nav__link">
         
   
   
@@ -821,7 +833,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../category/software/" class="md-nav__link">
+      <a href="../software/" class="md-nav__link">
         
   
   
@@ -851,7 +863,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../category/tools/" class="md-nav__link">
+      <a href="../tools/" class="md-nav__link">
         
   
   
@@ -946,7 +958,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/" class="md-nav__link">
+      <a href="../../../docs/" class="md-nav__link">
         
   
   
@@ -1026,7 +1038,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/hardware/materials-list/" class="md-nav__link">
+      <a href="../../../docs/hardware/materials-list/" class="md-nav__link">
         
   
   
@@ -1054,7 +1066,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/hardware/wiring-pinout/" class="md-nav__link">
+      <a href="../../../docs/hardware/wiring-pinout/" class="md-nav__link">
         
   
   
@@ -1082,7 +1094,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/hardware/enclosure-design/" class="md-nav__link">
+      <a href="../../../docs/hardware/enclosure-design/" class="md-nav__link">
         
   
   
@@ -1110,7 +1122,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/hardware/3d-printing-pipeline/" class="md-nav__link">
+      <a href="../../../docs/hardware/3d-printing-pipeline/" class="md-nav__link">
         
   
   
@@ -1198,7 +1210,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/setup/first-time-setup/" class="md-nav__link">
+      <a href="../../../docs/setup/first-time-setup/" class="md-nav__link">
         
   
   
@@ -1226,7 +1238,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/setup/pi-zero-setup/" class="md-nav__link">
+      <a href="../../../docs/setup/pi-zero-setup/" class="md-nav__link">
         
   
   
@@ -1254,7 +1266,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/setup/display-setup/" class="md-nav__link">
+      <a href="../../../docs/setup/display-setup/" class="md-nav__link">
         
   
   
@@ -1282,7 +1294,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/setup/dev-environment/" class="md-nav__link">
+      <a href="../../../docs/setup/dev-environment/" class="md-nav__link">
         
   
   
@@ -1370,7 +1382,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/software/project-structure/" class="md-nav__link">
+      <a href="../../../docs/software/project-structure/" class="md-nav__link">
         
   
   
@@ -1458,7 +1470,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/tools/devtool/" class="md-nav__link">
+      <a href="../../../docs/tools/devtool/" class="md-nav__link">
         
   
   
@@ -1486,7 +1498,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/tools/setup-cli/" class="md-nav__link">
+      <a href="../../../docs/tools/setup-cli/" class="md-nav__link">
         
   
   
@@ -1514,7 +1526,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/tools/website-dev/" class="md-nav__link">
+      <a href="../../../docs/tools/website-dev/" class="md-nav__link">
         
   
   
@@ -1602,7 +1614,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/reference/pico-w/" class="md-nav__link">
+      <a href="../../../docs/reference/pico-w/" class="md-nav__link">
         
   
   
@@ -1630,7 +1642,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/reference/pi-zero-wh/" class="md-nav__link">
+      <a href="../../../docs/reference/pi-zero-wh/" class="md-nav__link">
         
   
   
@@ -1658,7 +1670,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/reference/waveshare-eink/" class="md-nav__link">
+      <a href="../../../docs/reference/waveshare-eink/" class="md-nav__link">
         
   
   
@@ -1753,7 +1765,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../community/" class="md-nav__link">
+      <a href="../../../community/" class="md-nav__link">
         
   
   
@@ -1781,7 +1793,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../community/discord/" class="md-nav__link">
+      <a href="../../../community/discord/" class="md-nav__link">
         
   
   
@@ -1809,7 +1821,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../community/support/" class="md-nav__link">
+      <a href="../../../community/support/" class="md-nav__link">
         
   
   
@@ -1896,7 +1908,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about/" class="md-nav__link">
+      <a href="../../../about/" class="md-nav__link">
         
   
   
@@ -1924,7 +1936,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about/contact/" class="md-nav__link">
+      <a href="../../../about/contact/" class="md-nav__link">
         
   
   
@@ -1959,7 +1971,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../prompts/" class="md-nav__link">
+      <a href="../../../prompts/" class="md-nav__link">
         
   
   
@@ -1987,8 +1999,6 @@
             
             
               
-                
-              
               <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
@@ -2001,119 +2011,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-idea" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The Idea
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-phase-0-covered" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What Phase 0 Covered
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-decisions-made" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key Decisions Made
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Key Decisions Made">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#e-ink-over-lcd" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        E-Ink Over LCD
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pico-w-first-pi-zero-later" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pico W First, Pi Zero Later
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tactile-buttons-over-capacitive-touch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tactile Buttons Over Capacitive Touch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tactile-buttons-over-capacitive-touch_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tactile Buttons Over Capacitive Touch
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prototype-concept" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prototype Concept
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's Next
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -2121,193 +2018,124 @@
             
           
           
-  <div class="md-content md-content--post" data-md-component="content">
-    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
-      <div class="md-sidebar__scrollwrap">
-        <div class="md-sidebar__inner md-post">
-          <nav class="md-nav md-nav--primary">
-            <div class="md-post__back">
-              <div class="md-nav__title md-nav__container">
-                <a href="../" class="md-nav__link">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-                  <span class="md-ellipsis">
-                    Back to index
-                  </span>
-                </a>
-              </div>
-            </div>
+  <div class="md-content" data-md-component="content">
+    <div class="md-content__inner">
+      <header class="md-typeset">
+        <h1 id="design">Design<a class="headerlink" href="#design" title="Permanent link">&para;</a></h1>
+      </header>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+      <nav class="md-post__authors md-typeset">
+        
+          <span class="md-author">
+            <img src="https://avatars.githubusercontent.com/u/rompasaurus" alt="rompasaurus">
+          </span>
+        
+      </nav>
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2026-04-12 00:00:00+00:00">April 12, 2026</time></li>
+        
+          <li class="md-meta__item">
+            in
             
-              <div class="md-post__authors md-typeset">
-                
-                  <div class="md-profile md-post__profile">
-                    <span class="md-author md-author--long">
-                      <img src="https://avatars.githubusercontent.com/u/rompasaurus" alt="rompasaurus">
-                    </span>
-                    <span class="md-profile__description">
-                      <strong>
-                        
-                          rompasaurus
-                        
-                      </strong>
-                      <br>
-                      Builder
-                    </span>
-                  </div>
-                
-              </div>
-            
-            <ul class="md-post__meta md-nav__list">
-              <li class="md-nav__item md-nav__item--section">
-                <div class="md-post__title">
-                  <span class="md-ellipsis">
-                    Metadata
-                  </span>
-                </div>
-                <nav class="md-nav">
-                  <ul class="md-nav__list">
-                    <li class="md-nav__item">
-                      <div class="md-nav__link">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2026-04-08 00:00:00+00:00" class="md-ellipsis">April 8, 2026</time>
-                      </div>
-                    </li>
-                    
-                    
-                      <li class="md-nav__item">
-                        <div class="md-nav__link">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
-                          <span class="md-ellipsis">
-                            in
-                            
-                              <a href="../category/planning/">Planning</a></span>
-                        </div>
-                      </li>
-                    
-                    
-                      
-                      <li class="md-nav__item">
-                        <div class="md-nav__link">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
-                          <span class="md-ellipsis">
-                            
-                              2 min read
-                            
-                          </span>
-                        </div>
-                      </li>
-                    
-                  </ul>
-                </nav>
-              </li>
-            </ul>
-            
-          </nav>
+              <a href="../firmware/" class="md-meta__link">Firmware</a>, 
+              <a href="./" class="md-meta__link">Design</a></li>
+        
+        
           
-        </div>
-      </div>
+          <li class="md-meta__item">
+            
+              3 min read
+            
+          </li>
+        
+        
+      </ul>
+      
     </div>
-    <article class="md-content__inner md-typeset">
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="body-language-custom-body-shapes-and-movement-per-emotion"><a class="toclink" href="../../body-language-animations/">Body Language — Custom Body Shapes and Movement Per Emotion</a></h2>
+<p>The face was done. 16 distinct expressions. But the body was the same for every mood — a static black blob. Today the octopus learned to move, and two moods got entirely new body shapes. Fat is fat. Lazy lounges. Angry trembles. Chaotic distorts. The body finally matches the face.</p>
+
+    
+      <nav class="md-post__action">
+        <a href="../../body-language-animations/">
+          Continue reading
+        </a>
+      </nav>
+    
+    
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+      <nav class="md-post__authors md-typeset">
+        
+          <span class="md-author">
+            <img src="https://avatars.githubusercontent.com/u/rompasaurus" alt="rompasaurus">
+          </span>
+        
+      </nav>
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2026-04-12 00:00:00+00:00">April 12, 2026</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="../firmware/" class="md-meta__link">Firmware</a>, 
+              <a href="./" class="md-meta__link">Design</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              3 min read
+            
+          </li>
+        
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="16-emotions-building-the-octopus-personality-system"><a class="toclink" href="../../sixteen-emotions/">16 Emotions — Building the Octopus Personality System</a></h2>
+<p>One octopus personality isn't a pet. It's a novelty. Today the octopus learned to feel — angry eyebrows, sad droopy eyes, chaotic spiral pupils, heart-shaped horny eyes, and 12 more distinct emotional states. Each one changes how the octopus looks, moves, and talks.</p>
+
+    
+      <nav class="md-post__action">
+        <a href="../../sixteen-emotions/">
+          Continue reading
+        </a>
+      </nav>
+    
+    
+  </div>
+</article>
+      
       
         
+          
+
+
+
+<nav class="md-pagination">
   
-
-
-
-  
-  
-
-
-<h1 id="phase-0-planning-from-idea-to-blueprint">Phase 0: Planning — From Idea to Blueprint<a class="headerlink" href="#phase-0-planning-from-idea-to-blueprint" title="Permanent link">&para;</a></h1>
-<p>Every project starts somewhere. Dilder started with a question: how hard is it to actually build a Tamagotchi?</p>
-<!-- more -->
-
-<h2 id="the-idea">The Idea<a class="headerlink" href="#the-idea" title="Permanent link">&para;</a></h2>
-<p>The original Tamagotchi was a 1996 keychain toy with a tiny LCD, three buttons, and a virtual pet that needed feeding, attention, and care. The concept is simple. The implementation, for a modern DIY version with a proper e-ink display, 3D-printed case, and programmable firmware, is substantially more involved.</p>
-<p>The goals for Dilder:</p>
-<ol>
-<li>A functional virtual pet device you can hold in your hand</li>
-<li>A documented build process — hardware, software, enclosure, everything</li>
-<li>A public project with a community that can build their own</li>
-<li>An honest look at AI-assisted development — all prompts logged</li>
-</ol>
-<h2 id="what-phase-0-covered">What Phase 0 Covered<a class="headerlink" href="#what-phase-0-covered" title="Permanent link">&para;</a></h2>
-<p>Phase 0 was purely planning. No hardware ordered, no code written. Just research and documentation:</p>
-<ul>
-<li><strong>Hardware research</strong> — identifying the right display (Waveshare 2.13" e-ink), compute (starting with Pico W, Pi Zero WH later), and input options (tactile buttons)</li>
-<li><strong>Enclosure concepts</strong> — rough proportions, button layout, display-to-case ratio</li>
-<li><strong>Project structure</strong> — phases, documentation format, GitHub repo</li>
-<li><strong>Website and community planning</strong> — this site, Discord, Patreon</li>
-</ul>
-<h2 id="key-decisions-made">Key Decisions Made<a class="headerlink" href="#key-decisions-made" title="Permanent link">&para;</a></h2>
-<h3 id="e-ink-over-lcd">E-Ink Over LCD<a class="headerlink" href="#e-ink-over-lcd" title="Permanent link">&para;</a></h3>
-<p>E-ink was chosen over a small OLED or TFT LCD for a few reasons:</p>
-<ul>
-<li><strong>Standby current</strong> — less than 0.01µA in standby. Perfect for a device that needs to run on a small battery.</li>
-<li><strong>Readability</strong> — high contrast in any lighting condition, no backlight needed</li>
-<li><strong>Aesthetic</strong> — the Tamagotchi style aesthetic benefits from a high-contrast, "paper" look</li>
-<li><strong>Tradeoff</strong> — 2-second full refresh, 0.3-second partial refresh. Animation is possible but limited.</li>
-</ul>
-<h3 id="pico-w-first-pi-zero-later">Pico W First, Pi Zero Later<a class="headerlink" href="#pico-w-first-pi-zero-later" title="Permanent link">&para;</a></h3>
-<p>Development starts on the <strong>Raspberry Pi Pico W</strong> — it's what we have on hand, it's cheap (~€6), and it's ideal for prototyping the display and input system with MicroPython. Instant boot, simple USB workflow, no OS to configure.</p>
-<p>The <strong>Pi Zero WH</strong> is planned for Phase 5 when we need Linux, a filesystem, networking features, or more compute for a personality/AI system. The display and button wiring is nearly identical between the two boards.</p>
-<h3 id="tactile-buttons-over-capacitive-touch">Tactile Buttons Over Capacitive Touch<a class="headerlink" href="#tactile-buttons-over-capacitive-touch" title="Permanent link">&para;</a></h3>
-<h3 id="tactile-buttons-over-capacitive-touch_1">Tactile Buttons Over Capacitive Touch<a class="headerlink" href="#tactile-buttons-over-capacitive-touch_1" title="Permanent link">&para;</a></h3>
-<p>Five discrete 6×6mm tactile buttons (up, down, left, right, center/select) beat capacitive touch for a first prototype because:</p>
-<ul>
-<li>Breadboard-friendly — no soldering required for the test bench</li>
-<li>Tactile feedback matters for a game device</li>
-<li>Zero additional components needed (Pico W's internal pull-ups handle everything)</li>
-</ul>
-<h2 id="prototype-concept">Prototype Concept<a class="headerlink" href="#prototype-concept" title="Permanent link">&para;</a></h2>
-<p>The enclosure concept settled on an "iPod Nano" style layout — landscape rectangle, display on the left covering ~75% of the face, compact d-pad cluster on the right.</p>
-<p><strong>v2 dimensions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Metric</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Case outer</td>
-<td>88 × 34 × 19mm</td>
-</tr>
-<tr>
-<td>Display window</td>
-<td>57 × 27mm</td>
-</tr>
-<tr>
-<td>Active pixel area</td>
-<td>48.55 × 23.71mm (250×122 px)</td>
-</tr>
-</tbody>
-</table>
-<p><a href="../../docs/hardware/enclosure-design/">See the hardware docs for full enclosure specs</a></p>
-<h2 id="whats-next">What's Next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
-<p>Phase 1 is hardware assembly. The Pico W and e-ink display are on the bench. The goal: flash MicroPython, wire up the display and buttons on a breadboard, and get something — anything — to show on the screen.</p>
-<p>When the display shows its first pixel, Phase 1 is done.</p>
-
-
-
-
-
-
-
-  
-  
-
-
-
-  
-
-
-  
-
-
-
+</nav>
+        
       
-    </article>
+    </div>
   </div>
 
           
@@ -2328,19 +2156,33 @@
   
     
       
-        
-      
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../architecture/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Architecture">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Architecture
+              </div>
+            </div>
+          </a>
         
         
           
-          <a href="../phase-1-hardware-begins/" class="md-footer__link md-footer__link--next" aria-label="Next: Phase 1: Hardware — Pico W + E-Ink, Let&#39;s Go">
+          <a href="../firmware/" class="md-footer__link md-footer__link--next" aria-label="Next: Firmware">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Phase 1: Hardware — Pico W + E-Ink, Let's Go
+                Firmware
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2414,12 +2256,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../javascripts/octopus-banner.js"></script>
+        <script src="../../../javascripts/octopus-banner.js"></script>
       
     
   </body>
