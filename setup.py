@@ -374,6 +374,35 @@ def step_prerequisites():
     else:
         log_warn("ninja not found — will install in the next step")
 
+    # Tkinter (needed for DevTool GUI)
+    try:
+        run_cmd([sys.executable, "-c", "import tkinter"], check=False)
+        tk_ok = run_cmd([sys.executable, "-c", "import tkinter"], check=False).returncode == 0
+    except Exception:
+        tk_ok = False
+    if tk_ok:
+        log_ok("Tkinter available")
+    else:
+        log_warn("Tkinter not found — needed for DevTool GUI")
+        if distro == "arch":
+            log_info("  Install with: sudo pacman -S tk")
+        elif distro == "debian":
+            log_info("  Install with: sudo apt install python3-tk")
+
+    # pyserial (needed for DevTool serial communication)
+    try:
+        serial_ok = run_cmd([sys.executable, "-c", "import serial"], check=False).returncode == 0
+    except Exception:
+        serial_ok = False
+    if serial_ok:
+        log_ok("pyserial available")
+    else:
+        log_warn("pyserial not found — needed for DevTool serial monitor")
+        if distro == "arch":
+            log_info("  Install with: sudo pacman -S python-pyserial")
+        elif distro == "debian":
+            log_info("  Install with: sudo apt install python3-serial")
+
     print()
     if all_ok:
         log_ok("Prerequisites look good. Ready to proceed.")
@@ -679,13 +708,42 @@ def step_vscode():
 
     log_ok("VSCode found in PATH.")
 
-    extensions = [
-        ("ms-vscode.cpptools",              "C/C++"),
-        ("ms-vscode.cmake-tools",           "CMake Tools"),
-        ("twxs.cmake",                      "CMake syntax"),
-        ("ms-vscode.vscode-serial-monitor",  "Serial Monitor"),
-        ("marus25.cortex-debug",            "Cortex-Debug"),
-    ]
+    # Detect whether this is Code OSS (Open VSX marketplace) or proprietary
+    # VSCode (Microsoft marketplace). Code OSS doesn't have ms-vscode.*
+    # extensions — use open-source alternatives instead.
+    is_code_oss = False
+    result = run_cmd(["code", "--version"])
+    if result.returncode == 0:
+        # Check if the package is the open-source build
+        pkg_check = run_cmd(["pacman", "-Qi", "code"], check=False)
+        if pkg_check.returncode == 0 and "open source" in pkg_check.stdout.lower():
+            is_code_oss = True
+        # Also check for other OSS indicators
+        if not is_code_oss:
+            # Debian/Fedora: check if codium or code-oss
+            which_code = shutil.which("code")
+            if which_code:
+                resolved = str(Path(which_code).resolve())
+                if "codium" in resolved or "code-oss" in resolved:
+                    is_code_oss = True
+
+    if is_code_oss:
+        log_info("Detected Code OSS (Open VSX) — using open-source extensions")
+        extensions = [
+            ("llvm-vs-code-extensions.vscode-clangd", "clangd (C/C++ IntelliSense)"),
+            ("ms-vscode.cmake-tools",                 "CMake Tools"),
+            ("twxs.cmake",                            "CMake syntax"),
+            ("marus25.cortex-debug",                  "Cortex-Debug"),
+        ]
+    else:
+        log_info("Detected VSCode (Microsoft marketplace)")
+        extensions = [
+            ("ms-vscode.cpptools",              "C/C++"),
+            ("ms-vscode.cmake-tools",           "CMake Tools"),
+            ("twxs.cmake",                      "CMake syntax"),
+            ("ms-vscode.vscode-serial-monitor",  "Serial Monitor"),
+            ("marus25.cortex-debug",            "Cortex-Debug"),
+        ]
 
     # Check which are already installed
     result = run_cmd(["code", "--list-extensions"])
@@ -1288,18 +1346,16 @@ The display retains the image even when powered off.""")
         print()
         print(c("  ┌────────────────────────────────────────────────────────────┐", FG_GREEN, BOLD))
         print(c("  │                                                            │", FG_GREEN, BOLD))
-        print(c("  │           CHECKPOINT 2 COMPLETE — SETUP FINISHED           │", FG_GREEN, BOLD))
+        print(c("  │           CHECKPOINT 2 COMPLETE — DISPLAY WORKING          │", FG_GREEN, BOLD))
         print(c("  │                                                            │", FG_GREEN, BOLD))
         print(c("  │   Your Pico W C development environment is fully working.  │", FG_GREEN, BOLD))
         print(c("  │   Toolchain, build system, flash, serial, and display      │", FG_GREEN, BOLD))
         print(c("  │   are all verified.                                        │", FG_GREEN, BOLD))
         print(c("  │                                                            │", FG_GREEN, BOLD))
+        print(c("  │   Next: Docker setup for DevTool firmware builds.          │", FG_GREEN, BOLD))
+        print(c("  │                                                            │", FG_GREEN, BOLD))
         print(c("  └────────────────────────────────────────────────────────────┘", FG_GREEN, BOLD))
         print()
-        log_info("Next steps:")
-        log_info("  - Modify main.c, rebuild with 'ninja', and reflash")
-        log_info("  - Wire the 5 tactile buttons for input")
-        log_info("  - Start building the Dilder pet firmware")
         return True
     else:
         log_warn("Troubleshooting tips:")
@@ -1309,6 +1365,223 @@ The display retains the image even when powered off.""")
         log_info("  - Check serial output for error messages")
         log_info("  - Full troubleshooting: dev-setup/pico-and-display-first-time-setup.md")
         return True
+
+
+# ── Step 15: Docker Toolchain ───────────────────────────────────────────────
+
+@step(15, "Docker Build Toolchain", "Install Docker and pre-build the ARM cross-compilation container")
+def step_docker():
+    log_header("Step 15 — Docker Build Toolchain")
+
+    log_explain("""
+        The DevTool GUI uses Docker to compile standalone firmware (like the
+        Sassy Octopus program) inside an isolated container. This ensures the
+        ARM cross-compiler, Pico SDK, and build tools are always consistent,
+        regardless of what's installed on your host system.
+
+        This step will:
+          1. Check that Docker is installed and running
+          2. Verify docker-compose.yml and the Dockerfile exist
+          3. Pre-build the Docker image so first builds in DevTool are fast
+    """)
+
+    # ── 1. Check Docker is installed ──────────────────────────────────────
+
+    docker_bin = shutil.which("docker")
+    if docker_bin:
+        result = run_cmd(["docker", "--version"])
+        log_ok(f"Docker installed: {result.stdout.strip()}")
+    else:
+        log_warn("Docker not found on your system.")
+        log_explain("""
+            Docker is required for building standalone firmware in the DevTool.
+            Without it, you can still use the display emulator, serial monitor,
+            and asset manager — but firmware compilation won't work.
+        """)
+
+        distro = detect_distro()
+
+        if distro == "arch":
+            install_cmd = "sudo pacman -S --needed docker docker-compose docker-buildx"
+            enable_cmd = "sudo systemctl enable --now docker"
+            group_cmd = f"sudo usermod -aG docker {os.environ.get('USER', 'your_user')}"
+        elif distro == "debian":
+            install_cmd = "sudo apt install -y docker.io docker-compose-v2"
+            enable_cmd = "sudo systemctl enable --now docker"
+            group_cmd = f"sudo usermod -aG docker {os.environ.get('USER', 'your_user')}"
+        elif distro == "fedora":
+            install_cmd = "sudo dnf install -y docker docker-compose"
+            enable_cmd = "sudo systemctl enable --now docker"
+            group_cmd = f"sudo usermod -aG docker {os.environ.get('USER', 'your_user')}"
+        else:
+            log_info("Install Docker for your distribution:")
+            log_info("  https://docs.docker.com/engine/install/")
+            return prompt_continue() != "quit"
+
+        log_info("Install commands for your system:")
+        log_code_block(f"{install_cmd}\n{enable_cmd}\n{group_cmd}")
+        log_warn("After adding yourself to the docker group, you must log out and back in.")
+
+        if not prompt_yes_no("Run the install command now?"):
+            log_info("Skipped. Install Docker manually when ready.")
+            return True
+
+        log_step("Installing Docker...")
+        result = subprocess.run(install_cmd, shell=True)
+        if result.returncode != 0:
+            log_error("Docker installation failed. Check the output above.")
+            return False
+
+        # Enable the daemon
+        log_step("Enabling Docker daemon...")
+        subprocess.run(enable_cmd, shell=True)
+
+        # Add user to docker group
+        log_step("Adding user to docker group...")
+        subprocess.run(group_cmd, shell=True)
+
+        log_warn("You need to log out and back in for group changes to take effect.")
+        log_info("After logging back in, resume with: python3 setup.py --step 15")
+
+        # Re-check
+        if not shutil.which("docker"):
+            log_error("Docker still not found after install.")
+            return False
+
+        log_ok("Docker installed. Log out/in, then re-run this step.")
+        return True
+
+    # ── 2. Check Docker daemon is running ─────────────────────────────────
+
+    log_step("Checking Docker daemon...")
+    daemon_check = run_cmd(["docker", "info"], check=False)
+    if daemon_check.returncode != 0:
+        log_error("Docker daemon is not running.")
+
+        if "permission denied" in (daemon_check.stderr or "").lower():
+            user = os.environ.get("USER", "your_user")
+            log_warn(f"Permission denied — your user may not be in the 'docker' group.")
+            log_code_block(f"sudo usermod -aG docker {user}\n# Then log out and back in")
+        else:
+            log_info("Start Docker with:")
+            log_code_block("sudo systemctl start docker")
+
+        return False
+
+    log_ok("Docker daemon is running.")
+
+    # ── 3. Check docker compose is available ──────────────────────────────
+
+    compose_check = run_cmd(["docker", "compose", "version"], check=False)
+    if compose_check.returncode == 0:
+        log_ok(f"docker compose: {compose_check.stdout.strip()}")
+    else:
+        # Try legacy docker-compose
+        legacy = run_cmd(["docker-compose", "--version"], check=False)
+        if legacy.returncode == 0:
+            log_warn(f"Legacy docker-compose found: {legacy.stdout.strip()}")
+            log_info("Consider upgrading to docker compose v2 (built-in plugin).")
+        else:
+            log_error("docker compose not available.")
+            distro = detect_distro()
+            if distro == "arch":
+                log_info("Install with: sudo pacman -S docker-compose docker-buildx")
+            elif distro == "debian":
+                log_info("Install with: sudo apt install docker-compose-v2")
+            return False
+
+    # ── 4. Verify project files exist ─────────────────────────────────────
+
+    log_step("Checking Docker build files...")
+    compose_file = DEV_SETUP / "docker-compose.yml"
+    dockerfile = DEV_SETUP / "Dockerfile"
+
+    all_files_ok = True
+    if compose_file.exists():
+        log_ok(f"docker-compose.yml: {compose_file}")
+    else:
+        log_error(f"Missing: {compose_file}")
+        all_files_ok = False
+
+    if dockerfile.exists():
+        log_ok(f"Dockerfile: {dockerfile}")
+    else:
+        log_error(f"Missing: {dockerfile}")
+        all_files_ok = False
+
+    if not all_files_ok:
+        log_error("Docker build files are missing. Check that the repo is complete.")
+        return False
+
+    # ── 5. Pre-build the Docker image ─────────────────────────────────────
+
+    log_explain("""
+        Now we'll pre-build the Docker image that contains the ARM
+        cross-compiler and Pico SDK. This downloads ~500 MB the first time
+        but is cached for all future builds.
+    """)
+
+    if not prompt_yes_no("Pre-build the Docker image now? (recommended)"):
+        log_info("Skipped. The image will be built on first use in DevTool.")
+        return True
+
+    log_step("Building Docker image (this may take a few minutes)...")
+    print()
+
+    build_proc = subprocess.Popen(
+        ["docker", "compose", "build", "--progress=plain",
+         "build-sassy-octopus"],
+        cwd=str(DEV_SETUP),
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True,
+    )
+
+    for line in build_proc.stdout:
+        line = line.rstrip()
+        if line:
+            lower = line.lower()
+            if any(kw in lower for kw in [
+                "step", "run", "cached", "done", "error",
+                "pulling", "download", "extract",
+            ]):
+                print(c(f"    {line[:78]}", FG_GREY))
+
+    build_proc.wait(timeout=600)
+
+    if build_proc.returncode != 0:
+        log_error("Docker image build failed. Check the output above.")
+        return False
+
+    log_ok("Docker image built and cached.")
+
+    # Quick verification: run a trivial command in the container
+    log_step("Verifying ARM toolchain inside container...")
+    verify = run_cmd(
+        ["docker", "compose", "run", "--rm", "--entrypoint",
+         "arm-none-eabi-gcc", "build-sassy-octopus", "--version"],
+        check=False,
+        cwd=str(DEV_SETUP),
+    )
+    if verify.returncode == 0:
+        first_line = verify.stdout.strip().splitlines()[0] if verify.stdout else "OK"
+        log_ok(f"Container ARM GCC: {first_line}")
+    else:
+        log_warn("Could not verify ARM toolchain in container — build may still work.")
+
+    print()
+    print(c("  ┌────────────────────────────────────────────────────────────┐", FG_GREEN, BOLD))
+    print(c("  │                                                            │", FG_GREEN, BOLD))
+    print(c("  │         CHECKPOINT 3 COMPLETE — SETUP FINISHED             │", FG_GREEN, BOLD))
+    print(c("  │                                                            │", FG_GREEN, BOLD))
+    print(c("  │   Docker toolchain is ready. The DevTool can now build     │", FG_GREEN, BOLD))
+    print(c("  │   and flash standalone firmware to the Pico W.             │", FG_GREEN, BOLD))
+    print(c("  │                                                            │", FG_GREEN, BOLD))
+    print(c("  │   Launch DevTool:  python3 DevTool/devtool.py              │", FG_GREEN, BOLD))
+    print(c("  │                                                            │", FG_GREEN, BOLD))
+    print(c("  └────────────────────────────────────────────────────────────┘", FG_GREEN, BOLD))
+    print()
+
+    return True
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1377,16 +1650,24 @@ def show_status():
         log_ok("VSCode: installed")
         result = run_cmd(["code", "--list-extensions"])
         installed = set(result.stdout.strip().lower().splitlines()) if result.returncode == 0 else set()
-        exts = [
-            ("ms-vscode.cpptools", "C/C++"),
-            ("ms-vscode.cmake-tools", "CMake Tools"),
-            ("ms-vscode.vscode-serial-monitor", "Serial Monitor"),
-        ]
-        for ext_id, name in exts:
-            if ext_id.lower() in installed:
-                log_ok(f"  {name}")
-            else:
-                log_warn(f"  {name}: not installed")
+
+        # Check for either Microsoft or Open VSX C/C++ extension
+        has_cpp = ("ms-vscode.cpptools" in installed or
+                   "llvm-vs-code-extensions.vscode-clangd" in installed)
+        if has_cpp:
+            log_ok("  C/C++ IntelliSense")
+        else:
+            log_warn("  C/C++ IntelliSense: not installed")
+
+        if "ms-vscode.cmake-tools" in installed:
+            log_ok("  CMake Tools")
+        else:
+            log_warn("  CMake Tools: not installed")
+
+        if "marus25.cortex-debug" in installed:
+            log_ok("  Cortex-Debug")
+        else:
+            log_info("  Cortex-Debug: not installed (optional)")
     else:
         log_warn("VSCode: not found")
 
@@ -1409,6 +1690,49 @@ def show_status():
     else:
         log_info("hello_dilder.uf2: not built")
 
+    # Docker
+    print()
+    print(c("  Docker Toolchain", FG_WHITE, BOLD))
+    print(c("  " + "\u2500" * 50, FG_GREY))
+
+    if cmd_exists("docker"):
+        result = run_cmd(["docker", "--version"], check=False)
+        log_ok(f"Docker: {result.stdout.strip()}" if result.returncode == 0 else "Docker: installed")
+
+        daemon = run_cmd(["docker", "info"], check=False)
+        if daemon.returncode == 0:
+            log_ok("Docker daemon: running")
+        else:
+            log_warn("Docker daemon: not running")
+
+        compose = run_cmd(["docker", "compose", "version"], check=False)
+        if compose.returncode == 0:
+            log_ok(f"docker compose: {compose.stdout.strip()}")
+        else:
+            log_warn("docker compose: not available")
+
+        # Check if build image exists
+        images = run_cmd(["docker", "images", "--format", "{{.Repository}}:{{.Tag}}",
+                          "--filter", "reference=*build*"], check=False)
+        if images.returncode == 0 and images.stdout.strip():
+            log_ok("Build image: cached")
+        else:
+            log_info("Build image: not yet built (will build on first use)")
+    else:
+        log_warn("Docker: not installed")
+        log_info("  Run: python3 setup.py --step 15")
+
+    compose_file = DEV_SETUP / "docker-compose.yml"
+    dockerfile = DEV_SETUP / "Dockerfile"
+    if compose_file.exists():
+        log_ok("docker-compose.yml: present")
+    else:
+        log_error("docker-compose.yml: MISSING")
+    if dockerfile.exists():
+        log_ok("Dockerfile: present")
+    else:
+        log_error("Dockerfile: MISSING")
+
     # Hardware
     print()
     print(c("  Hardware", FG_WHITE, BOLD))
@@ -1419,12 +1743,284 @@ def show_status():
     else:
         log_info("Pico W not connected (or in BOOTSEL mode)")
 
+    # Testing
+    print()
+    print(c("  Testing", FG_WHITE, BOLD))
+    print(c("  " + "\u2500" * 50, FG_GREY))
+
+    testing_dir = PROJECT_ROOT / "testing"
+    testing_venv = testing_dir / ".venv"
+    testing_pytest = testing_venv / "bin" / "pytest"
+
+    if not testing_dir.exists():
+        log_info("testing/ directory not found")
+    else:
+        # Tkinter
+        tk_check = run_cmd([sys.executable, "-c", "import tkinter"], check=False)
+        if tk_check.returncode == 0:
+            log_ok("Tkinter: available")
+        else:
+            log_warn("Tkinter: not installed (run: python3 setup.py --test-setup)")
+
+        # Venv
+        if testing_venv.exists() and testing_pytest.exists():
+            log_ok(f"testing/.venv: ready")
+        elif testing_venv.exists():
+            log_warn("testing/.venv: exists but pytest missing")
+        else:
+            log_info("testing/.venv: not created (run: python3 setup.py --test-setup)")
+
+        # Playwright
+        venv_python = testing_venv / "bin" / "python"
+        if venv_python.exists():
+            pw = run_cmd([str(venv_python), "-c",
+                          "from playwright.sync_api import sync_playwright"], check=False)
+            if pw.returncode == 0:
+                log_ok("Playwright: available")
+            else:
+                log_warn("Playwright: not installed")
+        else:
+            log_info("Playwright: venv not set up")
+
+        # MkDocs
+        website_dir = PROJECT_ROOT / "website"
+        mkdocs_found = False
+        for vdir in (website_dir / "venv", website_dir / ".venv"):
+            if (vdir / "bin" / "mkdocs").exists():
+                mkdocs_found = True
+                break
+        if mkdocs_found:
+            log_ok("MkDocs: available")
+        else:
+            log_info("MkDocs: not installed")
+
+        # Test count
+        import re as _re
+        total_tests = 0
+        for domain in ("devtool", "setup_cli", "website"):
+            domain_dir = testing_dir / domain
+            if domain_dir.exists():
+                for tf in domain_dir.glob("test_*.py"):
+                    try:
+                        total_tests += len(_re.findall(r"^\s*def test_", tf.read_text(), _re.MULTILINE))
+                    except (OSError, UnicodeDecodeError):
+                        pass
+        if total_tests > 0:
+            log_ok(f"Test suite: {total_tests} tests discovered")
+        else:
+            log_info("Test suite: no tests found")
+
     print()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # List steps
 # ─────────────────────────────────────────────────────────────────────────────
+
+def setup_testing():
+    """Install all testing dependencies: tk, venv, pip packages, Playwright, MkDocs."""
+    log_header("Testing Framework Setup")
+
+    log_explain("""
+        This installs everything needed to run the Dilder test suite:
+          - Tkinter (system package) — for DevTool GUI tests
+          - Python venv with test dependencies — pytest, Playwright, etc.
+          - Playwright Chromium browser — for website tests
+          - MkDocs Material — for the website dev server
+
+        The test suite lives in testing/ and covers the DevTool GUI,
+        Setup CLI, and the MkDocs documentation website.
+    """)
+
+    testing_dir = PROJECT_ROOT / "testing"
+    testing_venv = testing_dir / ".venv"
+    testing_req = testing_dir / "requirements.txt"
+    website_dir = PROJECT_ROOT / "website"
+    website_dev = website_dir / "dev.py"
+
+    if not testing_dir.exists():
+        log_error(f"testing/ directory not found at {testing_dir}")
+        return
+
+    # ── 1. System packages (tk, pyserial, Pillow) ─────────────────────────
+
+    distro = detect_distro()
+
+    sys_deps = [
+        ("import tkinter",  "Tkinter",  {"arch": ["tk"],              "debian": ["python3-tk"],     "fedora": ["python3-tkinter"]}),
+        ("import serial",   "pyserial", {"arch": ["python-pyserial"], "debian": ["python3-serial"], "fedora": ["python3-pyserial"]}),
+        ("import PIL",      "Pillow",   {"arch": ["python-pillow"],   "debian": ["python3-pil"],    "fedora": ["python3-pillow"]}),
+    ]
+
+    missing_pkgs = []
+    for check_import, name, pkg_map in sys_deps:
+        log_step(f"Checking {name}…")
+        result = run_cmd([sys.executable, "-c", check_import], check=False)
+        if result.returncode == 0:
+            log_ok(f"{name} already available")
+        else:
+            pkgs = pkg_map.get(distro, [])
+            if pkgs:
+                missing_pkgs.extend(pkgs)
+                log_warn(f"{name} not available")
+            else:
+                log_warn(f"{name} not available — install manually")
+
+    if missing_pkgs:
+        log_step(f"Installing {len(missing_pkgs)} system package(s)…")
+        if distro == "arch":
+            install_cmd = ["sudo", "pacman", "-S", "--needed", "--noconfirm"] + missing_pkgs
+        elif distro == "debian":
+            install_cmd = ["sudo", "apt", "install", "-y"] + missing_pkgs
+        elif distro == "fedora":
+            install_cmd = ["sudo", "dnf", "install", "-y"] + missing_pkgs
+        else:
+            install_cmd = None
+
+        if install_cmd:
+            log_cmd(" ".join(install_cmd))
+            result = run_cmd(install_cmd, check=False, capture=False)
+            if result.returncode == 0:
+                log_ok("System packages installed")
+            else:
+                log_warn("Install failed — run manually:")
+                for pkg in missing_pkgs:
+                    if distro == "arch":
+                        log_info(f"  sudo pacman -S {pkg}")
+                    elif distro == "debian":
+                        log_info(f"  sudo apt install {pkg}")
+                    elif distro == "fedora":
+                        log_info(f"  sudo dnf install {pkg}")
+
+    # ── 2. Testing venv ──────────────────────────────────────────────────
+
+    venv_python = testing_venv / "bin" / "python"
+    venv_pip = testing_venv / "bin" / "pip"
+    venv_pytest = testing_venv / "bin" / "pytest"
+
+    needs_create = False
+    if testing_venv.exists():
+        # Check system-site-packages is enabled (needed for Tkinter access)
+        no_global = testing_venv / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "no-global-site-packages.txt"
+        if no_global.exists():
+            log_warn(".venv exists but lacks system-site-packages — recreating…")
+            shutil.rmtree(testing_venv)
+            needs_create = True
+        else:
+            log_ok("testing/.venv already exists")
+    else:
+        needs_create = True
+
+    if needs_create:
+        log_step("Creating testing/.venv with system-site-packages…")
+
+        class _FakeSpinner:
+            """Inline spinner for the setup."""
+            def __enter__(self): return self
+            def __exit__(self, *_): pass
+
+        with Spinner("Creating venv"):
+            run_cmd([sys.executable, "-m", "venv", "--system-site-packages",
+                     str(testing_venv)], check=False)
+        if venv_python.exists():
+            log_ok("testing/.venv created")
+        else:
+            log_error("Failed to create testing/.venv")
+            return
+
+    # ── 3. pip dependencies ──────────────────────────────────────────────
+
+    if testing_req.exists():
+        log_step("Installing test dependencies from requirements.txt…")
+        result = run_cmd([str(venv_pip), "install", "-r", str(testing_req)],
+                         check=False, capture=False)
+        if result.returncode == 0:
+            log_ok("Test dependencies installed")
+        else:
+            log_error("pip install failed")
+            return
+    else:
+        log_warn("testing/requirements.txt not found — skipping pip install")
+
+    # ── 4. Playwright browser ────────────────────────────────────────────
+
+    log_step("Installing Playwright Chromium…")
+    result = run_cmd([str(venv_python), "-m", "playwright", "install", "chromium"],
+                     check=False, capture=False)
+    if result.returncode == 0:
+        log_ok("Playwright Chromium installed")
+    else:
+        log_warn("Playwright install failed — website tests will be skipped")
+
+    # ── 5. MkDocs (for website tests) ────────────────────────────────────
+
+    # Check both venv/ and .venv/ conventions
+    mkdocs_exe = None
+    for vdir in (website_dir / "venv", website_dir / ".venv"):
+        candidate = vdir / "bin" / "mkdocs"
+        if candidate.exists():
+            mkdocs_exe = candidate
+            break
+
+    if mkdocs_exe:
+        log_ok("MkDocs already installed for website")
+    elif website_dev.exists():
+        log_step("Installing MkDocs via website/dev.py install…")
+        result = run_cmd([sys.executable, str(website_dev), "install"],
+                         check=False, capture=False)
+        if result.returncode == 0:
+            log_ok("MkDocs installed")
+        else:
+            log_warn("MkDocs install failed — website tests will be skipped")
+            log_info("  Try manually: cd website && python3 dev.py install")
+    else:
+        log_warn("website/dev.py not found — website tests will be skipped")
+
+    # ── 6. Summary ───────────────────────────────────────────────────────
+
+    print()
+    print(c("  Verification", FG_WHITE, BOLD))
+    print(c("  " + "\u2500" * 50, FG_GREY))
+
+    # Tkinter
+    tk_ok = run_cmd([sys.executable, "-c", "import tkinter"]).returncode == 0
+    if tk_ok:
+        log_ok("Tkinter  \u2192 DevTool tests enabled")
+    else:
+        log_warn("Tkinter  \u2192 DevTool tests will be SKIPPED")
+
+    # Playwright
+    pw_ok = (venv_python.exists() and
+             run_cmd([str(venv_python), "-c",
+                      "from playwright.sync_api import sync_playwright"]).returncode == 0)
+    if pw_ok:
+        log_ok("Playwright \u2192 Website tests enabled")
+    else:
+        log_warn("Playwright \u2192 Website tests will be SKIPPED")
+
+    # MkDocs
+    mkdocs_found = False
+    for vdir in (website_dir / "venv", website_dir / ".venv"):
+        if (vdir / "bin" / "mkdocs").exists():
+            mkdocs_found = True
+            break
+    if mkdocs_found:
+        log_ok("MkDocs   \u2192 Website server available")
+    else:
+        log_warn("MkDocs   \u2192 Website tests will be SKIPPED")
+
+    # pytest
+    if venv_pytest.exists():
+        log_ok("pytest   \u2192 Test runner ready")
+    else:
+        log_warn("pytest   \u2192 Not installed")
+
+    print()
+    log_ok("Testing setup complete! Run tests with:")
+    log_info("  cd testing && python3 test.py run")
+    log_info("  cd testing && python3 test.py         (interactive menu)")
+    print()
+
 
 def list_steps():
     """Print all steps with their status."""
@@ -1513,6 +2109,7 @@ examples:
   python3 setup.py --status     # check what's installed
   python3 setup.py --step 7     # jump to step 7 (build serial hello world)
   python3 setup.py --list       # show all steps
+  python3 setup.py --test-setup # install testing dependencies (tk, pytest, Playwright)
 """,
     )
     parser.add_argument("--status", action="store_true",
@@ -1521,6 +2118,8 @@ examples:
                         help="Jump to step N")
     parser.add_argument("--list", action="store_true",
                         help="List all setup steps")
+    parser.add_argument("--test-setup", action="store_true",
+                        help="Install testing dependencies (tk, pytest, Playwright, MkDocs)")
 
     args = parser.parse_args()
 
@@ -1534,6 +2133,10 @@ examples:
         print(c(f"  Project: {PROJECT_ROOT}", FG_GREY, DIM))
     else:
         print("\nDILDER — Pico W & Display First-Time Setup\n")
+
+    if args.test_setup:
+        setup_testing()
+        return
 
     if args.status:
         show_status()
@@ -1561,6 +2164,7 @@ examples:
           4. Set up VSCode with the right extensions
           5. Build and flash a serial "Hello World" (Checkpoint 1)
           6. Connect the display and build a display "Hello World" (Checkpoint 2)
+          7. Set up Docker for DevTool firmware builds (Checkpoint 3)
 
         At each step, you'll see an explanation of what's happening and why.
         You can skip any step, quit at any time, and resume later with:

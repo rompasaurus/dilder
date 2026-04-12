@@ -21,18 +21,105 @@ import os
 import platform
 import random
 import re
-import serial
-import serial.tools.list_ports
 import shutil
 import struct
 import subprocess
 import sys
 import threading
 import time
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, colorchooser, simpledialog, font as tkfont
 from pathlib import Path
 from datetime import datetime
+
+# ── Dependency gate ─────────────────────────────────────────────────────────
+# When run directly (python3 devtool.py), check for system packages before
+# importing them. If missing, offer to install and re-exec.
+# When imported as a module (e.g. by tests), skip the gate — the caller
+# is responsible for ensuring deps are present.
+
+def _check_and_install_deps():
+    """Check for required system packages and offer to install them."""
+    missing = []
+
+    try:
+        import tkinter as _tk  # noqa: F401
+    except ImportError:
+        missing.append(("tkinter", {"arch": "tk", "debian": "python3-tk", "fedora": "python3-tkinter"}))
+
+    try:
+        import serial as _ser  # noqa: F401
+    except ImportError:
+        missing.append(("pyserial", {"arch": "python-pyserial", "debian": "python3-serial", "fedora": "python3-pyserial"}))
+
+    if not missing:
+        return True
+
+    # Detect distro
+    distro = "unknown"
+    try:
+        with open("/etc/os-release") as f:
+            content = f.read().lower()
+        if "cachyos" in content or "arch" in content or "manjaro" in content:
+            distro = "arch"
+        elif "ubuntu" in content or "debian" in content or "mint" in content:
+            distro = "debian"
+        elif "fedora" in content or "rhel" in content or "centos" in content:
+            distro = "fedora"
+    except FileNotFoundError:
+        pass
+
+    names = [n for n, _ in missing]
+    pkgs = [pkg_map.get(distro) for _, pkg_map in missing if pkg_map.get(distro)]
+
+    print(f"\n  Missing dependencies: {', '.join(names)}")
+
+    if not pkgs:
+        print("  Unknown distro — install manually and re-run.")
+        return False
+
+    if distro == "arch":
+        cmd = ["sudo", "pacman", "-S", "--needed"] + pkgs
+    elif distro == "debian":
+        cmd = ["sudo", "apt", "install", "-y"] + pkgs
+    elif distro == "fedora":
+        cmd = ["sudo", "dnf", "install", "-y"] + pkgs
+    else:
+        return False
+
+    print(f"  Installing: {' '.join(pkgs)}")
+    print(f"  $ {' '.join(cmd)}\n")
+    result = subprocess.run(cmd)
+    if result.returncode == 0:
+        print("\n  Dependencies installed. Starting DevTool...\n")
+        return True
+    else:
+        print(f"\n  Install failed. Run manually:")
+        print(f"    {' '.join(cmd)}")
+        return False
+
+
+if __name__ == "__main__":
+    # Check deps BEFORE the module-level class definitions execute.
+    # If deps are missing and install succeeds, re-exec so the module
+    # loads fresh with the new packages.
+    _needs_install = False
+    try:
+        import tkinter as _tk_test  # noqa: F401
+        import serial as _ser_test  # noqa: F401
+    except ImportError:
+        _needs_install = True
+
+    if _needs_install:
+        if _check_and_install_deps():
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+        else:
+            sys.exit(1)
+
+# ── Now safe to import ──────────────────────────────────────────────────────
+
+import serial
+import serial.tools.list_ports
+import tkinter as tk
+from tkinter import ttk, filedialog, messagebox, colorchooser, simpledialog, font as tkfont
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Constants
@@ -2545,11 +2632,19 @@ class ProgramsTab(ttk.Frame):
         },
     }
 
+    DISPLAY_VARIANTS = [
+        ("V2",  "2.13\" V2 (SSD1675B)"),
+        ("V3",  "2.13\" V3 (SSD1680)"),
+        ("V3a", "2.13\" V3a (SSD1680, rev A)"),
+        ("V4",  "2.13\" V4 (SSD1680, internal LUT)"),
+    ]
+
     def __init__(self, parent, app):
         super().__init__(parent)
         self.app = app
         self.running_program = None
         self._stop_event = threading.Event()
+        self._display_variant = tk.StringVar(value="V3")
         self._build_ui()
 
     def _build_ui(self):
@@ -2582,6 +2677,19 @@ class ProgramsTab(ttk.Frame):
 
         self.stop_btn = ttk.Button(btn_frame, text="Stop", command=self._stop_program, state=tk.DISABLED)
         self.stop_btn.pack(side=tk.LEFT, padx=2)
+
+        # Display variant selector
+        display_frame = ttk.LabelFrame(list_frame, text="Display Model", padding=4)
+        display_frame.pack(fill=tk.X, pady=(8, 0))
+
+        self.display_combo = ttk.Combobox(
+            display_frame, textvariable=self._display_variant,
+            values=[label for _, label in self.DISPLAY_VARIANTS],
+            state="readonly", font=("JetBrains Mono", 9),
+        )
+        self.display_combo.current(1)  # Default: V3
+        self.display_combo.pack(fill=tk.X)
+        self.display_combo.bind("<<ComboboxSelected>>", self._on_display_changed)
 
         # Firmware flash section
         flash_frame = ttk.LabelFrame(list_frame, text="Pico Firmware", padding=4)
@@ -2631,6 +2739,17 @@ class ProgramsTab(ttk.Frame):
             return None
         keys = list(self.PROGRAMS.keys())
         return keys[sel[0]]
+
+    def _get_display_variant(self):
+        """Return the short variant key (V2, V3, V3a, V4) from the dropdown."""
+        idx = self.display_combo.current()
+        if 0 <= idx < len(self.DISPLAY_VARIANTS):
+            return self.DISPLAY_VARIANTS[idx][0]
+        return "V3"
+
+    def _on_display_changed(self, event=None):
+        variant = self._get_display_variant()
+        self.app.log(f"[programs] Display variant set to: {variant}")
 
     def _on_select(self, event=None):
         key = self._get_selected_key()
@@ -2827,16 +2946,7 @@ class ProgramsTab(ttk.Frame):
                 if line:
                     img_last_lines.append(line)
                     img_last_lines = img_last_lines[-10:]
-                    lower = line.lower()
-                    # Log download/install/build progress
-                    if any(kw in lower for kw in [
-                        "pulling", "download", "extract", "install",
-                        "apt", "clone", "step", "run", "copy",
-                        "cached", "done", "error", "warning",
-                        "get:", "setting up", "unpacking",
-                    ]):
-                        self.after(0, lambda l=line: self.app.log(f"[docker] {l}"))
-                    # Show latest line in status
+                    self.after(0, lambda l=line: self.app.log(f"[docker] {l}"))
                     short = line[:80]
                     self.after(0, lambda s=short: self.flash_status.config(
                         text=f"Docker image build...\n{s}"))
@@ -2848,8 +2958,6 @@ class ProgramsTab(ttk.Frame):
                 self.after(0, lambda: self.flash_status.config(
                     text=f"Docker image build failed:\n{err[:200]}",
                     foreground=FG_RED))
-                self.after(0, lambda: self.app.log(
-                    "[docker] FAILED:\n" + "\n".join(img_last_lines)))
                 self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
                 return
 
@@ -2873,13 +2981,7 @@ class ProgramsTab(ttk.Frame):
                 if line:
                     last_lines.append(line)
                     last_lines = last_lines[-10:]
-                    lower = line.lower()
-                    if any(kw in lower for kw in [
-                        "building", "compiling", "linking", "generating",
-                        "error", "warning", "ninja", "cmake", ".uf2",
-                        "scanning", "creating", "built target",
-                    ]):
-                        self.after(0, lambda l=line: self.app.log(f"[build] {l}"))
+                    self.after(0, lambda l=line: self.app.log(f"[build] {l}"))
                     self.after(0, lambda l=line: self.flash_status.config(
                         text=f"Compiling...\n{l[:60]}"))
 
@@ -2890,8 +2992,6 @@ class ProgramsTab(ttk.Frame):
                 self.after(0, lambda: self.flash_status.config(
                     text=f"Build failed (exit {proc.returncode}):\n{err[:200]}",
                     foreground=FG_RED))
-                self.after(0, lambda: self.app.log(
-                    f"[build] FAILED. Last output:\n" + "\n".join(last_lines)))
                 self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
                 return
 
@@ -2966,12 +3066,14 @@ class ProgramsTab(ttk.Frame):
                 foreground=FG_YELLOW)
             return
 
+        variant = self._get_display_variant()
+
         self.standalone_btn.config(state=tk.DISABLED)
         self.flash_btn.config(state=tk.DISABLED)
-        self.flash_status.config(text="Generating frames...", foreground=FG_ACCENT)
+        self.flash_status.config(text=f"Generating frames ({variant})...", foreground=FG_ACCENT)
 
         t = threading.Thread(target=self._do_deploy_standalone,
-                             args=(key, mount), daemon=True)
+                             args=(key, mount, variant), daemon=True)
         t.start()
 
     def _generate_frames_header(self, prog_key):
@@ -3032,10 +3134,11 @@ class ProgramsTab(ttk.Frame):
         self._log_build(f"Wrote frames.h ({size_kb:.0f} KB, {total_frames} frames)")
         return header_path
 
-    def _do_deploy_standalone(self, prog_key, mount):
+    def _do_deploy_standalone(self, prog_key, mount, variant="V3"):
         """Background thread: generate frames, docker build, flash."""
         try:
             # Step 1: Generate frames.h
+            self._log_build(f"Building for display variant: {variant}")
             header = self._generate_frames_header(prog_key)
             if not header:
                 self.after(0, lambda: self.flash_status.config(
@@ -3065,12 +3168,7 @@ class ProgramsTab(ttk.Frame):
             for line in img_proc.stdout:
                 line = line.rstrip()
                 if line:
-                    lower = line.lower()
-                    if any(kw in lower for kw in [
-                        "pulling", "download", "install", "cached",
-                        "done", "error", "step", "run",
-                    ]):
-                        self.after(0, lambda l=line: self.app.log(f"[docker] {l}"))
+                    self.after(0, lambda l=line: self.app.log(f"[docker] {l}"))
                     self.after(0, lambda l=line: self.flash_status.config(
                         text=f"Docker build...\n{l[:60]}"))
             img_proc.wait(timeout=600)
@@ -3082,10 +3180,12 @@ class ProgramsTab(ttk.Frame):
                 return
 
             # Step 4: Compile firmware
-            self._log_build("Compiling standalone firmware...")
+            self._log_build(f"Compiling standalone firmware (display: {variant})...")
 
             proc = subprocess.Popen(
-                ["docker", "compose", "run", "--rm", "build-sassy-octopus"],
+                ["docker", "compose", "run", "--rm",
+                 "-e", f"DISPLAY_VARIANT={variant}",
+                 "build-sassy-octopus"],
                 cwd=str(DEV_SETUP),
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 text=True,
@@ -3097,12 +3197,7 @@ class ProgramsTab(ttk.Frame):
                 if line:
                     last_lines.append(line)
                     last_lines = last_lines[-10:]
-                    lower = line.lower()
-                    if any(kw in lower for kw in [
-                        "building", "compiling", "linking", "error",
-                        "warning", "ninja", "cmake", ".uf2", "built target",
-                    ]):
-                        self.after(0, lambda l=line: self.app.log(f"[build] {l}"))
+                    self.after(0, lambda l=line: self.app.log(f"[build] {l}"))
                     self.after(0, lambda l=line: self.flash_status.config(
                         text=f"Compiling...\n{l[:60]}"))
 
@@ -3112,8 +3207,6 @@ class ProgramsTab(ttk.Frame):
                 err = "\n".join(last_lines[-5:])
                 self.after(0, lambda: self.flash_status.config(
                     text=f"Build failed:\n{err[:200]}", foreground=FG_RED))
-                self.after(0, lambda: self.app.log(
-                    "[build] FAILED:\n" + "\n".join(last_lines)))
                 return
 
             uf2_path = DEV_SETUP / "sassy-octopus" / "build" / "sassy_octopus.uf2"
@@ -3208,6 +3301,9 @@ class DilderDevTool(tk.Tk):
 
         self._build_ui()
 
+        # Run Docker health check after UI is ready
+        self.after(500, self._check_docker_toolchain)
+
     def _build_ui(self):
         # ── Vertical PanedWindow (notebook on top, log on bottom, resizable) ──
         paned = tk.PanedWindow(
@@ -3274,6 +3370,71 @@ class DilderDevTool(tk.Tk):
 
         paned.add(log_frame, minsize=40, stretch="never")
 
+    def _check_docker_toolchain(self):
+        """Run Docker health checks at startup and log results."""
+        def _check():
+            issues = []
+
+            # 1. Check Docker binary exists
+            if not shutil.which("docker"):
+                issues.append("Docker is not installed. Firmware builds will not work.")
+                issues.append("Run: python3 setup.py --step 15")
+                return issues
+
+            # 2. Check Docker daemon is running
+            try:
+                result = subprocess.run(
+                    ["docker", "info"], capture_output=True, text=True, timeout=10)
+                if result.returncode != 0:
+                    if "permission denied" in (result.stderr or "").lower():
+                        issues.append("Docker permission denied — add your user to the 'docker' group.")
+                    else:
+                        issues.append("Docker daemon is not running. Start it with: sudo systemctl start docker")
+                    return issues
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                issues.append("Docker check timed out or failed.")
+                return issues
+
+            # 3. Check docker compose
+            try:
+                result = subprocess.run(
+                    ["docker", "compose", "version"],
+                    capture_output=True, text=True, timeout=10)
+                if result.returncode != 0:
+                    issues.append("docker compose not available. Install docker-compose plugin.")
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                issues.append("docker compose not available.")
+
+            # 4. Check build files exist
+            compose_file = DEV_SETUP / "docker-compose.yml"
+            dockerfile = DEV_SETUP / "Dockerfile"
+            if not compose_file.exists():
+                issues.append(f"Missing: {compose_file}")
+            if not dockerfile.exists():
+                issues.append(f"Missing: {dockerfile}")
+
+            # 5. Check shared lib directory for sassy-octopus
+            lib_dir = DEV_SETUP / "hello-world" / "lib"
+            if not lib_dir.exists():
+                issues.append("Missing: dev-setup/hello-world/lib/ (shared display drivers)")
+                issues.append("Run setup.py step 11 to get the Waveshare library.")
+
+            return issues
+
+        def _report(issues):
+            if issues:
+                self.log("[startup] Docker toolchain issues detected:")
+                for issue in issues:
+                    self.log(f"[startup]   {issue}")
+            else:
+                self.log("[startup] Docker toolchain ready.")
+
+        def _run():
+            issues = _check()
+            self.after(0, lambda: _report(issues))
+
+        threading.Thread(target=_run, daemon=True).start()
+
     def log(self, msg):
         """Append a message to the bottom log bar."""
         timestamp = datetime.now().strftime("%H:%M:%S")
@@ -3301,13 +3462,6 @@ def main():
     # Instead of suspending, Ctrl+Z simply does nothing.
     import signal
     signal.signal(signal.SIGTSTP, signal.SIG_IGN)
-
-    # Ensure pyserial is available
-    try:
-        import serial
-    except ImportError:
-        print("pyserial is required. Install with: pip install pyserial")
-        sys.exit(1)
 
     app = DilderDevTool()
     app.mainloop()
