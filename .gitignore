@@ -6,9 +6,11 @@ dev-setup/hello-world-serial/build/
 dev-setup/hello-world/build/
 dev-setup/img-receiver/build/
 dev-setup/sassy-octopus/build/
+dev-setup/supportive-octopus/build/
 
 # Generated frame data
 dev-setup/sassy-octopus/frames.h
+dev-setup/supportive-octopus/frames.h
 
 # Waveshare library files (copied from hello-world per setup guide)
 dev-setup/hello-world/lib/
@@ -18,6 +20,8 @@ dev-setup/img-receiver/lib/
 dev-setup/img-receiver/pico_sdk_import.cmake
 dev-setup/sassy-octopus/lib/
 dev-setup/sassy-octopus/pico_sdk_import.cmake
+dev-setup/supportive-octopus/lib/
+dev-setup/supportive-octopus/pico_sdk_import.cmake
 
 # Python
 __pycache__/

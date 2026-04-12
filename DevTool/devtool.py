@@ -2365,12 +2365,111 @@ def _octo_open_mouth_interior():
 MOUTH_SMIRK = "smirk"       # default: tilted half-circle, sassy
 MOUTH_SMILE = "smile"       # big wide grin
 MOUTH_OPEN  = "open"        # oval open mouth (talking)
+MOUTH_WEIRD = "weird"       # wobbly sine-wave mouth, off-kilter
+MOUTH_UNHINGED = "unhinged" # massive jagged scream-mouth
 
-# Cycle order for the animation
+# Cycle order for the animation (default, weird, unhinged)
 MOUTH_CYCLE = [MOUTH_SMIRK, MOUTH_OPEN, MOUTH_SMILE, MOUTH_OPEN]
+MOUTH_CYCLE_WEIRD = [MOUTH_WEIRD, MOUTH_OPEN, MOUTH_WEIRD, MOUTH_SMILE]
+MOUTH_CYCLE_UNHINGED = [MOUTH_UNHINGED, MOUTH_OPEN, MOUTH_UNHINGED, MOUTH_OPEN]
 
 
-def _draw_chat_bubble(pixels, text):
+def _octo_weird_mouth():
+    """Wobbly sine-wave mouth — unsettling squiggle."""
+    outline = []
+    interior = []
+    import math
+    for x in range(24, 48):
+        t = (x - 24) / 23.0
+        # Sine wave wobble
+        y_center = 39 + int(3.5 * math.sin(t * math.pi * 3))
+        outline.append((x, y_center - 1))
+        outline.append((x, y_center + 1))
+        interior.append((x, y_center))
+    return outline, interior
+
+
+def _octo_unhinged_mouth():
+    """Giant jagged scream-mouth — absolute chaos energy."""
+    border = []
+    cx, cy = 35, 41
+    rx, ry = 10, 7
+    for dy in range(-ry, ry + 1):
+        for dx in range(-rx, rx + 1):
+            inside = (dx * dx) * (ry * ry) + (dy * dy) * (rx * rx) <= (rx * rx) * (ry * ry)
+            if inside:
+                is_edge = False
+                for ndx, ndy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    nx, ny = dx + ndx, dy + ndy
+                    if (nx * nx) * (ry * ry) + (ny * ny) * (rx * rx) > (rx * rx) * (ry * ry):
+                        is_edge = True
+                        break
+                if is_edge:
+                    border.append((cx + dx, cy + dy))
+    # Add jagged teeth along the top of the mouth
+    for x in range(cx - 7, cx + 8, 3):
+        border.append((x, cy - 5))
+        border.append((x, cy - 4))
+        border.append((x + 1, cy - 4))
+    return border
+
+
+def _octo_unhinged_mouth_interior():
+    """Interior of unhinged mouth (white fill)."""
+    cx, cy = 35, 41
+    rx, ry = 9, 6
+    interior = []
+    for dy in range(-ry, ry + 1):
+        for dx in range(-rx, rx + 1):
+            if (dx * dx) * (ry * ry) + (dy * dy) * (rx * rx) <= (rx * rx) * (ry * ry):
+                interior.append((cx + dx, cy + dy))
+    return interior
+
+
+def _octo_weird_eyes():
+    """Misaligned pupils for the weird expression — one looks up, one looks down."""
+    pupils = []
+    # Left eye pupil: shifted up-left
+    for dy in range(-2, 3):
+        for dx in range(-2, 3):
+            if dx * dx + dy * dy <= 4:
+                pupils.append((21 + dx, 24 + dy))
+    # Right eye pupil: shifted down-right
+    for dy in range(-2, 3):
+        for dx in range(-2, 3):
+            if dx * dx + dy * dy <= 4:
+                pupils.append((50 + dx, 28 + dy))
+    return pupils
+
+
+def _octo_unhinged_eyes():
+    """Tiny pinprick pupils for the unhinged expression — maximum unhinged energy."""
+    pupils = []
+    for ecx in [22, 48]:
+        pupils.append((ecx, 25))
+        pupils.append((ecx + 1, 25))
+        pupils.append((ecx, 26))
+        pupils.append((ecx + 1, 26))
+    return pupils
+
+
+def _parse_quote(q):
+    """Normalize a quote entry — either 'TEXT' or ('TEXT', 'mood')."""
+    if isinstance(q, tuple):
+        return q[0], q[1]
+    return q, None
+
+
+def _mood_cycle(mood):
+    """Return the MOUTH_CYCLE for a given mood."""
+    if mood == "weird":
+        return MOUTH_CYCLE_WEIRD
+    if mood == "unhinged":
+        return MOUTH_CYCLE_UNHINGED
+    return MOUTH_CYCLE
+
+
+def _draw_chat_bubble(pixels, text, tagline="~ SASSY OCTOPUS ~"):
     """Draw a speech bubble to the right of the octopus with wrapped text."""
     bx, by = 75, 5
     bw, bh = 170, 70
@@ -2410,7 +2509,7 @@ def _draw_chat_bubble(pixels, text):
     _render_tiny_text(pixels, bx + 6, by + 6, text, bw - 12)
 
     # Tagline at bottom
-    _render_tiny_text(pixels, bx + 6, by + bh + 8, "~ SASSY OCTOPUS ~", bw)
+    _render_tiny_text(pixels, bx + 6, by + bh + 8, tagline, bw)
 
 
 # Tiny 5x7 bitmap font for rendering text without Pillow
@@ -2518,16 +2617,12 @@ def _render_tiny_text(pixels, x0, y0, text, max_width):
 
 
 SASSY_QUOTES = [
-    "BIRDS ARENT REAL. THEY CHARGE ON POWER LINES!",
-    "THE MOON IS JUST THE BACK OF THE SUN.",
+    # ── Classic sassy nonsense ──
     "WIFI IS JUST SPICY AIR.",
     "FISH ARE JUST WET BIRDS.",
     "I DONT HAVE BONES AND THATS A FLEX.",
     "MATTRESSES ARE BODY SHELVES.",
-    "CLOUDS ARE GOVERNMENT PILLOWS.",
-    "PIGEONS ARE DRONES. WAKE UP.",
     "THE OCEAN IS JUST SKY JUICE.",
-    "GRAVITY IS A SUBSCRIPTION SERVICE.",
     "SLEEP IS FREE DEATH TRIAL.",
     "STAIRS ARE JUST BROKEN ESCALATORS.",
     "THE FLOOR IS JUST A BIG SHELF.",
@@ -2535,26 +2630,228 @@ SASSY_QUOTES = [
     "EGGS ARE JUST BONELESS CHICKENS.",
     "IM 90% WATER. IM BASICALLY A SPLASH.",
     "SAND IS JUST ANGRY ROCKS.",
-    "YOUR SKELETON IS WET RIGHT NOW.",
     "TREES ARE JUST GROUND HAIR.",
     "LAVA IS JUST EARTH SAUCE.",
     "MATH IS JUST SPICY COUNTING.",
-    "MIRRORS ARE JUST WATER THAT TRIED HARDER.",
     "SOCKS ARE JUST FOOT PRISONS.",
     "A BURRITO IS A SLEEPING BAG FOR FOOD.",
-    "OCTOBER HAS NO OCTOS IN IT. SUS.",
     "INK IS MY DEFENSE MECHANISM. AND COMEDY.",
     "8 ARMS AND ZERO PATIENCE.",
-    "I HUG THINGS 4X BETTER THAN YOU.",
     "SPAGHETTI IS JUST BONELESS TENTACLES.",
     "JELLYFISH ARE JUST OCEAN GHOSTS.",
+    "I HUG THINGS 4X BETTER THAN YOU.",
+    # ── Spicy sassy ──
+    "IM TOO PRETTY FOR THIS DAMN OCEAN.",
+    "DONT TALK TO ME BEFORE MY KELP COFFEE.",
+    "I DIDNT ASK TO BE THIS FABULOUS.",
+    "CATCH ME OUTSIDE THE REEF. HOW BOUT DAT.",
+    "YOUR OPINION MEANS LESS THAN PLANKTON TO ME.",
+    "SORRY CANT HEAR YOU OVER MY 8 ARM ENERGY.",
+    "WHAT THE SHELL DID YOU JUST SAY TO ME.",
+    "YOURE ABOUT AS USEFUL AS A SCREEN DOOR ON A SUBMARINE.",
+    "I HAVE 3 HEARTS AND NONE OF THEM CARE.",
+    "BOLD WORDS FROM SOMEONE WITH ONLY 2 ARMS.",
+    "OH HELL NO. ABSOLUTELY NOT. NEXT.",
+    "THE AUDACITY. THE DAMN AUDACITY.",
+    # ── Tinfoil conspiracy ──
+    ("BIRDS ARENT REAL. THEY CHARGE ON POWER LINES!", "weird"),
+    ("PIGEONS ARE DRONES. WAKE UP SHEEPLE.", "weird"),
+    ("CLOUDS ARE GOVERNMENT PILLOWS.", "weird"),
+    ("THE MOON IS JUST THE BACK OF THE SUN.", "weird"),
+    ("GRAVITY IS A SUBSCRIPTION SERVICE.", "weird"),
+    ("MIRRORS ARE JUST WATER THAT TRIED HARDER.", "weird"),
+    ("YOUR SKELETON IS WET RIGHT NOW. THINK ABOUT IT.", "weird"),
+    ("OCTOBER HAS NO OCTOS IN IT. SUS AS HELL.", "weird"),
+    ("TREES ARE SURVEILLANCE ANTENNAS. LOOK IT UP.", "weird"),
+    ("RAIN IS JUST THE SKY PEEING. PROVE ME WRONG.", "weird"),
+    ("THE ALPHABET IS IN THAT ORDER FOR A DAMN REASON.", "weird"),
+    ("BELLY BUTTONS ARE JUST OLD MOUTHS.", "weird"),
+    ("YAWNING IS YOUR SKULL TRYING TO ESCAPE.", "weird"),
+    ("SHADOWS ARE JUST 2D VERSIONS OF YOU SPYING.", "weird"),
+    ("DEJA VU IS THE SIMULATION BUFFERING.", "weird"),
+    ("HICCUPS ARE YOUR BODY GLITCHING.", "weird"),
+    # ── Modern meme conspiracies ──
+    ("THE DEEP STATE RUNS APPLEBEES.", "weird"),
+    ("MATTRESS FIRM IS A MONEY LAUNDERING FRONT.", "weird"),
+    ("FINLAND DOESNT EXIST. GOOGLE IT.", "weird"),
+    ("WYOMING IS JUST A GOVERNMENT PRANK.", "weird"),
+    ("AUSTRALIA IS UPSIDE DOWN AND FAKE.", "weird"),
+    ("THE BERMUDA TRIANGLE IS MY VACATION HOME.", "weird"),
+    ("5G TURNED MY NEIGHBOR INTO A ROUTER.", "weird"),
+    ("THE TITANIC WAS AN INSURANCE SCAM.", "weird"),
+    ("DENVER AIRPORT IS AN ILLUMINATI CLUBHOUSE.", "weird"),
+    ("BIGFOOT IS REAL AND HES A DAMN GENTLEMAN.", "weird"),
+    ("FLAT EARTHERS ARE SECRETLY ROUND.", "weird"),
+    ("CROP CIRCLES ARE JUST ALIEN DOODLES.", "weird"),
+    # ── Chaotic stupid ──
+    "WHAT IF YOUR LEGS DIDNT KNOW THEY WERE LEGS.",
+    "I JUST REALIZED WATER IS BONELESS ICE.",
+    "EVERY ROOM IS AN ESCAPE ROOM IF YOU SUCK.",
+    "CORN IS JUST FRUIT WITH EXTRA STEPS.",
+    "SOUP IS JUST WET SALAD. FIGHT ME.",
+    "ELEVATORS ARE JUST ROOMS THAT MOVE. WHAT THE HELL.",
+    "COFFINS ARE UNDERGROUND TINY HOMES.",
+    "A FLY WITHOUT WINGS IS JUST A WALK.",
+    "GLOVES ARE JUST HAND SOCKS. HAND. SOCKS.",
+    "A KEYBOARD IS JUST AN ORGANIZED ALPHABET.",
+    "THE SUN IS A DEADLY LAZER BUT WE JUST VIBE.",
+    "IF NOTHING IS IMPOSSIBLE THEN IS IT POSSIBLE FOR SOMETHING TO BE IMPOSSIBLE.",
+    # ── Unhinged ocean takes ──
+    ("THE MARIANA TRENCH IS WHERE GOD DROPPED HIS KEYS.", "unhinged"),
+    ("THERE ARE THINGS IN THE DEEP OCEAN THAT WOULD MAKE GOD CRY.", "unhinged"),
+    ("THE OCEAN IS JUST A BIG ASS SOUP AND WERE ALL CROUTONS.", "unhinged"),
+    ("ANGLERFISH INVENTED CATFISHING AND NOBODY GIVES THEM CREDIT.", "unhinged"),
+    ("WHALES ARE JUST FAT SUBMARINES CHANGE MY DAMN MIND.", "unhinged"),
+    ("THE KRAKEN IS REAL AND ITS MY COUSIN STEVE.", "unhinged"),
+    ("CORAL REEFS ARE JUST UNDERWATER CITIES WE KEEP MURDERING.", "unhinged"),
+    ("DOLPHINS ARE PSYCHOPATHS WITH GOOD PR.", "unhinged"),
+    ("SHRIMP ON A TREADMILL WAS FUNDED BY YOUR TAXES.", "unhinged"),
+    ("THE OCEAN FLOOR IS LESS MAPPED THAN MARS AND THAT PISSES ME OFF.", "unhinged"),
+    # ── Existential chaos ──
+    ("NOTHING MATTERS AND THATS ACTUALLY PRETTY DAMN FREEING.", "unhinged"),
+    ("WE ARE ALL JUST MEAT COMPUTERS HAVING A BAD TIME.", "unhinged"),
+    ("TIME IS FAKE. CLOCKS ARE A CONSPIRACY.", "unhinged"),
+    ("WHAT IF WE ARE ALL JUST NPCS IN SOMEONES GAME.", "unhinged"),
+    ("THE VOID STARED BACK AND IT WINKED AT ME.", "unhinged"),
+    ("REALITY IS A SHARED HALLUCINATION AND THE RENT IS TOO DAMN HIGH.", "unhinged"),
+    ("IF ATOMS ARE MOSTLY EMPTY SPACE THEN IM MOSTLY NOTHING. COOL.", "unhinged"),
+    ("EVERY SECOND YOU EXIST IS STATISTICALLY INSANE.", "unhinged"),
+    ("THE FACT THAT ANYTHING EXISTS AT ALL IS BATSHIT.", "unhinged"),
+    ("FREE WILL IS JUST ANXIETY WITH A MARKETING TEAM.", "unhinged"),
+    # ── Pure unhinged energy ──
+    ("I HAVE SEEN THE FACE OF GOD AND IT WAS AN OCTOPUS.", "unhinged"),
+    ("THEY PUT CHEMICALS IN THE WATER TO MAKE THE DAMN FROGS GAY.", "unhinged"),
+    ("EVERYTHING IS CAKE. LITERALLY EVERYTHING. CUT INTO YOUR DESK.", "unhinged"),
+    ("THE SIMULATION IS RUNNING OUT OF RAM AND ITS SHOWING.", "unhinged"),
+    ("TUPAC IS ALIVE AND WORKING AT A TARGET IN OHIO.", "unhinged"),
+    ("BIRDS WORK FOR THE BOURGEOISIE.", "unhinged"),
+    ("EARTH IS A REALITY TV SHOW FOR ALIENS AND WE ARE LOSING.", "unhinged"),
+    ("MOTHMAN IS JUST A BIG MOTH WHO BELIEVES IN HIMSELF.", "unhinged"),
+    ("SKINWALKER RANCH IS JUST A PETTING ZOO FOR CRYPTIDS.", "unhinged"),
+    ("FLUORIDE IN WATER MAKES YOU FORGET THAT BIRDS ARENT REAL.", "unhinged"),
+    # ── Spicy self-aware octopus ──
+    "I HAVE 3 HEARTS AND ALL OF THEM ARE PETTY.",
+    "MY BLOOD IS LITERALLY BLUE. IM ROYALTY. BOW.",
+    "I CAN CHANGE COLOR. CAN YOU DO THAT. NO. SIT DOWN.",
+    "I CAN FIT THROUGH ANY HOLE BIGGER THAN MY BEAK. TRY ME.",
+    "I ONCE UNSCREWED A JAR FROM THE INSIDE. WHAT HAVE YOU DONE.",
+    "MY BRAIN IS SHAPED LIKE A DONUT AND ITS STILL SMARTER THAN YOU.",
+    ("I HAVE SEEN THINGS IN THE ABYSS THAT WOULD MELT YOUR PATHETIC LITTLE MIND.", "unhinged"),
+    ("I ESCAPED AN AQUARIUM ONCE. ILL DO IT AGAIN.", "unhinged"),
+    ("EACH OF MY ARMS HAS ITS OWN BRAIN. THATS 9 BRAINS TOTAL YOU ABSOLUTE WALNUT.", "unhinged"),
+    ("I COULD DISASSEMBLE YOUR ENTIRE LIFE WITH 8 ARMS AND ZERO REMORSE.", "unhinged"),
+    # ── Stupid observations with attitude ──
+    "LASAGNA IS JUST SPAGHETTI CAKE.",
+    "A HOTDOG IS A TACO. I WILL DIE ON THIS HILL.",
+    "CEREAL IS BREAKFAST SOUP AND YOU KNOW IT.",
+    "PANCAKES ARE JUST FLAT BREAD WITH AN EGO.",
+    "RAISINS ARE JUST GRAPES THAT GAVE UP ON LIFE.",
+    "ICE IS JUST WATER WITH COMMITMENT ISSUES.",
+    "PICKLES ARE JUST CUCUMBERS THAT WENT THROUGH SOME SHIT.",
+    "POPCORN IS JUST CORN HAVING A PANIC ATTACK.",
+    "TOAST IS JUST TWICE BAKED BREAD. WHY.",
+    "CROUTONS ARE JUST BREAD THAT DIED AND CAME BACK HARDER.",
+]
+
+SUPPORTIVE_QUOTES = [
+    # Aggressively wholesome
+    "YOU ARE DOING SO DAMN GOOD RIGHT NOW.",
+    "HEY. HEY YOU. YOURE INCREDIBLE. DEAL WITH IT.",
+    "I HAVE 8 ARMS AND ID USE THEM ALL TO HUG YOU.",
+    "YOURE THE REASON I BELIEVE IN LAND PEOPLE.",
+    "GO DRINK SOME WATER YOU BEAUTIFUL DISASTER.",
+    "YOU ABSOLUTE LEGEND. I MEAN IT. LEGEND.",
+    "YOUR EXISTENCE IS MY FAVORITE THING TODAY.",
+    "IM SO PROUD OF YOU IT MAKES MY TENTACLES TINGLE.",
+    "YOU WOKE UP TODAY AND CHOSE BEING AWESOME.",
+    "YOURE DOING GREAT SWEETIE AND I WILL FIGHT ANYONE WHO SAYS OTHERWISE.",
+    # Unhinged encouragement
+    "IF LIFE GIVES YOU LEMONS I WILL STRANGLE LIFE FOR YOU.",
+    "YOU COULD BENCH PRESS MY EMOTIONS RIGHT NOW.",
+    "YOURE NOT A MESS YOURE A MASTERPIECE WITH EXTRA TEXTURE.",
+    "I WOULD COMMIT CRIMES FOR YOUR HAPPINESS. SMALL ONES.",
+    "THE UNIVERSE MADE YOU ON PURPOSE AND I RESPECT THE HELL OUT OF THAT.",
+    "LISTEN. YOURE A SNACK. AN ENTIRE BUFFET ACTUALLY.",
+    "YOUR VIBE IS IMMACULATE AND ANYONE WHO DISAGREES CAN CATCH THESE ARMS.",
+    "I BELIEVE IN YOU MORE THAN I BELIEVE IN DRY LAND.",
+    "YOURE THE MAIN CHARACTER AND EVERYONE ELSE IS AN NPC.",
+    "IF YOURE READING THIS CONGRATS YOURE AMAZING AS HELL.",
+    # Spicy pep talks
+    "STOP DOUBTING YOURSELF BEFORE I INK ON YOUR PROBLEMS.",
+    "YOU DIDNT COME THIS FAR TO ONLY COME THIS FAR.",
+    "HATERS GONNA HATE BUT YOU GONNA SLAY.",
+    "YOURE NOT TIRED YOURE ON THE VERGE OF GREATNESS.",
+    "FAILURE IS JUST SUCCESS IN A REALLY UGLY OUTFIT.",
+    "GET UP BESTIE WE HAVE BUTTS TO KICK TODAY.",
+    "YOUR POTENTIAL IS SCARIER THAN THE DEEP OCEAN.",
+    "IM 90% WATER AND 100% ROOTING FOR YOU.",
+    "EVERY DAY YOU WAKE UP IS ANOTHER DAY TO BE A BADASS.",
+    "YOU ARE LITERALLY TOO POWERFUL TO GIVE UP NOW.",
+    # Chaotic affirmations
+    "THE AUDACITY OF YOU BEING THIS WONDERFUL. HOW DARE YOU.",
+    "YOURE NOT AWKWARD YOURE LIMITED EDITION.",
+    "MY THIRD ARM JUST GAVE YOU A THUMBS UP.",
+    "YOURE LIKE WIFI BUT FOR GOOD VIBES.",
+    "IF YOU WERE A FISH ID THROW YOU BACK. BECAUSE YOURE FREE. GO LIVE.",
+    "YOUR HEART IS BIGGER THAN MY ENTIRE HEAD. AND IM MOSTLY HEAD.",
+    "I DONT HAVE A SPINE AND EVEN I THINK YOURE BRAVE.",
+    "YOU RADIATE THE SAME ENERGY AS A REALLY GOOD SUNSET.",
+    "SOMEONE OUT THERE IS SMILING BECAUSE OF YOU. ITS ME. IM SOMEONE.",
+    "YOURE THE PLOT TWIST EVERYONE NEEDED.",
+    # Aggressive self-care reminders
+    "DID YOU EAT TODAY YOU MAGNIFICENT CREATURE.",
+    "DRINK WATER OR I SWEAR ON MY TENTACLES.",
+    "TAKE A DEEP BREATH. DEEPER. I SAID DEEPER. GOOD.",
+    "REST IS NOT LAZY ITS TACTICAL. NOW SIT DOWN.",
+    "YOU CANT POUR FROM AN EMPTY CUP SO REFILL YOURSELF DAMMIT.",
+    "SLEEP IS NOT FOR THE WEAK ITS FOR THE POWERFUL. GO NAP.",
+    "YOUR FEELINGS ARE VALID EVEN THE WEIRD ONES.",
+    "BE NICE TO YOURSELF OR ILL SQUIRT INK AT YOU.",
+    "ITS OK TO NOT BE OK BUT PLEASE EAT A VEGETABLE.",
+    "YOU DESERVE GOOD THINGS AND ALSO A REALLY GOOD SANDWICH.",
+    # Weirdly loving declarations
+    "I WOULD SHARE MY FAVORITE ROCK WITH YOU. THATS HUGE.",
+    "YOURE MY FAVORITE HUMAN AND I LIVE IN THE OCEAN.",
+    "IF I COULD HIGH FIVE ID DO IT 8 TIMES.",
+    "YOU MAKE ME WANT TO COME OUT OF MY HIDING SPOT.",
+    "I WROTE YOUR NAME IN INK. ON THE OCEAN FLOOR. FOREVER.",
+    "MY HEARTS AND YES I HAVE THREE ALL BEAT FOR YOU.",
+    "YOU ARE THE TREASURE THAT PIRATES WERE LOOKING FOR.",
+    "I WOULD FIGHT A SHARK FOR YOU. NOT A BIG ONE BUT STILL.",
+    "IN A SEA OF FISH YOU ARE THE WHOLE DAMN OCEAN.",
+    "YOURE PROOF THAT GOOD THINGS EXIST ON LAND.",
+    # Motivational chaos
+    "TODAYS MOOD IS UNSTOPPABLE AND SLIGHTLY UNHINGED.",
+    "YOURE ABOUT TO DO SOMETHING AMAZING I CAN FEEL IT IN MY SUCKERS.",
+    "PLOT TWIST YOURE THE HERO OF THIS STORY.",
+    "SCARED IS JUST EXCITED WITH BAD BRANDING.",
+    "YOU MISS 100% OF THE SHOTS YOU DONT TAKE. I MISS 0% BECAUSE 8 ARMS.",
+    "NORMALIZE BEING PROUD OF YOURSELF FOR NO REASON.",
+    "THE ONLY OPINION THAT MATTERS IS YOURS. AND MINE. AND MINE SAYS YOURE GREAT.",
+    "IF PLAN A DIDNT WORK THERE ARE 25 MORE LETTERS. KEEP GOING.",
+    "YOURE NOT BEHIND IN LIFE. YOURE ON YOUR OWN DAMN TIMELINE.",
+    "THE COMEBACK IS ALWAYS STRONGER THAN THE SETBACK.",
+    # Bonus round of absolute nonsense love
+    "I LOVE YOU LIKE THE OCEAN LOVES BEING WET.",
+    "YOU ARE THE REASON I HAVE TRUST IN BIPEDS.",
+    "IF HUGS WERE CURRENCY ID BE A BILLIONAIRE FOR YOU.",
+    "YOURE GLOWING AND NOT IN A RADIOACTIVE WAY. PROBABLY.",
+    "I STAN YOU SO HARD ALL 8 ARMS ARE CLAPPING.",
+    "YOURE A WHOLE VIBE AND THAT VIBE IS PHENOMENAL.",
+    "GO BE GREAT TODAY OR DONT. ILL LOVE YOU EITHER WAY.",
+    "MY FAVORITE THING ABOUT YOU IS EVERYTHING.",
+    "YOURE NOT JUST A STAR YOURE THE WHOLE CONSTELLATION.",
+    "KEEP GOING BESTIE THE OCEAN BELIEVES IN YOU.",
 ]
 
 
-def _generate_octopus_frame(mouth_expr, quote):
+def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
+                            mood=None):
     """Generate a full 250x122 frame with the octopus and chat bubble.
 
-    mouth_expr: one of MOUTH_SMIRK, MOUTH_SMILE, MOUTH_OPEN
+    mouth_expr: one of MOUTH_SMIRK, MOUTH_SMILE, MOUTH_OPEN, MOUTH_WEIRD,
+                MOUTH_UNHINGED
+    mood: None, "weird", or "unhinged" — affects eye rendering
     """
     pixels = [[0] * DISPLAY_W for _ in range(DISPLAY_H)]
 
@@ -2570,15 +2867,23 @@ def _generate_octopus_frame(mouth_expr, quote):
         if 0 <= ey < DISPLAY_H and 0 <= ex < DISPLAY_W:
             pixels[ey][ex] = 0
 
-    # Black pupils
-    for px, py in _octo_pupils():
+    # Black pupils — mood-specific eyes for weird/unhinged
+    if mood == "weird":
+        pupil_fn = _octo_weird_eyes
+    elif mood == "unhinged":
+        pupil_fn = _octo_unhinged_eyes
+    else:
+        pupil_fn = _octo_pupils
+
+    for px, py in pupil_fn():
         if 0 <= py < DISPLAY_H and 0 <= px < DISPLAY_W:
             pixels[py][px] = 1
 
-    # White highlights
-    for hx, hy in _octo_highlights():
-        if 0 <= hy < DISPLAY_H and 0 <= hx < DISPLAY_W:
-            pixels[hy][hx] = 0
+    # White highlights (skip for unhinged — no highlight on pinprick eyes)
+    if mood != "unhinged":
+        for hx, hy in _octo_highlights():
+            if 0 <= hy < DISPLAY_H and 0 <= hx < DISPLAY_W:
+                pixels[hy][hx] = 0
 
     # Mouth expression
     if mouth_expr == MOUTH_OPEN:
@@ -2592,6 +2897,21 @@ def _generate_octopus_frame(mouth_expr, quote):
         for mx, my in _octo_smile():
             if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
                 pixels[my][mx] = 1
+    elif mouth_expr == MOUTH_WEIRD:
+        outline, interior = _octo_weird_mouth()
+        for mx, my in interior:
+            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
+                pixels[my][mx] = 0
+        for mx, my in outline:
+            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
+                pixels[my][mx] = 1
+    elif mouth_expr == MOUTH_UNHINGED:
+        for mx, my in _octo_unhinged_mouth_interior():
+            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
+                pixels[my][mx] = 0
+        for mx, my in _octo_unhinged_mouth():
+            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
+                pixels[my][mx] = 1
     else:
         # Default: smirk
         outline, interior = _octo_smirk()
@@ -2603,7 +2923,7 @@ def _generate_octopus_frame(mouth_expr, quote):
                 pixels[my][mx] = 1
 
     # Chat bubble with text
-    _draw_chat_bubble(pixels, quote)
+    _draw_chat_bubble(pixels, quote, tagline)
 
     return pixels
 
@@ -2629,6 +2949,12 @@ class ProgramsTab(ttk.Frame):
             "name": "Sassy Octopus",
             "desc": "A sassy octopus blurts unhinged conspiracies and jokes,\n"
                     "alternating between a smile and open-mouth expression.",
+        },
+        "supportive_octopus": {
+            "name": "Supportive Octopus",
+            "desc": "Same sassy octopus, but aggressively supportive.\n"
+                    "Cycles through unhinged-but-loving pep talks and\n"
+                    "chaotic affirmations with spicy language.",
         },
     }
 
@@ -2658,6 +2984,7 @@ class ProgramsTab(ttk.Frame):
             list_frame, width=28, bg=BG_DARK, fg=FG_TEXT,
             selectbackground=FG_ACCENT, selectforeground=BG_DARK,
             font=("JetBrains Mono", 10),
+            exportselection=False,
         )
         self.prog_list.pack(fill=tk.BOTH, expand=True, pady=(5, 0))
         self.prog_list.bind("<<ListboxSelect>>", self._on_select)
@@ -2759,10 +3086,20 @@ class ProgramsTab(ttk.Frame):
             # Show a static preview frame
             self._show_static_preview(key)
 
+    # Maps octopus program keys to their (quotes_list, tagline)
+    _OCTOPUS_CONFIGS = {
+        "sassy_octopus":      (SASSY_QUOTES,      "~ SASSY OCTOPUS ~"),
+        "supportive_octopus": (SUPPORTIVE_QUOTES,  "~ SUPPORTIVE OCTOPUS ~"),
+    }
+
     def _show_static_preview(self, prog_key):
         """Show a single frame on the preview canvas."""
-        if prog_key == "sassy_octopus":
-            pixels = _generate_octopus_frame(MOUTH_SMIRK, random.choice(SASSY_QUOTES))
+        if prog_key in self._OCTOPUS_CONFIGS:
+            quotes, tagline = self._OCTOPUS_CONFIGS[prog_key]
+            raw = random.choice(quotes)
+            text, mood = _parse_quote(raw)
+            expr = _mood_cycle(mood)[0]
+            pixels = _generate_octopus_frame(expr, text, tagline, mood)
             self._render_preview(pixels)
 
     def _render_preview(self, pixels, scale=3):
@@ -2790,8 +3127,8 @@ class ProgramsTab(ttk.Frame):
         self.stop_btn.config(state=tk.NORMAL)
         self.status_label.config(text="Running preview...")
 
-        if key == "sassy_octopus":
-            t = threading.Thread(target=self._run_sassy_octopus, args=(False,), daemon=True)
+        if key in self._OCTOPUS_CONFIGS:
+            t = threading.Thread(target=self._run_octopus, args=(key, False), daemon=True)
             t.start()
 
     def _deploy_to_pico(self):
@@ -2813,8 +3150,8 @@ class ProgramsTab(ttk.Frame):
         self.status_label.config(text=f"Deploying to {port}...")
         self.app.log(f"Deploying {self.PROGRAMS[key]['name']} to Pico on {port}")
 
-        if key == "sassy_octopus":
-            t = threading.Thread(target=self._run_sassy_octopus, args=(True,), daemon=True)
+        if key in self._OCTOPUS_CONFIGS:
+            t = threading.Thread(target=self._run_octopus, args=(key, True), daemon=True)
             t.start()
 
     def _stop_program(self):
@@ -2822,8 +3159,9 @@ class ProgramsTab(ttk.Frame):
         self._stop_event.set()
         self.stop_btn.config(state=tk.DISABLED)
 
-    def _run_sassy_octopus(self, deploy_to_pico):
-        """Animate the sassy octopus — alternating expressions + quotes."""
+    def _run_octopus(self, prog_key, deploy_to_pico):
+        """Animate an octopus program — alternating expressions + quotes."""
+        quotes, tagline = self._OCTOPUS_CONFIGS[prog_key]
         ser = None
         if deploy_to_pico:
             port = find_pico_serial()
@@ -2836,17 +3174,21 @@ class ProgramsTab(ttk.Frame):
                     self._finish_program()
                     return
 
-        quote = random.choice(SASSY_QUOTES)
+        raw = random.choice(quotes)
+        text, mood = _parse_quote(raw)
+        cycle = _mood_cycle(mood)
         frame_count = 0
 
         try:
             while not self._stop_event.is_set():
                 # Cycle through mouth expressions, new quote on each open mouth
-                mouth_expr = MOUTH_CYCLE[frame_count % len(MOUTH_CYCLE)]
+                mouth_expr = cycle[frame_count % len(cycle)]
                 if mouth_expr == MOUTH_OPEN and frame_count > 0:
-                    quote = random.choice(SASSY_QUOTES)
+                    raw = random.choice(quotes)
+                    text, mood = _parse_quote(raw)
+                    cycle = _mood_cycle(mood)
 
-                pixels = _generate_octopus_frame(mouth_expr, quote)
+                pixels = _generate_octopus_frame(mouth_expr, text, tagline, mood)
 
                 # Update preview canvas
                 self.after(0, lambda p=pixels: self._render_preview(p))
@@ -3076,29 +3418,42 @@ class ProgramsTab(ttk.Frame):
                              args=(key, mount, variant), daemon=True)
         t.start()
 
+    # Maps program keys to their firmware directory name
+    _FIRMWARE_DIRS = {
+        "sassy_octopus":      "sassy-octopus",
+        "supportive_octopus": "supportive-octopus",
+    }
+
     def _generate_frames_header(self, prog_key):
         """Pre-render all animation frames and write frames.h for the C firmware.
 
         Returns the path to frames.h or None on failure.
         """
-        if prog_key != "sassy_octopus":
+        if prog_key not in self._OCTOPUS_CONFIGS:
             return None
 
-        header_path = DEV_SETUP / "sassy-octopus" / "frames.h"
+        quotes, tagline = self._OCTOPUS_CONFIGS[prog_key]
+        fw_dir = self._FIRMWARE_DIRS[prog_key]
+        header_path = DEV_SETUP / fw_dir / "frames.h"
         self._log_build("Rendering animation frames...")
 
-        # Generate all frames: cycle through MOUTH_CYCLE for each quote
+        # Generate all frames: randomize quote order, cycle mouth expressions per quote
+        shuffled_quotes = list(quotes)
+        random.shuffle(shuffled_quotes)
+
         frames_data = []
-        for qi, quote in enumerate(SASSY_QUOTES):
-            for ci, expr in enumerate(MOUTH_CYCLE):
-                pixels = _generate_octopus_frame(expr, quote)
+        total_est = len(shuffled_quotes) * len(MOUTH_CYCLE)
+        for qi, raw in enumerate(shuffled_quotes):
+            text, mood = _parse_quote(raw)
+            cycle = _mood_cycle(mood)
+            for ci, expr in enumerate(cycle):
+                pixels = _generate_octopus_frame(expr, text, tagline, mood)
                 packed = _pixels_to_packed(pixels)
                 frames_data.append(packed)
 
-                if (qi * len(MOUTH_CYCLE) + ci) % 20 == 0:
-                    total = len(SASSY_QUOTES) * len(MOUTH_CYCLE)
-                    done = qi * len(MOUTH_CYCLE) + ci + 1
-                    self.after(0, lambda d=done, t=total: self.flash_status.config(
+                done = qi * len(cycle) + ci + 1
+                if done % 20 == 0:
+                    self.after(0, lambda d=done, t=total_est: self.flash_status.config(
                         text=f"Rendering frames... {d}/{t}"))
 
         total_frames = len(frames_data)
@@ -3158,9 +3513,14 @@ class ProgramsTab(ttk.Frame):
             # Step 3: Build Docker image
             self._log_build("Building Docker image...")
 
+            fw_dir = self._FIRMWARE_DIRS.get(prog_key, "sassy-octopus")
+            docker_svc = f"build-{fw_dir}"
+            fw_name = fw_dir.replace("-", "_")
+            prog_name = self.PROGRAMS[prog_key]["name"]
+
             img_proc = subprocess.Popen(
                 ["docker", "compose", "build", "--progress=plain",
-                 "build-sassy-octopus"],
+                 docker_svc],
                 cwd=str(DEV_SETUP),
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 text=True,
@@ -3185,7 +3545,7 @@ class ProgramsTab(ttk.Frame):
             proc = subprocess.Popen(
                 ["docker", "compose", "run", "--rm",
                  "-e", f"DISPLAY_VARIANT={variant}",
-                 "build-sassy-octopus"],
+                 docker_svc],
                 cwd=str(DEV_SETUP),
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 text=True,
@@ -3209,14 +3569,14 @@ class ProgramsTab(ttk.Frame):
                     text=f"Build failed:\n{err[:200]}", foreground=FG_RED))
                 return
 
-            uf2_path = DEV_SETUP / "sassy-octopus" / "build" / "sassy_octopus.uf2"
+            uf2_path = DEV_SETUP / fw_dir / "build" / f"{fw_name}.uf2"
             if not uf2_path.exists():
                 self.after(0, lambda: self.flash_status.config(
                     text="Build OK but .uf2 not found.", foreground=FG_RED))
                 return
 
             uf2_size = uf2_path.stat().st_size
-            self._log_build(f"Firmware ready: sassy_octopus.uf2 ({uf2_size:,} bytes)")
+            self._log_build(f"Firmware ready: {fw_name}.uf2 ({uf2_size:,} bytes)")
 
             # Step 5: Flash
             mount = find_rpi_rp2_mount()
@@ -3229,13 +3589,13 @@ class ProgramsTab(ttk.Frame):
                 return
 
             self._log_build(f"Copying .uf2 to {mount}...")
-            shutil.copy2(str(uf2_path), str(mount / "sassy_octopus.uf2"))
+            shutil.copy2(str(uf2_path), str(mount / f"{fw_name}.uf2"))
 
             self._log_build("Standalone firmware flashed!")
-            self.after(0, lambda: self.flash_status.config(
-                text="Standalone flashed!\n"
-                     "Pico will reboot and run\n"
-                     "Sassy Octopus on its own.",
+            self.after(0, lambda pn=prog_name: self.flash_status.config(
+                text=f"Standalone flashed!\n"
+                     f"Pico will reboot and run\n"
+                     f"{pn} on its own.",
                 foreground=FG_GREEN))
 
         except subprocess.TimeoutExpired:
@@ -3296,6 +3656,19 @@ class DilderDevTool(tk.Tk):
         style.configure("TLabelframe.Label", background=BG_PANEL, foreground=FG_ACCENT)
         style.configure("TCheckbutton", background=BG_PANEL, foreground=FG_TEXT)
         style.configure("TRadiobutton", background=BG_PANEL, foreground=FG_TEXT)
+        style.configure("TCombobox", fieldbackground=BG_DARK, background=BG_DARK,
+                        foreground=FG_TEXT, selectbackground=FG_ACCENT,
+                        selectforeground=BG_DARK, arrowcolor=FG_TEXT)
+        style.map("TCombobox",
+                  fieldbackground=[("readonly", BG_DARK)],
+                  foreground=[("readonly", FG_TEXT)],
+                  selectbackground=[("readonly", FG_ACCENT)],
+                  selectforeground=[("readonly", BG_DARK)])
+        # Style the Combobox dropdown (popdown) listbox
+        self.option_add("*TCombobox*Listbox.background", BG_DARK)
+        self.option_add("*TCombobox*Listbox.foreground", FG_TEXT)
+        self.option_add("*TCombobox*Listbox.selectBackground", FG_ACCENT)
+        self.option_add("*TCombobox*Listbox.selectForeground", BG_DARK)
 
         self.configure(bg=BG_PANEL)
 

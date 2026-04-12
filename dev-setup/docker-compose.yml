@@ -23,3 +23,12 @@ services:
       - ./sassy-octopus:/project
       - ./hello-world/lib:/project/lib
     working_dir: /project
+
+  build-supportive-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./supportive-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
