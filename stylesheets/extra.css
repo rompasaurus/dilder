@@ -109,6 +109,18 @@
     color: #fab387;
 }
 
+.octo-mode-hungry {
+    color: #f5c2e7;
+}
+
+.octo-mode-tired {
+    color: #7f849c;
+}
+
+.octo-mode-slaphappy {
+    color: #94e2d5;
+}
+
 .octo-banner-quote {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.95rem;
