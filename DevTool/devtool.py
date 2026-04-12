@@ -2469,22 +2469,28 @@ def _mood_cycle(mood):
     return MOUTH_CYCLE
 
 
-def _draw_chat_bubble(pixels, text, tagline="~ SASSY OCTOPUS ~"):
+def _draw_chat_bubble(pixels, text, tagline="~ SASSY OCTOPUS ~", y_offset=0):
     """Draw a speech bubble to the right of the octopus with wrapped text."""
-    bx, by = 75, 5
+    bx = 75
+    by = 5 + y_offset
     bw, bh = 170, 70
 
     # Bubble outline (double-thick)
     for x in range(bx + 3, bx + bw - 3):
-        pixels[by][x] = 1
-        pixels[by + 1][x] = 1
-        pixels[by + bh - 1][x] = 1
-        pixels[by + bh - 2][x] = 1
+        if 0 <= by < DISPLAY_H:
+            pixels[by][x] = 1
+        if 0 <= by + 1 < DISPLAY_H:
+            pixels[by + 1][x] = 1
+        if 0 <= by + bh - 1 < DISPLAY_H:
+            pixels[by + bh - 1][x] = 1
+        if 0 <= by + bh - 2 < DISPLAY_H:
+            pixels[by + bh - 2][x] = 1
     for y in range(by + 3, by + bh - 3):
-        pixels[y][bx] = 1
-        pixels[y][bx + 1] = 1
-        pixels[y][bx + bw - 1] = 1
-        pixels[y][bx + bw - 2] = 1
+        if 0 <= y < DISPLAY_H:
+            pixels[y][bx] = 1
+            pixels[y][bx + 1] = 1
+            pixels[y][bx + bw - 1] = 1
+            pixels[y][bx + bw - 2] = 1
     # Rounded corners
     for cx, cy in [(bx + 2, by + 2), (bx + bw - 3, by + 2),
                    (bx + 2, by + bh - 3), (bx + bw - 3, by + bh - 3)]:
@@ -2495,11 +2501,16 @@ def _draw_chat_bubble(pixels, text, tagline="~ SASSY OCTOPUS ~"):
                         pixels[cy + dy][cx + dx] = 1
 
     # Speech tail pointing left toward octopus mouth
+    tail_base_y = 35 + y_offset
     tail_points = [
-        (bx, 35), (bx - 1, 36), (bx - 2, 37), (bx - 3, 38),
-        (bx - 4, 39), (bx - 5, 40), (bx - 6, 41), (bx - 7, 42),
-        (bx - 6, 43), (bx - 5, 43), (bx - 4, 43), (bx - 3, 42),
-        (bx - 2, 41), (bx - 1, 40), (bx, 39),
+        (bx, tail_base_y), (bx - 1, tail_base_y + 1),
+        (bx - 2, tail_base_y + 2), (bx - 3, tail_base_y + 3),
+        (bx - 4, tail_base_y + 4), (bx - 5, tail_base_y + 5),
+        (bx - 6, tail_base_y + 6), (bx - 7, tail_base_y + 7),
+        (bx - 6, tail_base_y + 8), (bx - 5, tail_base_y + 8),
+        (bx - 4, tail_base_y + 8), (bx - 3, tail_base_y + 7),
+        (bx - 2, tail_base_y + 6), (bx - 1, tail_base_y + 5),
+        (bx, tail_base_y + 4),
     ]
     for tx, ty in tail_points:
         if 0 <= ty < DISPLAY_H and 0 <= tx < DISPLAY_W:
@@ -2509,7 +2520,9 @@ def _draw_chat_bubble(pixels, text, tagline="~ SASSY OCTOPUS ~"):
     _render_tiny_text(pixels, bx + 6, by + 6, text, bw - 12)
 
     # Tagline at bottom
-    _render_tiny_text(pixels, bx + 6, by + bh + 8, tagline, bw)
+    tag_y = by + bh + 5
+    if tag_y + 7 < DISPLAY_H:
+        _render_tiny_text(pixels, bx + 6, tag_y, tagline, bw)
 
 
 # Tiny 5x7 bitmap font for rendering text without Pillow
@@ -3063,17 +3076,34 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
     """
     pixels = [[0] * DISPLAY_W for _ in range(DISPLAY_H)]
 
+    # ── Date & time header at top center ──
+    now = datetime.now()
+    date_str = now.strftime("%B %d, %Y").upper()         # e.g. "APRIL 12, 2026"
+    time_str = now.strftime("%I:%M %p").lstrip("0").upper()  # e.g. "3:47 PM"
+    header = f"{date_str}  {time_str}"
+    # Center the header text (6px per char)
+    header_w = len(header) * 6
+    header_x = max(0, (DISPLAY_W - header_w) // 2)
+    _render_tiny_text(pixels, header_x, 1, header, DISPLAY_W)
+
+    # ── Vertical offset to push octopus + bubble down below the header ──
+    Y_OFF = 12  # shift everything down to center vertically with header
+
+    # Helper to set a pixel with y-offset applied
+    def _set(x, y, val):
+        yy = y + Y_OFF
+        if 0 <= x < DISPLAY_W and 0 <= yy < DISPLAY_H:
+            pixels[yy][x] = val
+
     # Draw body (filled)
     for y, runs in _octo_body():
-        if 0 <= y < DISPLAY_H:
-            for x0, x1 in runs:
-                for x in range(max(0, x0), min(x1 + 1, DISPLAY_W)):
-                    pixels[y][x] = 1
+        for x0, x1 in runs:
+            for x in range(max(0, x0), min(x1 + 1, DISPLAY_W)):
+                _set(x, y, 1)
 
     # White eye sockets
     for ex, ey in _octo_eyes():
-        if 0 <= ey < DISPLAY_H and 0 <= ex < DISPLAY_W:
-            pixels[ey][ex] = 0
+        _set(ex, ey, 0)
 
     # Black pupils — mood-specific eyes for weird/unhinged
     if mood == "weird":
@@ -3084,54 +3114,43 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
         pupil_fn = _octo_pupils
 
     for px, py in pupil_fn():
-        if 0 <= py < DISPLAY_H and 0 <= px < DISPLAY_W:
-            pixels[py][px] = 1
+        _set(px, py, 1)
 
     # White highlights (skip for unhinged — no highlight on pinprick eyes)
     if mood != "unhinged":
         for hx, hy in _octo_highlights():
-            if 0 <= hy < DISPLAY_H and 0 <= hx < DISPLAY_W:
-                pixels[hy][hx] = 0
+            _set(hx, hy, 0)
 
     # Mouth expression
     if mouth_expr == MOUTH_OPEN:
         for mx, my in _octo_open_mouth_interior():
-            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
-                pixels[my][mx] = 0
+            _set(mx, my, 0)
         for mx, my in _octo_open_mouth():
-            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
-                pixels[my][mx] = 1
+            _set(mx, my, 1)
     elif mouth_expr == MOUTH_SMILE:
         for mx, my in _octo_smile():
-            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
-                pixels[my][mx] = 1
+            _set(mx, my, 1)
     elif mouth_expr == MOUTH_WEIRD:
         outline, interior = _octo_weird_mouth()
         for mx, my in interior:
-            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
-                pixels[my][mx] = 0
+            _set(mx, my, 0)
         for mx, my in outline:
-            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
-                pixels[my][mx] = 1
+            _set(mx, my, 1)
     elif mouth_expr == MOUTH_UNHINGED:
         for mx, my in _octo_unhinged_mouth_interior():
-            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
-                pixels[my][mx] = 0
+            _set(mx, my, 0)
         for mx, my in _octo_unhinged_mouth():
-            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
-                pixels[my][mx] = 1
+            _set(mx, my, 1)
     else:
         # Default: smirk
         outline, interior = _octo_smirk()
         for mx, my in interior:
-            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
-                pixels[my][mx] = 0
+            _set(mx, my, 0)
         for mx, my in outline:
-            if 0 <= my < DISPLAY_H and 0 <= mx < DISPLAY_W:
-                pixels[my][mx] = 1
+            _set(mx, my, 1)
 
-    # Chat bubble with text
-    _draw_chat_bubble(pixels, quote, tagline)
+    # Chat bubble with text (also shifted down)
+    _draw_chat_bubble(pixels, quote, tagline, y_offset=Y_OFF)
 
     return pixels
 
