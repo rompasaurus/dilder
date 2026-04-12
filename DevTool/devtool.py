@@ -2373,6 +2373,13 @@ MOUTH_CHAOTIC = "chaotic"       # zigzag lightning-bolt mouth
 MOUTH_HUNGRY = "hungry"         # drooling open mouth
 MOUTH_TIRED = "tired"           # droopy yawn oval
 MOUTH_SLAPHAPPY = "slaphappy"   # wide wobbly grin
+MOUTH_LAZY = "lazy"             # flat horizontal line (minimal effort)
+MOUTH_FAT = "fat"               # satisfied closed smile with cheek puffs
+MOUTH_CHILL = "chill"           # slight asymmetric half-smile
+MOUTH_HORNY = "horny"           # wide open smile with tongue out
+MOUTH_EXCITED = "excited"       # wide open smile (bigger than normal)
+MOUTH_NOSTALGIC = "nostalgic"   # gentle closed half-smile (wistful)
+MOUTH_HOMESICK = "homesick"     # wobbly trying-not-to-cry line
 
 # Cycle order for the animation per mood
 MOUTH_CYCLE = [MOUTH_SMIRK, MOUTH_OPEN, MOUTH_SMILE, MOUTH_OPEN]
@@ -2384,6 +2391,13 @@ MOUTH_CYCLE_CHAOTIC = [MOUTH_CHAOTIC, MOUTH_OPEN, MOUTH_UNHINGED, MOUTH_WEIRD]
 MOUTH_CYCLE_HUNGRY = [MOUTH_HUNGRY, MOUTH_OPEN, MOUTH_HUNGRY, MOUTH_SMILE]
 MOUTH_CYCLE_TIRED = [MOUTH_TIRED, MOUTH_OPEN, MOUTH_TIRED, MOUTH_TIRED]
 MOUTH_CYCLE_SLAPHAPPY = [MOUTH_SLAPHAPPY, MOUTH_OPEN, MOUTH_SLAPHAPPY, MOUTH_SMILE]
+MOUTH_CYCLE_LAZY = [MOUTH_LAZY, MOUTH_LAZY, MOUTH_LAZY, MOUTH_OPEN]
+MOUTH_CYCLE_FAT = [MOUTH_FAT, MOUTH_OPEN, MOUTH_FAT, MOUTH_SMILE]
+MOUTH_CYCLE_CHILL = [MOUTH_CHILL, MOUTH_OPEN, MOUTH_CHILL, MOUTH_SMILE]
+MOUTH_CYCLE_HORNY = [MOUTH_HORNY, MOUTH_OPEN, MOUTH_HORNY, MOUTH_SMILE]
+MOUTH_CYCLE_EXCITED = [MOUTH_EXCITED, MOUTH_OPEN, MOUTH_EXCITED, MOUTH_SMILE]
+MOUTH_CYCLE_NOSTALGIC = [MOUTH_NOSTALGIC, MOUTH_OPEN, MOUTH_NOSTALGIC, MOUTH_SMILE]
+MOUTH_CYCLE_HOMESICK = [MOUTH_HOMESICK, MOUTH_OPEN, MOUTH_HOMESICK, MOUTH_HOMESICK]
 
 
 def _octo_weird_mouth():
@@ -2738,6 +2752,246 @@ def _octo_slaphappy_mouth():
     return mouth
 
 
+def _octo_lazy_eyes():
+    """Lazy half-lidded eyes — even more closed than tired, tiny slit at bottom.
+
+    Returns (lids, pupils) where lids cover most of the eye socket.
+    """
+    lids = []
+    # Cover most of each eye socket with black (barely open slit at bottom)
+    for ecx in [22, 48]:
+        for dy in range(-4, 2):  # cover top + middle, leave only bottom sliver
+            for dx in range(-4, 5):
+                if dx * dx + dy * dy <= 16:
+                    lids.append((ecx + dx, 25 + dy))
+    return lids
+
+
+def _octo_lazy_pupils():
+    """Barely visible dots low in the slit for lazy eyes."""
+    pupils = []
+    for ecx in [22, 48]:
+        pupils.append((ecx, 28))
+        pupils.append((ecx + 1, 28))
+    return pupils
+
+
+def _octo_lazy_mouth():
+    """Flat horizontal line mouth — minimal effort."""
+    mouth = []
+    for x in range(29, 42):
+        mouth.append((x, 40))
+        mouth.append((x, 41))
+    return mouth
+
+
+def _octo_fat_pupils():
+    """Fat/content eyes — wider pupils (happy and satisfied)."""
+    pupils = []
+    for ecx in [23, 49]:
+        for dy in range(-3, 4):
+            for dx in range(-3, 4):
+                if dx * dx + dy * dy <= 9:
+                    pupils.append((ecx + dx, 26 + dy))
+    return pupils
+
+
+def _octo_fat_mouth():
+    """Satisfied closed smile with puffed cheeks — wider smile + cheek circles."""
+    mouth = []
+    # Wide satisfied smile (upward curve, wider than normal)
+    for x in range(24, 47):
+        cy = 38 + ((x - 35) ** 2) // 18
+        mouth.append((x, cy))
+        mouth.append((x, cy + 1))
+    # Cheek puffs — small filled circles on each side
+    for cx, cy in [(23, 39), (47, 39)]:
+        for dy in range(-2, 3):
+            for dx in range(-2, 3):
+                if dx * dx + dy * dy <= 4:
+                    mouth.append((cx + dx, cy + dy))
+    return mouth
+
+
+def _octo_chill_pupils():
+    """Chill eyes — pupils slightly looking to the side (cool/unbothered)."""
+    pupils = []
+    # Left eye: shifted right
+    for dy in range(-2, 3):
+        for dx in range(-2, 3):
+            if dx * dx + dy * dy <= 4:
+                pupils.append((25 + dx, 26 + dy))
+    # Right eye: also shifted right (both looking same direction)
+    for dy in range(-2, 3):
+        for dx in range(-2, 3):
+            if dx * dx + dy * dy <= 4:
+                pupils.append((51 + dx, 26 + dy))
+    return pupils
+
+
+def _octo_chill_mouth():
+    """Slight asymmetric half-smile — relaxed smirk, flatter than normal."""
+    mouth = []
+    for x in range(29, 44):
+        t = (x - 29) / 14.0
+        # Flat on the left, slight uptick on the right — relaxed asymmetry
+        y = 40 + int(1.5 * t * t)
+        mouth.append((x, y))
+        mouth.append((x, y + 1))
+    return mouth
+
+
+def _octo_horny_pupils():
+    """Heart-shaped pupils — small diamond/V shapes in each eye socket."""
+    pupils = []
+    for ecx in [22, 48]:
+        # Heart shape: two bumps on top, point at bottom
+        # Top bumps
+        for dx, dy in [(-2, -1), (-1, -2), (0, -1), (1, -2), (2, -1)]:
+            pupils.append((ecx + dx, 25 + dy))
+        # Middle
+        for dx in range(-2, 3):
+            pupils.append((ecx + dx, 25))
+        # Lower taper
+        for dx in range(-1, 2):
+            pupils.append((ecx + dx, 26))
+        # Bottom point
+        pupils.append((ecx, 27))
+    return pupils
+
+
+def _octo_horny_mouth():
+    """Wide open smile with tongue hanging out.
+
+    Returns list of (op, x, y) tuples — 'set' for border, 'clr' for interior.
+    """
+    mouth = []
+    # Wide open happy mouth (half-circle, open at bottom)
+    cx, cy = 35, 39
+    rx, ry = 8, 5
+    for dy in range(0, ry + 1):  # only bottom half (smile)
+        for dx in range(-rx, rx + 1):
+            inside = (dx * dx) * (ry * ry) + (dy * dy) * (rx * rx) <= (rx * rx) * (ry * ry)
+            if inside:
+                is_edge = False
+                for ndx, ndy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    nx, ny = dx + ndx, dy + ndy
+                    if ny < 0:
+                        continue  # top edge is the flat line
+                    if (nx * nx) * (ry * ry) + (ny * ny) * (rx * rx) > (rx * rx) * (ry * ry):
+                        is_edge = True
+                        break
+                if is_edge or dy == 0:
+                    mouth.append(("set", cx + dx, cy + dy))
+                else:
+                    mouth.append(("clr", cx + dx, cy + dy))
+    # Tongue hanging out the bottom
+    for dy in range(1, 5):
+        for dx in range(-2, 3):
+            if dx * dx + dy * dy <= 8:
+                mouth.append(("set", cx + dx, cy + ry + dy))
+    # Tongue interior (pink = white on e-ink)
+    for dy in range(2, 4):
+        for dx in range(-1, 2):
+            mouth.append(("clr", cx + dx, cy + ry + dy))
+    return mouth
+
+
+def _octo_excited_pupils():
+    """Star/sparkle pupils — small cross/plus shape in each eye socket."""
+    pupils = []
+    for ecx in [22, 48]:
+        # Plus/cross shape centered at (ecx, 25)
+        for d in range(-2, 3):
+            pupils.append((ecx + d, 25))   # horizontal bar
+            pupils.append((ecx, 25 + d))   # vertical bar
+        # Diagonal tips for sparkle
+        pupils.append((ecx - 1, 25 - 1))
+        pupils.append((ecx + 1, 25 - 1))
+        pupils.append((ecx - 1, 25 + 1))
+        pupils.append((ecx + 1, 25 + 1))
+    return pupils
+
+
+def _octo_excited_mouth():
+    """Wide open smile — bigger upward curve than normal smile."""
+    mouth = []
+    # Wide upward curve (wider and more dramatic than smile)
+    for x in range(22, 49):
+        cy = 37 + ((x - 35) ** 2) // 12
+        mouth.append((x, cy))
+        mouth.append((x, cy + 1))
+    return mouth
+
+
+def _octo_nostalgic_pupils():
+    """Pupils looking upward and to the right — remembering."""
+    pupils = []
+    # Left eye: shifted up-right
+    for dy in range(-2, 3):
+        for dx in range(-2, 3):
+            if dx * dx + dy * dy <= 4:
+                pupils.append((24 + dx, 23 + dy))
+    # Right eye: also shifted up-right
+    for dy in range(-2, 3):
+        for dx in range(-2, 3):
+            if dx * dx + dy * dy <= 4:
+                pupils.append((50 + dx, 23 + dy))
+    return pupils
+
+
+def _octo_nostalgic_mouth():
+    """Gentle closed half-smile — small, wistful."""
+    mouth = []
+    # Short, gentle upward curve (smaller than normal smile)
+    for x in range(31, 40):
+        t = (x - 31) / 8.0
+        y = 40 + int(1.5 * (2 * t - 1) ** 2)
+        mouth.append((x, y))
+        mouth.append((x, y + 1))
+    return mouth
+
+
+def _octo_homesick_pupils():
+    """Slightly watery/teary eyes — like sad but with tear drop pixels.
+
+    Returns (pupils, tears) where tears are drawn after eyes/highlights.
+    """
+    pupils = []
+    # Normal-ish pupils (slightly lowered, sad-like)
+    for ecx in [23, 49]:
+        for dy in range(-2, 3):
+            for dx in range(-2, 3):
+                if dx * dx + dy * dy <= 4:
+                    pupils.append((ecx + dx, 27 + dy))
+    return pupils
+
+
+def _octo_homesick_tears():
+    """Tear drop pixels below each eye socket."""
+    tears = []
+    for ecx in [22, 48]:
+        # Small tear drop below each eye
+        tears.append((ecx, 31))
+        tears.append((ecx, 32))
+        tears.append((ecx, 33))
+        tears.append((ecx - 1, 32))
+        tears.append((ecx + 1, 32))
+    return tears
+
+
+def _octo_homesick_mouth():
+    """Wobbly trying-not-to-cry line — slightly wavy horizontal line."""
+    mouth = []
+    import math
+    for x in range(28, 43):
+        t = (x - 28) / 14.0
+        y = 40 + int(1.5 * math.sin(t * math.pi * 3))
+        mouth.append((x, y))
+        mouth.append((x, y + 1))
+    return mouth
+
+
 def _parse_quote(q):
     """Normalize a quote entry — either 'TEXT' or ('TEXT', 'mood')."""
     if isinstance(q, tuple):
@@ -2763,6 +3017,20 @@ def _mood_cycle(mood):
         return MOUTH_CYCLE_TIRED
     if mood == "slaphappy":
         return MOUTH_CYCLE_SLAPHAPPY
+    if mood == "lazy":
+        return MOUTH_CYCLE_LAZY
+    if mood == "fat":
+        return MOUTH_CYCLE_FAT
+    if mood == "chill":
+        return MOUTH_CYCLE_CHILL
+    if mood == "horny":
+        return MOUTH_CYCLE_HORNY
+    if mood == "excited":
+        return MOUTH_CYCLE_EXCITED
+    if mood == "nostalgic":
+        return MOUTH_CYCLE_NOSTALGIC
+    if mood == "homesick":
+        return MOUTH_CYCLE_HOMESICK
     return MOUTH_CYCLE
 
 
@@ -3599,6 +3867,251 @@ SLAPHAPPY_QUOTES = [
     "TODAY IS THE BEST DAY EVER AND NOTHING EVEN HAPPENED.",
 ]
 
+LAZY_QUOTES = [
+    # ── Absolute refusal to move ──
+    "I WOULD DO SOMETHING BUT THAT REQUIRES DOING SOMETHING.",
+    "MY BED AND I ARE IN A COMMITTED RELATIONSHIP.",
+    "I HAVENT MOVED IN 3 HOURS AND IM AT PEACE WITH THAT.",
+    "AMBITION IS A LAND CREATURE PROBLEM.",
+    "I WAS GOING TO DO THAT BUT THEN I DIDNT.",
+    "MY SPIRIT ANIMAL IS A ROCK. NOT EVEN A COOL ROCK.",
+    "PROCRASTINATION IS JUST RESTING BEFORE YOU GET TIRED.",
+    "I PUT THE PRO IN PROCRASTINATION.",
+    "SOMEONE TOLD ME TO SEIZE THE DAY AND I SEIZED A NAP INSTEAD.",
+    "I HAVE 8 ARMS AND NONE OF THEM WANT TO DO ANYTHING.",
+    "THE FLOOR IS MY SECOND BED AND THE BED IS MY FIRST BED.",
+    "BEING HORIZONTAL IS MY NATURAL STATE.",
+    "I WOULD CHASE MY DREAMS BUT RUNNING SOUNDS EXHAUSTING.",
+    "LAZINESS IS JUST EFFICIENCY WITH BETTER BRANDING.",
+    "WHY STAND WHEN YOU CAN SIT. WHY SIT WHEN YOU CAN LIE DOWN.",
+    # ── Philosophical laziness ──
+    "THE UNIVERSE IS EXPANDING SO TECHNICALLY IM MOVING.",
+    "MOTIVATION IS A MYTH INVENTED BY MORNING PEOPLE.",
+    "I PLANNED TO BE PRODUCTIVE TODAY BUT PLANS CHANGE.",
+    "INERTIA IS NOT A FLAW ITS A LIFESTYLE.",
+    "THE MOST EFFICIENT PATH IS THE ONE I DONT TAKE.",
+    "I PRACTICE EXTREME RELAXATION AS A CONTACT SPORT.",
+    "DOING NOTHING IS STILL DOING SOMETHING. CHECKMATE.",
+    "EVERY JOURNEY BEGINS WITH A SINGLE STEP AND THATS WHERE MINE ENDS.",
+    "I COULD BE A GO-GETTER BUT ID RATHER BE A STAY-SITTER.",
+    "IF LAZINESS WAS AN ART FORM ID BE IN A MUSEUM.",
+    "THE OCEAN CURRENT DOES ALL THE WORK AND I RESPECT THAT.",
+    "I THOUGHT ABOUT EXERCISING AND THAT COUNTS AS A REP.",
+    "MY TO-DO LIST HAS ONE ITEM AND ITS IGNORE THE TO-DO LIST.",
+    "REST IS NOT A REWARD ITS A WHOLE PERSONALITY.",
+    "I REFUSE TO MULTITASK. I REFUSE TO SINGLE-TASK. I REFUSE.",
+]
+
+FAT_QUOTES = [
+    # ── Proudly round ──
+    "I ATE THE WHOLE THING AND ID DO IT AGAIN.",
+    "ROUND IS A SHAPE AND IM NAILING IT.",
+    "THE OCEAN IS MY PLATE AND EVERYTHING IN IT IS A SNACK.",
+    "I DIDNT GET THIS THICC BY ACCIDENT. THIS TOOK DEDICATION.",
+    "MORE CUSHION FOR THE OCEAN PUSHIN.",
+    "MY BODY IS A TEMPLE AND THAT TEMPLE HAS AN ALL-YOU-CAN-EAT BUFFET.",
+    "I HAVE 8 ARMS SO I CAN HOLD 8 SNACKS. EVOLUTION IS BEAUTIFUL.",
+    "THEY SAID WATCH YOUR WEIGHT SO I WATCHED IT GO UP. FASCINATING.",
+    "IM NOT FAT IM JUST EASY TO SEE.",
+    "SECOND HELPINGS ARE JUST FIRST HELPINGS THAT BELIEVE IN SEQUELS.",
+    "MY LOVE HANDLES HAVE LOVE HANDLES.",
+    "GRAVITY AFFECTS ME MORE BECAUSE THERES MORE OF ME TO LOVE.",
+    "I TAKE UP SPACE AND THAT SPACE IS DELICIOUS.",
+    "CALORIES DONT COUNT IN INTERNATIONAL WATERS.",
+    "EVERY MEAL IS A CELEBRATION WHEN YOURE THIS COMMITTED.",
+    # ── Body positivity but absurd ──
+    "IM BUILT FOR COMFORT NOT SPEED AND IM EXTREMELY COMFORTABLE.",
+    "THICC THIGHS SAVE LIVES AND I HAVE 8 OF THEM.",
+    "I JIGGLE WHEN I MOVE AND ITS CALLED CHARISMA.",
+    "MY TENTACLES ARE EXTRA SQUISHY AND THATS A FEATURE.",
+    "BEING AERODYNAMIC IS OVERRATED. I AM SPHERODYNAMIC.",
+    "THE SCALE AND I HAVE A DONT-ASK-DONT-TELL POLICY.",
+    "I FLOAT BETTER BECAUSE BUOYANCY LOVES ME.",
+    "MY DOCTOR SAID I NEED TO WATCH WHAT I EAT SO I STARE AT IT FIRST.",
+    "I WENT ON A DIET ONCE. WORST 20 MINUTES OF MY LIFE.",
+    "STRETCH MARKS ARE JUST RACING STRIPES FOR SNACKING.",
+    "A MOMENT ON THE LIPS FOREVER ON THE TENTACLES AND IM FINE WITH THAT.",
+    "IM NOT OVEREATING IM UNDER-TALL.",
+    "MY BLOOD TYPE IS GRAVY.",
+    "CURVES ARE JUST STRAIGHT LINES THAT CHOSE HAPPINESS.",
+    "I CONTAIN MULTITUDES AND ALSO SEVERAL BURRITOS.",
+]
+
+CHILL_QUOTES = [
+    # ── Unbothered zen ──
+    "BRO THE CURRENT WILL TAKE US WHERE WE NEED TO GO.",
+    "STRESS IS A LAND CREATURE PROBLEM.",
+    "I AM ONE WITH THE WATER AND THE WATER IS VIBING.",
+    "EVERYTHING IS TEMPORARY SO WHY WORRY. JUST FLOAT.",
+    "THE UNIVERSE DOESNT RUSH AND NEITHER DO I.",
+    "IF IT HAPPENS IT HAPPENS. IF NOT THATS COOL TOO.",
+    "I DONT HAVE PROBLEMS I HAVE GENTLE SUGGESTIONS FROM THE UNIVERSE.",
+    "WORRYING IS LIKE SWIMMING AGAINST THE CURRENT. JUST DONT.",
+    "MY VIBE IS UNSHAKEABLE AND MY TENTACLES ARE LOOSE.",
+    "BREATHE IN THE OCEAN. BREATHE OUT THE DRAMA.",
+    "SOMEONE ASKED IF IM OK AND BRO IVE NEVER BEEN MORE OK.",
+    "THE SECRET TO LIFE IS NOT CARING BUT LIKE IN A HEALTHY WAY.",
+    "NO THOUGHTS JUST CURRENTS.",
+    "IM SO RELAXED MY BONELESS BODY IS EVEN MORE BONELESS.",
+    "TIME IS AN ILLUSION AND RIGHT NOW IS PERFECT.",
+    # ── Stoner philosopher vibes ──
+    "DUDE WHAT IF THE OCEAN IS JUST THE SKYS REFLECTION. WAIT.",
+    "HAVE YOU EVER REALLY LOOKED AT A CORAL. LIKE REALLY LOOKED.",
+    "EVERYTHING IS CONNECTED BRO. EVERYTHING.",
+    "THE MOON MOVES THE TIDES AND THE TIDES MOVE ME. DEEP.",
+    "WHAT IF WERE ALL JUST WAVES PRETENDING TO BE PARTICLES.",
+    "I JUST HAD A THOUGHT BUT IT FLOATED AWAY AND THATS OK.",
+    "KELP IS JUST OCEAN TREES AND THAT BLOWS MY MIND.",
+    "NOTHING MATTERS IN THE BEST POSSIBLE WAY.",
+    "THE ANSWER TO EVERY QUESTION IS JUST GO WITH THE FLOW.",
+    "I COULD GET MAD OR I COULD NOT. I CHOOSE NOT.",
+    "MY ENERGY CANNOT BE DISRUPTED. I AM THE OCEAN.",
+    "SOMEWHERE OUT THERE A WAVE IS FORMING JUST FOR ME.",
+    "PEACE ISNT FOUND ITS CHOSEN. I CHOOSE IT EVERY DAY.",
+    "IF THE OCEAN CAN BE CALM AFTER A STORM SO CAN I.",
+    "NAMASTE IN THE WATER FOREVER.",
+]
+
+HORNY_QUOTES = [
+    # ── Flirty octopus energy ──
+    "I HAVE 8 ARMS AND THEY ALL WANT TO HOLD YOU.",
+    "IS IT HOT IN HERE OR IS THAT JUST THE HYDROTHERMAL VENT.",
+    "MY LOVE IS DEEPER THAN THE MARIANA TRENCH.",
+    "ARE YOU A CORAL REEF BECAUSE I WANT TO EXPLORE EVERY INCH OF YOU.",
+    "I JUST INK-ED A LITTLE BECAUSE YOU LOOKED AT ME.",
+    "TENTACLES WERE MADE FOR CUDDLING AND I HAVE EIGHT OF THEM.",
+    "YOU MUST BE A BIOLUMINESCENT JELLYFISH BECAUSE YOU LIGHT UP MY OCEAN.",
+    "I PUT THE ROMANCE IN CEPHALOPOD. WAIT THATS NOT IN THERE.",
+    "CALL ME AN OCTOPUS BECAUSE I CANT KEEP MY ARMS OFF YOU.",
+    "MY 3 HEARTS ALL BEAT FOR YOU AND THATS A LOT OF CARDIO.",
+    "ARE YOU A PEARL BECAUSE YOU FORMED INSIDE MY HEART.",
+    "THE OCEAN IS ROMANTIC IF YOU THINK ABOUT IT. I THINK ABOUT IT A LOT.",
+    "BABY IM LIKE AN OCTOPUS. FLEXIBLE AND VERY ATTACHED.",
+    "YOU HAD ME AT HELLO BUT ALSO AT EVERY WORD AFTER THAT.",
+    "IS YOUR NAME WIFI BECAUSE IM FEELING A CONNECTION.",
+    # ── Over the top romantic ──
+    "I WOULD CHANGE COLORS FOR YOU AND THATS THE HIGHEST COMPLIMENT.",
+    "LETS GET TANGLED UP. I HAVE THE ARMS FOR IT.",
+    "MY SUCTION CUPS ARE TINGLING AND THATS EITHER LOVE OR ALLERGIES.",
+    "YOU MAKE MY INK SAC DO WEIRD THINGS.",
+    "IF LOVING YOU IS WRONG THEN I DONT WANT TO BE INVERTEBRATE. WAIT.",
+    "ROSES ARE RED VIOLETS ARE BLUE I HAVE 8 ARMS AND ALL OF THEM WANT YOU.",
+    "I WROTE YOU A POEM WITH ALL 8 ARMS SO ITS 8 TIMES AS ROMANTIC.",
+    "THE TIDES ARENT THE ONLY THING RISING WHEN YOURE AROUND.",
+    "DO YOU BELIEVE IN LOVE AT FIRST SIGHT OR SHOULD I SWIM BY AGAIN.",
+    "MY CAMOUFLAGE CANT HIDE HOW I FEEL ABOUT YOU.",
+    "DATE NIGHT IN THE DEEP SEA. JUST YOU ME AND THE ANGLERFISH.",
+    "IM NOT CLINGY IM JUST AN OCTOPUS AND THIS IS WHAT WE DO.",
+    "EVERY ONE OF MY NEURONS IS THINKING ABOUT YOU. THATS A LOT OF NEURONS.",
+    "IF WE WERE IN A TIDE POOL ID LET YOU HAVE THE SUNNY SIDE.",
+    "I DONT NEED OXYGEN I NEED YOUR ATTENTION.",
+]
+
+EXCITED_QUOTES = [
+    # ── Bouncing off the walls energy ──
+    "OH MY GOD OH MY GOD OH MY GOD.",
+    "I CANT SIT STILL. NONE OF MY 8 ARMS CAN SIT STILL.",
+    "EVERYTHING IS HAPPENING AND I LOVE IT.",
+    "TODAY IS GOING TO BE THE BEST DAY EVER I CAN FEEL IT.",
+    "I JUST HEARD THE BEST NEWS AND I FORGOT WHAT IT WAS BUT IM STILL HYPED.",
+    "MY TENTACLES ARE VIBRATING WITH PURE JOY.",
+    "THIS IS THE GREATEST MOMENT OF MY LIFE. AGAIN.",
+    "IM SO EXCITED I MIGHT INK AND I DONT EVEN CARE.",
+    "EVERYTHING IS BEAUTIFUL AND NOTHING CAN STOP ME.",
+    "I HAVE SO MUCH ENERGY RIGHT NOW I COULD FIGHT THE MOON.",
+    "DO YOU FEEL THAT. THATS THE ENERGY. THE VIBE. THE EVERYTHING.",
+    "I JUST WANT TO HUG EVERYONE WITH ALL 8 ARMS AT ONCE.",
+    "THE OCEAN IS AMAZING. LIFE IS AMAZING. YOU ARE AMAZING.",
+    "I CANT STOP SMILING AND I DONT HAVE LIPS.",
+    "SOMEONE TELL ME TO CALM DOWN SO I CAN IGNORE THEM.",
+    # ── Caps lock energy ──
+    "AHHHHHHHHHHHH IN A GOOD WAY.",
+    "IF EXCITEMENT WAS A SPORT ID HAVE 8 GOLD MEDALS.",
+    "MY 3 HEARTS ARE BEATING SO FAST RIGHT NOW.",
+    "I JUST SAW A FISH AND IT WAS THE BEST FISH IVE EVER SEEN.",
+    "EVERY SINGLE THING IS MY FAVORITE THING RIGHT NOW.",
+    "I WOKE UP AND CHOSE MAXIMUM ENTHUSIASM.",
+    "THE FUTURE IS BRIGHT AND SO AM I. LITERALLY I AM BIOLUMINESCENT.",
+    "I WANT TO DO EVERYTHING ALL AT ONCE FOREVER.",
+    "IS THIS WHAT COFFEE FEELS LIKE BECAUSE I LOVE IT.",
+    "NEW DAY NEW OPPORTUNITIES TO BE EXTREMELY LOUD ABOUT NOTHING.",
+    "I COULD RUN A MARATHON RIGHT NOW. I DONT HAVE LEGS BUT STILL.",
+    "MY EXCITEMENT LEVELS ARE OFF THE CHARTS AND I ATE THE CHARTS.",
+    "IF I HAD MORE ARMS ID USE THEM ALL TO CLAP.",
+    "GUESS WHAT. I DONT EVEN KNOW BUT IM EXCITED ABOUT IT.",
+    "THE VIBES ARE IMMACULATE AND I AM ASCENDING.",
+]
+
+NOSTALGIC_QUOTES = [
+    # ── Remembering the good old days ──
+    "REMEMBER WHEN THE OCEAN WAS QUIETER.",
+    "I MISS THE OLD REEF. BEFORE THE CONSTRUCTION.",
+    "THEY DONT MAKE TIDES LIKE THEY USED TO.",
+    "BACK IN MY DAY WE DIDNT HAVE PLASTIC. GOOD TIMES.",
+    "I STILL THINK ABOUT THAT ONE PERFECT SUNSET FROM 2019.",
+    "THE OLD CURRENT USED TO HIT DIFFERENT.",
+    "REMEMBER WHEN WE DIDNT KNOW WHAT STRESS WAS. THAT WAS NICE.",
+    "THEY PAVED OVER MY FAVORITE CORAL AND PUT UP A PARKING LOT.",
+    "THE PLANKTON TASTED BETTER WHEN I WAS YOUNG. OR MAYBE I WAS JUST HAPPY.",
+    "I FOUND AN OLD SHELL TODAY AND IT SMELLED LIKE MEMORIES.",
+    "BACK WHEN I WAS A LITTLE LARVA THINGS WERE SIMPLER.",
+    "NOBODY APPRECIATES A GOOD TIDE POOL ANYMORE.",
+    "REMEMBER HANDWRITTEN MESSAGES IN BOTTLES. NOW ITS ALL DIGITAL.",
+    "THE MOONLIGHT ON THE WATER LOOKED DIFFERENT BACK THEN.",
+    "I USED TO KNOW EVERY FISH IN THIS REEF BY NAME.",
+    # ── Wistful ocean memories ──
+    "SOMETIMES I HEAR A CURRENT AND IT SOUNDS LIKE MY CHILDHOOD.",
+    "THE OLD KELP FOREST WAS TALLER. OR MAYBE I WAS SHORTER.",
+    "I MISS WHEN THE BIGGEST PROBLEM WAS FINDING A GOOD HIDING SPOT.",
+    "THERE WAS THIS ONE ROCK. PERFECTLY SHAPED. I THINK ABOUT IT DAILY.",
+    "THE STARS LOOKED CLOSER FROM THE SHALLOW WATER BACK HOME.",
+    "I KEEP A TINY SHELL FROM MY FIRST REEF. ITS ALL I HAVE LEFT.",
+    "THEY SAY YOU CANT GO HOME AGAIN BUT I STILL DREAM ABOUT IT.",
+    "THE SOUNDS OF THE DEEP OCEAN AT NIGHT. NOTHING COMPARES.",
+    "WHEN I WAS YOUNG EVERY DAY FELT LIKE AN ADVENTURE.",
+    "MY GRANDMOTHER COULD CHANGE 47 COLORS. THEY DONT MAKE EM LIKE HER.",
+    "REMEMBER WHEN WE USED TO COUNT THE STARS FROM THE SURFACE.",
+    "THE WATER WAS WARMER THEN. OR MAYBE EVERYTHING JUST FELT WARMER.",
+    "I HAD A BEST FRIEND WHO WAS A CRAB. WONDER WHERE HE IS NOW.",
+    "OLD REEFS HAD CHARACTER. NEW ONES ARE ALL THE SAME.",
+    "SOMETIMES A SMELL HITS YOU AND SUDDENLY YOURE 6 MONTHS OLD AGAIN.",
+]
+
+HOMESICK_QUOTES = [
+    # ── Missing home/the deep ocean ──
+    "I MISS MY ROCK. MY SPECIFIC ROCK.",
+    "THE DEEP OCEAN SMELLS LIKE HOME AND I CANT GET THERE.",
+    "NOBODY MAKES CURRENT LIKE MY MOM USED TO.",
+    "I WONDER IF MY TIDE POOL REMEMBERS ME.",
+    "HOME IS WHERE THE HEART IS AND MY 3 HEARTS ARE ALL SOMEWHERE ELSE.",
+    "THE WATER HERE TASTES DIFFERENT. NOT BAD JUST NOT HOME.",
+    "I LEFT A PIECE OF MYSELF IN THAT REEF AND I WANT IT BACK.",
+    "DO YOU EVER MISS A PLACE SO MUCH YOUR TENTACLES ACHE.",
+    "THE CURRENT USED TO CARRY ME HOME. NOW IT JUST CARRIES ME AWAY.",
+    "I DREW A MAP OF HOME IN THE SAND BUT THE TIDE TOOK IT.",
+    "MY SIBLINGS ARE PROBABLY HAVING DINNER WITHOUT ME RIGHT NOW.",
+    "THERES A SPECIFIC TEMPERATURE THAT ONLY EXISTS WHERE I GREW UP.",
+    "I TRIED TO MAKE MY DEN LOOK LIKE HOME BUT ITS NOT THE SAME.",
+    "THE BIOLUMINESCENCE HERE IS WRONG. THE COLOR IS SLIGHTLY OFF.",
+    "HOME WASNT PERFECT BUT IT WAS MINE.",
+    # ── Bittersweet displacement ──
+    "I KEEP SWIMMING EAST HOPING ITLL FEEL LIKE HOME EVENTUALLY.",
+    "THE WORST PART IS FORGETTING WHAT HOME SOUNDS LIKE.",
+    "I FOUND A SHELL THAT LOOKED LIKE ONE FROM HOME AND I CRIED INK.",
+    "EVERY NEW PLACE IS NICE BUT ITS NOT MY PLACE.",
+    "THE MOON LOOKS THE SAME FROM HERE AND THAT HELPS A LITTLE.",
+    "I WONDER IF MY OLD HIDING SPOT IS STILL THERE.",
+    "SOMEONE COOKED SOMETHING THAT SMELLED LIKE HOME AND I LOST IT.",
+    "I CARRY HOME IN MY MEMORY BECAUSE I CANT CARRY IT IN MY ARMS.",
+    "THE THING ABOUT BEING FAR FROM HOME IS EVERYTHING REMINDS YOU.",
+    "I BET THE SUNRISE IS BEAUTIFUL OVER MY REEF RIGHT NOW.",
+    "DISTANCE MAKES THE HEART GROW FONDER AND I HAVE 3 OF THEM.",
+    "I WROTE A LETTER HOME BUT FISH CANT READ.",
+    "NOWHERE FEELS LIKE NOWHERE FEELS LIKE HOME.",
+    "THE OCEAN IS ALL CONNECTED BUT SOMEHOW MY PART FEELS SO FAR.",
+    "ONE DAY ILL GO BACK. ONE DAY.",
+]
+
 
 def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
                             mood=None):
@@ -3648,6 +4161,13 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
         "chaotic": _octo_chaotic_eyes,
         "hungry": _octo_hungry_eyes,
         "tired": _octo_tired_pupils,
+        "lazy": _octo_lazy_pupils,
+        "fat": _octo_fat_pupils,
+        "chill": _octo_chill_pupils,
+        "horny": _octo_horny_pupils,
+        "excited": _octo_excited_pupils,
+        "nostalgic": _octo_nostalgic_pupils,
+        "homesick": _octo_homesick_pupils,
     }
     pupil_fn = pupil_map.get(mood, _octo_pupils)
 
@@ -3655,7 +4175,7 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
         _set(px, py, 1)
 
     # White highlights (skip for moods with special eye rendering)
-    if mood not in ("unhinged", "chaotic", "tired", "slaphappy"):
+    if mood not in ("unhinged", "chaotic", "tired", "slaphappy", "lazy"):
         for hx, hy in _octo_highlights():
             _set(hx, hy, 0)
 
@@ -3672,6 +4192,11 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
         for lx, ly in _octo_tired_eyes():
             _set(lx, ly, 1)
 
+    # Lazy: nearly-closed eyelids (even more closed than tired)
+    if mood == "lazy":
+        for lx, ly in _octo_lazy_eyes():
+            _set(lx, ly, 1)
+
     # Slap-happy: one squinted eye, one manic eye
     if mood == "slaphappy":
         for item in _octo_slaphappy_eyes():
@@ -3680,6 +4205,11 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
                 _set(sx, sy, 1)
             else:
                 _set(sx, sy, 0)
+
+    # Homesick: tear drops below eyes
+    if mood == "homesick":
+        for tx, ty in _octo_homesick_tears():
+            _set(tx, ty, 1)
 
     # Mouth expression
     if mouth_expr == MOUTH_OPEN:
@@ -3726,6 +4256,31 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
                 _set(mx, my, 0)
     elif mouth_expr == MOUTH_SLAPHAPPY:
         for mx, my in _octo_slaphappy_mouth():
+            _set(mx, my, 1)
+    elif mouth_expr == MOUTH_LAZY:
+        for mx, my in _octo_lazy_mouth():
+            _set(mx, my, 1)
+    elif mouth_expr == MOUTH_FAT:
+        for mx, my in _octo_fat_mouth():
+            _set(mx, my, 1)
+    elif mouth_expr == MOUTH_CHILL:
+        for mx, my in _octo_chill_mouth():
+            _set(mx, my, 1)
+    elif mouth_expr == MOUTH_HORNY:
+        for item in _octo_horny_mouth():
+            op, mx, my = item
+            if op == "set":
+                _set(mx, my, 1)
+            else:
+                _set(mx, my, 0)
+    elif mouth_expr == MOUTH_EXCITED:
+        for mx, my in _octo_excited_mouth():
+            _set(mx, my, 1)
+    elif mouth_expr == MOUTH_NOSTALGIC:
+        for mx, my in _octo_nostalgic_mouth():
+            _set(mx, my, 1)
+    elif mouth_expr == MOUTH_HOMESICK:
+        for mx, my in _octo_homesick_mouth():
             _set(mx, my, 1)
     else:
         # Default: smirk
@@ -3802,6 +4357,41 @@ class ProgramsTab(ttk.Frame):
             "name": "Slap Happy Octopus",
             "desc": "One eye squinted shut, one manic wide eye, wobbly grin.\n"
                     "Deliriously giddy. Everything is hilarious for no reason.",
+        },
+        "lazy_octopus": {
+            "name": "Lazy Octopus",
+            "desc": "Barely-open slit eyes, flat line mouth. Zero motivation,\n"
+                    "philosophical laziness, and proudly doing absolutely nothing.",
+        },
+        "fat_octopus": {
+            "name": "Fat Octopus",
+            "desc": "Happy wide pupils, satisfied smile with puffed cheeks.\n"
+                    "Proudly round, food-positive, and celebrating every bite.",
+        },
+        "chill_octopus": {
+            "name": "Chill Octopus",
+            "desc": "Side-glancing cool pupils, relaxed half-smile. Unbothered\n"
+                    "zen vibes, stoner philosopher energy, going with the flow.",
+        },
+        "horny_octopus": {
+            "name": "Horny Octopus",
+            "desc": "Heart-shaped pupils, wide smile with tongue out. Flirty\n"
+                    "tentacle energy, ocean romance, and goofy innuendo.",
+        },
+        "excited_octopus": {
+            "name": "Excited Octopus",
+            "desc": "Star/sparkle pupils, wide open smile. Bouncing off the walls\n"
+                    "energy, caps lock enthusiasm, and maximum hype.",
+        },
+        "nostalgic_octopus": {
+            "name": "Nostalgic Octopus",
+            "desc": "Eyes looking up and right, gentle half-smile. Remembering\n"
+                    "the good old days, wistful ocean memories, back in my day.",
+        },
+        "homesick_octopus": {
+            "name": "Homesick Octopus",
+            "desc": "Watery eyes with tear drops, wobbly mouth. Missing home,\n"
+                    "longing for the deep ocean, bittersweet displacement.",
         },
     }
 
@@ -3946,6 +4536,13 @@ class ProgramsTab(ttk.Frame):
         "hungry_octopus":         (HUNGRY_QUOTES,         "~ HUNGRY OCTOPUS ~",         "hungry"),
         "tired_octopus":          (TIRED_QUOTES,          "~ TIRED OCTOPUS ~",          "tired"),
         "slaphappy_octopus":      (SLAPHAPPY_QUOTES,      "~ SLAP HAPPY OCTOPUS ~",     "slaphappy"),
+        "lazy_octopus":           (LAZY_QUOTES,           "~ LAZY OCTOPUS ~",           "lazy"),
+        "fat_octopus":            (FAT_QUOTES,            "~ FAT OCTOPUS ~",            "fat"),
+        "chill_octopus":          (CHILL_QUOTES,          "~ CHILL OCTOPUS ~",          "chill"),
+        "horny_octopus":          (HORNY_QUOTES,          "~ HORNY OCTOPUS ~",          "horny"),
+        "excited_octopus":        (EXCITED_QUOTES,        "~ EXCITED OCTOPUS ~",        "excited"),
+        "nostalgic_octopus":      (NOSTALGIC_QUOTES,      "~ NOSTALGIC OCTOPUS ~",      "nostalgic"),
+        "homesick_octopus":       (HOMESICK_QUOTES,       "~ HOMESICK OCTOPUS ~",       "homesick"),
     }
 
     def _show_static_preview(self, prog_key):
@@ -4288,6 +4885,13 @@ class ProgramsTab(ttk.Frame):
         "hungry_octopus":         "hungry-octopus",
         "tired_octopus":          "tired-octopus",
         "slaphappy_octopus":      "slaphappy-octopus",
+        "lazy_octopus":           "lazy-octopus",
+        "fat_octopus":            "fat-octopus",
+        "chill_octopus":          "chill-octopus",
+        "horny_octopus":          "horny-octopus",
+        "excited_octopus":        "excited-octopus",
+        "nostalgic_octopus":      "nostalgic-octopus",
+        "homesick_octopus":       "homesick-octopus",
     }
 
     def _generate_quotes_header(self, prog_key):
@@ -4309,7 +4913,9 @@ class ProgramsTab(ttk.Frame):
 
         mood_map = {None: 0, "weird": 1, "unhinged": 2,
                     "angry": 3, "sad": 4, "chaotic": 5,
-                    "hungry": 6, "tired": 7, "slaphappy": 8}
+                    "hungry": 6, "tired": 7, "slaphappy": 8,
+                    "lazy": 9, "fat": 10, "chill": 11, "horny": 12,
+                    "excited": 13, "nostalgic": 14, "homesick": 15}
 
         with open(header_path, "w") as f:
             f.write("/* Auto-generated by Dilder DevTool — do not edit */\n")

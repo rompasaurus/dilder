@@ -95,3 +95,66 @@ services:
       - ./slaphappy-octopus:/project
       - ./hello-world/lib:/project/lib
     working_dir: /project
+
+  build-lazy-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./lazy-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
+
+  build-fat-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./fat-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
+
+  build-chill-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./chill-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
+
+  build-horny-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./horny-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
+
+  build-excited-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./excited-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
+
+  build-nostalgic-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./nostalgic-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project
+
+  build-homesick-octopus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./homesick-octopus:/project
+      - ./hello-world/lib:/project/lib
+    working_dir: /project

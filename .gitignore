@@ -14,6 +14,13 @@ dev-setup/chaotic-octopus/build/
 dev-setup/hungry-octopus/build/
 dev-setup/tired-octopus/build/
 dev-setup/slaphappy-octopus/build/
+dev-setup/lazy-octopus/build/
+dev-setup/fat-octopus/build/
+dev-setup/chill-octopus/build/
+dev-setup/horny-octopus/build/
+dev-setup/excited-octopus/build/
+dev-setup/nostalgic-octopus/build/
+dev-setup/homesick-octopus/build/
 
 # Generated quote data (DevTool generates at build time)
 dev-setup/*/quotes.h
@@ -42,6 +49,20 @@ dev-setup/tired-octopus/lib/
 dev-setup/tired-octopus/pico_sdk_import.cmake
 dev-setup/slaphappy-octopus/lib/
 dev-setup/slaphappy-octopus/pico_sdk_import.cmake
+dev-setup/lazy-octopus/lib/
+dev-setup/lazy-octopus/pico_sdk_import.cmake
+dev-setup/fat-octopus/lib/
+dev-setup/fat-octopus/pico_sdk_import.cmake
+dev-setup/chill-octopus/lib/
+dev-setup/chill-octopus/pico_sdk_import.cmake
+dev-setup/horny-octopus/lib/
+dev-setup/horny-octopus/pico_sdk_import.cmake
+dev-setup/excited-octopus/lib/
+dev-setup/excited-octopus/pico_sdk_import.cmake
+dev-setup/nostalgic-octopus/lib/
+dev-setup/nostalgic-octopus/pico_sdk_import.cmake
+dev-setup/homesick-octopus/lib/
+dev-setup/homesick-octopus/pico_sdk_import.cmake
 
 # Python
 __pycache__/

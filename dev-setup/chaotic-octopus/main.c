@@ -84,6 +84,13 @@
 #define MOOD_HUNGRY   6
 #define MOOD_TIRED    7
 #define MOOD_SLAPHAPPY 8
+#define MOOD_LAZY      9
+#define MOOD_FAT       10
+#define MOOD_CHILL     11
+#define MOOD_HORNY     12
+#define MOOD_EXCITED   13
+#define MOOD_NOSTALGIC 14
+#define MOOD_HOMESICK  15
 
 /* Mouth expressions */
 #define EXPR_SMIRK    0
@@ -97,6 +104,13 @@
 #define EXPR_HUNGRY   8
 #define EXPR_TIRED    9
 #define EXPR_SLAPHAPPY 10
+#define EXPR_LAZY      11
+#define EXPR_FAT       12
+#define EXPR_CHILL     13
+#define EXPR_HORNY     14
+#define EXPR_EXCITED   15
+#define EXPR_NOSTALGIC 16
+#define EXPR_HOMESICK  17
 
 /* Landscape frame buffer (1 = black pixel, packed MSB-first) */
 static uint8_t frame[IMG_ROW_BYTES * IMG_H];
@@ -558,6 +572,224 @@ static void draw_mouth_slaphappy(void) {
     }
 }
 
+/* ─── Lazy: nearly-closed eyes, flat mouth ─── */
+
+static void draw_lids_lazy(void) {
+    /* Cover most of each eye socket — leave only bottom sliver open */
+    for (int e = 0; e < 2; e++) {
+        int ecx = e ? 48 : 22;
+        for (int dy = -4; dy < 2; dy++)
+            for (int dx = -4; dx <= 4; dx++)
+                if (dx*dx + dy*dy <= 16)
+                    px_set_off(ecx+dx, 25+dy);
+    }
+}
+
+static void draw_pupils_lazy(void) {
+    /* Barely visible dots low in the slit */
+    for (int e = 0; e < 2; e++) {
+        int ecx = e ? 48 : 22;
+        px_set_off(ecx, 28);
+        px_set_off(ecx+1, 28);
+    }
+}
+
+static void draw_mouth_lazy(void) {
+    /* Flat horizontal line — minimal effort */
+    for (int x = 29; x < 42; x++) {
+        px_set_off(x, 40);
+        px_set_off(x, 41);
+    }
+}
+
+/* ─── Fat: content wide pupils, smile with cheek puffs ─── */
+
+static void draw_pupils_fat(void) {
+    /* Wider pupils — happy and satisfied */
+    for (int e = 0; e < 2; e++) {
+        int ecx = e ? 49 : 23;
+        for (int dy = -3; dy <= 3; dy++)
+            for (int dx = -3; dx <= 3; dx++)
+                if (dx*dx + dy*dy <= 9)
+                    px_set_off(ecx+dx, 26+dy);
+    }
+}
+
+static void draw_mouth_fat(void) {
+    /* Wide satisfied smile + cheek puffs */
+    for (int x = 24; x < 47; x++) {
+        int cy = 38 + ((x-35)*(x-35)) / 18;
+        px_set_off(x, cy);
+        px_set_off(x, cy+1);
+    }
+    /* Cheek puffs */
+    int cheeks[][2] = {{23,39},{47,39}};
+    for (int c = 0; c < 2; c++)
+        for (int dy = -2; dy <= 2; dy++)
+            for (int dx = -2; dx <= 2; dx++)
+                if (dx*dx + dy*dy <= 4)
+                    px_set_off(cheeks[c][0]+dx, cheeks[c][1]+dy);
+}
+
+/* ─── Chill: side-glancing pupils, relaxed half-smile ─── */
+
+static void draw_pupils_chill(void) {
+    /* Pupils shifted right — looking to the side */
+    int centers[][2] = {{25,26},{51,26}};
+    for (int e = 0; e < 2; e++)
+        for (int dy = -2; dy <= 2; dy++)
+            for (int dx = -2; dx <= 2; dx++)
+                if (dx*dx + dy*dy <= 4)
+                    px_set_off(centers[e][0]+dx, centers[e][1]+dy);
+}
+
+static void draw_mouth_chill(void) {
+    /* Slight asymmetric half-smile — relaxed */
+    for (int x = 29; x < 44; x++) {
+        float t = (x - 29) / 14.0f;
+        int y = 40 + (int)(1.5f * t * t);
+        px_set_off(x, y);
+        px_set_off(x, y+1);
+    }
+}
+
+/* ─── Horny: heart-shaped pupils, tongue-out mouth ─── */
+
+static void draw_pupils_horny(void) {
+    /* Heart-shaped pupils in each eye socket */
+    for (int e = 0; e < 2; e++) {
+        int ecx = e ? 48 : 22;
+        /* Top bumps */
+        static const int8_t top[][2] = {{-2,-1},{-1,-2},{0,-1},{1,-2},{2,-1}};
+        for (int i = 0; i < 5; i++)
+            px_set_off(ecx+top[i][0], 25+top[i][1]);
+        /* Middle row */
+        for (int dx = -2; dx <= 2; dx++)
+            px_set_off(ecx+dx, 25);
+        /* Lower taper */
+        for (int dx = -1; dx <= 1; dx++)
+            px_set_off(ecx+dx, 26);
+        /* Bottom point */
+        px_set_off(ecx, 27);
+    }
+}
+
+static void draw_mouth_horny(void) {
+    /* Wide open smile with tongue hanging out */
+    int cx = 35, cy = 39, rx = 8, ry = 5;
+    for (int dy = 0; dy <= ry; dy++)
+        for (int dx = -rx; dx <= rx; dx++) {
+            int in = (dx*dx)*(ry*ry) + (dy*dy)*(rx*rx) <= (rx*rx)*(ry*ry);
+            if (!in) continue;
+            int edge = 0;
+            if (dy == 0) edge = 1;
+            else {
+                int ndxs[] = {-1,1,0,0}, ndys[] = {0,0,-1,1};
+                for (int n = 0; n < 4; n++) {
+                    int nx = dx+ndxs[n], ny = dy+ndys[n];
+                    if (ny < 0) continue;
+                    if ((nx*nx)*(ry*ry)+(ny*ny)*(rx*rx) > (rx*rx)*(ry*ry))
+                        { edge = 1; break; }
+                }
+            }
+            if (edge) px_set_off(cx+dx, cy+dy);
+            else      px_clr_off(cx+dx, cy+dy);
+        }
+    /* Tongue */
+    for (int dy = 1; dy < 5; dy++)
+        for (int dx = -2; dx <= 2; dx++)
+            if (dx*dx + dy*dy <= 8)
+                px_set_off(cx+dx, cy+ry+dy);
+    /* Tongue interior */
+    for (int dy = 2; dy < 4; dy++)
+        for (int dx = -1; dx <= 1; dx++)
+            px_clr_off(cx+dx, cy+ry+dy);
+}
+
+/* ─── Excited: star/sparkle pupils, wide open smile ─── */
+
+static void draw_pupils_excited(void) {
+    /* Star/sparkle cross-shaped pupils in each eye socket */
+    for (int e = 0; e < 2; e++) {
+        int ecx = e ? 48 : 22;
+        /* Plus/cross shape */
+        for (int d = -2; d <= 2; d++) {
+            px_set_off(ecx + d, 25);   /* horizontal bar */
+            px_set_off(ecx, 25 + d);   /* vertical bar */
+        }
+        /* Diagonal tips for sparkle */
+        px_set_off(ecx - 1, 24); px_set_off(ecx + 1, 24);
+        px_set_off(ecx - 1, 26); px_set_off(ecx + 1, 26);
+    }
+}
+
+static void draw_mouth_excited(void) {
+    /* Wide open smile — bigger upward curve than normal */
+    for (int x = 22; x < 49; x++) {
+        int cy = 37 + ((x - 35) * (x - 35)) / 12;
+        px_set_off(x, cy);
+        px_set_off(x, cy + 1);
+    }
+}
+
+/* ─── Nostalgic: pupils looking up-right, gentle half-smile ─── */
+
+static void draw_pupils_nostalgic(void) {
+    /* Pupils shifted up and to the right — remembering */
+    int centers[][2] = {{24, 23}, {50, 23}};
+    for (int e = 0; e < 2; e++)
+        for (int dy = -2; dy <= 2; dy++)
+            for (int dx = -2; dx <= 2; dx++)
+                if (dx*dx + dy*dy <= 4)
+                    px_set_off(centers[e][0]+dx, centers[e][1]+dy);
+}
+
+static void draw_mouth_nostalgic(void) {
+    /* Gentle closed half-smile — small, wistful */
+    for (int x = 31; x < 40; x++) {
+        float t = (x - 31) / 8.0f;
+        float v = 2.0f * t - 1.0f;
+        int y = 40 + (int)(1.5f * v * v);
+        px_set_off(x, y);
+        px_set_off(x, y + 1);
+    }
+}
+
+/* ─── Homesick: watery eyes with tears, wobbly mouth ─── */
+
+static void draw_pupils_homesick(void) {
+    /* Normal-ish pupils, slightly lowered (sad-like) */
+    for (int e = 0; e < 2; e++) {
+        int ecx = e ? 49 : 23;
+        for (int dy = -2; dy <= 2; dy++)
+            for (int dx = -2; dx <= 2; dx++)
+                if (dx*dx + dy*dy <= 4)
+                    px_set_off(ecx+dx, 27+dy);
+    }
+}
+
+static void draw_tears_homesick(void) {
+    /* Tear drop pixels below each eye socket */
+    for (int e = 0; e < 2; e++) {
+        int ecx = e ? 48 : 22;
+        px_set_off(ecx, 31);
+        px_set_off(ecx, 32);
+        px_set_off(ecx, 33);
+        px_set_off(ecx - 1, 32);
+        px_set_off(ecx + 1, 32);
+    }
+}
+
+static void draw_mouth_homesick(void) {
+    /* Wobbly trying-not-to-cry line — slightly wavy horizontal */
+    for (int x = 28; x < 43; x++) {
+        float t = (x - 28) / 14.0f;
+        int y = 40 + (int)(1.5f * sinf(t * 3.14159f * 3.0f));
+        px_set_off(x, y);
+        px_set_off(x, y + 1);
+    }
+}
+
 /* ─── Chat bubble ─── */
 
 static void draw_bubble(void) {
@@ -688,6 +920,13 @@ static void render_frame(const Quote *q, int expr) {
         case MOOD_CHAOTIC:  draw_pupils_chaotic();  break;
         case MOOD_HUNGRY:   draw_pupils_hungry();   break;
         case MOOD_TIRED:    draw_pupils_tired();    break;
+        case MOOD_LAZY:     draw_pupils_lazy();     break;
+        case MOOD_FAT:      draw_pupils_fat();      break;
+        case MOOD_CHILL:    draw_pupils_chill();    break;
+        case MOOD_HORNY:    draw_pupils_horny();    break;
+        case MOOD_EXCITED:  draw_pupils_excited();  break;
+        case MOOD_NOSTALGIC: draw_pupils_nostalgic(); break;
+        case MOOD_HOMESICK: draw_pupils_homesick(); break;
         default:            draw_pupils_normal();   break;
     }
 
@@ -696,6 +935,8 @@ static void render_frame(const Quote *q, int expr) {
     if (q->mood == MOOD_SAD)       draw_brows_sad();
     if (q->mood == MOOD_TIRED)     draw_lids_tired();
     if (q->mood == MOOD_SLAPHAPPY) draw_eyes_slaphappy();
+    if (q->mood == MOOD_LAZY)      draw_lids_lazy();
+    if (q->mood == MOOD_HOMESICK)  draw_tears_homesick();
 
     /* 4. Mouth expression (with Y_OFF) */
     switch (expr) {
@@ -709,6 +950,13 @@ static void render_frame(const Quote *q, int expr) {
         case EXPR_HUNGRY:    draw_mouth_hungry();    break;
         case EXPR_TIRED:     draw_mouth_tired();     break;
         case EXPR_SLAPHAPPY: draw_mouth_slaphappy(); break;
+        case EXPR_LAZY:      draw_mouth_lazy();      break;
+        case EXPR_FAT:       draw_mouth_fat();       break;
+        case EXPR_CHILL:     draw_mouth_chill();     break;
+        case EXPR_HORNY:     draw_mouth_horny();     break;
+        case EXPR_EXCITED:   draw_mouth_excited();   break;
+        case EXPR_NOSTALGIC: draw_mouth_nostalgic(); break;
+        case EXPR_HOMESICK:  draw_mouth_homesick();  break;
         default:             draw_mouth_smirk();     break;
     }
 
@@ -778,6 +1026,13 @@ static const uint8_t cycle_chaotic[]   = {EXPR_CHAOTIC, EXPR_OPEN, EXPR_UNHINGED
 static const uint8_t cycle_hungry[]    = {EXPR_HUNGRY, EXPR_OPEN, EXPR_HUNGRY, EXPR_SMILE};
 static const uint8_t cycle_tired[]     = {EXPR_TIRED, EXPR_OPEN, EXPR_TIRED, EXPR_TIRED};
 static const uint8_t cycle_slaphappy[] = {EXPR_SLAPHAPPY, EXPR_OPEN, EXPR_SLAPHAPPY, EXPR_SMILE};
+static const uint8_t cycle_lazy[]      = {EXPR_LAZY, EXPR_LAZY, EXPR_LAZY, EXPR_OPEN};
+static const uint8_t cycle_fat[]       = {EXPR_FAT, EXPR_OPEN, EXPR_FAT, EXPR_SMILE};
+static const uint8_t cycle_chill[]     = {EXPR_CHILL, EXPR_OPEN, EXPR_CHILL, EXPR_SMILE};
+static const uint8_t cycle_horny[]     = {EXPR_HORNY, EXPR_OPEN, EXPR_HORNY, EXPR_SMILE};
+static const uint8_t cycle_excited[]   = {EXPR_EXCITED, EXPR_OPEN, EXPR_EXCITED, EXPR_SMILE};
+static const uint8_t cycle_nostalgic[] = {EXPR_NOSTALGIC, EXPR_OPEN, EXPR_NOSTALGIC, EXPR_SMILE};
+static const uint8_t cycle_homesick[]  = {EXPR_HOMESICK, EXPR_OPEN, EXPR_HOMESICK, EXPR_HOMESICK};
 
 static const uint8_t *mood_cycle(uint8_t mood) {
     switch (mood) {
@@ -789,6 +1044,13 @@ static const uint8_t *mood_cycle(uint8_t mood) {
         case MOOD_HUNGRY:    return cycle_hungry;
         case MOOD_TIRED:     return cycle_tired;
         case MOOD_SLAPHAPPY: return cycle_slaphappy;
+        case MOOD_LAZY:      return cycle_lazy;
+        case MOOD_FAT:       return cycle_fat;
+        case MOOD_CHILL:     return cycle_chill;
+        case MOOD_HORNY:     return cycle_horny;
+        case MOOD_EXCITED:   return cycle_excited;
+        case MOOD_NOSTALGIC: return cycle_nostalgic;
+        case MOOD_HOMESICK:  return cycle_homesick;
         default:             return cycle_normal;
     }
 }
