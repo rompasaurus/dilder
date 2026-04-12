@@ -1,0 +1,5562 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
+      
+      
+        <meta name="author" content="rompasaurus">
+      
+      
+        <link rel="canonical" href="https://dilder.dev/docs/hardware/3d-printing-pipeline/">
+      
+      
+        <link rel="prev" href="../enclosure-design/">
+      
+      
+        <link rel="next" href="../../setup/first-time-setup/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>3D Printing Pipeline - Dilder</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-PLACEHOLDER"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-PLACEHOLDER",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-PLACEHOLDER",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#3d-printing-prototyping-pipeline-analysis-document" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Dilder" class="md-header__button md-logo" aria-label="Dilder" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73A2 2 0 1 0 10 4c0 .74.4 1.39 1 1.73V7h-1c-3.87 0-7 3.13-7 7H2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h1v1a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2v-1h1c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1M9.7 15.45l-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45m9 0-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Dilder
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              3D Printing Pipeline
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/rompasaurus/dilder" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    rompasaurus/dilder
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../blog/" class="md-tabs__link">
+          
+  
+  
+  Blog
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Docs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../community/" class="md-tabs__link">
+          
+  
+  
+  Community
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/" class="md-tabs__link">
+          
+  
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../prompts/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Prompt Log
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Dilder" class="md-nav__button md-logo" aria-label="Dilder" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73A2 2 0 1 0 10 4c0 .74.4 1.39 1 1.73V7h-1c-3.87 0-7 3.13-7 7H2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h1v1a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2v-1h1c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1M9.7 15.45l-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45m9 0-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45"/></svg>
+
+    </a>
+    Dilder
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/rompasaurus/dilder" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    rompasaurus/dilder
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Blog
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Build Journal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Archive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Archive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/archive/2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2026
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Categories
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Categories
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Docs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Hardware
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../materials-list/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materials List
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wiring-pinout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiring & Pinout
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../enclosure-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enclosure Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D Printing Pipeline
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D Printing Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-technology-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Technology Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-fdm-fff-fused-deposition-modeling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. FDM / FFF — Fused Deposition Modeling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. FDM / FFF — Fused Deposition Modeling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#printer-tiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Printer Tiers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#material-costs-per-spool-1-kg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Material Costs Per Spool (1 kg)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#print-time-for-dilder-enclosure-both-halves" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Print Time for Dilder Enclosure (Both Halves)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verdict-for-this-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verdict for This Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-sla-msla-resin-printing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. SLA / MSLA — Resin Printing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. SLA / MSLA — Resin Printing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#printer-tiers_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Printer Tiers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#material-costs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Material Costs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pros_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#print-time-for-dilder-enclosure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Print Time for Dilder Enclosure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verdict-for-this-project_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verdict for This Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-sls-selective-laser-sintering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. SLS — Selective Laser Sintering
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. SLS — Selective Laser Sintering">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#availability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Availability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pros_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verdict-for-this-project_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verdict for This Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-mjf-multi-jet-fusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. MJF — Multi Jet Fusion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. MJF — Multi Jet Fusion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#availability_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Availability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pros_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verdict-for-this-project_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verdict for This Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-other-industrial-technologies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Other Industrial Technologies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Other Industrial Technologies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#polyjet-material-jetting-stratasys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PolyJet / Material Jetting (Stratasys)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#binder-jetting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Binder Jetting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dmls-slm-metal-3d-printing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DMLS / SLM (Metal 3D Printing)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sheet-metal-laser-cut-cnc-bend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sheet Metal (Laser Cut + CNC Bend)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-technology-comparison-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Technology Comparison Matrix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-third-party-print-services-deep-dive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Third-Party Print Services — Deep Dive
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Third-Party Print Services — Deep Dive">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jlcpcb-jlc3dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JLCPCB (JLC3DP)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pcbway-3d-printing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PCBWay 3D Printing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#craftcloud-all3dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Craftcloud (All3DP)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shapeways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shapeways
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Xometry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hubs-protolabs-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hubs (Protolabs Network)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sculpteo-basf-forward-am" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sculpteo (BASF Forward AM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendcutsend-sheet-metal-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SendCutSend (Sheet Metal Alternative)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-notable-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Notable Services
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-third-party-service-comparison-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Third-Party Service Comparison Matrix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-material-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Material Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Material Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fdm-materials-for-enclosures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FDM Materials — For Enclosures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sla-resins-for-enclosures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SLA Resins — For Enclosures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slsmjf-materials-for-enclosures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SLS/MJF Materials — For Enclosures
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-cad-software-and-design-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. CAD Software and Design Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. CAD Software and Design Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#software-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Software Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-workflow-for-this-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Workflow for This Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kicad-to-cad-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KiCad to CAD Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-cad-libraries-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key CAD Libraries / Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-pricing-estimates-for-the-dilder-enclosure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Pricing Estimates for the Dilder Enclosure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Pricing Estimates for the Dilder Enclosure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#home-printing-marginal-cost-per-enclosure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Home Printing — Marginal Cost Per Enclosure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#service-printing-total-cost-including-shipping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Printing — Total Cost Including Shipping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-costs-one-time-reusable-across-prints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Costs (One-Time, Reusable Across Prints)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#total-first-prototype-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Total First Prototype Cost
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-viable-options-ranked-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Viable Options — Ranked Recommendations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Viable Options — Ranked Recommendations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-a-jlcpcb-mjf-pa12-best-value-without-a-printer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A: JLCPCB MJF PA12 (Best Value Without a Printer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-bambu-lab-a1-mini-petg-best-for-rapid-iteration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B: Bambu Lab A1 Mini + PETG (Best for Rapid Iteration)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-c-hybrid-home-fdm-for-iteration-jlcpcb-mjf-for-finals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option C: Hybrid — Home FDM for Iteration + JLCPCB MJF for Finals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-d-craftcloud-best-quote-shopping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option D: Craftcloud — Best Quote Shopping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-e-xometryhubs-fastest-professional-parts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option E: Xometry/Hubs — Fastest Professional Parts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-decision-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Decision Framework
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-scaling-path-prototype-to-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Scaling Path — Prototype to Production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/first-time-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    First-Time Setup (C SDK)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/pi-zero-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/display-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Display Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/dev-environment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dev Environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Software
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../software/project-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tools
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/devtool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevTool (GUI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/setup-cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/website-dev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Website Dev CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/pi-zero-wh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pi Zero WH (future)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/waveshare-eink/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waveshare e-Paper HAT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../community/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../community/discord/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../community/support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Support on Patreon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Dilder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/contact/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contact
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompt Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-technology-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Technology Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-fdm-fff-fused-deposition-modeling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. FDM / FFF — Fused Deposition Modeling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. FDM / FFF — Fused Deposition Modeling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#printer-tiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Printer Tiers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#material-costs-per-spool-1-kg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Material Costs Per Spool (1 kg)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#print-time-for-dilder-enclosure-both-halves" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Print Time for Dilder Enclosure (Both Halves)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verdict-for-this-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verdict for This Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-sla-msla-resin-printing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. SLA / MSLA — Resin Printing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. SLA / MSLA — Resin Printing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#printer-tiers_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Printer Tiers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#material-costs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Material Costs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pros_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#print-time-for-dilder-enclosure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Print Time for Dilder Enclosure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verdict-for-this-project_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verdict for This Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-sls-selective-laser-sintering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. SLS — Selective Laser Sintering
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. SLS — Selective Laser Sintering">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#availability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Availability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pros_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verdict-for-this-project_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verdict for This Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-mjf-multi-jet-fusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. MJF — Multi Jet Fusion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. MJF — Multi Jet Fusion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#availability_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Availability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pros_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verdict-for-this-project_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verdict for This Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-other-industrial-technologies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Other Industrial Technologies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Other Industrial Technologies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#polyjet-material-jetting-stratasys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PolyJet / Material Jetting (Stratasys)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#binder-jetting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Binder Jetting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dmls-slm-metal-3d-printing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DMLS / SLM (Metal 3D Printing)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sheet-metal-laser-cut-cnc-bend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sheet Metal (Laser Cut + CNC Bend)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-technology-comparison-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Technology Comparison Matrix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-third-party-print-services-deep-dive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Third-Party Print Services — Deep Dive
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Third-Party Print Services — Deep Dive">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jlcpcb-jlc3dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JLCPCB (JLC3DP)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pcbway-3d-printing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PCBWay 3D Printing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#craftcloud-all3dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Craftcloud (All3DP)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shapeways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shapeways
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Xometry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hubs-protolabs-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hubs (Protolabs Network)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sculpteo-basf-forward-am" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sculpteo (BASF Forward AM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendcutsend-sheet-metal-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SendCutSend (Sheet Metal Alternative)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-notable-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Notable Services
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-third-party-service-comparison-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Third-Party Service Comparison Matrix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-material-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Material Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Material Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fdm-materials-for-enclosures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FDM Materials — For Enclosures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sla-resins-for-enclosures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SLA Resins — For Enclosures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slsmjf-materials-for-enclosures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SLS/MJF Materials — For Enclosures
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-cad-software-and-design-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. CAD Software and Design Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. CAD Software and Design Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#software-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Software Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-workflow-for-this-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Workflow for This Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kicad-to-cad-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KiCad to CAD Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-cad-libraries-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key CAD Libraries / Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-pricing-estimates-for-the-dilder-enclosure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Pricing Estimates for the Dilder Enclosure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Pricing Estimates for the Dilder Enclosure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#home-printing-marginal-cost-per-enclosure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Home Printing — Marginal Cost Per Enclosure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#service-printing-total-cost-including-shipping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Printing — Total Cost Including Shipping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-costs-one-time-reusable-across-prints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Costs (One-Time, Reusable Across Prints)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#total-first-prototype-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Total First Prototype Cost
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-viable-options-ranked-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Viable Options — Ranked Recommendations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Viable Options — Ranked Recommendations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-a-jlcpcb-mjf-pa12-best-value-without-a-printer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A: JLCPCB MJF PA12 (Best Value Without a Printer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-bambu-lab-a1-mini-petg-best-for-rapid-iteration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B: Bambu Lab A1 Mini + PETG (Best for Rapid Iteration)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-c-hybrid-home-fdm-for-iteration-jlcpcb-mjf-for-finals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option C: Hybrid — Home FDM for Iteration + JLCPCB MJF for Finals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-d-craftcloud-best-quote-shopping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option D: Craftcloud — Best Quote Shopping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-e-xometryhubs-fastest-professional-parts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option E: Xometry/Hubs — Fastest Professional Parts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-decision-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Decision Framework
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-scaling-path-prototype-to-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Scaling Path — Prototype to Production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="3d-printing-prototyping-pipeline-analysis-document">3D Printing Prototyping Pipeline — Analysis Document<a class="headerlink" href="#3d-printing-prototyping-pipeline-analysis-document" title="Permanent link">&para;</a></h1>
+<p>A comprehensive evaluation of every viable 3D printing technology, service, and CAD workflow for designing and manufacturing the Dilder enclosure. This document exists to make informed, cost-effective decisions about how to go from CAD model to physical prototype (and eventually small-batch production).</p>
+<p><strong>Target part:</strong> Two-piece snap-fit enclosure, ~88 x 34 x 19 mm, ~15–25 g material, housing a Pico W + Waveshare 2.13" e-Paper display + 5 tactile buttons.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#1-technology-overview">Technology Overview</a></li>
+<li><a href="#2-fdm--fff--fused-deposition-modeling">FDM / FFF — Fused Deposition Modeling</a></li>
+<li><a href="#3-sla--msla--resin-printing">SLA / MSLA — Resin Printing</a></li>
+<li><a href="#4-sls--selective-laser-sintering">SLS — Selective Laser Sintering</a></li>
+<li><a href="#5-mjf--multi-jet-fusion">MJF — Multi Jet Fusion</a></li>
+<li><a href="#6-other-industrial-technologies">Other Industrial Technologies</a></li>
+<li><a href="#7-technology-comparison-matrix">Technology Comparison Matrix</a></li>
+<li><a href="#8-third-party-print-services--deep-dive">Third-Party Print Services — Deep Dive</a></li>
+<li><a href="#9-third-party-service-comparison-matrix">Third-Party Service Comparison Matrix</a></li>
+<li><a href="#10-material-guide">Material Guide</a></li>
+<li><a href="#11-cad-software-and-design-workflow">CAD Software and Design Workflow</a></li>
+<li><a href="#12-pricing-estimates-for-the-dilder-enclosure">Pricing Estimates for the Dilder Enclosure</a></li>
+<li><a href="#13-viable-options--ranked-recommendations">Viable Options — Ranked Recommendations</a></li>
+<li><a href="#14-decision-framework">Decision Framework</a></li>
+<li><a href="#15-scaling-path--prototype-to-production">Scaling Path — Prototype to Production</a></li>
+</ol>
+<hr />
+<h2 id="1-technology-overview">1. Technology Overview<a class="headerlink" href="#1-technology-overview" title="Permanent link">&para;</a></h2>
+<p>There are four 3D printing technologies relevant to small electronics enclosures. Each makes fundamental trade-offs between cost, speed, surface finish, and mechanical properties.</p>
+<table>
+<thead>
+<tr>
+<th>Technology</th>
+<th>Process</th>
+<th>Home Printer?</th>
+<th>Service Available?</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>FDM/FFF</strong></td>
+<td>Melted plastic filament deposited layer by layer</td>
+<td>Yes ($150–$1500)</td>
+<td>Yes</td>
+<td>Cheapest functional prototypes, fastest iteration</td>
+</tr>
+<tr>
+<td><strong>SLA/MSLA</strong></td>
+<td>UV light cures liquid resin layer by layer</td>
+<td>Yes ($150–$3000)</td>
+<td>Yes</td>
+<td>Best surface finish and detail at desktop scale</td>
+</tr>
+<tr>
+<td><strong>SLS</strong></td>
+<td>Laser sinters nylon powder</td>
+<td>No (machines start ~$10K)</td>
+<td>Yes</td>
+<td>Strongest functional parts, no supports needed</td>
+</tr>
+<tr>
+<td><strong>MJF</strong></td>
+<td>Inkjet + infrared fuses nylon powder</td>
+<td>No (machines start ~$100K)</td>
+<td>Yes</td>
+<td>Production-quality nylon parts, best price/quality via services</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-fdm-fff-fused-deposition-modeling">2. FDM / FFF — Fused Deposition Modeling<a class="headerlink" href="#2-fdm-fff-fused-deposition-modeling" title="Permanent link">&para;</a></h2>
+<h3 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
+<p>A thermoplastic filament (1.75 mm diameter spool) is fed through a heated nozzle (180–300 C) and deposited in layers (typically 0.2 mm) onto a heated build plate. The part builds up layer by layer from the bottom.</p>
+<h3 id="printer-tiers">Printer Tiers<a class="headerlink" href="#printer-tiers" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Price Range</th>
+<th>Examples</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Budget</strong></td>
+<td>$150–$300</td>
+<td>Creality Ender 3 V3, Elegoo Neptune 4, Anycubic Kobra 3</td>
+<td>Adequate for enclosures. Most now have auto-leveling and direct drive.</td>
+</tr>
+<tr>
+<td><strong>Mid-range</strong></td>
+<td>$300–$700</td>
+<td><strong>Bambu Lab A1 Mini (~$250)</strong>, Bambu Lab A1 (~$400), Prusa MK4S (~$600)</td>
+<td>Significantly better quality, speed (200–500 mm/s), and reliability out of the box. The A1 Mini is the sweet spot for this project.</td>
+</tr>
+<tr>
+<td><strong>Enthusiast</strong></td>
+<td>$700–$1500</td>
+<td>Bambu Lab P1S/X1C, Prusa XL, Voron kits</td>
+<td>Enclosed chambers (needed for ABS/ASA), multi-material, excellent reliability.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="material-costs-per-spool-1-kg">Material Costs Per Spool (1 kg)<a class="headerlink" href="#material-costs-per-spool-1-kg" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Material</th>
+<th>Cost/kg</th>
+<th>For our enclosure (~25 g)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PLA</td>
+<td>$15–25</td>
+<td>~$0.50</td>
+</tr>
+<tr>
+<td>PETG</td>
+<td>$18–28</td>
+<td>~$0.60</td>
+</tr>
+<tr>
+<td>ABS</td>
+<td>$18–25</td>
+<td>~$0.55</td>
+</tr>
+<tr>
+<td>ASA</td>
+<td>$22–30</td>
+<td>~$0.70</td>
+</tr>
+<tr>
+<td>TPU</td>
+<td>$25–35</td>
+<td>~$0.80</td>
+</tr>
+<tr>
+<td>Nylon PA12</td>
+<td>$35–60</td>
+<td>~$1.25</td>
+</tr>
+<tr>
+<td>CF-PETG</td>
+<td>$35–55</td>
+<td>~$1.10</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pros">Pros<a class="headerlink" href="#pros" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Lowest cost of entry</strong> — a capable printer costs $200–400</li>
+<li><strong>Cheapest per-part cost</strong> — under $1 in material for our enclosure</li>
+<li><strong>Fastest iteration</strong> — print a new revision in 1–3 hours, same day</li>
+<li><strong>Enormous material variety</strong> — rigid, flexible, high-temp, filled composites</li>
+<li><strong>Functionally strong</strong> — PETG and ASA parts handle real-world use</li>
+<li><strong>Supports snap-fits, screw bosses, living hinges</strong> in the right materials</li>
+<li><strong>Post-processing options</strong> — sanding, painting, acetone smoothing (ABS), filler primer</li>
+<li><strong>Massive community</strong> — thousands of tutorials, pre-made parametric enclosure generators</li>
+<li><strong>No hazardous chemicals</strong> — PLA and PETG are safe in a normal room</li>
+</ul>
+<h3 id="cons">Cons<a class="headerlink" href="#cons" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Visible layer lines</strong> — 0.2 mm layers are noticeable; 0.12 mm is better but slower</li>
+<li><strong>Dimensional accuracy</strong> — typically +/- 0.2–0.3 mm (well-tuned machines hit +/- 0.1 mm)</li>
+<li><strong>Anisotropic strength</strong> — parts are weakest between layers (Z-axis)</li>
+<li><strong>Overhangs &gt; 45 deg require supports</strong> — which leave marks on the surface</li>
+<li><strong>Fine features are limited</strong> — thin walls under 1 mm and small text are challenging</li>
+<li><strong>Surface finish is not consumer-product quality</strong> without post-processing</li>
+<li><strong>Stringing and artifacts</strong> need cleanup, especially with PETG</li>
+</ul>
+<h3 id="print-time-for-dilder-enclosure-both-halves">Print Time for Dilder Enclosure (Both Halves)<a class="headerlink" href="#print-time-for-dilder-enclosure-both-halves" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Printer Speed</th>
+<th>Layer Height</th>
+<th>Estimated Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Budget (60 mm/s)</td>
+<td>0.2 mm</td>
+<td>3–5 hours</td>
+</tr>
+<tr>
+<td>Mid-range (200 mm/s)</td>
+<td>0.2 mm</td>
+<td>1–2 hours</td>
+</tr>
+<tr>
+<td>Mid-range (200 mm/s)</td>
+<td>0.12 mm</td>
+<td>2–3 hours</td>
+</tr>
+</tbody>
+</table>
+<h3 id="verdict-for-this-project">Verdict for This Project<a class="headerlink" href="#verdict-for-this-project" title="Permanent link">&para;</a></h3>
+<p><strong>Best choice for rapid iteration during early prototyping.</strong> If you plan to iterate the enclosure design more than 2–3 times, owning a $200–400 FDM printer pays for itself vs. ordering from services each time. The Bambu Lab A1 Mini ($250) is the strongest recommendation for this use case.</p>
+<hr />
+<h2 id="3-sla-msla-resin-printing">3. SLA / MSLA — Resin Printing<a class="headerlink" href="#3-sla-msla-resin-printing" title="Permanent link">&para;</a></h2>
+<h3 id="how-it-works_1">How It Works<a class="headerlink" href="#how-it-works_1" title="Permanent link">&para;</a></h3>
+<p>A vat of liquid photopolymer resin sits above an LCD screen (MSLA) or under a UV laser (SLA). The screen/laser selectively cures one layer of resin at a time. The build plate lifts, fresh resin flows in, and the next layer is cured. Parts require post-processing: washing in IPA or water, then UV curing.</p>
+<h3 id="printer-tiers_1">Printer Tiers<a class="headerlink" href="#printer-tiers_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Price Range</th>
+<th>Examples</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Budget MSLA</strong></td>
+<td>$150–$300</td>
+<td>Elegoo Mars/Saturn series, Anycubic Photon Mono series</td>
+<td>Excellent detail. The Elegoo Saturn 4 Ultra offers 10K+ resolution.</td>
+</tr>
+<tr>
+<td><strong>Mid-range MSLA</strong></td>
+<td>$300–$700</td>
+<td>Elegoo Saturn 4 Ultra, Anycubic Photon Mono M7, Phrozen Sonic series</td>
+<td>Larger build volumes, higher resolution.</td>
+</tr>
+<tr>
+<td><strong>Professional</strong></td>
+<td>$700–$3500</td>
+<td>Formlabs Form 4 (~$2000–3500), Prusa SL1S</td>
+<td>Gold standard. Exceptional material options and engineering resins.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="material-costs">Material Costs<a class="headerlink" href="#material-costs" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Resin Type</th>
+<th>Cost/Liter</th>
+<th>For our enclosure (~20 ml)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard</td>
+<td>$25–40</td>
+<td>~$0.70</td>
+</tr>
+<tr>
+<td>ABS-like / tough</td>
+<td>$35–55</td>
+<td>~$1.00</td>
+</tr>
+<tr>
+<td>Flexible</td>
+<td>$45–65</td>
+<td>~$1.20</td>
+</tr>
+<tr>
+<td>High-temp</td>
+<td>$50–80</td>
+<td>~$1.50</td>
+</tr>
+<tr>
+<td>Water-washable</td>
+<td>$30–45</td>
+<td>~$0.80</td>
+</tr>
+<tr>
+<td>Engineering (Formlabs)</td>
+<td>$100–200</td>
+<td>~$3.50</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pros_1">Pros<a class="headerlink" href="#pros_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Exceptional surface finish</strong> — layer heights 0.025–0.05 mm, near-smooth surfaces</li>
+<li><strong>Best dimensional accuracy</strong> at desktop scale — +/- 0.05–0.1 mm</li>
+<li><strong>Fine features and small text/logos</strong> render cleanly</li>
+<li><strong>Near-injection-mold surface quality</strong> on appearance prototypes</li>
+<li><strong>Isotropic strength</strong> within the XY plane</li>
+<li><strong>Speed is independent of part count per layer</strong> — print multiple enclosures at same speed as one</li>
+</ul>
+<h3 id="cons_1">Cons<a class="headerlink" href="#cons_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Resin is messy, toxic (uncured), and requires PPE</strong> — nitrile gloves, ventilation</li>
+<li><strong>Post-processing is mandatory</strong> — IPA wash + UV cure adds 30–60 minutes</li>
+<li><strong>Parts are generally more brittle</strong> than FDM (standard resin snaps under flex)</li>
+<li><strong>Snap-fits are fragile</strong> unless using tough/engineering resin at higher cost</li>
+<li><strong>Resin fumes</strong> — printer needs a well-ventilated area, not a bedroom or living space</li>
+<li><strong>IPA waste disposal</strong> is an environmental/safety consideration</li>
+<li><strong>Smaller build volumes</strong> than FDM at equivalent price</li>
+<li><strong>Resin has a shelf life</strong> — opened bottles degrade over months</li>
+<li><strong>Support removal leaves witness marks</strong> that need sanding</li>
+</ul>
+<h3 id="print-time-for-dilder-enclosure">Print Time for Dilder Enclosure<a class="headerlink" href="#print-time-for-dilder-enclosure" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Resin Printer</th>
+<th>Layer Height</th>
+<th>Estimated Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MSLA (any)</td>
+<td>0.05 mm</td>
+<td>2–4 hours + 30–60 min post-processing</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>MSLA cures the entire layer at once, so print time depends on height, not footprint area. Printing 4 enclosures takes the same time as 1 (if they fit on the plate).</p>
+</blockquote>
+<h3 id="verdict-for-this-project_1">Verdict for This Project<a class="headerlink" href="#verdict-for-this-project_1" title="Permanent link">&para;</a></h3>
+<p><strong>Best for appearance prototypes and demos.</strong> If you need a case that looks polished for a presentation or photo, SLA delivers the best surface quality. Not ideal for functional snap-fit prototypes (brittleness), and the messy/toxic workflow adds friction to rapid iteration. Consider SLA for the "final look" prototype, FDM for iterating the fit.</p>
+<hr />
+<h2 id="4-sls-selective-laser-sintering">4. SLS — Selective Laser Sintering<a class="headerlink" href="#4-sls-selective-laser-sintering" title="Permanent link">&para;</a></h2>
+<h3 id="how-it-works_2">How It Works<a class="headerlink" href="#how-it-works_2" title="Permanent link">&para;</a></h3>
+<p>A thin layer of powdered nylon is spread across the build area. A CO2 laser traces the cross-section, sintering (fusing) the powder into solid plastic. A new layer of powder is spread and the process repeats. The surrounding unsintered powder acts as support, so <strong>no support structures are needed</strong> — any geometry is printable.</p>
+<h3 id="availability">Availability<a class="headerlink" href="#availability" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Price</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Formlabs Fuse 1+ 30W</td>
+<td>~$18,000–25,000</td>
+<td>"Prosumer" SLS. Not hobbyist-viable.</td>
+</tr>
+<tr>
+<td>Sinterit Lisa PRO</td>
+<td>~$10,000–15,000</td>
+<td>Small-format SLS. Still too expensive.</td>
+</tr>
+<tr>
+<td><strong>Print services</strong></td>
+<td><strong>$4–25 per enclosure</strong></td>
+<td><strong>Widely available, most practical option.</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="pros_2">Pros<a class="headerlink" href="#pros_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>No supports needed</strong> — complete geometric freedom for complex snap-fits, internal features, living hinges</li>
+<li><strong>Excellent mechanical properties</strong> — nylon PA12 is strong, slightly flexible, and impact-resistant</li>
+<li><strong>Functional end-use quality</strong> — parts feel and perform like injection-molded plastic</li>
+<li><strong>Good dimensional accuracy</strong> — +/- 0.1–0.2 mm</li>
+<li><strong>Self-supporting</strong> means parts stack efficiently in the build volume — reduces per-part cost at volume</li>
+<li><strong>Can be dyed, polished, or vapor smoothed</strong> for improved appearance</li>
+<li><strong>High temperature resistance</strong> — PA12 melts at ~175 C</li>
+</ul>
+<h3 id="cons_2">Cons<a class="headerlink" href="#cons_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Not available as a home printer</strong> at hobbyist budgets</li>
+<li><strong>Surface is slightly rough/grainy</strong> — matte texture, not glossy smooth</li>
+<li><strong>Minimum wall thickness ~0.8 mm</strong> — thinner features may not resolve</li>
+<li><strong>Per-part cost is higher</strong> than home FDM — $4–25 through services</li>
+<li><strong>Lead time</strong> — 5–15 days including shipping from services</li>
+<li><strong>Limited colour options</strong> — natural white/grey PA12, or dyed black. Custom colours via painting.</li>
+<li><strong>Fine detail is softer</strong> than SLA — small text below ~1 mm may blur</li>
+</ul>
+<h3 id="verdict-for-this-project_2">Verdict for This Project<a class="headerlink" href="#verdict-for-this-project_2" title="Permanent link">&para;</a></h3>
+<p><strong>Best for functional prototypes and final enclosures.</strong> When the design is locked down after FDM iteration, ordering SLS PA12 through JLCPCB or PCBWay gives you a durable, professional-feeling case for under $15 shipped. No layer lines, strong snap-fits, and it feels like a real product.</p>
+<hr />
+<h2 id="5-mjf-multi-jet-fusion">5. MJF — Multi Jet Fusion<a class="headerlink" href="#5-mjf-multi-jet-fusion" title="Permanent link">&para;</a></h2>
+<h3 id="how-it-works_3">How It Works<a class="headerlink" href="#how-it-works_3" title="Permanent link">&para;</a></h3>
+<p>HP's proprietary process. An inkjet array deposits fusing agent and detailing agent onto a bed of nylon powder. An infrared energy source passes over, fusing the powder where the agent was deposited. Similar to SLS in concept but faster and with slightly better surface finish.</p>
+<h3 id="availability_1">Availability<a class="headerlink" href="#availability_1" title="Permanent link">&para;</a></h3>
+<p>Only available through print services. HP machines start at ~$100,000+.</p>
+<h3 id="pros_3">Pros<a class="headerlink" href="#pros_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Slightly better surface finish than SLS</strong> — smoother, more uniform</li>
+<li><strong>Excellent mechanical properties</strong> — comparable to or slightly better than SLS PA12</li>
+<li><strong>Very good dimensional accuracy</strong> — +/- 0.1–0.2 mm</li>
+<li><strong>Faster throughput than SLS</strong> — better economics at volume</li>
+<li><strong>Parts are dark grey/black by default</strong> — no painting needed for a dark enclosure</li>
+<li><strong>Functional end-use quality</strong> — production-viable parts</li>
+<li><strong>Often same price or cheaper than SLS</strong> through services</li>
+</ul>
+<h3 id="cons_3">Cons<a class="headerlink" href="#cons_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Not available for home use</strong> — service-only</li>
+<li><strong>Limited material options</strong> — primarily PA12 nylon</li>
+<li><strong>Per-part cost still higher than home FDM</strong> — $3–20 through services</li>
+<li><strong>Lead time</strong> — 5–15 days through services</li>
+<li><strong>Dark grey/black default colour</strong> — if you want white or coloured, you need to paint/dye</li>
+<li><strong>Slightly grainy surface</strong> — better than SLS but not SLA-smooth</li>
+</ul>
+<h3 id="verdict-for-this-project_3">Verdict for This Project<a class="headerlink" href="#verdict-for-this-project_3" title="Permanent link">&para;</a></h3>
+<p><strong>The strongest service-based option for this enclosure.</strong> MJF PA12 through JLCPCB is often $3–8 for our part, it comes out dark grey (which looks good), it's mechanically excellent, and the finish is better than SLS. If ordering from a service, MJF PA12 should be the default choice.</p>
+<hr />
+<h2 id="6-other-industrial-technologies">6. Other Industrial Technologies<a class="headerlink" href="#6-other-industrial-technologies" title="Permanent link">&para;</a></h2>
+<p>These are less relevant for this project but included for completeness.</p>
+<h3 id="polyjet-material-jetting-stratasys">PolyJet / Material Jetting (Stratasys)<a class="headerlink" href="#polyjet-material-jetting-stratasys" title="Permanent link">&para;</a></h3>
+<p>Inkjet-like deposition of photopolymer droplets, UV cured. Exceptional detail and multi-material/multi-colour capability. Parts tend to be brittle and UV-sensitive. Available through services at $30–80+ for small parts. <strong>Overkill for this project</strong> unless you need multi-material prototyping.</p>
+<h3 id="binder-jetting">Binder Jetting<a class="headerlink" href="#binder-jetting" title="Permanent link">&para;</a></h3>
+<p>Used for metal parts and full-colour sandstone. Not relevant for functional plastic enclosures.</p>
+<h3 id="dmls-slm-metal-3d-printing">DMLS / SLM (Metal 3D Printing)<a class="headerlink" href="#dmls-slm-metal-3d-printing" title="Permanent link">&para;</a></h3>
+<p>Laser-sintered metal (aluminium, stainless steel, titanium). $100+ per small part. Only relevant if you need RF shielding or extreme thermal conductivity. <strong>Not applicable to this project.</strong></p>
+<h3 id="sheet-metal-laser-cut-cnc-bend">Sheet Metal (Laser Cut + CNC Bend)<a class="headerlink" href="#sheet-metal-laser-cut-cnc-bend" title="Permanent link">&para;</a></h3>
+<p>Not technically 3D printing, but a viable alternative enclosure strategy. Services like SendCutSend can laser-cut aluminium panels and CNC-bend them into enclosures for $5–15 per piece with 1–3 day turnaround. Worth considering for a production enclosure with a premium metal feel.</p>
+<hr />
+<h2 id="7-technology-comparison-matrix">7. Technology Comparison Matrix<a class="headerlink" href="#7-technology-comparison-matrix" title="Permanent link">&para;</a></h2>
+<p>Side-by-side comparison for the Dilder enclosure specifically.</p>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>FDM</th>
+<th>SLA/MSLA</th>
+<th>SLS</th>
+<th>MJF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Home printer cost</strong></td>
+<td>$200–$700</td>
+<td>$150–$3500</td>
+<td>Not viable</td>
+<td>Not viable</td>
+</tr>
+<tr>
+<td><strong>Material cost per enclosure</strong></td>
+<td>$0.35–$1.30</td>
+<td>$0.55–$3.50</td>
+<td>Service only</td>
+<td>Service only</td>
+</tr>
+<tr>
+<td><strong>Service cost per enclosure</strong></td>
+<td>$1–$5</td>
+<td>$1–$8</td>
+<td>$4–$25</td>
+<td>$3–$20</td>
+</tr>
+<tr>
+<td><strong>Dimensional accuracy</strong></td>
+<td>+/- 0.2 mm</td>
+<td>+/- 0.05 mm</td>
+<td>+/- 0.15 mm</td>
+<td>+/- 0.15 mm</td>
+</tr>
+<tr>
+<td><strong>Surface finish</strong></td>
+<td>Visible layers</td>
+<td>Near-smooth</td>
+<td>Slightly grainy</td>
+<td>Slightly grainy</td>
+</tr>
+<tr>
+<td><strong>Snap-fit durability</strong></td>
+<td>Good (PETG)</td>
+<td>Poor (brittle)</td>
+<td>Excellent</td>
+<td>Excellent</td>
+</tr>
+<tr>
+<td><strong>Layer visibility</strong></td>
+<td>Yes</td>
+<td>Barely</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Supports needed</strong></td>
+<td>Yes (overhangs)</td>
+<td>Yes (always)</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Post-processing</strong></td>
+<td>Minimal</td>
+<td>Wash + cure</td>
+<td>Optional dyeing</td>
+<td>Optional dyeing</td>
+</tr>
+<tr>
+<td><strong>Safety/mess</strong></td>
+<td>Clean, safe</td>
+<td>Toxic resin, PPE</td>
+<td>N/A (service)</td>
+<td>N/A (service)</td>
+</tr>
+<tr>
+<td><strong>Iteration speed</strong></td>
+<td>1–3 hours</td>
+<td>3–5 hours</td>
+<td>5–15 days</td>
+<td>5–15 days</td>
+</tr>
+<tr>
+<td><strong>Min wall thickness</strong></td>
+<td>1.0 mm</td>
+<td>0.5 mm</td>
+<td>0.8 mm</td>
+<td>0.8 mm</td>
+</tr>
+<tr>
+<td><strong>Heat resistance</strong></td>
+<td>55–100 C</td>
+<td>50–230 C</td>
+<td>~175 C</td>
+<td>~175 C</td>
+</tr>
+<tr>
+<td><strong>Best for</strong></td>
+<td>Rapid iteration</td>
+<td>Appearance models</td>
+<td>Functional finals</td>
+<td>Functional finals</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-third-party-print-services-deep-dive">8. Third-Party Print Services — Deep Dive<a class="headerlink" href="#8-third-party-print-services-deep-dive" title="Permanent link">&para;</a></h2>
+<h3 id="jlcpcb-jlc3dp">JLCPCB (JLC3DP)<a class="headerlink" href="#jlcpcb-jlc3dp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Detail</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>URL</strong></td>
+<td>jlcpcb.com/3d-printing</td>
+</tr>
+<tr>
+<td><strong>Materials</strong></td>
+<td>SLA (standard, ABS-like, tough, high-temp resins), SLS (PA12, PA12-HP), MJF (PA12), FDM (ABS, PLA)</td>
+</tr>
+<tr>
+<td><strong>Pricing for Dilder enclosure</strong></td>
+<td>SLA standard: $1–4. MJF PA12: $3–8. SLS PA12: $4–10.</td>
+</tr>
+<tr>
+<td><strong>Lead time</strong></td>
+<td>3–5 business days production + 5–15 days shipping (standard)</td>
+</tr>
+<tr>
+<td><strong>Shipping</strong></td>
+<td>$3–15 depending on method. Can combine with PCB orders.</td>
+</tr>
+<tr>
+<td><strong>Minimum order</strong></td>
+<td>None, but shipping cost makes batching smart</td>
+</tr>
+<tr>
+<td><strong>Finish options</strong></td>
+<td>Dyeing (MJF/SLS), sanding, painting</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pros:</strong> Cheapest option by far. Instant online quoting. Consistent quality. Combines with PCB orders to share shipping. Huge material selection. Upload STL/STEP and get a quote in seconds.</p>
+<p><strong>Cons:</strong> Shipping from China takes 7–15 days. Quality control is good but not premium-tier. Limited colour options for MJF/SLS. Communication can be slow if issues arise.</p>
+<p><strong>Verdict:</strong> Default choice for cost-effective prototyping. Order MJF PA12 for functional parts, SLA for appearance parts.</p>
+<hr />
+<h3 id="pcbway-3d-printing">PCBWay 3D Printing<a class="headerlink" href="#pcbway-3d-printing" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Detail</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>URL</strong></td>
+<td>pcbway.com/3d-printing</td>
+</tr>
+<tr>
+<td><strong>Materials</strong></td>
+<td>SLA (standard, ABS-like, tough, castable), SLS (PA12, glass-filled nylon), MJF (PA12), FDM (PLA, ABS, PETG, Nylon), also metal DMLS and CNC machining</td>
+</tr>
+<tr>
+<td><strong>Pricing for Dilder enclosure</strong></td>
+<td>SLA standard: $3–8. MJF PA12: $5–12. SLS PA12: $6–15.</td>
+</tr>
+<tr>
+<td><strong>Lead time</strong></td>
+<td>3–7 business days production + 5–15 days shipping</td>
+</tr>
+<tr>
+<td><strong>Shipping</strong></td>
+<td>$5–20 depending on method</td>
+</tr>
+<tr>
+<td><strong>Minimum order</strong></td>
+<td>None</td>
+</tr>
+<tr>
+<td><strong>Finish options</strong></td>
+<td>Dyeing, painting, polishing, vapor smoothing</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pros:</strong> Wider material selection than JLCPCB. More finishing options (painting, polishing, vapour smoothing). Good quality. Also offers CNC machining and injection moulding for scaling up. Convenient to bundle with PCB orders.</p>
+<p><strong>Cons:</strong> Slightly more expensive than JLCPCB. Same China shipping times. $25 minimum on some order types may apply.</p>
+<p><strong>Verdict:</strong> Good alternative to JLCPCB, especially if you need finishing services or want to explore CNC/injection moulding for later production runs.</p>
+<hr />
+<h3 id="craftcloud-all3dp">Craftcloud (All3DP)<a class="headerlink" href="#craftcloud-all3dp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Detail</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>URL</strong></td>
+<td>craftcloud3d.com</td>
+</tr>
+<tr>
+<td><strong>What it is</strong></td>
+<td>Price-comparison marketplace aggregating quotes from 150+ print services worldwide</td>
+</tr>
+<tr>
+<td><strong>Materials</strong></td>
+<td>Whatever the underlying services offer — essentially everything</td>
+</tr>
+<tr>
+<td><strong>Pricing</strong></td>
+<td>Upload your STL, select material, compare quotes from many providers</td>
+</tr>
+<tr>
+<td><strong>Lead time</strong></td>
+<td>Varies by provider (typically 3–14 days + shipping)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pros:</strong> One upload, many quotes. Finds local printers that can deliver faster. Great for discovering the cheapest option for a specific material/quantity. Some providers offer domestic shipping (faster than China).</p>
+<p><strong>Cons:</strong> Not a printer — you're ordering from an unknown shop. Quality varies by provider. Less predictable than ordering from JLCPCB/PCBWay directly. No relationship or combined ordering.</p>
+<p><strong>Verdict:</strong> Use as a comparison tool. Upload the STL to Craftcloud alongside JLCPCB to sanity-check pricing. Especially useful when you need a US/EU-based printer for faster delivery.</p>
+<hr />
+<h3 id="shapeways">Shapeways<a class="headerlink" href="#shapeways" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Detail</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>URL</strong></td>
+<td>shapeways.com</td>
+</tr>
+<tr>
+<td><strong>Materials</strong></td>
+<td>SLS (PA12, PA11, glass-filled), MJF (PA12), Metals (stainless, brass, silver, gold), full-colour sandstone</td>
+</tr>
+<tr>
+<td><strong>Pricing for Dilder enclosure</strong></td>
+<td>Nylon SLS: $10–25. MJF: $10–20. Metal: $30–100+.</td>
+</tr>
+<tr>
+<td><strong>Lead time</strong></td>
+<td>5–10 business days + shipping</td>
+</tr>
+<tr>
+<td><strong>Shipping</strong></td>
+<td>Standard from $5–10 (US)</td>
+</tr>
+<tr>
+<td><strong>Minimum order</strong></td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pros:</strong> Unique material options (metals, full colour). Good quality SLS/MJF. US-based shipping. Established brand.</p>
+<p><strong>Cons:</strong> Went through bankruptcy in 2024 (acquired by Brainstone) — verify current service status. Significantly more expensive than JLCPCB/PCBWay. Limited FDM options.</p>
+<p><strong>Verdict:</strong> Only consider for unique materials (metal enclosure, full-colour model) or if you need US-based fast shipping and Craftcloud doesn't surface cheaper options.</p>
+<hr />
+<h3 id="xometry">Xometry<a class="headerlink" href="#xometry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Detail</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>URL</strong></td>
+<td>xometry.com</td>
+</tr>
+<tr>
+<td><strong>Materials</strong></td>
+<td>FDM, SLA, SLS, MJF, PolyJet, DMLS metal, CNC machining, injection moulding, sheet metal</td>
+</tr>
+<tr>
+<td><strong>Pricing for Dilder enclosure</strong></td>
+<td>SLS PA12: $15–35. MJF: $12–30. SLA: $10–25.</td>
+</tr>
+<tr>
+<td><strong>Lead time</strong></td>
+<td>3 business days (expedited) to 10 days (standard)</td>
+</tr>
+<tr>
+<td><strong>Shipping</strong></td>
+<td>Included in US quotes</td>
+</tr>
+<tr>
+<td><strong>Minimum order</strong></td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pros:</strong> Fastest US-based option (3-day expedite). Professional-grade quality. Inspection reports and tolerancing available. Instant online quoting. Also offers CNC, injection moulding, sheet metal — one-stop shop for scaling.</p>
+<p><strong>Cons:</strong> 3–5x more expensive than JLCPCB. Overkill for hobby prototyping. Pricing targets professional/industrial customers.</p>
+<p><strong>Verdict:</strong> Use when you need parts fast in the US (3-day turnaround) and cost is secondary, or when you need certifications/inspection reports.</p>
+<hr />
+<h3 id="hubs-protolabs-network">Hubs (Protolabs Network)<a class="headerlink" href="#hubs-protolabs-network" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Detail</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>URL</strong></td>
+<td>hubs.com</td>
+</tr>
+<tr>
+<td><strong>Materials</strong></td>
+<td>FDM, SLA, SLS, MJF, PolyJet, Metal — full range</td>
+</tr>
+<tr>
+<td><strong>Pricing for Dilder enclosure</strong></td>
+<td>SLS: $15–30. MJF: $12–25. SLA: $10–20.</td>
+</tr>
+<tr>
+<td><strong>Lead time</strong></td>
+<td>5–10 business days standard, 3 days expedited</td>
+</tr>
+<tr>
+<td><strong>Minimum order</strong></td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pros:</strong> Reliable, professional quality. Part of Protolabs (large manufacturing network). Good for guaranteed consistency.</p>
+<p><strong>Cons:</strong> Similar pricing to Xometry — professional tier. Not cost-effective for hobby prototyping.</p>
+<p><strong>Verdict:</strong> Interchangeable with Xometry. Use whichever quotes lower for your specific part.</p>
+<hr />
+<h3 id="sculpteo-basf-forward-am">Sculpteo (BASF Forward AM)<a class="headerlink" href="#sculpteo-basf-forward-am" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Detail</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>URL</strong></td>
+<td>sculpteo.com</td>
+</tr>
+<tr>
+<td><strong>Materials</strong></td>
+<td>SLS (PA12, PA11, glass-filled, alumide, TPU), SLA, metals</td>
+</tr>
+<tr>
+<td><strong>Pricing for Dilder enclosure</strong></td>
+<td>SLS PA12: $10–25. SLA: $8–15.</td>
+</tr>
+<tr>
+<td><strong>Lead time</strong></td>
+<td>5–10 business days + shipping from France/US</td>
+</tr>
+<tr>
+<td><strong>Minimum order</strong></td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pros:</strong> Good European option. Part of BASF's additive manufacturing division. Online batch analysis and design optimisation tools. Reliable quality.</p>
+<p><strong>Cons:</strong> Mid-range pricing. Shipping from France to US adds time and cost.</p>
+<p><strong>Verdict:</strong> Best option for EU-based ordering. Otherwise, JLCPCB is cheaper.</p>
+<hr />
+<h3 id="sendcutsend-sheet-metal-alternative">SendCutSend (Sheet Metal Alternative)<a class="headerlink" href="#sendcutsend-sheet-metal-alternative" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Detail</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>URL</strong></td>
+<td>sendcutsend.com</td>
+</tr>
+<tr>
+<td><strong>What it is</strong></td>
+<td>Laser cutting, waterjet, and CNC bending — NOT 3D printing</td>
+</tr>
+<tr>
+<td><strong>Materials</strong></td>
+<td>Aluminium, steel, stainless, copper, brass, acrylic, delrin</td>
+</tr>
+<tr>
+<td><strong>Pricing</strong></td>
+<td>Laser-cut aluminium panels: $5–15 per piece</td>
+</tr>
+<tr>
+<td><strong>Lead time</strong></td>
+<td>1–3 business days (US domestic)</td>
+</tr>
+<tr>
+<td><strong>Minimum order</strong></td>
+<td>$29 per order</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pros:</strong> Extremely fast turnaround (1–3 days). Premium metal feel. Precise laser cutting. Can CNC-bend flat patterns into enclosure shapes.</p>
+<p><strong>Cons:</strong> Not 3D printing — requires designing the enclosure as flat panels + bend lines. $29 minimum order. Limited to flat/bent geometries (no complex 3D shapes). Requires different CAD approach.</p>
+<p><strong>Verdict:</strong> Consider for a premium metal enclosure in later production phases. Not practical for initial prototyping where you need complex internal features (standoffs, screw bosses, battery bay).</p>
+<hr />
+<h3 id="other-notable-services">Other Notable Services<a class="headerlink" href="#other-notable-services" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Specialty</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Protolabs</strong> (protolabs.com)</td>
+<td>Industrial-grade, 1–3 day rush</td>
+<td>Premium pricing ($30–100+). For urgent professional needs only.</td>
+</tr>
+<tr>
+<td><strong>Wenext</strong> (wenext.cn)</td>
+<td>Chinese MJF/SLS</td>
+<td>Very competitive for bulk orders. Worth checking for 10+ units.</td>
+</tr>
+<tr>
+<td><strong>Treatstock</strong> (treatstock.com)</td>
+<td>Marketplace for local print shops</td>
+<td>Variable quality. Can find local printers for same-day pickup.</td>
+</tr>
+<tr>
+<td><strong>Jawstec</strong> (jawstec.com)</td>
+<td>US-based SLS specialist</td>
+<td>PA12 nylon. Good quality, $10–20 for small parts.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-third-party-service-comparison-matrix">9. Third-Party Service Comparison Matrix<a class="headerlink" href="#9-third-party-service-comparison-matrix" title="Permanent link">&para;</a></h2>
+<p>All prices are for the Dilder enclosure (both halves, ~88 x 34 x 19 mm, ~15–25 cm cubed).</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>FDM Price</th>
+<th>SLA Price</th>
+<th>SLS PA12</th>
+<th>MJF PA12</th>
+<th>Shipping</th>
+<th>Lead Time</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>JLCPCB</strong></td>
+<td>$1–4</td>
+<td>$1–5</td>
+<td>$4–10</td>
+<td><strong>$3–8</strong></td>
+<td>$3–15</td>
+<td>7–15 days</td>
+<td><strong>Cheapest overall</strong></td>
+</tr>
+<tr>
+<td><strong>PCBWay</strong></td>
+<td>$2–5</td>
+<td>$3–8</td>
+<td>$5–12</td>
+<td>$5–12</td>
+<td>$5–20</td>
+<td>8–14 days</td>
+<td>Good finishing options</td>
+</tr>
+<tr>
+<td><strong>Craftcloud</strong></td>
+<td>Varies</td>
+<td>Varies</td>
+<td>Varies</td>
+<td>Varies</td>
+<td>Varies</td>
+<td>3–14 days</td>
+<td>Price comparison</td>
+</tr>
+<tr>
+<td><strong>Shapeways</strong></td>
+<td>—</td>
+<td>$8–15</td>
+<td>$10–25</td>
+<td>$10–20</td>
+<td>$5–10</td>
+<td>7–12 days</td>
+<td>Metal/unique materials</td>
+</tr>
+<tr>
+<td><strong>Xometry</strong></td>
+<td>$10–25</td>
+<td>$10–25</td>
+<td>$15–35</td>
+<td>$12–30</td>
+<td>Included</td>
+<td>3–10 days</td>
+<td><strong>Fastest US delivery</strong></td>
+</tr>
+<tr>
+<td><strong>Hubs</strong></td>
+<td>$10–25</td>
+<td>$10–20</td>
+<td>$15–30</td>
+<td>$12–25</td>
+<td>Varies</td>
+<td>3–10 days</td>
+<td>Professional quality</td>
+</tr>
+<tr>
+<td><strong>Sculpteo</strong></td>
+<td>$5–15</td>
+<td>$8–15</td>
+<td>$10–25</td>
+<td>$8–20</td>
+<td>Varies</td>
+<td>5–10 days</td>
+<td>Best EU option</td>
+</tr>
+<tr>
+<td><strong>SendCutSend</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>Included</td>
+<td>1–3 days</td>
+<td>Sheet metal alternative</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-material-guide">10. Material Guide<a class="headerlink" href="#10-material-guide" title="Permanent link">&para;</a></h2>
+<h3 id="fdm-materials-for-enclosures">FDM Materials — For Enclosures<a class="headerlink" href="#fdm-materials-for-enclosures" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Material</th>
+<th>Cost/kg</th>
+<th>Bed Temp</th>
+<th>Enclosure Req'd</th>
+<th>Heat Resist</th>
+<th>Snap-Fit Suitability</th>
+<th>Best Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PLA</strong></td>
+<td>$15–25</td>
+<td>60 C</td>
+<td>No</td>
+<td>~55 C</td>
+<td>Poor (brittle)</td>
+<td>Cheap fit-check prototypes</td>
+</tr>
+<tr>
+<td><strong>PETG</strong></td>
+<td>$18–28</td>
+<td>80 C</td>
+<td>No</td>
+<td>~80 C</td>
+<td><strong>Good</strong> (flexible)</td>
+<td><strong>Best general-purpose enclosure material</strong></td>
+</tr>
+<tr>
+<td><strong>ABS</strong></td>
+<td>$18–25</td>
+<td>100 C</td>
+<td><strong>Yes</strong></td>
+<td>~100 C</td>
+<td>Good</td>
+<td>Acetone-smoothable for polished finish</td>
+</tr>
+<tr>
+<td><strong>ASA</strong></td>
+<td>$22–30</td>
+<td>100 C</td>
+<td><strong>Yes</strong></td>
+<td>~100 C</td>
+<td>Good</td>
+<td><strong>UV-stable for outdoor/sun exposure</strong></td>
+</tr>
+<tr>
+<td><strong>TPU</strong></td>
+<td>$25–35</td>
+<td>50 C</td>
+<td>No</td>
+<td>~80 C</td>
+<td>Excellent (rubber)</td>
+<td>Gaskets, bumpers, flexible grips</td>
+</tr>
+<tr>
+<td><strong>Nylon PA</strong></td>
+<td>$35–60</td>
+<td>80 C</td>
+<td><strong>Yes</strong></td>
+<td>~180 C</td>
+<td><strong>Excellent</strong></td>
+<td>Best snap-fits, living hinges</td>
+</tr>
+<tr>
+<td><strong>CF-PETG</strong></td>
+<td>$35–55</td>
+<td>80 C</td>
+<td>No</td>
+<td>~85 C</td>
+<td>Good</td>
+<td>Stiff, premium look, dimensionally stable</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recommendation for Dilder:</strong> Start with <strong>PLA</strong> for quick fit checks, switch to <strong>PETG</strong> for functional prototypes. If you own an enclosed printer, <strong>ASA</strong> is the upgrade path for a durable final case.</p>
+<h3 id="sla-resins-for-enclosures">SLA Resins — For Enclosures<a class="headerlink" href="#sla-resins-for-enclosures" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Resin Type</th>
+<th>Cost/L</th>
+<th>Toughness</th>
+<th>Best Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard</td>
+<td>$25–40</td>
+<td>Brittle</td>
+<td>Appearance prototypes, display models</td>
+</tr>
+<tr>
+<td>ABS-like</td>
+<td>$35–55</td>
+<td>Moderate</td>
+<td>Functional prototypes with care</td>
+</tr>
+<tr>
+<td><strong>Tough</strong></td>
+<td>$45–70</td>
+<td><strong>Good</strong></td>
+<td><strong>Best resin for functional snap-fits</strong></td>
+</tr>
+<tr>
+<td>Water-washable</td>
+<td>$30–45</td>
+<td>Moderate</td>
+<td>Convenience (no IPA cleanup)</td>
+</tr>
+<tr>
+<td>High-temp</td>
+<td>$50–80</td>
+<td>Moderate</td>
+<td>Enclosures near heat sources</td>
+</tr>
+<tr>
+<td>Engineering (Formlabs)</td>
+<td>$100–200</td>
+<td>Excellent</td>
+<td>When you need injection-mold-like performance</td>
+</tr>
+</tbody>
+</table>
+<h3 id="slsmjf-materials-for-enclosures">SLS/MJF Materials — For Enclosures<a class="headerlink" href="#slsmjf-materials-for-enclosures" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Material</th>
+<th>Service Cost/cm cubed</th>
+<th>Key Properties</th>
+<th>Best Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PA12 Nylon</strong></td>
+<td>$0.15–0.40</td>
+<td>Strong, slightly flexible, ~175 C melting</td>
+<td><strong>Default for functional parts</strong></td>
+</tr>
+<tr>
+<td>PA11 Nylon</td>
+<td>$0.20–0.50</td>
+<td>More flexible, better impact than PA12</td>
+<td>Snap-fits, living hinges</td>
+</tr>
+<tr>
+<td>PA12 Glass-Filled</td>
+<td>$0.20–0.50</td>
+<td>Stiffer, more dimensionally stable, more brittle</td>
+<td>Precision parts needing rigidity</td>
+</tr>
+<tr>
+<td>Alumide</td>
+<td>$0.25–0.50</td>
+<td>Aluminium-filled PA12, metallic appearance</td>
+<td>Premium cosmetic finish</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11-cad-software-and-design-workflow">11. CAD Software and Design Workflow<a class="headerlink" href="#11-cad-software-and-design-workflow" title="Permanent link">&para;</a></h2>
+<h3 id="software-comparison">Software Comparison<a class="headerlink" href="#software-comparison" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Software</th>
+<th>Cost</th>
+<th>Platform</th>
+<th>Parametric</th>
+<th>Learning Curve</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fusion 360 (Personal)</strong></td>
+<td>Free</td>
+<td>Win/Mac</td>
+<td>Yes</td>
+<td>Moderate</td>
+<td><strong>Best overall for this project</strong></td>
+</tr>
+<tr>
+<td>FreeCAD</td>
+<td>Free</td>
+<td>Win/Mac/Linux</td>
+<td>Yes</td>
+<td>Steep</td>
+<td>Open-source, Linux-native</td>
+</tr>
+<tr>
+<td>OpenSCAD</td>
+<td>Free</td>
+<td>All</td>
+<td>Yes (code)</td>
+<td>Moderate (if you code)</td>
+<td>Programmers, parametric generators</td>
+</tr>
+<tr>
+<td>Tinkercad</td>
+<td>Free</td>
+<td>Browser</td>
+<td>No</td>
+<td>Easy</td>
+<td>Quick first sketch, beginners</td>
+</tr>
+<tr>
+<td>Onshape (Free)</td>
+<td>Free</td>
+<td>Browser</td>
+<td>Yes</td>
+<td>Moderate</td>
+<td>Linux users, browser-based CAD</td>
+</tr>
+<tr>
+<td>Fusion 360 (Commercial)</td>
+<td>$595/yr</td>
+<td>Win/Mac</td>
+<td>Yes</td>
+<td>Moderate</td>
+<td>STEP export, unlimited docs</td>
+</tr>
+<tr>
+<td>SolidWorks Maker</td>
+<td>~$99/yr</td>
+<td>Win</td>
+<td>Yes</td>
+<td>Moderate</td>
+<td>If you can get a Maker licence</td>
+</tr>
+<tr>
+<td>SolidWorks (Full)</td>
+<td>$3,995/yr</td>
+<td>Win</td>
+<td>Yes</td>
+<td>Moderate</td>
+<td>Industry standard, overkill for hobby</td>
+</tr>
+</tbody>
+</table>
+<h3 id="recommended-workflow-for-this-project">Recommended Workflow for This Project<a class="headerlink" href="#recommended-workflow-for-this-project" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Quick shape exploration</strong> — Tinkercad (1–2 hours to confirm proportions)</li>
+<li><strong>Parametric model</strong> — Fusion 360 with user parameters for all key dimensions (4–8 hours)</li>
+<li><strong>Import PCB reference</strong> — Export KiCad board as STEP, import into Fusion 360 as reference body</li>
+<li><strong>Design around components</strong> — use actual component bodies for clearance checks</li>
+<li><strong>Export STL</strong> — separate files for top shell and bottom shell</li>
+<li><strong>Upload to print service</strong> — or slice for home printer</li>
+</ol>
+<h3 id="kicad-to-cad-integration">KiCad to CAD Integration<a class="headerlink" href="#kicad-to-cad-integration" title="Permanent link">&para;</a></h3>
+<p>If a custom PCB is designed later:</p>
+<ol>
+<li><strong>KiCad:</strong> Assign 3D models to all footprints. Export via File &gt; Export &gt; STEP.</li>
+<li><strong>Fusion 360:</strong> File &gt; Insert &gt; Insert Mesh (STEP). Create enclosure as new component around the PCB body.</li>
+<li><strong>FreeCAD + StepUp:</strong> The KiCadStepUp workbench reads <code>.kicad_pcb</code> files directly — tightest integration.</li>
+<li><strong>OpenSCAD:</strong> Import dimensions as parameters. Less direct but fully scriptable.</li>
+</ol>
+<h3 id="key-cad-libraries-resources">Key CAD Libraries / Resources<a class="headerlink" href="#key-cad-libraries-resources" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>What It Provides</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GrabCAD</strong></td>
+<td>Pre-made 3D models of Pico W, common connectors, batteries</td>
+</tr>
+<tr>
+<td><strong>BOSL2 (OpenSCAD)</strong></td>
+<td>Snap-fit joints, threads, rounded boxes, hardware inserts</td>
+</tr>
+<tr>
+<td><strong>NopSCADlib (OpenSCAD)</strong></td>
+<td>Screws, nuts, heat-set inserts, PCB models</td>
+</tr>
+<tr>
+<td><strong>Adafruit Fritzing/STEP libs</strong></td>
+<td>Component 3D models</td>
+</tr>
+<tr>
+<td><strong>McMaster-Carr CAD</strong></td>
+<td>Every fastener and hardware component as STEP</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="12-pricing-estimates-for-the-dilder-enclosure">12. Pricing Estimates for the Dilder Enclosure<a class="headerlink" href="#12-pricing-estimates-for-the-dilder-enclosure" title="Permanent link">&para;</a></h2>
+<p>All estimates are for the two-piece enclosure (top + bottom shell), ~88 x 34 x 19 mm, ~15–25 g of material.</p>
+<h3 id="home-printing-marginal-cost-per-enclosure">Home Printing — Marginal Cost Per Enclosure<a class="headerlink" href="#home-printing-marginal-cost-per-enclosure" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Material</th>
+<th>Electricity</th>
+<th>Total</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Home FDM (PLA)</td>
+<td>$0.40</td>
+<td>$0.05</td>
+<td><strong>$0.45</strong></td>
+<td>Cheapest possible</td>
+</tr>
+<tr>
+<td>Home FDM (PETG)</td>
+<td>$0.60</td>
+<td>$0.05</td>
+<td><strong>$0.65</strong></td>
+<td>Best functional material</td>
+</tr>
+<tr>
+<td>Home FDM (ASA)</td>
+<td>$0.70</td>
+<td>$0.08</td>
+<td><strong>$0.78</strong></td>
+<td>UV-stable</td>
+</tr>
+<tr>
+<td>Home SLA (standard)</td>
+<td>$0.70</td>
+<td>$0.05</td>
+<td><strong>$0.75</strong></td>
+<td>+ IPA/consumables ~$0.50</td>
+</tr>
+<tr>
+<td>Home SLA (tough)</td>
+<td>$1.20</td>
+<td>$0.05</td>
+<td><strong>$1.25</strong></td>
+<td>Best resin for function</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>These do not include printer amortisation. A $250 printer over 100 prints adds $2.50/print.</p>
+</blockquote>
+<h3 id="service-printing-total-cost-including-shipping">Service Printing — Total Cost Including Shipping<a class="headerlink" href="#service-printing-total-cost-including-shipping" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Part Cost</th>
+<th>Shipping</th>
+<th>Total</th>
+<th>Material</th>
+<th>Lead Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JLCPCB MJF PA12</td>
+<td>$3–8</td>
+<td>$5–10</td>
+<td><strong>$8–18</strong></td>
+<td>Nylon</td>
+<td>7–15 days</td>
+</tr>
+<tr>
+<td>JLCPCB SLA</td>
+<td>$1–5</td>
+<td>$5–10</td>
+<td><strong>$6–15</strong></td>
+<td>Resin</td>
+<td>7–15 days</td>
+</tr>
+<tr>
+<td>JLCPCB SLS PA12</td>
+<td>$4–10</td>
+<td>$5–10</td>
+<td><strong>$9–20</strong></td>
+<td>Nylon</td>
+<td>7–15 days</td>
+</tr>
+<tr>
+<td>PCBWay MJF PA12</td>
+<td>$5–12</td>
+<td>$8–15</td>
+<td><strong>$13–27</strong></td>
+<td>Nylon</td>
+<td>8–14 days</td>
+</tr>
+<tr>
+<td>Craftcloud (best quote)</td>
+<td>$5–15</td>
+<td>Varies</td>
+<td><strong>$10–25</strong></td>
+<td>Varies</td>
+<td>3–14 days</td>
+</tr>
+<tr>
+<td>Xometry MJF PA12</td>
+<td>$12–30</td>
+<td>Included</td>
+<td><strong>$12–30</strong></td>
+<td>Nylon</td>
+<td>3–10 days</td>
+</tr>
+<tr>
+<td>Shapeways SLS PA12</td>
+<td>$10–25</td>
+<td>$5–10</td>
+<td><strong>$15–35</strong></td>
+<td>Nylon</td>
+<td>7–12 days</td>
+</tr>
+</tbody>
+</table>
+<h3 id="hardware-costs-one-time-reusable-across-prints">Hardware Costs (One-Time, Reusable Across Prints)<a class="headerlink" href="#hardware-costs-one-time-reusable-across-prints" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Cost</th>
+<th>Source</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M2 heat-set inserts (50-pack)</td>
+<td>~$6</td>
+<td>Amazon</td>
+<td>Brass knurled inserts, press-fit with soldering iron</td>
+</tr>
+<tr>
+<td>M2 x 6 mm screws (50-pack)</td>
+<td>~$5</td>
+<td>Amazon</td>
+<td>Socket head cap screws</td>
+</tr>
+<tr>
+<td>Soldering iron (for heat-set inserts)</td>
+<td>~$25</td>
+<td>Amazon (if not already owned)</td>
+<td>Any iron with a conical tip works</td>
+</tr>
+</tbody>
+</table>
+<h3 id="total-first-prototype-cost">Total First Prototype Cost<a class="headerlink" href="#total-first-prototype-cost" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Print</th>
+<th>Hardware</th>
+<th>Tools</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cheapest (JLCPCB MJF)</strong></td>
+<td>$8–18</td>
+<td>$11</td>
+<td>$0 (if own iron)</td>
+<td><strong>$19–29</strong></td>
+</tr>
+<tr>
+<td><strong>Cheapest (home FDM, own printer)</strong></td>
+<td>$0.65</td>
+<td>$11</td>
+<td>$0</td>
+<td><strong>$12</strong></td>
+</tr>
+<tr>
+<td><strong>Buy printer + print</strong></td>
+<td>$250 (printer) + $0.65</td>
+<td>$11</td>
+<td>$0</td>
+<td><strong>$262</strong> (amortised to ~$14 after 100 prints)</td>
+</tr>
+<tr>
+<td><strong>Fastest (Xometry MJF)</strong></td>
+<td>$12–30</td>
+<td>$11</td>
+<td>$0</td>
+<td><strong>$23–41</strong> (3-day delivery)</td>
+</tr>
+<tr>
+<td><strong>Premium (SLS PA12, polished)</strong></td>
+<td>$15–35</td>
+<td>$11</td>
+<td>$0</td>
+<td><strong>$26–46</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="13-viable-options-ranked-recommendations">13. Viable Options — Ranked Recommendations<a class="headerlink" href="#13-viable-options-ranked-recommendations" title="Permanent link">&para;</a></h2>
+<h3 id="option-a-jlcpcb-mjf-pa12-best-value-without-a-printer">Option A: JLCPCB MJF PA12 (Best Value Without a Printer)<a class="headerlink" href="#option-a-jlcpcb-mjf-pa12-best-value-without-a-printer" title="Permanent link">&para;</a></h3>
+<p><strong>Total cost:</strong> ~$12–20 per iteration (part + shipping)
+<strong>Lead time:</strong> 7–15 days
+<strong>Quality:</strong> Production-grade nylon, no layer lines, dark grey finish</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cheapest service option</td>
+<td>1–2 week wait per iteration</td>
+</tr>
+<tr>
+<td>MJF nylon is mechanically excellent</td>
+<td>Limited to JLCPCB's material/colour options</td>
+</tr>
+<tr>
+<td>No printer investment needed</td>
+<td>Can't iterate same-day</td>
+</tr>
+<tr>
+<td>Bundle with PCB orders to save shipping</td>
+<td>Requires uploading STL each time</td>
+</tr>
+<tr>
+<td>Parts look and feel professional</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> If you don't want to buy a printer and can tolerate 1–2 week iteration cycles. Especially good if you're already ordering PCBs from JLCPCB.</p>
+<hr />
+<h3 id="option-b-bambu-lab-a1-mini-petg-best-for-rapid-iteration">Option B: Bambu Lab A1 Mini + PETG (Best for Rapid Iteration)<a class="headerlink" href="#option-b-bambu-lab-a1-mini-petg-best-for-rapid-iteration" title="Permanent link">&para;</a></h3>
+<p><strong>Upfront cost:</strong> ~$250 (printer) + ~$25 (PETG spool)
+<strong>Per-iteration cost:</strong> ~$0.65
+<strong>Lead time:</strong> 1–3 hours per print
+<strong>Quality:</strong> Visible layer lines, but mechanically sound</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Same-day iteration — print, test, revise, reprint</td>
+<td>$275 upfront investment</td>
+</tr>
+<tr>
+<td>Under $1 per enclosure in material</td>
+<td>Visible layer lines (not presentation quality)</td>
+</tr>
+<tr>
+<td>Enormous material variety</td>
+<td>Requires desk space and some learning</td>
+</tr>
+<tr>
+<td>Printer is useful for future projects</td>
+<td>Print quality depends on tuning and settings</td>
+</tr>
+<tr>
+<td>PETG snap-fits work well</td>
+<td>Not as clean as MJF/SLS for final product</td>
+</tr>
+<tr>
+<td>Community and troubleshooting resources are vast</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> If you plan to iterate the design more than 3–4 times (likely) and want the fastest feedback loop. The printer pays for itself quickly and is useful for all future hardware projects.</p>
+<hr />
+<h3 id="option-c-hybrid-home-fdm-for-iteration-jlcpcb-mjf-for-finals">Option C: Hybrid — Home FDM for Iteration + JLCPCB MJF for Finals<a class="headerlink" href="#option-c-hybrid-home-fdm-for-iteration-jlcpcb-mjf-for-finals" title="Permanent link">&para;</a></h3>
+<p><strong>Cost:</strong> ~$275 upfront + ~$0.65/iteration + ~$15 for final MJF print
+<strong>Lead time:</strong> Hours for iteration, 1–2 weeks for final</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Best of both worlds</td>
+<td>Highest total spend</td>
+</tr>
+<tr>
+<td>Fast iteration during design phase</td>
+<td>Need to manage two workflows</td>
+</tr>
+<tr>
+<td>Professional final parts via MJF</td>
+<td></td>
+</tr>
+<tr>
+<td>Each technology covers the other's weakness</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> The recommended approach if budget allows. Use FDM to nail the fit, then order MJF PA12 for the final version.</p>
+<hr />
+<h3 id="option-d-craftcloud-best-quote-shopping">Option D: Craftcloud — Best Quote Shopping<a class="headerlink" href="#option-d-craftcloud-best-quote-shopping" title="Permanent link">&para;</a></h3>
+<p><strong>Total cost:</strong> ~$10–25 per iteration
+<strong>Lead time:</strong> 3–14 days depending on provider</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Finds the cheapest provider for your specific part</td>
+<td>Ordering from unknown shops</td>
+</tr>
+<tr>
+<td>May find local printers with 2–3 day delivery</td>
+<td>Variable quality between providers</td>
+</tr>
+<tr>
+<td>Wide material selection</td>
+<td>No relationship building with a single service</td>
+</tr>
+<tr>
+<td>No printer investment</td>
+<td>Not as cheap as JLCPCB direct</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> When you want domestic (US/EU) shipping speed without buying a printer, or when you need a specific material that JLCPCB doesn't offer.</p>
+<hr />
+<h3 id="option-e-xometryhubs-fastest-professional-parts">Option E: Xometry/Hubs — Fastest Professional Parts<a class="headerlink" href="#option-e-xometryhubs-fastest-professional-parts" title="Permanent link">&para;</a></h3>
+<p><strong>Total cost:</strong> ~$15–40 per iteration
+<strong>Lead time:</strong> 3–5 business days (US domestic)</p>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fastest service-based option</td>
+<td>Most expensive per-part</td>
+</tr>
+<tr>
+<td>Guaranteed professional quality</td>
+<td>Overkill for hobby prototyping</td>
+</tr>
+<tr>
+<td>Instant quoting, inspection reports available</td>
+<td></td>
+</tr>
+<tr>
+<td>One-stop shop for scaling (CNC, injection)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best for:</strong> When you need parts urgently for a deadline or demo and cost is secondary.</p>
+<hr />
+<h2 id="14-decision-framework">14. Decision Framework<a class="headerlink" href="#14-decision-framework" title="Permanent link">&para;</a></h2>
+<p>Use this flowchart to pick your approach:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Will you iterate the enclosure design more than 3 times?
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── YES → Do you have $250–400 for a printer?
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── YES → Option B (Bambu A1 Mini + PETG) or Option C (Hybrid)
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   └── NO  → Option A (JLCPCB MJF), accept slower iteration
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>└── NO  → Do you need parts in under 5 days?
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ├── YES → Option E (Xometry/Hubs)
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    └── NO  → Option A (JLCPCB MJF) — cheapest for 1–3 prints
+</span></code></pre></div>
+<p><strong>For the Dilder specifically:</strong> The enclosure will almost certainly need 3+ iterations (display fit, button alignment, USB port clearance, battery bay sizing). <strong>Option C (Hybrid)</strong> is the strongest long-term recommendation. <strong>Option A (JLCPCB MJF)</strong> is the best if minimising upfront spend.</p>
+<hr />
+<h2 id="15-scaling-path-prototype-to-production">15. Scaling Path — Prototype to Production<a class="headerlink" href="#15-scaling-path-prototype-to-production" title="Permanent link">&para;</a></h2>
+<p>If the Dilder moves beyond one-off prototyping:</p>
+<table>
+<thead>
+<tr>
+<th>Volume</th>
+<th>Best Technology</th>
+<th>Per-Unit Cost</th>
+<th>Setup Cost</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1–5 units</td>
+<td>MJF PA12 via JLCPCB</td>
+<td>$5–15</td>
+<td>$0</td>
+<td>Order as needed</td>
+</tr>
+<tr>
+<td>5–20 units</td>
+<td>MJF PA12 bulk via JLCPCB</td>
+<td>$3–10</td>
+<td>$0</td>
+<td>Volume discounts kick in</td>
+</tr>
+<tr>
+<td>20–50 units</td>
+<td>MJF PA12 or SLS bulk</td>
+<td>$2–8</td>
+<td>$0</td>
+<td>Services offer batch pricing</td>
+</tr>
+<tr>
+<td>50–100 units</td>
+<td><strong>Injection moulding consideration</strong></td>
+<td>$1–3</td>
+<td>$500–3,000 (mould)</td>
+<td>Break-even vs. MJF at ~50–100 units</td>
+</tr>
+<tr>
+<td>100–500 units</td>
+<td>Injection moulding (JLCPCB/PCBWay)</td>
+<td>$0.50–2</td>
+<td>$1,000–3,000 (mould)</td>
+<td>Per-unit cost drops dramatically</td>
+</tr>
+<tr>
+<td>500+ units</td>
+<td>Injection moulding (dedicated manufacturer)</td>
+<td>$0.20–1</td>
+<td>$2,000–5,000 (mould)</td>
+<td>Standard mass production</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Key insight:</strong> JLCPCB and PCBWay both offer injection moulding services. A simple two-part mould for the Dilder enclosure would cost $500–2,000 and produce parts at $0.50–2 each. At ~100 units, injection moulding becomes cheaper per-unit than MJF 3D printing. This is the natural scaling path from the same vendors already used for prototyping.</p>
+</blockquote>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>URL</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JLCPCB 3D Printing</td>
+<td>jlcpcb.com/3d-printing</td>
+<td>Primary print service recommendation</td>
+</tr>
+<tr>
+<td>PCBWay 3D Printing</td>
+<td>pcbway.com/3d-printing</td>
+<td>Secondary print service</td>
+</tr>
+<tr>
+<td>Craftcloud</td>
+<td>craftcloud3d.com</td>
+<td>Price comparison marketplace</td>
+</tr>
+<tr>
+<td>Bambu Lab</td>
+<td>bambulab.com</td>
+<td>Recommended home FDM printer</td>
+</tr>
+<tr>
+<td>Fusion 360 Personal</td>
+<td>autodesk.com/products/fusion-360/personal</td>
+<td>Recommended CAD software</td>
+</tr>
+<tr>
+<td>All3DP Material Guide</td>
+<td>all3dp.com</td>
+<td>Material comparison articles</td>
+</tr>
+<tr>
+<td>CNC Kitchen (YouTube)</td>
+<td>youtube.com/@CNCKitchen</td>
+<td>Material testing and print optimisation</td>
+</tr>
+<tr>
+<td>Maker's Muse (YouTube)</td>
+<td>youtube.com/@MakersMuse</td>
+<td>Enclosure design tutorials</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../enclosure-design/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Enclosure Design">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Enclosure Design
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../setup/first-time-setup/" class="md-footer__link md-footer__link--next" aria-label="Next: First-Time Setup (C SDK)">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                First-Time Setup (C SDK)
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/rompasaurus/dilder" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://discord.gg/PLACEHOLDER" target="_blank" rel="noopener" title="Discord" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://patreon.com/MchenrysDevelopment" target="_blank" rel="noopener" title="Patreon" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M490 153.8c-.1-65.4-51-119-110.7-138.3-74.2-24-172-20.5-242.9 12.9C50.6 68.9 23.6 157.7 22.6 246.2 21.8 319 29 510.6 137.2 512c80.3 1 92.3-102.5 129.5-152.3 26.4-35.5 60.5-45.5 102.4-55.9 72-17.8 121.1-74.7 121-150z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://youtube.com/@rompasaurus" target="_blank" rel="noopener" title="YouTube" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M549.7 124.1c-6.2-23.7-24.8-42.3-48.3-48.6C458.9 64 288.1 64 288.1 64S117.3 64 74.7 75.5c-23.5 6.3-42 24.9-48.3 48.6C15 167 15 256.4 15 256.4s0 89.4 11.4 132.3c6.3 23.6 24.8 41.5 48.3 47.8C117.3 448 288.1 448 288.1 448s170.8 0 213.4-11.5c23.5-6.3 42-24.2 48.3-47.8 11.4-42.9 11.4-132.3 11.4-132.3s0-89.4-11.4-132.3zM232.2 337.6V175.2l142.7 81.2z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

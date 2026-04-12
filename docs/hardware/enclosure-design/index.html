@@ -18,7 +18,7 @@
         <link rel="prev" href="../wiring-pinout/">
       
       
-        <link rel="next" href="../../setup/first-time-setup/">
+        <link rel="next" href="../3d-printing-pipeline/">
       
       
         
@@ -1132,6 +1132,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#3d-printing-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3D Printing Pipeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3D Printing Pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technology-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technology Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#top-service-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top Service Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#future-revisions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1146,6 +1196,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3d-printing-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D Printing Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2121,6 +2199,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#3d-printing-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3D Printing Pipeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3D Printing Pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technology-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technology Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#top-service-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top Service Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#future-revisions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2316,6 +2444,113 @@
 </table>
 <p><strong>Recommendation for prototype:</strong> PLA. Fast to iterate, lowest barrier to getting prints done. Switch to PETG or ASA for a final build.</p>
 <hr />
+<h2 id="3d-printing-pipeline">3D Printing Pipeline<a class="headerlink" href="#3d-printing-pipeline" title="Permanent link">&para;</a></h2>
+<p>A full analysis of printing technologies, third-party services, CAD workflows, and cost estimates is available in the dedicated pipeline document:</p>
+<p><strong><a href="../../../../hardware-design/3d-printing-pipeline.md">3D Printing Prototyping Pipeline</a></strong></p>
+<h3 id="technology-summary">Technology Summary<a class="headerlink" href="#technology-summary" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Technology</th>
+<th>Home Printer?</th>
+<th>Service Cost (Dilder case)</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>FDM/FFF</strong></td>
+<td>Yes ($150–$1500)</td>
+<td>$1–$5</td>
+<td>Cheapest rapid iteration</td>
+</tr>
+<tr>
+<td><strong>SLA/MSLA</strong></td>
+<td>Yes ($150–$3500)</td>
+<td>$1–$8</td>
+<td>Best surface finish</td>
+</tr>
+<tr>
+<td><strong>SLS</strong></td>
+<td>No (service only)</td>
+<td>$4–$25</td>
+<td>Strongest functional parts</td>
+</tr>
+<tr>
+<td><strong>MJF</strong></td>
+<td>No (service only)</td>
+<td>$3–$20</td>
+<td>Best price/quality via services</td>
+</tr>
+</tbody>
+</table>
+<h3 id="recommended-approach">Recommended Approach<a class="headerlink" href="#recommended-approach" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Method</th>
+<th>Material</th>
+<th>Est. Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fit-check prototypes</td>
+<td>Home FDM or JLCPCB SLA</td>
+<td>PLA / standard resin</td>
+<td>$0.50–$15</td>
+</tr>
+<tr>
+<td>Functional prototypes</td>
+<td>Home FDM or JLCPCB MJF</td>
+<td>PETG / PA12 nylon</td>
+<td>$0.65–$18</td>
+</tr>
+<tr>
+<td>Final enclosure</td>
+<td>JLCPCB MJF</td>
+<td>PA12 nylon (dark grey)</td>
+<td>$8–$18 shipped</td>
+</tr>
+</tbody>
+</table>
+<h3 id="top-service-options">Top Service Options<a class="headerlink" href="#top-service-options" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Dilder Case Price</th>
+<th>Lead Time</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>JLCPCB</strong></td>
+<td>$3–10 + $5–10 shipping</td>
+<td>7–15 days</td>
+<td>Cheapest, bundle with PCB orders</td>
+</tr>
+<tr>
+<td><strong>Craftcloud</strong></td>
+<td>$5–15 + varies</td>
+<td>3–14 days</td>
+<td>Price-comparison marketplace</td>
+</tr>
+<tr>
+<td><strong>Xometry</strong></td>
+<td>$12–30 (shipping included)</td>
+<td>3–10 days</td>
+<td>Fastest US option</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Combine with PCB orders</p>
+<p>If ordering PCBs from JLCPCB, add the 3D-printed case to the same shipment to eliminate separate shipping costs. MJF PA12 nylon is the recommended material — no layer lines, strong snap-fits, dark grey finish.</p>
+</div>
+<hr />
 <h2 id="future-revisions">Future Revisions<a class="headerlink" href="#future-revisions" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>v3:</strong> Incorporate real component fits once hardware is assembled — verify display + board stack height, button stem clearance</li>
@@ -2378,13 +2613,13 @@
         
         
           
-          <a href="../../setup/first-time-setup/" class="md-footer__link md-footer__link--next" aria-label="Next: First-Time Setup (C SDK)">
+          <a href="../3d-printing-pipeline/" class="md-footer__link md-footer__link--next" aria-label="Next: 3D Printing Pipeline">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                First-Time Setup (C SDK)
+                3D Printing Pipeline
               </div>
             </div>
             <div class="md-footer__button md-icon">
