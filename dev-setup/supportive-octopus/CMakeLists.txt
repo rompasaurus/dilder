@@ -54,6 +54,7 @@ target_link_libraries(supportive_octopus
     hardware_spi
     hardware_gpio
     hardware_adc
+    hardware_rtc
     m
 )
 

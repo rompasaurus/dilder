@@ -19,6 +19,8 @@
 #include <math.h>
 #include "pico/stdlib.h"
 #include "hardware/adc.h"
+#include "hardware/rtc.h"
+#include "pico/util/datetime.h"
 #include "DEV_Config.h"
 
 /* Display variant selection */
@@ -90,6 +92,9 @@ static uint8_t frame[IMG_ROW_BYTES * IMG_H];
 /* Display buffer (portrait orientation for e-ink driver) */
 static uint8_t display_buf[((DISP_W + 7) / 8) * DISP_H];
 
+/* Vertical offset — pushes octopus + bubble down to make room for clock */
+#define Y_OFF 12
+
 /* ─── Pixel helpers ─── */
 static inline void px_set(int x, int y) {
     if (x >= 0 && x < IMG_W && y >= 0 && y < IMG_H)
@@ -99,6 +104,9 @@ static inline void px_clr(int x, int y) {
     if (x >= 0 && x < IMG_W && y >= 0 && y < IMG_H)
         frame[y * IMG_ROW_BYTES + x / 8] &= ~(0x80 >> (x & 7));
 }
+/* Offset versions — add Y_OFF to y before drawing */
+static inline void px_set_off(int x, int y) { px_set(x, y + Y_OFF); }
+static inline void px_clr_off(int x, int y) { px_clr(x, y + Y_OFF); }
 
 /* ─── Octopus body (RLE: y, num_spans, x0, x1, ...) terminated by 0xFF ─── */
 static const uint8_t body_rle[] = {
@@ -214,8 +222,8 @@ static void fill_circle(int cx, int cy, int r_sq, int set) {
     for (int dy = -r; dy <= r; dy++)
         for (int dx = -r; dx <= r; dx++)
             if (dx * dx + dy * dy <= r_sq) {
-                if (set) px_set(cx + dx, cy + dy);
-                else     px_clr(cx + dx, cy + dy);
+                if (set) px_set_off(cx + dx, cy + dy);
+                else     px_clr_off(cx + dx, cy + dy);
             }
 }
 
@@ -228,7 +236,7 @@ static void draw_body(void) {
             int x0 = *p++;
             int x1 = *p++;
             for (int x = x0; x <= x1; x++)
-                px_set(x, y);
+                px_set_off(x, y);
         }
     }
 }
@@ -258,8 +266,8 @@ static void draw_pupils_weird(void) {
 
 static void draw_pupils_unhinged(void) {
     /* Tiny pinprick pupils, no highlights */
-    px_set(22, 25); px_set(23, 25); px_set(22, 26); px_set(23, 26);
-    px_set(48, 25); px_set(49, 25); px_set(48, 26); px_set(49, 26);
+    px_set_off(22, 25); px_set_off(23, 25); px_set_off(22, 26); px_set_off(23, 26);
+    px_set_off(48, 25); px_set_off(49, 25); px_set_off(48, 26); px_set_off(49, 26);
 }
 
 /* ─── Mouth expressions ─── */
@@ -271,37 +279,34 @@ static void draw_mouth_smirk(void) {
         float v = 2.0f * t - 1.0f;
         float arc = (fabsf(v) < 1.0f) ? 5.0f * sqrtf(1.0f - v * v) : 0.0f;
         int yc = (int)(39.0f + tilt + arc);
-        px_clr(x, yc);       /* white interior */
-        px_set(x, yc - 1);   /* black outline */
-        px_set(x, yc + 1);
+        px_clr_off(x, yc);
+        px_set_off(x, yc - 1);
+        px_set_off(x, yc + 1);
     }
 }
 
 static void draw_mouth_smile(void) {
     for (int x = 26; x < 45; x++) {
         int cy = 38 + ((x - 35) * (x - 35)) / 25;
-        px_set(x, cy);
-        px_set(x, cy + 1);
+        px_set_off(x, cy);
+        px_set_off(x, cy + 1);
     }
 }
 
 static void draw_mouth_open(void) {
     int cx = 35, cy = 40, rx = 7, ry = 5;
-    /* White interior (smaller ellipse) */
     for (int dy = -4; dy <= 4; dy++)
         for (int dx = -6; dx <= 6; dx++)
             if (dx*dx*16 + dy*dy*36 <= 36*16)
-                px_clr(cx + dx, cy + dy);
-    /* Black border */
+                px_clr_off(cx + dx, cy + dy);
     for (int dy = -ry; dy <= ry; dy++)
         for (int dx = -rx; dx <= rx; dx++) {
             if (dx*dx*ry*ry + dy*dy*rx*rx > rx*rx*ry*ry) continue;
-            /* Check if any neighbor is outside */
             for (int nd = 0; nd < 4; nd++) {
                 int nx = dx + ((nd==0)?-1:(nd==1)?1:0);
                 int ny = dy + ((nd==2)?-1:(nd==3)?1:0);
                 if (nx*nx*ry*ry + ny*ny*rx*rx > rx*rx*ry*ry) {
-                    px_set(cx + dx, cy + dy);
+                    px_set_off(cx + dx, cy + dy);
                     break;
                 }
             }
@@ -312,20 +317,18 @@ static void draw_mouth_weird(void) {
     for (int x = 24; x < 48; x++) {
         float t = (x - 24) / 23.0f;
         int yc = 39 + (int)(3.5f * sinf(t * 3.14159f * 3.0f));
-        px_clr(x, yc);
-        px_set(x, yc - 1);
-        px_set(x, yc + 1);
+        px_clr_off(x, yc);
+        px_set_off(x, yc - 1);
+        px_set_off(x, yc + 1);
     }
 }
 
 static void draw_mouth_unhinged(void) {
     int cx = 35, cy = 41, rx = 10, ry = 7;
-    /* White interior */
     for (int dy = -6; dy <= 6; dy++)
         for (int dx = -9; dx <= 9; dx++)
             if (dx*dx*36 + dy*dy*81 <= 81*36)
-                px_clr(cx + dx, cy + dy);
-    /* Black border */
+                px_clr_off(cx + dx, cy + dy);
     for (int dy = -ry; dy <= ry; dy++)
         for (int dx = -rx; dx <= rx; dx++) {
             if (dx*dx*ry*ry + dy*dy*rx*rx > rx*rx*ry*ry) continue;
@@ -333,23 +336,22 @@ static void draw_mouth_unhinged(void) {
                 int nx = dx + ((nd==0)?-1:(nd==1)?1:0);
                 int ny = dy + ((nd==2)?-1:(nd==3)?1:0);
                 if (nx*nx*ry*ry + ny*ny*rx*rx > rx*rx*ry*ry) {
-                    px_set(cx + dx, cy + dy);
+                    px_set_off(cx + dx, cy + dy);
                     break;
                 }
             }
         }
-    /* Jagged teeth */
     for (int x = cx - 7; x <= cx + 7; x += 3) {
-        px_set(x, cy - 5);
-        px_set(x, cy - 4);
-        px_set(x + 1, cy - 4);
+        px_set_off(x, cy - 5);
+        px_set_off(x, cy - 4);
+        px_set_off(x + 1, cy - 4);
     }
 }
 
 /* ─── Chat bubble ─── */
 
 static void draw_bubble(void) {
-    int bx = 75, by = 5, bw = 170, bh = 70;
+    int bx = 75, by = 5 + Y_OFF, bw = 170, bh = 70;
     /* Top/bottom edges (double thick) */
     for (int x = bx + 3; x < bx + bw - 3; x++) {
         px_set(x, by); px_set(x, by + 1);
@@ -368,12 +370,11 @@ static void draw_bubble(void) {
                 if (abs(dx) + abs(dy) <= 1)
                     px_set(corners[c][0]+dx, corners[c][1]+dy);
     /* Speech tail */
-    static const int8_t tail[][2] = {
-        {0,35},{-1,36},{-2,37},{-3,38},{-4,39},{-5,40},{-6,41},{-7,42},
-        {-6,43},{-5,43},{-4,43},{-3,42},{-2,41},{-1,40},{0,39}
-    };
+    int tb = 35 + Y_OFF;
+    static const int8_t tail_dx[] = {0,-1,-2,-3,-4,-5,-6,-7,-6,-5,-4,-3,-2,-1,0};
+    static const int8_t tail_dy[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 7, 6, 5, 4};
     for (int i = 0; i < 15; i++)
-        px_set(bx + tail[i][0], tail[i][1]);
+        px_set(bx + tail_dx[i], tb + tail_dy[i]);
 }
 
 /* ─── Text rendering ─── */
@@ -426,24 +427,56 @@ static void draw_text(int x0, int y0, const char *text, int max_w) {
 
 /* ─── Frame composition ─── */
 
+/* ─── RTC clock helpers ─── */
+
+static const char *month_names[] = {
+    "JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE",
+    "JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"
+};
+
+static void draw_clock_header(void) {
+    datetime_t t;
+    rtc_get_datetime(&t);
+
+    /* Format: "APRIL 12, 2026  3:47 PM" */
+    char buf[48];
+    int hr12 = t.hour % 12;
+    if (hr12 == 0) hr12 = 12;
+    const char *ampm = (t.hour < 12) ? "AM" : "PM";
+    snprintf(buf, sizeof(buf), "%s %d, %d  %d:%02d %s",
+             month_names[t.month - 1], t.day, t.year, hr12, t.min, ampm);
+
+    /* Center the header (6px per char) */
+    int len = (int)strlen(buf);
+    int header_w = len * 6;
+    int header_x = (IMG_W - header_w) / 2;
+    if (header_x < 0) header_x = 0;
+
+    /* draw_text uses raw px_set (no offset) — renders at y=1, top of screen */
+    draw_text(header_x, 1, buf, IMG_W);
+}
+
 static void render_frame(const Quote *q, int expr) {
     /* Clear to white */
     memset(frame, 0, sizeof(frame));
 
-    /* 1. Body */
+    /* 0. Date & time header at top center (no Y offset) */
+    draw_clock_header();
+
+    /* 1. Body (with Y_OFF) */
     draw_body();
 
-    /* 2. Eyes (white sockets) */
+    /* 2. Eyes (white sockets, with Y_OFF) */
     draw_eyes();
 
-    /* 3. Pupils (mood-specific) */
+    /* 3. Pupils (mood-specific, with Y_OFF) */
     switch (q->mood) {
         case MOOD_WEIRD:    draw_pupils_weird();    break;
         case MOOD_UNHINGED: draw_pupils_unhinged(); break;
         default:            draw_pupils_normal();   break;
     }
 
-    /* 4. Mouth expression */
+    /* 4. Mouth expression (with Y_OFF) */
     switch (expr) {
         case EXPR_OPEN:     draw_mouth_open();     break;
         case EXPR_SMILE:    draw_mouth_smile();    break;
@@ -452,14 +485,16 @@ static void render_frame(const Quote *q, int expr) {
         default:            draw_mouth_smirk();    break;
     }
 
-    /* 5. Chat bubble outline */
+    /* 5. Chat bubble outline (with Y_OFF via draw_bubble) */
     draw_bubble();
 
-    /* 6. Quote text inside bubble */
-    draw_text(81, 11, q->text, 158);
+    /* 6. Quote text inside bubble (manually offset) */
+    draw_text(81, 11 + Y_OFF, q->text, 158);
 
-    /* 7. Tagline below bubble */
-    draw_text(81, 83, TAGLINE, 170);
+    /* 7. Tagline below bubble (manually offset) */
+    int tag_y = 5 + 70 + 5 + Y_OFF;
+    if (tag_y + 7 < IMG_H)
+        draw_text(81, tag_y, TAGLINE, 170);
 }
 
 /* ─── Transpose landscape → portrait for e-ink driver ─── */
@@ -521,10 +556,46 @@ static const uint8_t *mood_cycle(uint8_t mood) {
 
 /* ─── Main ─── */
 
+/* ─── Parse compile-time date/time to seed the RTC ─── */
+
+static int parse_month(const char *s) {
+    static const char *m[] = {"Jan","Feb","Mar","Apr","May","Jun",
+                              "Jul","Aug","Sep","Oct","Nov","Dec"};
+    for (int i = 0; i < 12; i++)
+        if (s[0] == m[i][0] && s[1] == m[i][1] && s[2] == m[i][2])
+            return i + 1;
+    return 1;
+}
+
+static void init_rtc_from_compile_time(void) {
+    /* __DATE__ = "Apr 12 2026", __TIME__ = "19:05:15" */
+    const char *d = __DATE__;
+    const char *t = __TIME__;
+
+    datetime_t dt = {
+        .year  = (int16_t)(atoi(d + 7)),
+        .month = (int8_t)parse_month(d),
+        .day   = (int8_t)atoi(d + 4),
+        .dotw  = 0,  /* RTC doesn't need accurate day-of-week */
+        .hour  = (int8_t)atoi(t),
+        .min   = (int8_t)atoi(t + 3),
+        .sec   = (int8_t)atoi(t + 6),
+    };
+
+    rtc_init();
+    rtc_set_datetime(&dt);
+    sleep_us(64);  /* wait for RTC to latch */
+    printf("RTC set to %04d-%02d-%02d %02d:%02d:%02d\n",
+           dt.year, dt.month, dt.day, dt.hour, dt.min, dt.sec);
+}
+
 int main(void) {
     stdio_init_all();
     sleep_ms(1000);
     printf("%s starting (display: %s, %d quotes)...\n", TAGLINE, DISPLAY_NAME, QUOTE_COUNT);
+
+    /* Initialize RTC from compile time (keeps ticking from there) */
+    init_rtc_from_compile_time();
 
     if (DEV_Module_Init() != 0) {
         printf("ERROR: Hardware init failed.\n");
