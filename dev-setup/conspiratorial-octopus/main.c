@@ -74,10 +74,13 @@
 #define IMG_H         122
 #define IMG_ROW_BYTES ((IMG_W + 7) / 8)  /* 32 */
 
-/* Mood values (match quotes.h) */
+/* Mood values (match quotes.h mood_map in devtool.py) */
 #define MOOD_NORMAL   0
 #define MOOD_WEIRD    1
 #define MOOD_UNHINGED 2
+#define MOOD_ANGRY    3
+#define MOOD_SAD      4
+#define MOOD_CHAOTIC  5
 
 /* Mouth expressions */
 #define EXPR_SMIRK    0
@@ -85,6 +88,9 @@
 #define EXPR_SMILE    2
 #define EXPR_WEIRD    3
 #define EXPR_UNHINGED 4
+#define EXPR_ANGRY    5
+#define EXPR_SAD      6
+#define EXPR_CHAOTIC  7
 
 /* Landscape frame buffer (1 = black pixel, packed MSB-first) */
 static uint8_t frame[IMG_ROW_BYTES * IMG_H];
@@ -270,6 +276,78 @@ static void draw_pupils_unhinged(void) {
     px_set_off(48, 25); px_set_off(49, 25); px_set_off(48, 26); px_set_off(49, 26);
 }
 
+static void draw_pupils_angry(void) {
+    /* Pupils shifted inward and down — glaring toward the nose */
+    fill_circle(25, 27, 4, 1);  /* left: shifted right+down */
+    fill_circle(47, 27, 4, 1);  /* right: shifted left+down */
+    fill_circle(23, 24, 1, 0);  /* highlights */
+    fill_circle(45, 24, 1, 0);
+}
+
+static void draw_brows_angry(void) {
+    /* Thick slanted half-circle arcs across top of eye sockets.
+       Outer edges high, inner edges low — angry V shape.
+       Must match Python _octo_angry_eyes(). */
+    for (int i = 0; i < 18; i++) {
+        float t = i / 17.0f;
+        int x = 14 + (int)(t * 16);
+        float arc = 2.5f * sinf(t * 3.14159f);
+        int y = (int)(20 + t * 5 - arc);
+        for (int dy = 0; dy < 3; dy++) px_set_off(x, y + dy);
+        px_set_off(x + 1, y + 1);
+    }
+    for (int i = 0; i < 18; i++) {
+        float t = i / 17.0f;
+        int x = 40 + (int)(t * 16);
+        float arc = 2.5f * sinf(t * 3.14159f);
+        int y = (int)(25 - t * 5 - arc);
+        for (int dy = 0; dy < 3; dy++) px_set_off(x, y + dy);
+        px_set_off(x + 1, y + 1);
+    }
+}
+
+static void draw_pupils_sad(void) {
+    /* Pupils shifted downward — looking at the floor */
+    fill_circle(23, 28, 4, 1);
+    fill_circle(49, 28, 4, 1);
+    fill_circle(21, 25, 1, 0);
+    fill_circle(47, 25, 1, 0);
+}
+
+static void draw_brows_sad(void) {
+    /* Droopy brows — outer edges low, inner edges high (inverse of angry) */
+    for (int i = 0; i < 18; i++) {
+        float t = i / 17.0f;
+        int x = 14 + (int)(t * 16);
+        float arc = 2.5f * sinf(t * 3.14159f);
+        int y = (int)(25 - t * 5 - arc);  /* inner high, outer low */
+        for (int dy = 0; dy < 3; dy++) px_set_off(x, y + dy);
+    }
+    for (int i = 0; i < 18; i++) {
+        float t = i / 17.0f;
+        int x = 40 + (int)(t * 16);
+        float arc = 2.5f * sinf(t * 3.14159f);
+        int y = (int)(20 + t * 5 - arc);
+        for (int dy = 0; dy < 3; dy++) px_set_off(x, y + dy);
+    }
+}
+
+static void draw_pupils_chaotic(void) {
+    /* Spiral/ring eyes — concentric circles for dizzy look */
+    for (int ecx_i = 0; ecx_i < 2; ecx_i++) {
+        int ecx = (ecx_i == 0) ? 22 : 48;
+        /* Outer ring */
+        for (int dy = -3; dy <= 3; dy++)
+            for (int dx = -3; dx <= 3; dx++) {
+                int dist = dx * dx + dy * dy;
+                if (dist >= 5 && dist <= 9)
+                    px_set_off(ecx + dx, 25 + dy);
+            }
+        /* Center dot */
+        px_set_off(ecx, 25);
+    }
+}
+
 /* ─── Mouth expressions ─── */
 
 static void draw_mouth_smirk(void) {
@@ -345,6 +423,34 @@ static void draw_mouth_unhinged(void) {
         px_set_off(x, cy - 5);
         px_set_off(x, cy - 4);
         px_set_off(x + 1, cy - 4);
+    }
+}
+
+static void draw_mouth_angry(void) {
+    /* Tight downward frown — inverted parabola */
+    for (int x = 28; x < 43; x++) {
+        int cy = 40 - ((x - 35) * (x - 35)) / 20;
+        px_set_off(x, cy);
+        px_set_off(x, cy + 1);
+    }
+}
+
+static void draw_mouth_sad(void) {
+    /* Gentle downward curve frown */
+    for (int x = 26; x < 45; x++) {
+        int cy = 42 - ((x - 35) * (x - 35)) / 30;
+        px_set_off(x, cy);
+        px_set_off(x, cy + 1);
+    }
+}
+
+static void draw_mouth_chaotic(void) {
+    /* Zigzag lightning-bolt mouth */
+    for (int x = 24; x < 48; x++) {
+        int phase = (x - 24) % 6;
+        int y = (phase < 3) ? 38 + phase * 2 : 44 - phase * 2 + 6;
+        px_set_off(x, y);
+        px_set_off(x, y + 1);
     }
 }
 
@@ -473,8 +579,15 @@ static void render_frame(const Quote *q, int expr) {
     switch (q->mood) {
         case MOOD_WEIRD:    draw_pupils_weird();    break;
         case MOOD_UNHINGED: draw_pupils_unhinged(); break;
+        case MOOD_ANGRY:    draw_pupils_angry();    break;
+        case MOOD_SAD:      draw_pupils_sad();      break;
+        case MOOD_CHAOTIC:  draw_pupils_chaotic();  break;
         default:            draw_pupils_normal();   break;
     }
+
+    /* 3b. Eyebrows for angry/sad moods */
+    if (q->mood == MOOD_ANGRY) draw_brows_angry();
+    if (q->mood == MOOD_SAD)   draw_brows_sad();
 
     /* 4. Mouth expression (with Y_OFF) */
     switch (expr) {
@@ -482,6 +595,9 @@ static void render_frame(const Quote *q, int expr) {
         case EXPR_SMILE:    draw_mouth_smile();    break;
         case EXPR_WEIRD:    draw_mouth_weird();    break;
         case EXPR_UNHINGED: draw_mouth_unhinged(); break;
+        case EXPR_ANGRY:    draw_mouth_angry();    break;
+        case EXPR_SAD:      draw_mouth_sad();      break;
+        case EXPR_CHAOTIC:  draw_mouth_chaotic();  break;
         default:            draw_mouth_smirk();    break;
     }
 
@@ -545,11 +661,17 @@ static uint32_t rng_next(void) {
 static const uint8_t cycle_normal[]   = {EXPR_SMIRK, EXPR_OPEN, EXPR_SMILE, EXPR_OPEN};
 static const uint8_t cycle_weird[]    = {EXPR_WEIRD, EXPR_OPEN, EXPR_WEIRD, EXPR_SMILE};
 static const uint8_t cycle_unhinged[] = {EXPR_UNHINGED, EXPR_OPEN, EXPR_UNHINGED, EXPR_OPEN};
+static const uint8_t cycle_angry[]    = {EXPR_ANGRY, EXPR_OPEN, EXPR_ANGRY, EXPR_ANGRY};
+static const uint8_t cycle_sad[]      = {EXPR_SAD, EXPR_OPEN, EXPR_SAD, EXPR_SMILE};
+static const uint8_t cycle_chaotic[]  = {EXPR_CHAOTIC, EXPR_OPEN, EXPR_UNHINGED, EXPR_WEIRD};
 
 static const uint8_t *mood_cycle(uint8_t mood) {
     switch (mood) {
         case MOOD_WEIRD:    return cycle_weird;
         case MOOD_UNHINGED: return cycle_unhinged;
+        case MOOD_ANGRY:    return cycle_angry;
+        case MOOD_SAD:      return cycle_sad;
+        case MOOD_CHAOTIC:  return cycle_chaotic;
         default:            return cycle_normal;
     }
 }
