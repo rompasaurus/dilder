@@ -79,6 +79,8 @@ Use `--status` to check your current environment at a glance:
 | Micro-USB data cable | **Must be a data cable, not charge-only** — this is the #1 gotcha |
 | Linux PC | Arch/CachyOS, Ubuntu, Debian, or Fedora |
 
+![Pico W and e-Paper display — the two components you need](../../assets/images/hardware/pico-w-and-display-separated.jpg)
+
 !!! tip "No breadboard or jumper wires needed"
     The Waveshare HAT has a female header socket that slides directly onto the Pico W's male header pins. No breadboard, no jumper wires — just push it on.
 
@@ -101,6 +103,8 @@ Use `--status` to check your current environment at a glance:
 
 ### The Pico W at a Glance
 
+![Raspberry Pi Pico W — top view](../../assets/images/hardware/pico-w-board.jpg)
+
 - **Chip:** RP2040 — dual-core ARM Cortex-M0+ at 133 MHz
 - **RAM:** 264 KB SRAM
 - **Flash:** 2 MB onboard QSPI
@@ -109,6 +113,8 @@ Use `--status` to check your current environment at a glance:
 - **Wi-Fi:** 802.11n 2.4 GHz (Infineon CYW43439)
 
 ### The Waveshare 2.13" e-Paper V3 at a Glance
+
+![Waveshare e-Paper HAT — back side showing pin labels and SPI connections](../../assets/images/hardware/waveshare-hat-back.jpg)
 
 - **Resolution:** 250 x 122 pixels, black and white
 - **Driver IC:** SSD1680
@@ -486,6 +492,12 @@ The Pico W has **male header pins soldered on**. The Waveshare HAT has a **femal
 2. Press down firmly and evenly until the HAT is fully seated on the Pico W headers.
 3. The HAT should sit snug with no pins visible between the boards.
 
+![Pico W mounted on the Waveshare HAT — side view showing header connection](../../assets/images/hardware/pico-mounted-on-hat-side.jpg)
+
+![Pico W mounted on the Waveshare HAT — top view](../../assets/images/hardware/pico-mounted-on-hat-top.jpg)
+
+![Assembled unit — back view showing pin headers](../../assets/images/hardware/assembled-back-view.jpg)
+
 ### Step 7.3 — Verify the Connection
 
 Before plugging in USB, check:
@@ -574,7 +586,11 @@ Heartbeat: 1
 - **"Pico W + e-Paper V3"** in 16px font
 - **"First build successful!"** in 12px font
 
+![Hello, Dilder! running on the e-ink display — proof of life](../../assets/images/hardware/hello-dilder-running.jpg)
+
 If text appears on the display — the full hardware stack is working.
+
+![Sassy Octopus running standalone on the Pico W](../../assets/images/hardware/sassy-octopus-running.jpg)
 
 ---
 
