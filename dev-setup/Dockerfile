@@ -26,5 +26,5 @@ WORKDIR /project
 # Display variant (V2, V3, V3a, V4) — override via docker compose environment
 ENV DISPLAY_VARIANT=V3
 
-# Default command: configure + build
-CMD ["sh", "-c", "rm -rf build && mkdir build && cd build && cmake -G Ninja -DPICO_BOARD=pico_w -DDISPLAY_VARIANT=${DISPLAY_VARIANT} .. && ninja"]
+# Default command: copy SDK import helper, configure + build
+CMD ["sh", "-c", "cp /opt/pico-sdk/external/pico_sdk_import.cmake . 2>/dev/null; rm -rf build && mkdir build && cd build && cmake -G Ninja -DPICO_BOARD=pico_w -DDISPLAY_VARIANT=${DISPLAY_VARIANT} .. && ninja"]
