@@ -130,7 +130,7 @@ Each phase maps to a section of the blog/YouTube series and can be followed inde
 |----------|-------------|
 | [PromptProgression.md](PromptProgression.md) | Every AI prompt used in development (104+), timestamped with token counts and file changes |
 | [docs/hardware-research.md](docs/hardware-research.md) | Component research, materials list, GPIO pinout, and enclosure concepts |
-| [assets/octopus-emotion-states.md](assets/octopus-emotion-states.md) | All 16 emotional states with rendered previews and animation strips |
+| [Emotion States](https://dilder.dev/docs/software/emotion-states/) | All 16 emotional states with rendered previews and animation strips |
 | [docs/keyboard-to-pico-input.md](docs/keyboard-to-pico-input.md) | Input mapping plan for interactive octopus control |
 | [Blog](https://dilder.dev/blog/) | Build journal — 8 posts covering planning through body animations |
 | YouTube (TBD) | Video walkthroughs for each phase |
