@@ -893,7 +893,7 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Prompt:** "Alright we have a sassy octopus, let's make a sassy supportive octopus — same functionality but just the text should be more oriented to humorous but supportive statements, littered with unhinged but weirdly loving statements, sprinkle in some spicy language, and make a huge list of cycled text for this and add it to the programs to be deployable to the Pico."
 - **Input Tokens (est):** ~80
 - **Output Tokens (est):** ~12,000
-- **Commit:** `TBD`
+- **Commit:** `da4d979`
 - **Files Created/Modified:**
   - `DevTool/devtool.py` (modified — added `SUPPORTIVE_QUOTES` list with 80 quotes, added `supportive_octopus` program entry, parameterized `_draw_chat_bubble` and `_generate_octopus_frame` with tagline, refactored `_run_sassy_octopus` to generic `_run_octopus`, added `_OCTOPUS_CONFIGS` and `_FIRMWARE_DIRS` lookup dicts)
   - `dev-setup/supportive-octopus/main.c` (created — standalone Pico firmware for Supportive Octopus)
@@ -908,7 +908,7 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Prompt:** "OK the sassy quotes are looking sparse compared to the supportive ones, let's expand on this — more unhinged, more weird, more conspiratorial, and more chaotic. Sprinkle in plenty of spicy language and swear words too. Get tin-foiled with some of them, get stupid with the others. Pull from modern memetic conspiracies. And if the quotes are especially weird give the octopus a weird expression, and especially unhinged make an unhinged expression."
 - **Input Tokens (est):** ~100
 - **Output Tokens (est):** ~15,000
-- **Commit:** `TBD`
+- **Commit:** `da4d979`
 - **Files Created/Modified:**
   - `DevTool/devtool.py` (modified — expanded `SASSY_QUOTES` from 30 to 124 entries with mood tags, added `MOUTH_WEIRD` and `MOUTH_UNHINGED` expressions with pixel art functions for wobbly sine-wave mouth and jagged scream-mouth, added `_octo_weird_eyes` with misaligned pupils and `_octo_unhinged_eyes` with tiny pinprick pupils, added `_parse_quote` and `_mood_cycle` helpers, updated all rendering and frame generation to use mood-based expression cycling)
 
@@ -919,7 +919,7 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Prompt:** "OK the DevTool program tab is a bit wonky — when I select a display model it deselects the program. Also the display mode is hard to read once selected, the background lightness ruins the text."
 - **Input Tokens (est):** ~40
 - **Output Tokens (est):** ~3,000
-- **Commit:** `TBD`
+- **Commit:** `da4d979`
 - **Files Created/Modified:**
   - `DevTool/devtool.py` (modified — added `exportselection=False` to program Listbox to prevent deselection on focus loss, added `TCombobox` dark theme styling with proper `fieldbackground`/`foreground`/`selectbackground` for readonly state, added `option_add` for combobox popdown listbox dark theme)
 
@@ -930,7 +930,7 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Prompt:** "Let's embed the sassy and supportive octopus on the website too, as a banner with all the quotes made. Have it cycle through them at the top."
 - **Input Tokens (est):** ~30
 - **Output Tokens (est):** ~10,000
-- **Commit:** `TBD`
+- **Commit:** `b447aab`
 - **Files Created/Modified:**
   - `website/docs/javascripts/octopus-banner.js` (created — canvas-rendered pixel art octopus with typewriter quote cycling across both sassy and supportive pools, responsive design)
   - `website/docs/stylesheets/extra.css` (modified — added octopus banner styles with dark background, blinking cursor, responsive breakpoints)
