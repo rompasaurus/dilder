@@ -1282,6 +1282,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../battery-wiring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../enclosure-design/" class="md-nav__link">
         
   
@@ -2674,6 +2702,18 @@
 <td>Digital in</td>
 </tr>
 <tr>
+<td>Battery VSYS</td>
+<td>—</td>
+<td>39</td>
+<td>Power in (1.8–5.5V)</td>
+</tr>
+<tr>
+<td>Battery GND</td>
+<td>—</td>
+<td>38</td>
+<td>Ground (shared with display)</td>
+</tr>
+<tr>
 <td>Piezo buzzer (future)</td>
 <td>GP15</td>
 <td>20</td>
@@ -2681,7 +2721,7 @@
 </tr>
 <tr>
 <td><strong>Pins used</strong></td>
-<td><strong>12</strong></td>
+<td><strong>12 GPIO + 2 power</strong></td>
 <td></td>
 <td></td>
 </tr>
@@ -2693,6 +2733,10 @@
 </tr>
 </tbody>
 </table>
+<div class="admonition tip">
+<p class="admonition-title">Battery power</p>
+<p>The 3.7V LiPo connects to VSYS (pin 39) and GND (pin 38) — no GPIO pins consumed. See the dedicated <a href="../battery-wiring/">Battery Wiring Guide</a> for full setup instructions, charging options, and voltage monitoring.</p>
+</div>
 <hr />
 <h2 id="pico-w-pin-map-visual">Pico W Pin Map (Visual)<a class="headerlink" href="#pico-w-pin-map-visual" title="Permanent link">&para;</a></h2>
 <p>Pins used by this project are highlighted. Full electrical specs in the <a href="../../reference/pico-w/">Pico W reference</a>.</p>
