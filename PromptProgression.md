@@ -1482,3 +1482,146 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Files Created/Modified:**
   - `PromptProgression.md` (modified — added Prompt #118)
   - `DevTool/devtool.py`, `PromptProgression.md`, `website/docs/prompts/index.md` — all committed and pushed
+
+---
+
+## Prompt #119
+- **Date/Time:** 2026-04-13
+- **Prompt:** "I've done a bit of research on the Pico and since the Raspberry Pi Pico W features the CYW43439 chip, it supports both Wi-Fi and Bluetooth (BLE). Depending on whether you have an existing Wi-Fi network or want the devices to work entirely independently, there are three primary ways to achieve discovery and synchronization. [Detailed research on Wi-Fi Infrastructure Mode, Wi-Fi SoftAP Mode, and BLE Advertising including detection/sync mechanisms, pros/cons, and handshake logic.] What I would like to have is a feature that synchronizes with other Picos running this pet and provides a bonus or notification to indicate that you discovered other players. Add a research document for this feature to the root docs folder."
+- **Input Tokens (est):** ~500
+- **Output Tokens (est):** ~8,000
+- **Files Created/Modified:**
+  - `docs/peer-discovery-research.md` (created — full research document covering three communication methods, recommended BLE approach, discovery protocol design with 13-byte handshake packet, validation logic, cooldown timer, reward/notification system with animations and stat boosts, encounter log data structure, display feedback, technical considerations for power/flash/versioning/security, and phased implementation plan A–E)
+
+---
+
+## Prompt #120
+- **Date/Time:** 2026-04-13
+- **Prompt:** "I think another component of peer discovery would be mating prospects to create unique offspring based on the other types of creatures met via proximity."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~6,000
+- **Files Created/Modified:**
+  - `docs/peer-discovery-research.md` (modified — added Mating & Offspring System section: genetic trait system with 17-bit genome encoding 6 traits, 45/45/10 inheritance algorithm, mating eligibility conditions, offspring lifecycle with egg/hatching/slots, offspring data structure, generation tracking, BLE protocol extension for gene exchange, display integration for mating events; expanded implementation phases from A–E to A–I; added new open questions about trait rendering, offspring permanence, cross-pollination, and consent UX)
+
+---
+
+## Prompt #121
+- **Date/Time:** 2026-04-13
+- **Prompt:** "I suppose with a mating system we could generate unique animals and creatures as a result based on this but would it get too complex to compute this on a Pico?"
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~4,000
+- **Files Created/Modified:**
+  - `docs/peer-discovery-research.md` (modified — added Computational Feasibility on the Pico W section: genetics calculation cost analysis showing sub-microsecond execution, rendering cost breakdown showing table lookups vs hardcoded values are identical cost, combinatorial variety analysis showing 131,072 unique combinations from ~308 bytes of lookup tables, SRAM budget showing ~45 bytes additional, flash budget showing ~3.4KB additional, and hardware limitation analysis confirming the Pico W has orders of magnitude more resources than needed)
+
+---
+
+## Prompt #122
+- **Date/Time:** 2026-04-13
+- **Prompt:** "Also tell me what it would take to add more flash memory if that would be needed."
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~6,000
+- **Files Created/Modified:**
+  - `docs/hardware-research.md` (modified — added Flash Memory Expansion section: current flash budget analysis, Option 0 Pico 2 W upgrade, Option 1 SPI NOR flash chips W25Q16–W25Q128 with pricing and SPI0 wiring table, Option 2 pre-assembled breakout modules, Option 3 MicroSD card, comparison summary table, and tiered recommendation)
+
+---
+
+## Prompt #123
+- **Date/Time:** 2026-04-13
+- **Prompt:** "Is there a way to get 100+ MB of flash?"
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~2,500
+- **Files Created/Modified:**
+  - (No files modified — conversational response explaining SPI NAND flash chips W25N01GV through W25N04KV with pricing, NOR vs NAND trade-offs table, and recommendation that MicroSD is the better choice for 100+ MB)
+
+---
+
+## Prompt #124
+- **Date/Time:** 2026-04-13
+- **Prompt:** "Give the price and update the docs."
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~8,000
+- **Files Created/Modified:**
+  - `docs/hardware-research.md` (modified — added Option 3 SPI NAND Flash section with W25N512GV through W25N04KV chip lineup and pricing, NOR vs NAND comparison table, driver complexity notes mentioning dhara FTL library, breakout module availability; restructured Option 4 MicroSD with clearer pricing; expanded comparison summary table with all NAND options; updated recommendation with two paths to 100+ MB)
+
+---
+
+## Prompt #125
+- **Date/Time:** 2026-04-13
+- **Prompt:** "How much more power hungry is the Pi Zero?"
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~1,500
+- **Files Created/Modified:**
+  - (No files modified — conversational response referencing existing battery life data from hardware-research.md: Pi Zero W draws 3.2x more active power, 35x more in sleep, needs a boost converter, and lasts ~12 hours on 1000mAh vs 6.8 days for the Pico W)
+
+---
+
+## Prompt #126
+- **Date/Time:** 2026-04-13
+- **Prompt:** "Can I get a Pico with a larger NAND memory somewhere somehow?"
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~3,000
+- **Files Created/Modified:**
+  - (No files modified — conversational response explaining no Pico-class board ships with NAND; listed RP2040/RP2350 boards with extra NOR flash including WeAct RP2040, SparkFun Thing Plus, and Pimoroni Pico Plus 2 W with 16MB flash + 8MB PSRAM at ~$14; confirmed 100+ MB always requires external add-on)
+
+---
+
+## Prompt #127
+- **Date/Time:** 2026-04-13
+- **Prompt:** "Add this to the doc and give the power consumption estimates."
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~8,000
+- **Files Created/Modified:**
+  - `docs/hardware-research.md` (modified — expanded Option 0 into full board upgrade comparison table with Pico W, Pico 2 W, Adafruit Feather RP2040, SparkFun Thing Plus RP2040, and Pimoroni Pico Plus 2 W; added power consumption comparison table for all boards; added battery life estimates showing Pimoroni at ~5.5–6.0 days vs Pico 2 W at ~6.4 days; added external flash power consumption table for NOR, NAND, MicroSD, and PSRAM; updated comparison summary with power column; updated recommendation to include Pimoroni as Option 3)
+
+---
+
+## Prompt #128
+- **Date/Time:** 2026-04-13
+- **Prompt:** "Let's look at the Chinese market and tell me if there is a Pico-like board with Wi-Fi and a lot of memory."
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~8,000
+- **Files Created/Modified:**
+  - (No files modified — conversational research response covering Chinese MCU boards: ESP32-S3 boards from WeAct, Luatos, YD, and Lolin with 16MB flash + 8MB PSRAM + WiFi + BLE at $3.50–6; RP2040 boards from WeAct and YD with 16MB flash but no wireless at $2.50–3.50; exotic options like Sipeed BL616/BL808; trade-off analysis of Pico SDK vs ESP-IDF migration)
+
+---
+
+## Prompt #129
+- **Date/Time:** 2026-04-13
+- **Prompt:** "Give me the processor specs and speed."
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~6,000
+- **Files Created/Modified:**
+  - (No files modified — conversational response with detailed ESP32-S3 vs RP2040 vs RP2350 comparison: CPU architecture, clock speeds, FPU, DSP, cache sizes, DMA, crypto acceleration, CoreMark and Dhrystone benchmarks, power consumption comparison)
+
+---
+
+## Prompt #130
+- **Date/Time:** 2026-04-13
+- **Prompt:** "Also give me the documentation rating for these options and how easy code would be given the docs and API and resources available."
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~2,000
+- **Files Created/Modified:**
+  - (No files modified — conversational response with developer experience ratings for Pico SDK, Pico SDK 2.x, and ESP-IDF across documentation quality, getting started ease, API clarity, community support, example code, BLE maturity, e-ink library support, Arduino support, and toolchain setup)
+
+---
+
+## Prompt #131
+- **Date/Time:** 2026-04-13
+- **Prompt:** "Other than e-ink, what is another very low watt screen option for this project?"
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~6,000
+- **Files Created/Modified:**
+  - (No files modified — conversational research response covering Sharp Memory LCD, OLED, and Nokia PCD8544 displays: Sharp LS013B7DH03 as top pick with 1µA standby and 10–20 fps animation at $15–25; SSD1306 OLED as runner-up at $2–5 with 60 fps but 100–250x more power; PCD8544 as retro budget option at $1–3 but only 84x48 resolution; full comparison matrix of power, animation, sunlight readability, battery life, and pricing)
+
+---
+
+## Prompt #132
+- **Date/Time:** 2026-04-13
+- **Prompt:** "Get all the session prompts for this project and add to the prompts and commit and push the code."
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~15,000
+- **Files Created/Modified:**
+  - `PromptProgression.md` (modified — added Prompts #119–132)
+  - `docs/peer-discovery-research.md` (created)
+  - `docs/hardware-research.md` (modified)
+  - All changes committed and pushed

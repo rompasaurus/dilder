@@ -429,6 +429,215 @@ For maximum runtime without changing the enclosure, a **2000mAh** cell (60×40×
 
 ---
 
+## Flash Memory Expansion
+
+The Pico W's 2MB onboard flash is soldered to the board and cannot be upgraded in-place. If future features (large encounter logs, creature databases, asset storage) outgrow the onboard flash, external storage can be added via the second SPI bus.
+
+### Current Flash Budget
+
+| Consumer | Estimated Size | Notes |
+|---|---|---|
+| Firmware code | ~200–500KB | Grows with features but well within 2MB |
+| Peer discovery + breeding data | ~3.4KB | Encounter log, offspring, trait tables |
+| Future creature assets / lookup tables | ~10–50KB | Conservative upper bound for modular trait system |
+| **Headroom remaining** | **~1.4–1.8MB** | On the current 2MB Pico W |
+
+The breeding system and peer discovery need negligible flash. Expansion is only relevant if the project grows to include large asset libraries, sound samples, or extensive save data.
+
+### Option 0: Board Upgrade (More Onboard Flash)
+
+Before adding external hardware, consider boards with more built-in flash.
+
+| Board | Chip | Flash | SRAM | WiFi | BLE | Price | SDK Compatibility |
+|---|---|---|---|---|---|---|---|
+| **Pico W** (current) | RP2040 | 2MB | 264KB | Yes | Yes | ~$6 | Pico SDK (current) |
+| **Pico 2 W** | RP2350 | 4MB | 520KB | Yes | BLE 5.2 | ~$7.50 | Pico SDK 2.x (backwards-compatible) |
+| **Adafruit Feather RP2040** | RP2040 | 8MB | 264KB | No | No | ~$12 | Pico SDK (compatible) |
+| **SparkFun Thing Plus RP2040** | RP2040 | 16MB | 264KB | No | No | ~$18 | Pico SDK (compatible) |
+| **Pimoroni Pico Plus 2 W** | RP2350 | **16MB** | 520KB + **8MB PSRAM** | **Yes** | **BLE 5.2** | ~$14 | Pico SDK 2.x (compatible) |
+
+**Key findings:**
+- No RP2040/RP2350 board ships with more than 16MB onboard flash. NAND (100+ MB) is always an external add-on — microcontroller boards are sized for firmware, not bulk storage.
+- The **Pimoroni Pico Plus 2 W** is the standout: 16MB flash (4x Pico 2 W), 8MB PSRAM for runtime data, WiFi + BLE, same RP2350 chip. At ~$14 it's the most flash you can get without external hardware.
+- The Adafruit and SparkFun boards lack WiFi/BLE, which blocks peer discovery — they're not viable for Dilder without an external wireless module.
+- The **Pico 2 W** remains the best value for the standard roadmap at ~$7.50.
+
+#### Power Consumption Comparison
+
+| Board | Active (WiFi off) | Active (WiFi on) | Deep Sleep | Notes |
+|---|---|---|---|---|
+| **Pico W** (current) | ~28mA | ~80mA | ~1.0mA | Baseline |
+| **Pico 2 W** | ~32mA | ~85mA | ~0.7mA | Slightly higher active, better sleep |
+| **Adafruit Feather RP2040** | ~25mA | N/A (no WiFi) | ~1.0mA | Similar to Pico W (same RP2040) |
+| **SparkFun Thing Plus RP2040** | ~25mA | N/A (no WiFi) | ~1.0mA | Similar to Pico W (same RP2040) |
+| **Pimoroni Pico Plus 2 W** | ~35–40mA | ~90–100mA | ~0.8–1.0mA | Slightly higher due to PSRAM (continuous refresh ~2–5mA) |
+
+The Pimoroni Pico Plus 2 W draws slightly more power than the Pico 2 W because the 8MB PSRAM requires periodic refresh cycles even when idle. Estimated battery life impact:
+
+| Board | 1000mAh battery (Tamagotchi mode) |
+|---|---|
+| **Pico W** | ~6.8 days |
+| **Pico 2 W** | ~6.4 days |
+| **Pimoroni Pico Plus 2 W** | ~5.5–6.0 days |
+
+The ~0.5–1 day difference from PSRAM overhead is minor. If 16MB onboard flash eliminates the need for an external NAND chip (which itself draws ~5mA during reads), the Pimoroni board may actually break even on power.
+
+#### Board Recommendation for Flash
+
+- **Standard path:** Pico 2 W (~$7.50) — 4MB is plenty for the current roadmap. Add external NAND later only if needed.
+- **Maximum onboard flash:** Pimoroni Pico Plus 2 W (~$14) — 16MB flash + 8MB PSRAM, WiFi + BLE, same SDK. Worth it if you want headroom without external chips.
+- **100+ MB:** Any board above + external W25N NAND chip (~$2–5) or MicroSD (~$5). No board in this class ships with that much built in.
+
+### Option 1: SPI Flash Chip (Best for Dilder)
+
+A dedicated SPI NOR flash chip on the Pico's second SPI bus (SPI0). This is the standard microcontroller approach for external storage.
+
+| Chip | Capacity | Interface | Speed | Package | Price | Source |
+|---|---|---|---|---|---|---|
+| **W25Q16JV** | 2MB | SPI / Dual / Quad | 133MHz | SOIC-8 | ~$0.40 | AliExpress, LCSC, Mouser |
+| **W25Q32JV** | 4MB | SPI / Dual / Quad | 133MHz | SOIC-8 | ~$0.50 | AliExpress, LCSC, Mouser |
+| **W25Q64JV** | 8MB | SPI / Dual / Quad | 133MHz | SOIC-8 | ~$0.60 | AliExpress, LCSC, Mouser |
+| **W25Q128JV** | **16MB** | SPI / Dual / Quad | 133MHz | SOIC-8 | ~$0.80 | AliExpress, LCSC, Mouser |
+
+**Recommended: W25Q128JV (16MB, ~$0.80).** At this price point there's no reason to go smaller. 16MB is 8x the Pico W's onboard flash.
+
+**Wiring (SPI0):**
+
+| Flash Pin | Function | Pico W GPIO | Pico W Pin # |
+|---|---|---|---|
+| CS | Chip Select | GP17 | 22 |
+| CLK | SPI Clock | GP18 (SPI0 SCK) | 24 |
+| DI (MOSI) | Data In | GP19 (SPI0 TX) | 25 |
+| DO (MISO) | Data Out | GP16 (SPI0 RX) | 21 |
+| WP | Write Protect | 3V3 (tied high) | 36 |
+| HOLD | Hold | 3V3 (tied high) | 36 |
+| VCC | Power | 3V3 | 36 |
+| GND | Ground | GND | 38 |
+
+**GPIO cost:** 4 pins (GP16–GP19), using SPI0 which is currently free. Leaves 10+ GPIO still available.
+
+**Software:** The Pico SDK includes `hardware_spi` for raw SPI access. Winbond W25Q chips use a standard command set (read: `0x03`, write: `0x02`, erase: `0x20`). A simple read/write driver is ~100 lines of C. Community libraries exist (e.g., `pico-w25q`).
+
+**Breadboard note:** SOIC-8 is a surface-mount package (not breadboard-friendly). For prototyping, use a **SOIC-8 to DIP breakout board** (~$0.50 for a pack of 10) or buy a **pre-mounted module** (see below).
+
+### Option 2: SPI Flash Module (Breadboard-Friendly)
+
+Pre-assembled breakout boards with a W25Q chip already soldered, with DIP header pins for direct breadboard use.
+
+| Module | Capacity | Price | Notes |
+|---|---|---|---|
+| W25Q32 breakout (generic) | 4MB | ~$1.50–2.50 | Common on AliExpress, 6-pin or 8-pin DIP |
+| W25Q128 breakout (generic) | 16MB | ~$2.00–3.50 | Same form factor, just larger chip |
+| Adafruit SPI Flash (W25Q128) | 16MB | ~$5.95 | Higher quality, well-documented, STEMMA QT option |
+
+**Recommended for prototyping: Generic W25Q128 breakout (~$2.50).** Same wiring as Option 1, but plugs directly into the breadboard. Upgrade to the bare SOIC-8 chip for the final PCB.
+
+### Option 3: SPI NAND Flash (100+ MB)
+
+For high-capacity storage without an SD card, SPI NAND flash chips offer 128MB–1GB in the same SOIC-8 package as the NOR chips above. Same SPI0 wiring, same pinout — just a different command set and page-based access.
+
+| Chip | Capacity | Interface | Speed | Package | Price | Source |
+|---|---|---|---|---|---|---|
+| **W25N512GV** | 64MB | SPI / Quad | 104MHz | SOIC-8 | ~$1.00–1.50 | AliExpress, LCSC, Mouser |
+| **W25N01GV** | **128MB** | SPI / Quad | 104MHz | SOIC-8 | ~$1.50–2.50 | AliExpress, LCSC, Mouser |
+| **W25N02KV** | **256MB** | SPI / Quad | 104MHz | SOIC-8 | ~$3.00–4.00 | AliExpress, LCSC, Mouser |
+| **W25M02GV** | **256MB** | SPI / Quad | 104MHz | SOIC-8 (stacked die) | ~$4.00–5.00 | AliExpress, LCSC, Mouser |
+| **W25N04KV** | **512MB** | SPI / Quad | 104MHz | SOIC-8 | ~$5.00–7.00 | LCSC, Mouser |
+| **W25N01GV x2 (stacked)** | **256MB** | SPI / Quad | 104MHz | 2x SOIC-8 (shared bus, separate CS) | ~$3.00–5.00 | Use 1 extra GPIO for second CS |
+
+**Wiring:** Identical to the NOR flash chips (Option 1) — same 4 GPIO on SPI0.
+
+**Breakout modules:** Less common than NOR breakouts, but generic W25N01GV modules exist on AliExpress for ~$2.50–4.00. For breadboard prototyping, a bare chip on a SOIC-8 to DIP adapter (~$0.50) also works.
+
+#### NOR vs NAND — Key Differences
+
+| | NOR (W25Q series) | NAND (W25N series) |
+|---|---|---|
+| Max affordable capacity | ~16–32MB | **128MB–512MB** |
+| Read access | Byte-addressable, random access | Page-based (2KB pages) |
+| Write | Byte/page program | Page program only (2KB) |
+| Erase granularity | 4KB sector erase | **128KB block erase** |
+| Bad blocks | None — every block guaranteed | **Must manage bad block table** |
+| Read speed | Fast random reads | Fast sequential, slower random |
+| Driver complexity | Simple (~100 lines of C) | Moderate (~300–500 lines, need bad block management) |
+| Wear leveling | Not needed at low write rates | **Recommended** — NAND blocks wear faster |
+
+**Software:** No Pico SDK built-in support for NAND. You need a driver that handles:
+1. Page-based read/write (2KB aligned)
+2. Bad block table (BBT) — scan on first boot, skip known-bad blocks
+3. Optional wear leveling if writes are frequent (a simple block rotation scheme is sufficient)
+
+This is ~300–500 lines of C — more work than NOR but well within reach. The dhara library (open-source NAND FTL) is a lightweight option that handles bad blocks and wear leveling in ~1,500 lines of C.
+
+**Best for:** Large asset storage (sound samples, sprite libraries, extensive creature databases) where you need 100+ MB but want to avoid the SD card form factor and filesystem overhead.
+
+### Option 4: MicroSD Card (Simplest Path to 100+ MB)
+
+An SD card module communicates over SPI and provides gigabytes of storage. The easiest way to get massive capacity with the least software complexity for large storage.
+
+| Module | Capacity | Price | Source |
+|---|---|---|---|
+| Generic MicroSD SPI module | — (card-dependent) | ~$1.00–2.00 (module only) | AliExpress, Amazon |
+| + MicroSD card (8GB) | 8GB (8,192MB) | ~$3.00–4.00 | Amazon, any retailer |
+| + MicroSD card (32GB) | 32GB (32,768MB) | ~$4.00–6.00 | Amazon, any retailer |
+| **Total (module + 8GB card)** | **8GB** | **~$4.00–6.00** | |
+
+**Wiring:** Same as SPI flash (4 GPIO on SPI0). Slightly higher power draw (~20–30mA during read/write vs ~5mA for NAND flash).
+
+**Software:** Requires a FAT filesystem library (FatFS). Well-documented for the Pico SDK — the `pico-extras` repo includes an SD card SPI example. More setup than raw NOR but less custom code than NAND (FatFS is battle-tested and handles all the block management internally).
+
+**Advantages over NAND:**
+- PC-readable — pop the card out and browse files on any computer
+- Swappable — upgrade capacity by swapping cards
+- No bad block management — the SD card controller handles this internally
+- FatFS is a proven library vs. writing a custom NAND driver
+
+**Disadvantages:**
+- Physically larger — the SD module adds ~24x18mm to the board footprint
+- Higher power draw (~20–30mA active vs ~5mA for NAND)
+- Slightly slower random access due to FAT filesystem overhead
+- Moving part (removable card) — less robust for a handheld device
+
+### Comparison Summary
+
+| Option | Capacity | Cost | GPIO | Power (active) | Breadboard Ready | Complexity | Best For |
+|---|---|---|---|---|---|---|---|
+| **Pico 2 W upgrade** | 4MB (+2MB) | ~$1.50 | 0 | +4mA | Yes | None | First step — do this regardless |
+| **Pimoroni Pico Plus 2 W** | **16MB onboard** | ~$14 | 0 | +7–12mA | Yes | None | Max onboard flash + PSRAM |
+| **W25Q128 NOR chip** | +16MB external | ~$0.80 | 4 (SPI0) | +5mA (read) | No (needs breakout) | Low | Final PCB, up to 16MB |
+| **W25Q128 NOR breakout** | +16MB external | ~$2.50 | 4 (SPI0) | +5mA (read) | Yes | Low | Prototyping, up to 16MB |
+| **Adafruit SPI Flash** | +16MB external | ~$5.95 | 4 (SPI0) | +5mA (read) | Yes | Low | Best documentation |
+| **W25N01GV NAND chip** | **+128MB external** | ~$1.50–2.50 | 4 (SPI0) | +5mA (read) | No (needs breakout) | Medium | 100+ MB on final PCB |
+| **W25N02KV NAND chip** | **+256MB external** | ~$3.00–4.00 | 4 (SPI0) | +5mA (read) | No (needs breakout) | Medium | 256MB on final PCB |
+| **W25N04KV NAND chip** | **+512MB external** | ~$5.00–7.00 | 4 (SPI0) | +5mA (read) | No (needs breakout) | Medium | Maximum NAND capacity |
+| **MicroSD module + 8GB** | **+8GB external** | ~$4.00–6.00 | 4 (SPI0) | +20–30mA (read) | Yes | Medium | Easiest 100+ MB, PC-readable |
+| **MicroSD module + 32GB** | **+32GB external** | ~$5.00–8.00 | 4 (SPI0) | +20–30mA (read) | Yes | Medium | Maximum cheap storage |
+
+### External Flash Power Consumption
+
+| Storage Type | Active Read | Active Write | Standby | Notes |
+|---|---|---|---|---|
+| **NOR flash (W25Q)** | ~5mA | ~10–15mA | <1µA | Near-zero idle draw, brief write spikes |
+| **NAND flash (W25N)** | ~5mA | ~10–15mA | <1µA | Similar to NOR; writes are page-based (2KB chunks) |
+| **MicroSD card** | ~20–30mA | ~30–50mA | ~0.1–0.2mA | Highest draw; SD controller always partially active |
+| **PSRAM (Pimoroni board)** | ~2–5mA | ~2–5mA | ~2–5mA (refresh) | Always-on refresh is the cost — no true standby |
+
+For Tamagotchi mode (mostly sleeping, brief bursts of activity), NOR and NAND flash are effectively free — standby is <1µA. MicroSD costs ~0.1–0.2mA even when idle, which adds ~0.1 day battery drain on 1000mAh. PSRAM's constant refresh is the most significant but still minor (~0.5–1 day impact).
+
+### Recommendation
+
+1. **Now:** Don't worry about it. The 2MB onboard flash has ~1.5MB of headroom — more than enough for the current roadmap including breeding.
+2. **When upgrading the board:** Move to the **Pico 2 W** for 4MB flash at ~$1.50 extra cost.
+3. **If you want max onboard flash:** The **Pimoroni Pico Plus 2 W** (~$14) gives 16MB flash + 8MB PSRAM with no external wiring. ~0.5–1 day battery life trade-off from PSRAM refresh.
+4. **If you need up to 16MB external:** Add a **W25Q128 NOR breakout** (~$2.50) for prototyping, bare chip (~$0.80) for the final PCB. Simplest driver, no bad block headaches, near-zero power impact.
+5. **If you need 100+ MB:** Two viable paths:
+   - **MicroSD module + card (~$5)** — easiest software (FatFS), PC-readable, swappable. Highest power draw (+20–30mA active). Best if form factor allows.
+   - **W25N01GV NAND chip (~$2)** — smaller footprint, lower power (+5mA active, <1µA standby), no moving parts. Better for a compact handheld, but requires a custom NAND driver with bad block management.
+
+Total cost for maximum compact storage: **~$5.50** (Pico 2 W upgrade + W25N02KV NAND = 4MB onboard + 256MB external = 260MB total, no SD card slot needed, +5mA active draw only during reads).
+
+---
+
 ## Prototype Enclosure Concept
 
 > Enclosure design is deferred until Phase 5/6 when we migrate to the Pi Zero. The Pico W prototype lives on a breadboard.
