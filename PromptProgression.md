@@ -1636,8 +1636,24 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Files Created/Modified:**
   - `website/docs/docs/hardware/joystick-wiring.md` (created — full wiring guide with TOC, step-by-step instructions, wiring diagram, C and MicroPython test code, debounce notes, GPIO budget, future expansion compatibility, troubleshooting table)
   - `website/mkdocs.yml` (modified — added Joystick Wiring nav entry under Hardware)
-  - `website/docs/docs/hardware/materials-list.md` (modified — added DollaTek 5-Way Navigation Button Module to essential components)
-  - `website/docs/docs/hardware/wiring-pinout.md` (modified — added joystick module cross-reference tip box)
+  - `website/docs/docs/hardware/materials-list.md` (modified — added DollaTek 5-Way Navigation Button Module)
+  - `website/docs/docs/hardware/wiring-pinout.md` (modified — added joystick module cross-reference)
   - `PromptProgression.md` (modified — added Prompt #133)
   - `website/docs/prompts/index.md` (modified — added Prompts #114–133)
+  - All changes committed and pushed
+
+---
+
+## Prompt #134
+- **Date/Time:** 2026-04-13
+- **Prompt:** "OK let's also make a plan for this component as well: InnCraft Energy Lithium Polymer Battery 1000 mAh 3.7V, 51x34x5 Model 503450 2P Molex 51021-020 1.25mm Connection. Guide me through wiring this up and make another MD hardware doc on this."
+- **Input Tokens (est):** ~100
+- **Output Tokens (est):** ~25,000
+- **Files Created/Modified:**
+  - `website/docs/docs/hardware/battery-wiring.md` (created — full LiPo wiring guide with TOC, 3 wiring options, step-by-step for direct and TP4056, safety guide, voltage monitoring code in C and MicroPython, battery life estimates, charging behavior, troubleshooting)
+  - `website/mkdocs.yml` (modified — added Battery Wiring nav entry under Hardware)
+  - `website/docs/docs/hardware/materials-list.md` (modified — updated 1000mAh battery entry with InnCraft product link and Molex connector details)
+  - `website/docs/docs/hardware/wiring-pinout.md` (modified — added battery VSYS/GND to pin budget table and cross-reference)
+  - `PromptProgression.md` (modified — added Prompts #133–134)
+  - `website/docs/prompts/index.md` (modified — added Prompt #134)
   - All changes committed and pushed

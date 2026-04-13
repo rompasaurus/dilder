@@ -48,7 +48,7 @@ Order these when you're ready to move off USB power. See [Hardware Research](htt
 
 | Item | Est. Cost | Notes |
 |------|-----------|-------|
-| 3.7V LiPo battery (1000mAh, recommended) | ~€7 | JST PH 2.0mm connector, 50×34×5mm. Wires directly to VSYS — no boost converter needed. Provides ~6.8 days in Tamagotchi mode. |
+| 3.7V LiPo battery (1000mAh, recommended) | ~€8 | [InnCraft Energy 503450](https://www.amazon.de/dp/B0F88RQX7C) — Molex 51021-0200 1.25mm connector, 51×34×5mm. Wires directly to VSYS — no boost converter needed. Provides ~6.8 days in Tamagotchi mode. See [Battery Wiring Guide](battery-wiring.md). |
 | 3.7V LiPo battery (2000mAh, max runtime) | ~€10 | 60×40×7mm. ~13.6 days in Tamagotchi mode. Verify enclosure clearance (7mm thick). |
 | TP4056 charging module (budget) | ~€1.50 | USB charging with over-discharge protection. Output wires to VSYS pin. |
 | Adafruit PowerBoost 500C (upgrade) | ~€16 | LiPo charger + 5V boost + load sharing (use device while charging). Has low-battery output pin. |

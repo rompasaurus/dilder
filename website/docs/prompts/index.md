@@ -1148,3 +1148,13 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Input Tokens (est):** ~250
 - **Output Tokens (est):** ~30,000
 - **Files:** `website/docs/docs/hardware/joystick-wiring.md` (created — full wiring guide with TOC, step-by-step instructions, diagrams, test code, troubleshooting), `website/mkdocs.yml` (added joystick nav entry), `website/docs/docs/hardware/materials-list.md` (added DollaTek module), `website/docs/docs/hardware/wiring-pinout.md` (added joystick cross-reference), `PromptProgression.md` (#133), `website/docs/prompts/index.md` (#114–133)
+
+---
+
+## Prompt #134 — 2026-04-13
+
+**Prompt:** "OK let's also make a plan for this component as well: InnCraft Energy Lithium Polymer Battery 1000 mAh 3.7V, 51x34x5 Model 503450 2P Molex 51021-020 1.25mm Connection. Guide me through wiring this up and make another MD hardware doc on this."
+
+- **Input Tokens (est):** ~100
+- **Output Tokens (est):** ~25,000
+- **Files:** `website/docs/docs/hardware/battery-wiring.md` (created — full LiPo wiring guide with TOC, 3 wiring options, step-by-step for direct and TP4056, safety guide, voltage monitoring code, battery life estimates, charging behavior, troubleshooting), `website/mkdocs.yml` (added Battery Wiring nav entry), `website/docs/docs/hardware/materials-list.md` (updated with InnCraft battery product link), `website/docs/docs/hardware/wiring-pinout.md` (added battery power entry and cross-reference), `PromptProgression.md` (#134), `website/docs/prompts/index.md` (#134)

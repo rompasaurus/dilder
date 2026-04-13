@@ -105,9 +105,14 @@ if BUTTONS['center'].value() == 0:
 | Button LEFT | GP4 | 6 | Digital in |
 | Button RIGHT | GP5 | 7 | Digital in |
 | Button CENTER | GP6 | 9 | Digital in |
+| Battery VSYS | — | 39 | Power in (1.8–5.5V) |
+| Battery GND | — | 38 | Ground (shared with display) |
 | Piezo buzzer (future) | GP15 | 20 | PWM |
-| **Pins used** | **12** | | |
+| **Pins used** | **12 GPIO + 2 power** | | |
 | **Pins free** | **14+ GPIO remaining** | | |
+
+!!! tip "Battery power"
+    The 3.7V LiPo connects to VSYS (pin 39) and GND (pin 38) — no GPIO pins consumed. See the dedicated [Battery Wiring Guide](battery-wiring.md) for full setup instructions, charging options, and voltage monitoring.
 
 ---
 
