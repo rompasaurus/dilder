@@ -948,3 +948,203 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Input Tokens (est):** ~25
 - **Output Tokens (est):** ~20,000
 - **Files:** `PromptProgression.md` (#112–117), `website/docs/prompts/index.md` (#108–113)
+
+---
+
+## Prompt #114 — 2026-04-12
+
+**Prompt:** "We need to organize the programs — they are getting too complex. Let's make a tree structure for it that expands and collapses. Use your best judgment, don't make it more than 3 deep."
+
+- **Input Tokens (est):** ~35
+- **Output Tokens (est):** ~15,000
+- **Files:** `DevTool/devtool.py` (replaced flat `tk.Listbox` with collapsible `ttk.Treeview`; added `PROGRAM_TREE` hierarchy, `_TOOL_PROGRAMS` dict, `_tree_id_to_key` mapping; styled with dark theme)
+
+---
+
+## Prompt #115 — 2026-04-12
+
+**Prompt:** (Runtime error: `_tkinter.TclError: unknown option "-width"` — `ttk.Treeview` does not accept a `width` constructor argument)
+
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~500
+- **Files:** `DevTool/devtool.py` (replaced `width=28` with `.column("#0", width=220)`)
+
+---
+
+## Prompt #116 — 2026-04-12
+
+**Prompt:** "I think we need to add a level for 'Octopus' to contain all the things below Tools."
+
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~2,000
+- **Files:** `DevTool/devtool.py` (merged "Emotional States" and "Interactive" under single "Octopus" top-level node)
+
+---
+
+## Prompt #117 — 2026-04-12
+
+**Prompt:** "OK run through all the session prompts for this project again and update the prompt document. Fix grammar while you're at it."
+
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~20,000
+- **Files:** `PromptProgression.md` (#112–117), `website/docs/prompts/index.md` (#108–113)
+
+---
+
+## Prompt #118 — 2026-04-12
+
+**Prompt:** "OK run through all the session prompts for this project again and update the prompt document. Fix grammar while you're at it." (Duplicate of #117 — prompted commit of uncommitted changes)
+
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~2,000
+- **Files:** `PromptProgression.md` (#118), `DevTool/devtool.py`, `website/docs/prompts/index.md` — all committed and pushed
+
+---
+
+## Prompt #119 — 2026-04-13
+
+**Prompt:** "I've done a bit of research on the Pico and since the Raspberry Pi Pico W features the CYW43439 chip, it supports both Wi-Fi and Bluetooth (BLE)... What I would like to have is a feature that synchronizes with other Picos running this pet and provides a bonus or notification to indicate that you discovered other players. Add a research document for this feature to the root docs folder."
+
+- **Input Tokens (est):** ~500
+- **Output Tokens (est):** ~8,000
+- **Files:** `docs/peer-discovery-research.md` (created — BLE discovery protocol, 13-byte handshake packet, reward system, phased implementation plan A–E)
+
+---
+
+## Prompt #120 — 2026-04-13
+
+**Prompt:** "I think another component of peer discovery would be mating prospects to create unique offspring based on the other types of creatures met via proximity."
+
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~6,000
+- **Files:** `docs/peer-discovery-research.md` (added Mating & Offspring System: 17-bit genome encoding 6 traits, 45/45/10 inheritance algorithm, egg/hatching lifecycle, BLE protocol extension)
+
+---
+
+## Prompt #121 — 2026-04-13
+
+**Prompt:** "I suppose with a mating system we could generate unique animals and creatures as a result based on this but would it get too complex to compute this on a Pico?"
+
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~4,000
+- **Files:** `docs/peer-discovery-research.md` (added Computational Feasibility section: sub-microsecond genetics, 131,072 unique combinations from ~308 bytes of lookup tables, confirming Pico W has orders of magnitude more resources than needed)
+
+---
+
+## Prompt #122 — 2026-04-13
+
+**Prompt:** "Also tell me what it would take to add more flash memory if that would be needed."
+
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~6,000
+- **Files:** `docs/hardware-research.md` (added Flash Memory Expansion section: SPI NOR chips W25Q16–W25Q128, MicroSD, Pico 2 W upgrade path, tiered recommendation)
+
+---
+
+## Prompt #123 — 2026-04-13
+
+**Prompt:** "Is there a way to get 100+ MB of flash?"
+
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~2,500
+- **Files:** No files — conversational response explaining SPI NAND flash and recommendation that MicroSD is better for 100+ MB
+
+---
+
+## Prompt #124 — 2026-04-13
+
+**Prompt:** "Give the price and update the docs."
+
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~8,000
+- **Files:** `docs/hardware-research.md` (added SPI NAND Flash section with W25N512GV–W25N04KV pricing, NOR vs NAND comparison, updated recommendation with two paths to 100+ MB)
+
+---
+
+## Prompt #125 — 2026-04-13
+
+**Prompt:** "How much more power hungry is the Pi Zero?"
+
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~1,500
+- **Files:** No files — conversational response: Pi Zero W draws 3.2x more active power, 35x more in sleep, ~12 hours on 1000mAh vs 6.8 days for Pico W
+
+---
+
+## Prompt #126 — 2026-04-13
+
+**Prompt:** "Can I get a Pico with a larger NAND memory somewhere somehow?"
+
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~3,000
+- **Files:** No files — conversational response listing RP2040/RP2350 boards with extra NOR flash including Pimoroni Pico Plus 2 W with 16MB flash + 8MB PSRAM at ~$14
+
+---
+
+## Prompt #127 — 2026-04-13
+
+**Prompt:** "Add this to the doc and give the power consumption estimates."
+
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~8,000
+- **Files:** `docs/hardware-research.md` (expanded board upgrade comparison with power consumption and battery life estimates for Pimoroni Pico Plus 2 W, Adafruit Feather RP2040, SparkFun Thing Plus RP2040)
+
+---
+
+## Prompt #128 — 2026-04-13
+
+**Prompt:** "Let's look at the Chinese market and tell me if there is a Pico-like board with Wi-Fi and a lot of memory."
+
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~8,000
+- **Files:** No files — research on ESP32-S3 boards from WeAct/Luatos/YD/Lolin with 16MB flash + 8MB PSRAM + WiFi + BLE at $3.50–6; trade-off analysis of Pico SDK vs ESP-IDF migration
+
+---
+
+## Prompt #129 — 2026-04-13
+
+**Prompt:** "Give me the processor specs and speed."
+
+- **Input Tokens (est):** ~10
+- **Output Tokens (est):** ~6,000
+- **Files:** No files — detailed ESP32-S3 vs RP2040 vs RP2350 comparison: CPU architecture, clock speeds, FPU, DSP, benchmarks, power consumption
+
+---
+
+## Prompt #130 — 2026-04-13
+
+**Prompt:** "Also give me the documentation rating for these options and how easy code would be given the docs and API and resources available."
+
+- **Input Tokens (est):** ~25
+- **Output Tokens (est):** ~2,000
+- **Files:** No files — developer experience ratings for Pico SDK, Pico SDK 2.x, and ESP-IDF across documentation, API clarity, community support, BLE maturity, and toolchain setup
+
+---
+
+## Prompt #131 — 2026-04-13
+
+**Prompt:** "Other than e-ink, what is another very low watt screen option for this project?"
+
+- **Input Tokens (est):** ~15
+- **Output Tokens (est):** ~6,000
+- **Files:** No files — research on Sharp Memory LCD (1uA standby, 10–20 fps), SSD1306 OLED ($2–5, 60 fps but higher power), Nokia PCD8544 ($1–3, 84x48); comparison matrix of power, animation, sunlight readability, battery life
+
+---
+
+## Prompt #132 — 2026-04-13
+
+**Prompt:** "Get all the session prompts for this project and add to the prompts and commit and push the code."
+
+- **Input Tokens (est):** ~20
+- **Output Tokens (est):** ~15,000
+- **Files:** `PromptProgression.md` (#119–132), `docs/peer-discovery-research.md`, `docs/hardware-research.md` — all committed and pushed
+
+---
+
+## Prompt #133 — 2026-04-13
+
+**Prompt:** "OK today I should be receiving this DollaTek 5pcs Five Direction Navigation Button Module for MCU AVR Game 5D Rocker Joystick... let's make a wiring and setup plan to begin testing this component with the Pico board and suggest the ideal way to wire this given the screen and headers already being used and also tell me if a GPS module could be attached along with an accelerometer."
+
+- **Input Tokens (est):** ~250
+- **Output Tokens (est):** ~30,000
+- **Files:** `website/docs/docs/hardware/joystick-wiring.md` (created — full wiring guide with TOC, step-by-step instructions, diagrams, test code, troubleshooting), `website/mkdocs.yml` (added joystick nav entry), `website/docs/docs/hardware/materials-list.md` (added DollaTek module), `website/docs/docs/hardware/wiring-pinout.md` (added joystick cross-reference), `PromptProgression.md` (#133), `website/docs/prompts/index.md` (#114–133)

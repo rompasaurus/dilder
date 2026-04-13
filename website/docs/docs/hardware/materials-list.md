@@ -24,7 +24,8 @@ Order these first. Everything else can wait.
 | Half-size breadboard | ~€4 | For wiring buttons and display connections. |
 | Jumper wire kit (M-F and M-M) | ~€4 | **Required** — the display HAT cannot plug directly into the Pico W. Use F-M wires from the HAT's 8-pin header to the breadboard. |
 | 6×6mm tactile buttons (pack of 20) | ~€3 | Various stem heights. Snap-on colored caps recommended for identifying buttons. |
-| **Subtotal** | **~€34** | |
+| DollaTek 5-Way Navigation Button Module | ~€8.17 (5-pack) | [B07HBPW3DF](https://www.amazon.de/dp/B07HBPW3DF) — 5-direction rocker joystick (Up/Down/Left/Right/Center). GPIO digital input, active LOW. Drop-in replacement for the 5 tactile buttons above. See [Joystick Wiring Guide](joystick-wiring.md). |
+| **Subtotal** | **~€42** | |
 
 ---
 

@@ -112,6 +112,7 @@ nav:
       - Hardware:
           - Materials List: docs/hardware/materials-list.md
           - Wiring & Pinout: docs/hardware/wiring-pinout.md
+          - Joystick Wiring: docs/hardware/joystick-wiring.md
           - Enclosure Design: docs/hardware/enclosure-design.md
           - 3D Printing Pipeline: docs/hardware/3d-printing-pipeline.md
       - Setup:

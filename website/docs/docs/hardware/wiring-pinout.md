@@ -47,6 +47,9 @@ The Waveshare 2.13" e-Paper HAT is designed for the Pi Zero's 40-pin header, but
 
 Five 6×6mm tactile buttons wired to GPIO pins using the Pico W's internal pull-up resistors. No external resistors needed.
 
+!!! tip "Joystick module alternative"
+    The DollaTek 5-Way Navigation Button Module can replace the five individual tactile buttons with identical wiring (same GPIOs, same pull-up config). See the dedicated [Joystick Wiring Guide](joystick-wiring.md) for full setup instructions.
+
 **Per-button wiring:**
 ```
 Pico GPIO pin ──── button leg A

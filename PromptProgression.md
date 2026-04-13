@@ -1625,3 +1625,19 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `docs/peer-discovery-research.md` (created)
   - `docs/hardware-research.md` (modified)
   - All changes committed and pushed
+
+---
+
+## Prompt #133
+- **Date/Time:** 2026-04-13
+- **Prompt:** "OK today I should be receiving this DollaTek 5pcs Five Direction Navigation Button Module for MCU AVR Game 5D Rocker Joystick... let's make a wiring and setup plan to begin testing this component with the Pico board and suggest the ideal way to wire this given the screen and headers already being used and also tell me if a GPS module could be attached along with an accelerometer."
+- **Input Tokens (est):** ~250
+- **Output Tokens (est):** ~30,000
+- **Files Created/Modified:**
+  - `website/docs/docs/hardware/joystick-wiring.md` (created — full wiring guide with TOC, step-by-step instructions, wiring diagram, C and MicroPython test code, debounce notes, GPIO budget, future expansion compatibility, troubleshooting table)
+  - `website/mkdocs.yml` (modified — added Joystick Wiring nav entry under Hardware)
+  - `website/docs/docs/hardware/materials-list.md` (modified — added DollaTek 5-Way Navigation Button Module to essential components)
+  - `website/docs/docs/hardware/wiring-pinout.md` (modified — added joystick module cross-reference tip box)
+  - `PromptProgression.md` (modified — added Prompt #133)
+  - `website/docs/prompts/index.md` (modified — added Prompts #114–133)
+  - All changes committed and pushed
