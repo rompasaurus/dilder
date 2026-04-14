@@ -77,3 +77,8 @@ __pycache__/
 # VSCode workspace settings (user-specific)
 .vscode/
 hardware-design/kicad/dilder-breadboard/.history
+
+# KiCad lock files and backups
+*.lck
+*-backups/
+hardware-design/Board Design kicad/.history/
