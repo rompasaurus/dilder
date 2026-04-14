@@ -26,7 +26,7 @@
   (text "RASPBERRY PI PICO WH"
     (exclude_from_sim no)
     (at 270 55 0)
-    (effects (font (size 5 5) (bold yes)) (justify center))
+    (effects (font (size 5 5) (bold yes)) (justify left))
     (uuid "b0000002-0000-0000-0000-000000000001")
   )
 
@@ -204,13 +204,13 @@
   (text "GY-NEO6MV2 GPS MODULE"
     (exclude_from_sim no)
     (at 112 68 0)
-    (effects (font (size 3.5 3.5) (bold yes)) (justify center))
+    (effects (font (size 3.5 3.5) (bold yes)) (justify left))
     (uuid "d0010001-0000-0000-0000-000000000001")
   )
   (text "UART 9600 baud"
     (exclude_from_sim no)
     (at 112 76 0)
-    (effects (font (size 2 2) (italic yes)) (justify center))
+    (effects (font (size 2 2) (italic yes)) (justify left))
     (uuid "d0010002-0000-0000-0000-000000000001")
   )
   (text "VCC ----> 3V3 [Pin 36]"
@@ -264,13 +264,13 @@
   (text "DOLLATEK 5-WAY JOYSTICK"
     (exclude_from_sim no)
     (at 112 151 0)
-    (effects (font (size 3.5 3.5) (bold yes)) (justify center))
+    (effects (font (size 3.5 3.5) (bold yes)) (justify left))
     (uuid "d0020001-0000-0000-0000-000000000001")
   )
   (text "Active LOW, internal pull-ups"
     (exclude_from_sim no)
     (at 112 159 0)
-    (effects (font (size 2 2) (italic yes)) (justify center))
+    (effects (font (size 2 2) (italic yes)) (justify left))
     (uuid "d0020002-0000-0000-0000-000000000001")
   )
   (text "UP     ----> GP2 [Pin 4]"
@@ -351,13 +351,13 @@
   (text "WAVESHARE 2.13\" e-PAPER V3"
     (exclude_from_sim no)
     (at 112 246 0)
-    (effects (font (size 3.5 3.5) (bold yes)) (justify center))
+    (effects (font (size 3.5 3.5) (bold yes)) (justify left))
     (uuid "d0030001-0000-0000-0000-000000000001")
   )
   (text "SPI1, 4MHz, 250x122px"
     (exclude_from_sim no)
     (at 112 254 0)
-    (effects (font (size 2 2) (italic yes)) (justify center))
+    (effects (font (size 2 2) (italic yes)) (justify left))
     (uuid "d0030002-0000-0000-0000-000000000001")
   )
   (text "DC   ----> GP8  [Pin 11]"
@@ -438,13 +438,13 @@
   (text "HC-SR04 ULTRASONIC"
     (exclude_from_sim no)
     (at 442 68 0)
-    (effects (font (size 3.5 3.5) (bold yes)) (justify center))
+    (effects (font (size 3.5 3.5) (bold yes)) (justify left))
     (uuid "d0040001-0000-0000-0000-000000000001")
   )
   (text "5V POWER - VOLTAGE DIVIDER ON ECHO"
     (exclude_from_sim no)
     (at 442 76 0)
-    (effects (font (size 2 2) (italic yes)) (justify center))
+    (effects (font (size 2 2) (italic yes)) (justify left))
     (uuid "d0040002-0000-0000-0000-000000000001")
   )
   (text "VCC  <---- VBUS 5V [Pin 40]"
@@ -533,13 +533,13 @@
   (text "SPEAKER / PIEZO BUZZER"
     (exclude_from_sim no)
     (at 442 201 0)
-    (effects (font (size 3.5 3.5) (bold yes)) (justify center))
+    (effects (font (size 3.5 3.5) (bold yes)) (justify left))
     (uuid "d0050001-0000-0000-0000-000000000001")
   )
   (text "GP15 PWM output"
     (exclude_from_sim no)
     (at 442 209 0)
-    (effects (font (size 2 2) (italic yes)) (justify center))
+    (effects (font (size 2 2) (italic yes)) (justify left))
     (uuid "d0050002-0000-0000-0000-000000000001")
   )
   (text "SIMPLE: GP15 [Pin 20] --> Piezo(+)"
