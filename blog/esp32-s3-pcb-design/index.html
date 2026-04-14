@@ -12,31 +12,29 @@
         <meta name="author" content="rompasaurus">
       
       
-        <link rel="canonical" href="https://dilder.dev/blog/archive/2026/page/2/">
+        <link rel="canonical" href="https://dilder.dev/blog/esp32-s3-pcb-design/">
       
       
-        <link rel="prev" href="../../../../category/tools/">
+        <link rel="prev" href="../custom-pcb-research/">
       
-      
-        <link rel="next" href="../../../../../docs/">
       
       
         
       
       
-      <link rel="icon" href="../../../../../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>2026 - Dilder</title>
+        <title>From RP2040 to ESP32-S3 — Designing the Dilder PCB - Dilder</title>
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -55,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -92,7 +90,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#2026" class="md-skip">
+        <a href="#from-rp2040-to-esp32-s3-designing-the-dilder-pcb" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +104,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../../.." title="Dilder" class="md-header__button md-logo" aria-label="Dilder" data-md-component="logo">
+    <a href="../.." title="Dilder" class="md-header__button md-logo" aria-label="Dilder" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73A2 2 0 1 0 10 4c0 .74.4 1.39 1 1.73V7h-1c-3.87 0-7 3.13-7 7H2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h1v1a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2v-1h1c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1M9.7 15.45l-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45m9 0-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45"/></svg>
@@ -126,7 +124,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              2026
+              From RP2040 to ESP32-S3 — Designing the Dilder PCB
             
           </span>
         </div>
@@ -239,7 +237,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../.." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -262,7 +260,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../../../" class="md-tabs__link">
+        <a href="../" class="md-tabs__link">
           
   
   
@@ -282,7 +280,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../docs/" class="md-tabs__link">
+        <a href="../../docs/" class="md-tabs__link">
           
   
   
@@ -302,7 +300,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../community/" class="md-tabs__link">
+        <a href="../../community/" class="md-tabs__link">
           
   
   
@@ -322,7 +320,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../about/" class="md-tabs__link">
+        <a href="../../about/" class="md-tabs__link">
           
   
   
@@ -340,7 +338,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../../prompts/" class="md-tabs__link">
+      <a href="../../prompts/" class="md-tabs__link">
         
   
   
@@ -364,7 +362,9 @@
           
             
               
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
@@ -375,7 +375,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../../.." title="Dilder" class="md-nav__button md-logo" aria-label="Dilder" data-md-component="logo">
+    <a href="../.." title="Dilder" class="md-nav__button md-logo" aria-label="Dilder" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73A2 2 0 1 0 10 4c0 .74.4 1.39 1 1.73V7h-1c-3.87 0-7 3.13-7 7H2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h1v1a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2v-1h1c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1M9.7 15.45l-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45m9 0-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45"/></svg>
@@ -405,7 +405,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -486,12 +486,14 @@
                 
   
   
+    
+  
   
     
   
   
-    <li class="md-nav__item">
-      <a href="../../../../" class="md-nav__link">
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -516,8 +518,6 @@
                 
   
   
-    
-  
   
   
     
@@ -533,11 +533,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
         
           
           <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
@@ -558,7 +558,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -575,19 +575,10 @@
   
   
     
-      
-    
   
   
     <li class="md-nav__item">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="../../" class="md-nav__link md-nav__link--active">
+      <a href="../archive/2026/" class="md-nav__link">
         
   
   
@@ -603,7 +594,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -681,7 +671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../category/architecture/" class="md-nav__link">
+      <a href="../category/architecture/" class="md-nav__link">
         
   
   
@@ -711,7 +701,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../category/design/" class="md-nav__link">
+      <a href="../category/design/" class="md-nav__link">
         
   
   
@@ -741,7 +731,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../category/firmware/" class="md-nav__link">
+      <a href="../category/firmware/" class="md-nav__link">
         
   
   
@@ -771,7 +761,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../category/hardware/" class="md-nav__link">
+      <a href="../category/hardware/" class="md-nav__link">
         
   
   
@@ -801,7 +791,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../category/pcb-design/" class="md-nav__link">
+      <a href="../category/pcb-design/" class="md-nav__link">
         
   
   
@@ -831,7 +821,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../category/planning/" class="md-nav__link">
+      <a href="../category/planning/" class="md-nav__link">
         
   
   
@@ -861,7 +851,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../category/software/" class="md-nav__link">
+      <a href="../category/software/" class="md-nav__link">
         
   
   
@@ -891,7 +881,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../category/tools/" class="md-nav__link">
+      <a href="../category/tools/" class="md-nav__link">
         
   
   
@@ -986,7 +976,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/" class="md-nav__link">
+      <a href="../../docs/" class="md-nav__link">
         
   
   
@@ -1066,7 +1056,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/hardware/materials-list/" class="md-nav__link">
+      <a href="../../docs/hardware/materials-list/" class="md-nav__link">
         
   
   
@@ -1094,7 +1084,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/hardware/wiring-pinout/" class="md-nav__link">
+      <a href="../../docs/hardware/wiring-pinout/" class="md-nav__link">
         
   
   
@@ -1122,7 +1112,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/hardware/joystick-wiring/" class="md-nav__link">
+      <a href="../../docs/hardware/joystick-wiring/" class="md-nav__link">
         
   
   
@@ -1150,7 +1140,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/hardware/battery-wiring/" class="md-nav__link">
+      <a href="../../docs/hardware/battery-wiring/" class="md-nav__link">
         
   
   
@@ -1178,7 +1168,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/hardware/enclosure-design/" class="md-nav__link">
+      <a href="../../docs/hardware/enclosure-design/" class="md-nav__link">
         
   
   
@@ -1206,7 +1196,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/hardware/3d-printing-pipeline/" class="md-nav__link">
+      <a href="../../docs/hardware/3d-printing-pipeline/" class="md-nav__link">
         
   
   
@@ -1294,7 +1284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/setup/first-time-setup/" class="md-nav__link">
+      <a href="../../docs/setup/first-time-setup/" class="md-nav__link">
         
   
   
@@ -1322,7 +1312,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/setup/pi-zero-setup/" class="md-nav__link">
+      <a href="../../docs/setup/pi-zero-setup/" class="md-nav__link">
         
   
   
@@ -1350,7 +1340,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/setup/display-setup/" class="md-nav__link">
+      <a href="../../docs/setup/display-setup/" class="md-nav__link">
         
   
   
@@ -1378,7 +1368,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/setup/dev-environment/" class="md-nav__link">
+      <a href="../../docs/setup/dev-environment/" class="md-nav__link">
         
   
   
@@ -1466,7 +1456,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/design/user-engagement-plan/" class="md-nav__link">
+      <a href="../../docs/design/user-engagement-plan/" class="md-nav__link">
         
   
   
@@ -1494,7 +1484,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/design/custom-pcb-design-research/" class="md-nav__link">
+      <a href="../../docs/design/custom-pcb-design-research/" class="md-nav__link">
         
   
   
@@ -1582,7 +1572,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/software/project-structure/" class="md-nav__link">
+      <a href="../../docs/software/project-structure/" class="md-nav__link">
         
   
   
@@ -1610,7 +1600,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/software/emotion-states/" class="md-nav__link">
+      <a href="../../docs/software/emotion-states/" class="md-nav__link">
         
   
   
@@ -1698,7 +1688,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/tools/devtool/" class="md-nav__link">
+      <a href="../../docs/tools/devtool/" class="md-nav__link">
         
   
   
@@ -1726,7 +1716,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/tools/setup-cli/" class="md-nav__link">
+      <a href="../../docs/tools/setup-cli/" class="md-nav__link">
         
   
   
@@ -1754,7 +1744,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/tools/website-dev/" class="md-nav__link">
+      <a href="../../docs/tools/website-dev/" class="md-nav__link">
         
   
   
@@ -1842,7 +1832,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/reference/pico-w/" class="md-nav__link">
+      <a href="../../docs/reference/pico-w/" class="md-nav__link">
         
   
   
@@ -1870,7 +1860,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/reference/pi-zero-wh/" class="md-nav__link">
+      <a href="../../docs/reference/pi-zero-wh/" class="md-nav__link">
         
   
   
@@ -1898,7 +1888,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/reference/waveshare-eink/" class="md-nav__link">
+      <a href="../../docs/reference/waveshare-eink/" class="md-nav__link">
         
   
   
@@ -1926,7 +1916,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../docs/reference/esp32-s3-wroom1/" class="md-nav__link">
+      <a href="../../docs/reference/esp32-s3-wroom1/" class="md-nav__link">
         
   
   
@@ -2021,7 +2011,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../community/" class="md-nav__link">
+      <a href="../../community/" class="md-nav__link">
         
   
   
@@ -2049,7 +2039,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../community/discord/" class="md-nav__link">
+      <a href="../../community/discord/" class="md-nav__link">
         
   
   
@@ -2077,7 +2067,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../community/support/" class="md-nav__link">
+      <a href="../../community/support/" class="md-nav__link">
         
   
   
@@ -2164,7 +2154,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../about/" class="md-nav__link">
+      <a href="../../about/" class="md-nav__link">
         
   
   
@@ -2192,7 +2182,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../about/contact/" class="md-nav__link">
+      <a href="../../about/contact/" class="md-nav__link">
         
   
   
@@ -2227,7 +2217,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../prompts/" class="md-nav__link">
+      <a href="../../prompts/" class="md-nav__link">
         
   
   
@@ -2255,6 +2245,8 @@
             
             
               
+                
+              
               <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
@@ -2267,6 +2259,163 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-we-left-the-rp2040" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why We Left the RP2040
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enter-the-esp32-s3-wroom-1-n16r8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enter the ESP32-S3-WROOM-1-N16R8
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-pcb-design-journey" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The PCB Design Journey
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The PCB Design Journey">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kicad-setup-and-jlcpcb-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KiCad Setup and JLCPCB Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#component-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Selection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-schematic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Schematic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#board-layout-iteration-after-iteration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Board Layout — Iteration After Iteration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-antenna-keep-out-challenge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Antenna Keep-Out Challenge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-display-connector-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Display Connector Decision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#freerouting-the-autorouter-experiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FreeRouting — The Autorouter Experiment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reference-designs-that-helped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference Designs That Helped
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-we-are-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where We Are Now
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's Next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -2274,272 +2423,259 @@
             
           
           
-  <div class="md-content" data-md-component="content">
-    <div class="md-content__inner">
-      <header class="md-typeset">
-        <h1 id="2026">2026<a class="headerlink" href="#2026" title="Permanent link">&para;</a></h1>
-      </header>
-      
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-      <nav class="md-post__authors md-typeset">
-        
-          <span class="md-author">
-            <img src="https://avatars.githubusercontent.com/u/600873?v=4" alt="rompasaurus">
-          </span>
-        
-      </nav>
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2026-04-11 00:00:00+00:00">April 11, 2026</time></li>
-        
-          <li class="md-meta__item">
-            in
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
             
-              <a href="../../../../category/firmware/" class="md-meta__link">Firmware</a>, 
-              <a href="../../../../category/architecture/" class="md-meta__link">Architecture</a></li>
-        
-        
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="https://avatars.githubusercontent.com/u/600873?v=4" alt="rompasaurus">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          rompasaurus
+                        
+                      </strong>
+                      <br>
+                      Builder
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2026-04-15 00:00:00+00:00" class="md-ellipsis">April 15, 2026</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../category/hardware/">Hardware</a>, 
+                              <a href="../category/pcb-design/">PCB Design</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              6 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
           
-          <li class="md-meta__item">
-            
-              3 min read
-            
-          </li>
-        
-        
-      </ul>
-      
+        </div>
+      </div>
     </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="runtime-rendering-from-4mb-pre-baked-frames-to-30kb-firmware"><a class="toclink" href="../../../../runtime-rendering-revolution/">Runtime Rendering — From 4MB Pre-Baked Frames to 30KB Firmware</a></h2>
-<p>The biggest architectural decision so far: throw away every pre-rendered frame and draw the octopus mathematically at runtime. The firmware went from 4MB to 30KB. This is how and why.</p>
-
-    
-      <nav class="md-post__action">
-        <a href="../../../../runtime-rendering-revolution/">
-          Continue reading
-        </a>
-      </nav>
-    
-    
-  </div>
-</article>
-      
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-      <nav class="md-post__authors md-typeset">
-        
-          <span class="md-author">
-            <img src="https://avatars.githubusercontent.com/u/600873?v=4" alt="rompasaurus">
-          </span>
-        
-      </nav>
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2026-04-11 00:00:00+00:00">April 11, 2026</time></li>
-        
-          <li class="md-meta__item">
-            in
-            
-              <a href="../../../../category/software/" class="md-meta__link">Software</a>, 
-              <a href="../../../../category/firmware/" class="md-meta__link">Firmware</a></li>
-        
-        
-          
-          <li class="md-meta__item">
-            
-              3 min read
-            
-          </li>
-        
-        
-      </ul>
-      
-    </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="the-sassy-octopus-is-born"><a class="toclink" href="../../../../sassy-octopus-born/">The Sassy Octopus is Born</a></h2>
-<p>Meet the first resident of Dilder. She's got a smirk, two round eyes, five wavy tentacles, and 196 opinions about WiFi, toasters, and the meaning of ink.</p>
-
-    
-      <nav class="md-post__action">
-        <a href="../../../../sassy-octopus-born/">
-          Continue reading
-        </a>
-      </nav>
-    
-    
-  </div>
-</article>
-      
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-      <nav class="md-post__authors md-typeset">
-        
-          <span class="md-author">
-            <img src="https://avatars.githubusercontent.com/u/600873?v=4" alt="rompasaurus">
-          </span>
-        
-      </nav>
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2026-04-10 00:00:00+00:00">April 10, 2026</time></li>
-        
-          <li class="md-meta__item">
-            in
-            
-              <a href="../../../../category/hardware/" class="md-meta__link">Hardware</a>, 
-              <a href="../../../../category/firmware/" class="md-meta__link">Firmware</a></li>
-        
-        
-          
-          <li class="md-meta__item">
-            
-              2 min read
-            
-          </li>
-        
-        
-      </ul>
-      
-    </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="first-pixels-hello-world-on-the-e-ink-display"><a class="toclink" href="../../../../phase-1-first-pixels/">First Pixels — Hello World on the E-Ink Display</a></h2>
-<p>We got pixels. Real, physical, black-on-white pixels on the Waveshare 2.13" e-ink display, driven by C firmware on the Pico W. Phase 1's proof-of-life is alive.</p>
-
-    
-      <nav class="md-post__action">
-        <a href="../../../../phase-1-first-pixels/">
-          Continue reading
-        </a>
-      </nav>
-    
-    
-  </div>
-</article>
-      
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-      <nav class="md-post__authors md-typeset">
-        
-          <span class="md-author">
-            <img src="https://avatars.githubusercontent.com/u/600873?v=4" alt="rompasaurus">
-          </span>
-        
-      </nav>
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2026-04-09 00:00:00+00:00">April 9, 2026</time></li>
-        
-          <li class="md-meta__item">
-            in
-            
-              <a href="../../../../category/hardware/" class="md-meta__link">Hardware</a></li>
-        
-        
-          
-          <li class="md-meta__item">
-            
-              2 min read
-            
-          </li>
-        
-        
-      </ul>
-      
-    </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="phase-1-hardware-pico-w-e-ink-lets-go"><a class="toclink" href="../../../../phase-1-hardware-begins/">Phase 1: Hardware — Pico W + E-Ink, Let's Go</a></h2>
-<p>The planning phase is done. We've got hardware on the bench. Phase 1 begins now.</p>
-
-    
-      <nav class="md-post__action">
-        <a href="../../../../phase-1-hardware-begins/">
-          Continue reading
-        </a>
-      </nav>
-    
-    
-  </div>
-</article>
-      
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-      <nav class="md-post__authors md-typeset">
-        
-          <span class="md-author">
-            <img src="https://avatars.githubusercontent.com/u/600873?v=4" alt="rompasaurus">
-          </span>
-        
-      </nav>
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2026-04-08 00:00:00+00:00">April 8, 2026</time></li>
-        
-          <li class="md-meta__item">
-            in
-            
-              <a href="../../../../category/planning/" class="md-meta__link">Planning</a></li>
-        
-        
-          
-          <li class="md-meta__item">
-            
-              2 min read
-            
-          </li>
-        
-        
-      </ul>
-      
-    </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="phase-0-planning-from-idea-to-blueprint"><a class="toclink" href="../../../../phase-0-planning/">Phase 0: Planning — From Idea to Blueprint</a></h2>
-<p>Every project starts somewhere. Dilder started with a question: how hard is it to actually build a Tamagotchi?</p>
-
-    
-      <nav class="md-post__action">
-        <a href="../../../../phase-0-planning/">
-          Continue reading
-        </a>
-      </nav>
-    
-    
-  </div>
-</article>
-      
+    <article class="md-content__inner md-typeset">
       
         
-          
+  
 
 
 
-<nav class="md-pagination">
-  <a class="md-pagination__link" href="../../">1</a> <span class="md-pagination__current">2</span>
-</nav>
-        
+  
+  
+
+
+<h1 id="from-rp2040-to-esp32-s3-designing-the-dilder-pcb">From RP2040 to ESP32-S3 — Designing the Dilder PCB<a class="headerlink" href="#from-rp2040-to-esp32-s3-designing-the-dilder-pcb" title="Permanent link">&para;</a></h1>
+<p>The breadboard era is ending. After weeks of jumper wires, borrowed breakout boards, and firmware running on a Pico W, it's time to design a real PCB — a single board that holds everything the Dilder needs. And in the process, we swapped the entire MCU.</p>
+<!-- more -->
+
+<h2 id="why-we-left-the-rp2040">Why We Left the RP2040<a class="headerlink" href="#why-we-left-the-rp2040" title="Permanent link">&para;</a></h2>
+<p>The RP2040 served us well for prototyping. It's cheap, it boots instantly, and the Pico W made breadboard development painless. But when we sat down to design a custom PCB, the problems became obvious:</p>
+<ul>
+<li><strong>No built-in flash</strong> — the RP2040 needs an external QSPI flash chip, crystal oscillator, and a handful of decoupling caps just to wake up</li>
+<li><strong>No Bluetooth</strong> — the Pico W has WiFi, but adding BLE means an external module</li>
+<li><strong>RF certification</strong> — designing an antenna or integrating an uncertified radio module is a project unto itself</li>
+</ul>
+<p>We looked at the bill of materials for an RP2040-based custom board and counted 7+ passive components just for the MCU subsystem. There had to be a better way.</p>
+<h2 id="enter-the-esp32-s3-wroom-1-n16r8">Enter the ESP32-S3-WROOM-1-N16R8<a class="headerlink" href="#enter-the-esp32-s3-wroom-1-n16r8" title="Permanent link">&para;</a></h2>
+<p>The ESP32-S3-WROOM-1-N16R8 is, frankly, overkill for a Tamagotchi. And that's exactly why we picked it.</p>
+<ul>
+<li><strong>16MB flash + 8MB PSRAM</strong> — the maxed-out variant, room for every quote Jamal will ever have</li>
+<li><strong>WiFi + Bluetooth 5 (LE)</strong> — both radios built in, pre-certified</li>
+<li><strong>Dual-core 240MHz Xtensa LX7</strong> — more power than we need, but nice to have headroom</li>
+<li><strong>USB OTG</strong> — native USB, no FTDI chip needed</li>
+<li><strong>44 GPIO pins</strong> — more than enough for our peripherals</li>
+</ul>
+<p>The module is a complete system: flash, PSRAM, crystal, antenna, RF matching network, and shielding can — all in one package. Drop it on a PCB, add power, and you have a working computer. That alone eliminated 7 components from the BOM.</p>
+<h2 id="the-pcb-design-journey">The PCB Design Journey<a class="headerlink" href="#the-pcb-design-journey" title="Permanent link">&para;</a></h2>
+<h3 id="kicad-setup-and-jlcpcb-integration">KiCad Setup and JLCPCB Integration<a class="headerlink" href="#kicad-setup-and-jlcpcb-integration" title="Permanent link">&para;</a></h3>
+<p>We started by setting up KiCad 9 with the JLCPCB fabrication plugin, which lets you export Gerbers in exactly the format JLCPCB expects and includes their parts library for component sourcing. A setup script (<code>setup-kicad-jlcpcb.py</code>) automates the installation so anyone following along can replicate the toolchain.</p>
+<h3 id="component-selection">Component Selection<a class="headerlink" href="#component-selection" title="Permanent link">&para;</a></h3>
+<p>The full BOM came together around the ESP32-S3:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ESP32-S3-WROOM-1-N16R8</td>
+<td>MCU — WiFi, BLE, flash, PSRAM</td>
+</tr>
+<tr>
+<td>MPU-6050</td>
+<td>6-axis IMU (accelerometer + gyroscope)</td>
+</tr>
+<tr>
+<td>AMS1117-3.3</td>
+<td>3.3V LDO regulator</td>
+</tr>
+<tr>
+<td>TP4056</td>
+<td>LiPo charging IC (USB-C input)</td>
+</tr>
+<tr>
+<td>DW01A + FS8205A</td>
+<td>Battery protection (over-discharge, over-current)</td>
+</tr>
+<tr>
+<td>USB-C connector</td>
+<td>Charging and programming</td>
+</tr>
+<tr>
+<td>5-way joystick</td>
+<td>Navigation input</td>
+</tr>
+<tr>
+<td>8-pin JST-SH connector</td>
+<td>ePaper display connection</td>
+</tr>
+</tbody>
+</table>
+<p>27 components total, including passives. Compare that to the ~34+ we would have needed with a bare RP2040.</p>
+<h3 id="the-schematic">The Schematic<a class="headerlink" href="#the-schematic" title="Permanent link">&para;</a></h3>
+<p>The schematic was built in sections: power (USB-C to TP4056 charger to battery protection to AMS1117 LDO), MCU (ESP32-S3 with boot/reset buttons and USB data lines), peripherals (MPU-6050 on I2C, joystick on GPIO, ePaper connector with SPI signals). Net labels keep the schematic readable — no rats' nest of wires crossing the sheet.</p>
+<h3 id="board-layout-iteration-after-iteration">Board Layout — Iteration After Iteration<a class="headerlink" href="#board-layout-iteration-after-iteration" title="Permanent link">&para;</a></h3>
+<p>Layout is where the real decisions happen. We went through multiple placement iterations, optimizing based on signal flow, antenna requirements, and mechanical constraints:</p>
+<ul>
+<li><strong>ESP32-S3 at the top</strong> — antenna overhanging the board edge for best RF performance</li>
+<li><strong>MPU-6050 below-left</strong> — close to the MCU for clean I2C routing</li>
+<li><strong>ePaper connector below-right</strong> — 8-pin JST-SH header for the display ribbon cable</li>
+<li><strong>Power section in the middle</strong> — AMS1117, TP4056, battery protection clustered together</li>
+<li><strong>5-way joystick centered above USB-C at the bottom</strong> — ergonomic thumb position</li>
+<li><strong>USB-C at the very bottom</strong> — charging port accessible when held in hand</li>
+</ul>
+<p>Component placement was optimized based on which side of the ESP32-S3 module each GPIO pin exits, minimizing trace crossings.</p>
+<h2 id="the-antenna-keep-out-challenge">The Antenna Keep-Out Challenge<a class="headerlink" href="#the-antenna-keep-out-challenge" title="Permanent link">&para;</a></h2>
+<p>The ESP32-S3-WROOM-1 has a PCB antenna that extends beyond the module's footprint. Espressif's hardware design guidelines are strict: <strong>no copper (traces, pours, or planes) under or near the antenna area</strong>, on any layer. No components either. The antenna needs to overhang the board edge into free space.</p>
+<p>This single requirement drove a major decision: we needed a <strong>4-layer PCB</strong>. With only 2 layers, routing traces around the antenna keep-out zone while still connecting all the GPIO pins would have been nearly impossible without making the board much larger. Four layers give us:</p>
+<ul>
+<li><strong>Top</strong> — signal traces and components</li>
+<li><strong>Inner 1</strong> — continuous ground plane (critical for RF and signal integrity)</li>
+<li><strong>Inner 2</strong> — power plane (3.3V distribution)</li>
+<li><strong>Bottom</strong> — additional signal routing</li>
+</ul>
+<p>The unbroken ground plane on Inner 1 is especially important — it provides the RF ground reference the antenna needs and keeps return current paths clean for high-speed signals.</p>
+<h2 id="the-display-connector-decision">The Display Connector Decision<a class="headerlink" href="#the-display-connector-decision" title="Permanent link">&para;</a></h2>
+<p>This one caused some head-scratching. The Waveshare 2.13" ePaper display we've been using comes in two form factors:</p>
+<ol>
+<li><strong>Pico-ePaper-2.13</strong> — a Pico-native module with a 40-pin header that plugs directly onto the Pico W (what we've been using for prototyping)</li>
+<li><strong>Waveshare 2.13" e-Paper HAT</strong> — a Raspberry Pi HAT version with a 24-pin FPC connector to the raw display panel</li>
+</ol>
+<p>For the custom PCB, we considered putting a raw 24-pin FPC connector on the board to connect directly to the display's flex cable. But that would mean:</p>
+<ul>
+<li>Sourcing and routing a 24-pin FPC connector (tight pitch, tricky to solder)</li>
+<li>Handling the display driver signals directly</li>
+<li>Losing compatibility with the HAT's built-in level shifting and connector</li>
+</ul>
+<p>Instead, we went with an <strong>8-pin JST-SH connector</strong> that carries only the SPI signals (MOSI, CLK, CS, DC, RST, BUSY) plus power and ground. This connects to the Waveshare HAT via its 8-pin ribbon cable header. Simpler routing, proven signal integrity, and we can swap display modules without redesigning the PCB.</p>
+<h2 id="freerouting-the-autorouter-experiment">FreeRouting — The Autorouter Experiment<a class="headerlink" href="#freerouting-the-autorouter-experiment" title="Permanent link">&para;</a></h2>
+<p>With 27 components placed, we needed to route the traces. KiCad has a built-in interactive router, but we also tried <strong>FreeRouting</strong>, an open-source autorouter, to see if it could handle the job.</p>
+<p>Results: mixed. FreeRouting can solve simple boards quickly, but our 4-layer design with antenna keep-out zones, ground plane requirements, and mixed-signal routing (SPI, I2C, USB, analog) pushed it past its comfort zone. The autorouter would complete routes but produce suboptimal results — traces taking unnecessary detours, vias placed in awkward locations, ground plane integrity compromised.</p>
+<p>The lesson: autorouters are useful for getting a rough first pass or solving simple boards, but for a design like this, <strong>interactive routing in KiCad is the way to go</strong>. You need human judgment for antenna keep-out compliance, controlled impedance traces for USB, and clean power distribution.</p>
+<h2 id="reference-designs-that-helped">Reference Designs That Helped<a class="headerlink" href="#reference-designs-that-helped" title="Permanent link">&para;</a></h2>
+<p>We didn't design in a vacuum. Three open-source reference designs were particularly useful:</p>
+<ul>
+<li><strong>Olimex ESP32-S3-DevKit-Lipo</strong> — clean power management with LiPo charging, open hardware with full KiCad files</li>
+<li><strong>atomic14 ESP32-S3 boards</strong> — minimal designs that show what you can strip away and still have a working system</li>
+<li><strong>UnexpectedMaker FeatherS3</strong> — excellent example of antenna placement and 4-layer routing for ESP32-S3</li>
+</ul>
+<p>Studying these designs confirmed our approach and caught potential mistakes before they were committed to copper.</p>
+<h2 id="where-we-are-now">Where We Are Now<a class="headerlink" href="#where-we-are-now" title="Permanent link">&para;</a></h2>
+<p>The board sits at <strong>45mm x 80mm</strong>, 4-layer, with all 27 components placed and ready for routing. The design lives in <code>hardware-design/Board Design kicad/</code> with:</p>
+<ul>
+<li>Full KiCad project (<code>.kicad_pro</code>, <code>.kicad_sch</code>, <code>.kicad_pcb</code>)</li>
+<li>Python build scripts that place components programmatically via KiCad's pcbnew API</li>
+<li>Research documentation covering module specs, antenna requirements, and design decisions</li>
+</ul>
+<p>The PCB can be regenerated from scratch by running the build script — every component position, every design rule is captured in code, not just in KiCad's GUI state.</p>
+<h2 id="whats-next">What's Next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Interactive routing in KiCad</strong> — manually route all traces with proper design rules (antenna keep-out, USB impedance, power trace widths)</li>
+<li><strong>Design rule check (DRC)</strong> — verify the board passes KiCad's and JLCPCB's manufacturing constraints</li>
+<li><strong>Generate Gerbers</strong> — export fabrication files in JLCPCB format</li>
+<li><strong>Order from JLCPCB</strong> — ship to Germany, wait for boards</li>
+<li><strong>Assemble and test</strong> — solder components, flash firmware, see if the octopus boots on custom hardware</li>
+</ol>
+<p>From a breadboard held together with optimism and jumper wires to a real PCB. The octopus is getting a proper home.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+  
+
+
+
       
-    </div>
+    </article>
   </div>
 
           
@@ -2560,10 +2696,12 @@
   
     
       
+        
+      
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../../../category/tools/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Tools">
+          <a href="../custom-pcb-research/" class="md-footer__link md-footer__link--prev" aria-label="Previous: From Breadboard to Custom PCB — The Research">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2573,27 +2711,11 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Tools
+                From Breadboard to Custom PCB — The Research
               </div>
             </div>
           </a>
         
-        
-          
-          <a href="../../../../../docs/" class="md-footer__link md-footer__link--next" aria-label="Next: Overview">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                Overview
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
         
       </nav>
     
@@ -2660,12 +2782,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../../../../javascripts/octopus-banner.js"></script>
+        <script src="../../javascripts/octopus-banner.js"></script>
       
     
   </body>

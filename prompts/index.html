@@ -776,6 +776,36 @@
   
   
     <li class="md-nav__item">
+      <a href="../blog/category/pcb-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PCB Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
       <a href="../blog/category/planning/" class="md-nav__link">
         
   
@@ -1851,6 +1881,34 @@
     
   
     Waveshare e-Paper HAT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/reference/esp32-s3-wroom1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ESP32-S3 WROOM-1
   
 
     
@@ -3567,6 +3625,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#prompt-144-2026-04-14-to-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #144 — 2026-04-14 to 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-145-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #145 — 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -4965,6 +5045,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#prompt-144-2026-04-14-to-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #144 — 2026-04-14 to 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-145-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #145 — 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -5984,6 +6086,23 @@
 <li><strong>Input Tokens (est):</strong> ~150</li>
 <li><strong>Output Tokens (est):</strong> ~20,000</li>
 <li><strong>Files:</strong> 16 HEIC images converted to named JPEGs in <code>build-session/</code> directory (joystick closeup, test bench, mood selector running with input indicators, LiPo battery, GPIO wiring, workspace). <code>website/docs/blog/posts/joystick-first-input.md</code> (created — build session blog post with 6 photos). Battery/joystick/wiring docs updated with hardware photos. Home page updated with Phase 2 joystick milestone and live hardware photo. README milestones updated. Battery confirmed: InnCraft Energy INS503450, 1000mAh, matches existing wiring guide. <code>PromptProgression.md</code> (#143), <code>website/docs/prompts/index.md</code> (#143)</li>
+</ul>
+<hr />
+<h2 id="prompt-144-2026-04-14-to-2026-04-15">Prompt #144 — 2026-04-14 to 2026-04-15<a class="headerlink" href="#prompt-144-2026-04-14-to-2026-04-15" title="Permanent link">&para;</a></h2>
+<p><strong>Prompt:</strong> "Create a KiCad setup, component selection, schematic, and PCB board design for custom Dilder hardware." (Multi-session, ~30 follow-up prompts evolving through RP2040 to ESP32-S3 transition, autorouting attempts, display connector research.)</p>
+<ul>
+<li><strong>Input Tokens (est):</strong> ~5,000</li>
+<li><strong>Output Tokens (est):</strong> ~200,000</li>
+<li><strong>Key Decisions:</strong> RP2040 → ESP32-S3-WROOM-1-N16R8 (WiFi+BLE, 16MB flash, 8MB PSRAM). 2-layer → 4-layer PCB. 24-pin FPC → 8-pin header for Waveshare display. Board target: ~30x75mm. FreeRouting autorouter installed. JLCPCB for fabrication.</li>
+<li><strong>Files:</strong> <code>docs/esp32-s3-pcb-research.md</code> (created — module research, antenna keep-out, reference designs, layout strategy). <code>hardware-design/pcb-design-plan.md</code> (major update — ESP32-S3 transition). <code>hardware-design/setup-kicad-jlcpcb.py</code> (KiCad + JLCPCB plugin installer). <code>hardware-design/Board Design kicad/</code> (KiCad project: .kicad_pro, .kicad_sch, .kicad_pcb, build scripts). <code>website/docs/docs/reference/esp32-s3-wroom1.md</code> (ESP32-S3 reference page). Website nav + design docs updated. Commit: <code>af57530</code></li>
+</ul>
+<hr />
+<h2 id="prompt-145-2026-04-15">Prompt #145 — 2026-04-15<a class="headerlink" href="#prompt-145-2026-04-15" title="Permanent link">&para;</a></h2>
+<p><strong>Prompt:</strong> "Use the research to map out components on the board. Processor at top with antenna off the edge, USB-C at bottom, joystick centered above USB-C. Optimize placement. Then update docs, website, blog, commit, and update prompts."</p>
+<ul>
+<li><strong>Input Tokens (est):</strong> ~200</li>
+<li><strong>Output Tokens (est):</strong> ~15,000</li>
+<li><strong>Files:</strong> <code>website/docs/blog/posts/esp32-s3-pcb-design.md</code> (created — blog post covering RP2040 to ESP32-S3 transition, PCB design journey, antenna keep-out, display connector, FreeRouting lessons, reference designs). <code>README.md</code> (added ESP32-S3 PCB milestone). <code>website/docs/index.md</code> (added PCB design status). <code>hardware-design/Board Design kicad/build_esp32s3.py</code> (v7 placement). <code>hardware-design/Board Design kicad/dilder.kicad_pcb</code> (regenerated — 45x80mm, 27 components). <code>PromptProgression.md</code> (#145), <code>website/docs/prompts/index.md</code> (#145). Commit: <code>9b4f3e8</code></li>
 </ul>
 
 
