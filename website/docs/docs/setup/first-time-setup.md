@@ -75,7 +75,7 @@ Use `--status` to check your current environment at a glance:
 | Item | Notes |
 |------|-------|
 | Raspberry Pi Pico W | **With male headers soldered on** |
-| Waveshare 2.13" e-Paper HAT V3 | SSD1680 driver — check the PCB silkscreen on the back |
+| Waveshare Pico-ePaper-2.13 | SSD1680 driver, Pico-native module — plugs directly onto Pico W |
 | Micro-USB data cable | **Must be a data cable, not charge-only** — this is the #1 gotcha |
 | Linux PC | Arch/CachyOS, Ubuntu, Debian, or Fedora |
 

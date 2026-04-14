@@ -1218,3 +1218,13 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Input Tokens (est):** ~100
 - **Output Tokens (est):** ~20,000
 - **Files:** `docs/breadboard-wiring-guide.md` (created — full breadboard wiring guide: pin assignment table for 5 peripherals on 16 GPIO, master ASCII wiring diagram, component-by-component wiring with HC-SR04 voltage divider and speaker transistor amplifier, breadboard zone layout, power budget, test code for all peripherals, troubleshooting table), `PromptProgression.md` (#140), `website/docs/prompts/index.md` (#140)
+
+---
+
+## Prompt #141 — 2026-04-14
+
+**Prompt:** "The Waveshare I have has a 40-pin header on the back — update the wiring to reflect that. Double check the physical pin mapping. I don't have VCC, I have VSYS. Update README, materials list, and all references."
+
+- **Input Tokens (est):** ~300
+- **Output Tokens (est):** ~25,000
+- **Files:** `docs/breadboard-wiring-guide.md` (corrected display model to Pico-ePaper-2.13, replaced VCC/pin 36 with VSYS/pin 39, replaced RPi HAT section with Pico-native 40-pin docs, updated all diagrams and tables), `website/docs/docs/hardware/wiring-pinout.md` (same corrections — VSYS/pin 39, Pico-native module docs, updated pin map and diagrams), `website/docs/docs/hardware/materials-list.md` (corrected product name and specs), `README.md` (corrected product name and link), `website/docs/blog/posts/phase-1-hardware.md` (corrected product name), `website/docs/docs/tools/setup-cli.md` (corrected product name), `website/docs/docs/setup/first-time-setup.md` (corrected product name), `docs/setup-guide.md` (corrected product name), `docs/hardware-research.md` (corrected product name), `PromptProgression.md` (#141), `website/docs/prompts/index.md` (#141)

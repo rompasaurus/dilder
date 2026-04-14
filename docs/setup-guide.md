@@ -4,7 +4,7 @@ A complete, step-by-step guide to setting up a Raspberry Pi Zero WH with a Waves
 
 **Target hardware:**
 - Raspberry Pi Zero WH (pre-soldered headers)
-- Waveshare 2.13" e-Paper HAT V3 (SSD1680 driver, 250x122px, black & white)
+- Waveshare Pico-ePaper-2.13 (SSD1680 driver, 250x122px, black & white, Pico-native module)
 - Half-size breadboard + jumper wires
 - 5x 6x6mm tactile push buttons
 - Micro SD card (16GB+)

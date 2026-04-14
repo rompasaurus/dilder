@@ -15,15 +15,15 @@ The planning phase is done. We've got hardware on the bench. Phase 1 begins now.
 
 ## The Hardware
 
-We're starting with what's on hand: a **Raspberry Pi Pico W** and a **Waveshare 2.13" e-Paper HAT V3**. The original plan called for a Pi Zero WH, but the Pico W is cheaper, boots instantly, and is perfect for prototyping the display and input system. The Pi Zero upgrade is planned for Phase 5 when we need Linux.
+We're starting with what's on hand: a **Raspberry Pi Pico W** and a **Waveshare Pico-ePaper-2.13**. The original plan called for a Pi Zero WH, but the Pico W is cheaper, boots instantly, and is perfect for prototyping the display and input system. The Pi Zero upgrade is planned for Phase 5 when we need Linux.
 
 | Item | Notes |
 |------|-------|
 | Raspberry Pi Pico W | RP2040 dual-core, 264KB SRAM, WiFi + BLE, ~€6 |
-| Waveshare 2.13" e-Paper HAT V3 | SSD1680 driver, 250×122px, ~€15 |
+| Waveshare Pico-ePaper-2.13 | SSD1680 driver, 250×122px, Pico-native module, ~€15 |
 | Micro-USB cable | Power + data |
 | Half-size breadboard | Prototyping |
-| Jumper wire kit (M-F, M-M) | Display HAT connects via jumper wires, not the 40-pin header |
+| Jumper wire kit (M-F, M-M) | Display can plug directly onto Pico or use 8-pin breakout for breadboard |
 | 6×6mm tactile buttons (×20) | With snap-on caps |
 
 ## The Test Bench Plan

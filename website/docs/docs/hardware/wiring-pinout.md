@@ -5,25 +5,25 @@ GPIO assignments and breadboard wiring for the Dilder test bench (Pico W).
 Full official hardware reference docs:
 
 - [Raspberry Pi Pico W reference](../reference/pico-w.md)
-- [Waveshare 2.13" e-Paper HAT reference](../reference/waveshare-eink.md)
+- [Waveshare Pico-ePaper-2.13 reference](../reference/waveshare-eink.md)
 
 ---
 
-## Display Wiring (Jumper Wires)
+## Display Hardware — Waveshare Pico-ePaper-2.13
 
-The Waveshare 2.13" e-Paper HAT is designed for the Pi Zero's 40-pin header, but the Pico W has a different pinout. Connect the display to the Pico W using **female-to-male jumper wires** from the HAT's 8-pin header.
+The Waveshare Pico-ePaper-2.13 is a **Pico-native module** with a **40-pin female GPIO header** on the back — designed to plug directly onto the Raspberry Pi Pico W's male header pins. When seated on the Pico, all SPI, control, and power connections are made automatically through the header.
 
-!!! tip "Finding the 8-pin header"
-    The HAT has an 8-pin 2.54mm pitch header along one edge, labeled: VCC, GND, DIN, CLK, CS, DC, RST, BUSY. Use F-M jumper wires from these pins to the Pico W on your breadboard.
+!!! tip "Direct plug vs. breadboard"
+    You can plug the module straight onto the Pico W for a compact setup with no wiring. For breadboard prototyping (where you need access to all Pico pins for other peripherals like the joystick, GPS, etc.), use the module's **8-pin breakout header** with female-to-male jumper wires instead.
 
 !!! warning "Power off before wiring"
     Always disconnect USB before connecting or disconnecting jumper wires. The e-ink panel can be damaged by voltage spikes.
 
-### Display Pin Mapping
+### Display Pin Mapping (Pico W)
 
 | e-Paper Signal | Function | Pico W GPIO | Pico W Pin # | Direction |
 |---|---|---|---|---|
-| VCC | 3.3V power | 3V3(OUT) | 36 | → display |
+| VSYS | System power (1.8-5.5V) | VSYS | 39 | → display |
 | GND | Ground | GND | 38 | → display |
 | DIN | SPI MOSI — pixel data | GP11 (SPI1 TX) | 15 | → display |
 | CLK | SPI clock | GP10 (SPI1 SCK) | 14 | → display |
@@ -98,7 +98,7 @@ if BUTTONS['center'].value() == 0:
 | e-ink DIN | GP11 | 15 | SPI1 TX |
 | e-ink RST | GP12 | 16 | Digital out |
 | e-ink BUSY | GP13 | 17 | Digital in |
-| e-ink VCC | 3V3(OUT) | 36 | Power |
+| e-ink VSYS | VSYS | 39 | Power (onboard regulator) |
 | e-ink GND | GND | 38 | Ground |
 | Button UP | GP2 | 4 | Digital in |
 | Button DOWN | GP3 | 5 | Digital in |
@@ -112,7 +112,7 @@ if BUTTONS['center'].value() == 0:
 | **Pins free** | **14+ GPIO remaining** | | |
 
 !!! tip "Battery power"
-    The 3.7V LiPo connects to VSYS (pin 39) and GND (pin 38) — no GPIO pins consumed. See the dedicated [Battery Wiring Guide](battery-wiring.md) for full setup instructions, charging options, and voltage monitoring.
+    The 3.7V LiPo connects to VSYS (pin 39) and GND (pin 38) — shared with the e-Paper module's power rail. See the dedicated [Battery Wiring Guide](battery-wiring.md) for full setup instructions, charging options, and voltage monitoring.
 
 ---
 
@@ -123,10 +123,10 @@ Pins used by this project are highlighted. Full electrical specs in the [Pico W 
 ```
                ┌───USB───┐
    GP0  [ 1]   │         │  [40]  VBUS
-   GP1  [ 2]   │  PICO   │  [39]  VSYS
+   GP1  [ 2]   │  PICO   │  [39]  VSYS      ◄── e-ink VSYS
    GND  [ 3]   │    W    │  [38]  GND       ◄── e-ink GND
 ▶  GP2  [ 4]   │         │  [37]  3V3_EN
-▶  GP3  [ 5]   │         │  [36]  3V3(OUT)  ◄── e-ink VCC
+▶  GP3  [ 5]   │         │  [36]  3V3(OUT)
 ▶  GP4  [ 6]   │         │  [35]  ADC_VREF
 ▶  GP5  [ 7]   │         │  [34]  GP28
    GND  [ 8]   │         │  [33]  AGND
@@ -146,7 +146,7 @@ Pins used by this project are highlighted. Full electrical specs in the [Pico W 
 ▶ = used by Dilder
 
 Left side (pins 4–17):  Buttons (GP2–GP6) + Display SPI (GP8–GP13)
-Right side (pin 36):    3V3 power to display
+Right side (pin 39):    VSYS power to display (onboard regulator)
 Right side (pin 38):    GND to display
 ```
 
@@ -157,7 +157,7 @@ Right side (pin 38):    GND to display
 ```
 Pico W (on breadboard)
 │
-├─ Pin 36 (3V3 OUT) ──────────── e-Paper VCC
+├─ Pin 39 (VSYS)    ──────────── e-Paper VSYS
 ├─ Pin 38 (GND)     ──────────── e-Paper GND ── breadboard GND rail
 ├─ Pin 15 (GP11 / SPI1 TX)  ──── e-Paper DIN
 ├─ Pin 14 (GP10 / SPI1 SCK) ──── e-Paper CLK
@@ -177,7 +177,7 @@ Pico W (on breadboard)
 
 ## SPI Configuration
 
-The e-ink display uses SPI1 on the Pico W. No kernel configuration needed — SPI is set up in MicroPython code.
+The e-ink display uses **SPI1** on the Pico W. No kernel configuration needed — SPI is set up in MicroPython code.
 
 | SPI Parameter | Value |
 |---------------|-------|
@@ -201,7 +201,7 @@ cs = Pin(9, Pin.OUT, value=1)   # active LOW, start HIGH
 
 | Symptom | Check |
 |---------|-------|
-| Display shows nothing | Wiring correct? VCC on 3V3(OUT) not VBUS? SPI pins correct? |
+| Display shows nothing | Wiring correct? VSYS on pin 39? SPI pins correct? |
 | Garbage output | Wrong driver version (V3 vs V4) — check PCB silkscreen |
 | Display flickers then goes blank | RST or BUSY wired to wrong pins |
 | BUSY pin always HIGH | Display stuck in refresh — disconnect power, reconnect, run `epd.Clear()` |

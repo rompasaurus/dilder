@@ -1748,3 +1748,24 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `PromptProgression.md` (modified — added Prompt #140)
   - `website/docs/prompts/index.md` (modified — added Prompt #140)
   - All changes committed and pushed
+
+---
+
+## Prompt #141
+- **Date/Time:** 2026-04-14
+- **Prompt:** "The Waveshare I have has a 40-pin header on the back — update the wiring to reflect that and check the online docs to confirm this. [Follow-up: double check the physical pin mapping for the Waveshare rev 3a with the Pico headers, something doesn't seem right. Follow-up: I don't have VCC on the Waveshare, I have a VSYS though. Follow-up: yes update the README and materials list as well, and update the prompts file with this troubleshooting — all the chats for this project not yet added today.]"
+- **Input Tokens (est):** ~300
+- **Output Tokens (est):** ~25,000
+- **Files Created/Modified:**
+  - `docs/breadboard-wiring-guide.md` (modified — corrected display model from "Waveshare 2.13" e-Paper HAT V3" to "Waveshare Pico-ePaper-2.13"; replaced VCC/3V3(OUT)/pin 36 power with VSYS/pin 39 throughout; replaced RPi HAT 40-pin header section with Pico-native 40-pin direct-plug documentation; updated pin assignment table, master wiring diagram, annotated pin map, power budget, voltage level table, wire shopping list, and breadboard layout notes)
+  - `website/docs/docs/hardware/wiring-pinout.md` (modified — replaced RPi HAT 40-pin header section with Pico-native module documentation; corrected all VCC/pin 36 references to VSYS/pin 39; updated visual pin map, text wiring diagram, GPIO pin budget, SPI config note, battery tip, and troubleshooting)
+  - `website/docs/docs/hardware/materials-list.md` (modified — corrected product name, specs table, and jumper wire notes)
+  - `README.md` (modified — corrected display product name and link)
+  - `website/docs/blog/posts/phase-1-hardware.md` (modified — corrected product name and jumper wire note)
+  - `website/docs/docs/tools/setup-cli.md` (modified — corrected product name and HAT plug note)
+  - `website/docs/docs/setup/first-time-setup.md` (modified — corrected product name)
+  - `docs/setup-guide.md` (modified — corrected product name)
+  - `docs/hardware-research.md` (modified — corrected product name and connection notes)
+  - `PromptProgression.md` (modified — added Prompt #141)
+  - `website/docs/prompts/index.md` (modified — added Prompt #141)
+  - All changes committed and pushed

@@ -37,7 +37,7 @@ That's how Dilder was born. Not from an engineering roadmap, but from a stuffed 
 | Component | Details |
 |-----------|---------|
 | Board | Raspberry Pi Pico W (or Pico WH with pre-soldered headers) |
-| Display | [Waveshare 2.13" e-Paper HAT V3](https://www.amazon.de/-/en/gp/product/B07Q5PZMGT) — 250x122px, black & white, SPI, SSD1680 driver |
+| Display | [Waveshare Pico-ePaper-2.13](https://www.waveshare.com/pico-epaper-2.13.htm) — 250x122px, black & white, SPI1, SSD1680 driver, Pico-native 40-pin plug-in module |
 | Power | USB micro-B (development); battery TBD |
 | Input | 5x 6x6mm tactile push buttons (3 nav + 2 action) via GPIO |
 

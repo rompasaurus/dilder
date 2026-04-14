@@ -258,10 +258,10 @@ Simple 6x6mm through-hole momentary switches, optionally with colored snap-on ca
 | Item | Est. Cost | Notes |
 |------|-----------|-------|
 | Raspberry Pi Pico W | ~$6 | On hand. Micro-USB for power + data. |
-| Waveshare 2.13" e-Paper HAT V3 | ~$15 | On hand. SSD1680 driver, 250×122px. Connected via jumper wires (not HAT connector). |
+| Waveshare Pico-ePaper-2.13 | ~$15 | On hand. SSD1680 driver, 250×122px. Pico-native module — plugs directly onto Pico W or connects via 8-pin breakout header. |
 | Micro-USB cable | ~$2 | For Pico W power + programming |
 | Half-size breadboard | ~$3-5 | For prototyping button + display wiring |
-| Jumper wire kit (M-F and M-M) | ~$3-6 | **Required** — the display HAT doesn't plug into the Pico W directly |
+| Jumper wire kit (M-F and M-M) | ~$3-6 | Needed for breadboard peripherals (joystick, GPS, HC-SR04). Display can plug directly onto Pico. |
 | 6x6mm tactile buttons (pack of 20) | ~$2-3 | Various heights, with snap-on caps |
 | **Subtotal** | **~$31-37** | |
 

@@ -32,7 +32,7 @@
 | # | Component | Model | Interface | Voltage | Notes |
 |---|-----------|-------|-----------|---------|-------|
 | 1 | **Microcontroller** | Raspberry Pi Pico WH | — | 3.3V logic / 5V USB | Pre-soldered headers |
-| 2 | **e-Paper Display** | Waveshare 2.13" V3 | SPI1 | 3.3V | SSD1680 driver, 250x122px |
+| 2 | **e-Paper Display** | Waveshare Pico-ePaper-2.13 | SPI1 | VSYS (1.8-5.5V) | SSD1680 driver, 250x122px, Pico-native module |
 | 3 | **5-Way Joystick** | DollaTek 5D Navigation | GPIO (active LOW) | 3.3V | Up/Down/Left/Right/Center |
 | 4 | **GPS Module** | GY-NEO6MV2 (NEO-6M) | UART (9600 baud) | 3.3-5V | NMEA output, onboard regulator |
 | 5 | **Ultrasonic Sensor** | HC-SR04 | GPIO (TRIG/ECHO) | **5V** | Needs voltage divider on ECHO |
@@ -43,7 +43,7 @@
 
 | Peripheral | Signal | Pico GPIO | Physical Pin | Direction | Interface |
 |------------|--------|-----------|-------------|-----------|-----------|
-| **e-Paper** | VCC | 3V3(OUT) | 36 | Power out | — |
+| **e-Paper** | VSYS | VSYS | 39 | Power in | — |
 | | GND | GND | 38 | Ground | — |
 | | DIN (MOSI) | GP11 | 15 | Out | SPI1 TX |
 | | CLK | GP10 | 14 | Out | SPI1 SCK |
@@ -77,11 +77,11 @@
                          PICO WH
                     .----[USB]----.
 GPS TX --------> GP0  [1]  |  [40] VBUS ---------> HC-SR04 VCC (5V)
-GPS RX <-------- GP1  [2]  |  [39] VSYS
+GPS RX <-------- GP1  [2]  |  [39] VSYS ---------> e-Paper VSYS
 GPS GND -------> GND  [3]  |  [38] GND ----------> e-Paper GND
 Joystick UP ---> GP2  [4]  |  [37] 3V3_EN
-Joystick DOWN -> GP3  [5]  |  [36] 3V3(OUT) -.---> e-Paper VCC
-Joystick LEFT -> GP4  [6]  |  [35] ADC_VREF  '--> GPS VCC
+Joystick DOWN -> GP3  [5]  |  [36] 3V3(OUT) -----> GPS VCC
+Joystick LEFT -> GP4  [6]  |  [35] ADC_VREF
 Joystick RIGHT > GP5  [7]  |  [34] GP28
 Joystick GND --> GND  [8]  |  [33] AGND
 Joystick CTR --> GP6  [9]  |  [32] GP27
@@ -117,10 +117,10 @@ HC-SR04 TRIG <- GP14 [19]  |  [22] GP17
 ```
                 .----[USB]----.
  GPS TX>RX GP0 [1]  |        | [40] VBUS  HC-SR04 5V
- GPS RX<TX GP1 [2]  |        | [39] VSYS
+ GPS RX<TX GP1 [2]  |        | [39] VSYS  e-Paper VSYS
  GPS GND   GND [3]  |  PICO  | [38] GND   e-Paper GND
  JOY UP    GP2 [4]  |   WH   | [37] 3V3_EN
- JOY DOWN  GP3 [5]  |        | [36] 3V3   e-Paper+GPS VCC
+ JOY DOWN  GP3 [5]  |        | [36] 3V3   GPS VCC
  JOY LEFT  GP4 [6]  |        | [35] VREF
  JOY RIGHT GP5 [7]  |        | [34] GP28
  JOY GND   GND [8]  |        | [33] AGND
@@ -143,22 +143,30 @@ HC-SR04 TRIG <- GP14 [19]  |  [22] GP17
 
 ## 5. Component-by-Component Wiring
 
-### 5.1 Waveshare 2.13" e-Paper V3 (SPI1)
+### 5.1 Waveshare Pico-ePaper-2.13 (SPI1)
 
-Uses the 8-pin header on the HAT board. Connect with female-to-male jumper wires.
+#### About the Module's 40-Pin Header
 
-| e-Paper Pin | Wire Color (suggested) | Pico WH Pin | GPIO |
-|------------|------------------------|-------------|------|
-| VCC | Red | Pin 36 (3V3 OUT) | — |
-| GND | Black | Pin 38 (GND) | — |
-| DIN | Blue | Pin 15 | GP11 (SPI1 TX) |
-| CLK | Yellow | Pin 14 | GP10 (SPI1 SCK) |
-| CS | Orange | Pin 12 | GP9 (SPI1 CSn) |
-| DC | Green | Pin 11 | GP8 |
-| RST | White | Pin 16 | GP12 |
-| BUSY | Purple | Pin 17 | GP13 |
+The Waveshare Pico-ePaper-2.13 is a **Pico-native module** — it has a **40-pin female GPIO header** on the back designed to plug directly onto the Raspberry Pi Pico W's male header pins. When seated directly on the Pico, no jumper wires are needed for the display — all SPI, control, and power pins align automatically.
+
+> **Direct plug vs. breadboard:** You can plug the module straight onto the Pico W for a compact setup. For breadboard prototyping (where you need access to all Pico pins for other peripherals), use the module's **8-pin breakout header** with female-to-male jumper wires instead.
+
+#### Pin Mapping (Pico W)
+
+| e-Paper Pin | Wire Color (suggested) | Pico WH Pin | GPIO | Function |
+|------------|------------------------|-------------|------|----------|
+| VSYS | Red | Pin 39 (VSYS) | — | System power (1.8-5.5V) |
+| GND | Black | Pin 38 (GND) | — | Ground |
+| DIN | Blue | Pin 15 | GP11 (SPI1 TX) | SPI MOSI |
+| CLK | Yellow | Pin 14 | GP10 (SPI1 SCK) | SPI clock |
+| CS | Orange | Pin 12 | GP9 (SPI1 CSn) | Chip select (active LOW) |
+| DC | Green | Pin 11 | GP8 | Data/command select |
+| RST | White | Pin 16 | GP12 | Reset (active LOW) |
+| BUSY | Purple | Pin 17 | GP13 | Busy flag (input) |
 
 **SPI Config:** SPI1, Mode 0, 4 MHz, MSB-first.
+
+> **Power note:** The module's 8-pin header is labeled **VSYS** (not VCC). This connects to the Pico's VSYS rail (pin 39), which provides the USB voltage (~5V when powered via USB). The module has an onboard voltage regulator that steps this down to 3.3V for the display. Do **not** connect VSYS to the 3V3(OUT) pin — use pin 39.
 
 ---
 
@@ -312,8 +320,8 @@ Use a **full-size breadboard** (830 tie points). A half-size board will be very 
 | + Power Rail (bottom) - 5V from VBUS Pin 40 (HC-SR04 only) -- |
 | - Ground Rail (bottom) - GND (bridged to top GND rail) ------- |
 |                                                                |
-| e-Paper display connects via flying wires (F-M jumpers)        |
-| from the HAT 8-pin header to the left side of the Pico        |
+| e-Paper connects via flying wires (F-M jumpers) from the      |
+| module's 8-pin header, or plugs directly onto the Pico        |
 '---------------------------------------------------------------'
 ```
 
@@ -330,15 +338,15 @@ Use a **full-size breadboard** (830 tie points). A half-size board will be very 
 | Component | Active Current | Voltage | Source |
 |-----------|---------------|---------|--------|
 | Pico WH (WiFi off) | ~28mA | 3.3V | Internal LDO |
-| e-Paper display (refreshing) | ~5mA | 3.3V | 3V3(OUT) |
-| e-Paper display (static) | ~0.01mA | 3.3V | 3V3(OUT) |
+| e-Paper display (refreshing) | ~5mA | VSYS | Pin 39 (onboard regulator) |
+| e-Paper display (static) | ~0.01mA | VSYS | Pin 39 (onboard regulator) |
 | GPS module (acquiring) | ~45mA | 3.3V | 3V3(OUT) |
 | GPS module (tracking) | ~35mA | 3.3V | 3V3(OUT) |
 | HC-SR04 | ~15mA | 5V | VBUS |
 | Joystick | ~0mA | — | Passive switches |
 | **Total (all active)** | **~95mA** | | |
 
-The 3V3(OUT) rail is rated for **300mA max**. With everything running simultaneously we draw ~80mA from 3V3 — well within limits.
+The 3V3(OUT) rail is rated for **300mA max**. The e-Paper module draws from VSYS (pin 39) via its own onboard regulator, not from 3V3(OUT) — so the GPS (~45mA) is the main 3V3 consumer, well within limits.
 
 **USB power (from computer/adapter):** Provides 500mA on VBUS, more than enough.
 
@@ -352,7 +360,7 @@ The GPS is the biggest consumer. If running on battery later, consider powering 
 
 | Component | Logic Level | Safe on Pico? |
 |-----------|------------|---------------|
-| e-Paper | 3.3V | Yes — direct connection |
+| e-Paper | 3.3V logic, VSYS power | Yes — SPI signals are 3.3V, power via VSYS (onboard regulator) |
 | Joystick | 3.3V (passive) | Yes — direct connection |
 | GPS (TX/RX) | 3.3V | Yes — GY-NEO6MV2 has 3.3V logic |
 | HC-SR04 TRIG | 3.3V input accepted | Yes — 3.3V exceeds the HIGH threshold |
@@ -592,7 +600,7 @@ int main() {
 | Item | Quantity | Notes |
 |------|----------|-------|
 | Male-to-male jumper wires | ~15 | For breadboard connections |
-| Female-to-male jumper wires | ~10 | For e-Paper HAT header |
+| Female-to-male jumper wires | ~10 | For e-Paper 8-pin breakout header (if not using direct plug) |
 | 1K resistor | 1 | HC-SR04 voltage divider |
 | 2K resistor (or 1.8K) | 1 | HC-SR04 voltage divider |
 | Full-size breadboard | 1 | 830 tie points recommended |
