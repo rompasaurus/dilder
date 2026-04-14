@@ -2,6 +2,11 @@
 
 GPIO assignments and breadboard wiring for the Dilder test bench (Pico W).
 
+<figure markdown="span">
+  ![Pico W with jumper wires connected to e-Paper display](../../assets/images/hardware/build-session/pico-w-gpio-wiring-top.jpg){ width="500" loading=lazy }
+  <figcaption>Pico W GPIO header with jumper wires connected to the e-Paper display's 8-pin breakout</figcaption>
+</figure>
+
 Full official hardware reference docs:
 
 - [Raspberry Pi Pico W reference](../reference/pico-w.md)

@@ -1237,4 +1237,14 @@ This is part of the transparency experiment — showing AI-assisted development 
 
 - **Input Tokens (est):** ~100
 - **Output Tokens (est):** ~30,000
-- **Files:** `dev-setup/joystick-mood-selector/main.c` (created — GPIO joystick mood selector: LEFT/RIGHT cycle moods, UP = random, DOWN = new quote, CENTER = reset; last input indicator on display; 200ms debounce; serial fallback), `dev-setup/joystick-mood-selector/CMakeLists.txt` (created), `dev-setup/docker-compose.yml` (added build service), `DevTool/devtool.py` (registered in PROGRAMS, PROGRAM_TREE, _OCTOPUS_CONFIGS, _FIRMWARE_DIRS), `.gitignore` (added entries). Build error: Docker `no such service` — fixed by adding docker-compose entry. Build artifacts accidentally committed — cleaned up with gitignore + `git rm --cached`. Hardware: CENTER button not registering — wiring error, CENTER wire in GND (pin 8) instead of GP6 (pin 9). Commits: `9e8e49c`, `5d70554`
+- **Files:** `dev-setup/joystick-mood-selector/main.c` (created — GPIO joystick mood selector: LEFT/RIGHT cycle moods, UP = random, DOWN = new quote, CENTER = reset; last input indicator on display; 200ms debounce; serial fallback), `dev-setup/joystick-mood-selector/CMakeLists.txt` (created), `dev-setup/docker-compose.yml` (added build service), `DevTool/devtool.py` (registered in PROGRAMS, PROGRAM_TREE, _OCTOPUS_CONFIGS, _FIRMWARE_DIRS), `.gitignore` (added entries). Build error: Docker `no such service` — fixed by adding docker-compose entry. Build artifacts accidentally committed — cleaned up with gitignore + `git rm --cached`. Hardware: CENTER button not registering — wiring error, CENTER wire in GND (pin 8) instead of GP6 (pin 9). Commits: `9e8e49c`, `5d70554`, `55189fd`
+
+---
+
+## Prompt #143 — 2026-04-14
+
+**Prompt:** "Update docs, website, and blog with joystick session photos. Convert HEIC images to JPEG, annotate them, add battery photo, plan battery wiring."
+
+- **Input Tokens (est):** ~150
+- **Output Tokens (est):** ~20,000
+- **Files:** 16 HEIC images converted to named JPEGs in `build-session/` directory (joystick closeup, test bench, mood selector running with input indicators, LiPo battery, GPIO wiring, workspace). `website/docs/blog/posts/joystick-first-input.md` (created — build session blog post with 6 photos). Battery/joystick/wiring docs updated with hardware photos. Home page updated with Phase 2 joystick milestone and live hardware photo. README milestones updated. Battery confirmed: InnCraft Energy INS503450, 1000mAh, matches existing wiring guide. `PromptProgression.md` (#143), `website/docs/prompts/index.md` (#143)

@@ -91,8 +91,10 @@ Each phase maps to a section of the blog/YouTube series and can be followed inde
 - [x] Date/time clock header from RTC
 - [x] C-faithful preview renderer for verifying firmware matches DevTool
 - [x] Keyboard-to-Pico input mapping plan ([docs/keyboard-to-pico-input.md](docs/keyboard-to-pico-input.md))
-- [ ] Implement serial command input for interactive mood control
-- [ ] Wire and test GPIO button inputs
+- [x] Implement serial command input for interactive mood control
+- [x] Wire and test GPIO joystick input (DollaTek 5-way, GP2–GP6)
+- [x] Joystick Mood Selector firmware with on-screen input indicator
+- [ ] Battery power (LiPo on VSYS) — InnCraft 1000mAh acquired
 - [ ] Build game loop with state machine (idle, interact, sleep)
 
 ### Phase 3 — Pet Logic & Gameplay

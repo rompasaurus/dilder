@@ -33,6 +33,11 @@ Complete wiring, setup, and testing instructions for the DollaTek 5-Way Navigati
 
 ## Overview
 
+<figure markdown="span">
+  ![DollaTek 5-way joystick module](../../assets/images/hardware/build-session/dollatek-joystick-closeup.jpg){ width="350" loading=lazy }
+  <figcaption>DollaTek 5-Way Navigation Button Module — rocker joystick with center click</figcaption>
+</figure>
+
 The DollaTek 5-Way Navigation Button Module is a compact 5-direction rocker joystick with discrete digital outputs for **Up**, **Down**, **Left**, **Right**, and **Center (press)**. Unlike an analog joystick, each direction is a simple switch that connects to ground when activated — making it ideal for menu navigation on the Dilder's e-ink display.
 
 This module replaces the five individual 6x6mm tactile buttons originally planned for the project. The wiring is identical in principle (active-LOW with internal pull-ups) but the module provides a cleaner single-component solution.

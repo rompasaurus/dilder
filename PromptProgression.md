@@ -1791,4 +1791,25 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Hardware troubleshooting:**
   - CENTER button not registering — traced to wiring error: joystick CENTER wire was in GND (pin 8) instead of GP6 (pin 9). Adjacent pins on breadboard. Fixed by moving wire to correct pin. Code was correct.
 - **Commits:** `9e8e49c` (firmware + DevTool), `5d70554` (gitignore fix + build artifact cleanup)
+  - All changes committed and pushed as `55189fd`
+
+---
+
+## Prompt #143
+- **Date/Time:** 2026-04-14
+- **Prompt:** "Update the documentation and website and blog with the joystick session. I have added some HEIC images — convert them to JPEG, annotate what's in them, update the MD docs where relevant. Update the blog and docs on the site as well. There is a battery pic in these files — get the battery model and begin to plan out how to wire that up. Then update the prompts and commit."
+- **Input Tokens (est):** ~150
+- **Output Tokens (est):** ~20,000
+- **Files Created/Modified:**
+  - 16 HEIC images converted to JPEG in `website/docs/assets/images/hardware/build-session/` with descriptive names: sassy-octopus-display-front, pico-w-epaper-stacked-rear, jamal-plush-armchair, dollatek-joystick-closeup, pico-w-jumper-wires-display-side/angle, pico-w-gpio-wiring-top/closeup, test-bench-full-with-joystick, joystick-selector-tired-mood/hungry-left/hungry-npcs, lipo-battery-inncraft-1000mah, workspace-full-breadboard-setup, joystick-on-breadboard
+  - `assets/*.heic` (16 files deleted — replaced with JPEGs above)
+  - `website/docs/blog/posts/joystick-first-input.md` (created — blog post: joystick build session with 6 annotated photos, wiring mixup story, battery planning, next steps)
+  - `website/docs/docs/hardware/battery-wiring.md` (modified — added battery photo to specifications section)
+  - `website/docs/docs/hardware/joystick-wiring.md` (modified — added joystick close-up photo to overview section)
+  - `website/docs/docs/hardware/wiring-pinout.md` (modified — added GPIO wiring photo at top of page)
+  - `website/docs/index.md` (modified — updated Phase 2 status with joystick milestone, added live hardware photo)
+  - `README.md` (modified — marked serial input and GPIO joystick as done, added battery power as next step)
+  - `PromptProgression.md` (modified — added Prompt #143)
+  - `website/docs/prompts/index.md` (modified — added Prompt #143)
+  - Battery identified: InnCraft Energy INS503450, 1000mAh, 3.7V, Molex 51021-0200 — matches existing battery wiring guide exactly. Wiring plan: direct to VSYS (pin 39) for breadboard testing, TP4056 for permanent build.
   - All changes committed and pushed

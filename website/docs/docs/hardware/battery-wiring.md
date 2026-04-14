@@ -59,6 +59,11 @@ This guide covers three wiring options from simplest to most featured, with the 
 
 ## Battery Specifications
 
+<figure markdown="span">
+  ![InnCraft Energy 1000mAh LiPo battery with Molex connector](../../assets/images/hardware/build-session/lipo-battery-inncraft-1000mah.jpg){ width="450" loading=lazy }
+  <figcaption>InnCraft Energy 503450 — 1000mAh, 3.7V. Red (+) and black (-) wires terminate in a Molex 51021-0200 1.25mm connector.</figcaption>
+</figure>
+
 | Attribute | Value |
 |-----------|-------|
 | **Product** | InnCraft Energy Lithium Polymer Battery |

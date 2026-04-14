@@ -120,11 +120,16 @@ Select a program and you get a live preview, estimated firmware size (~100KB), h
 ## Current Phase
 
 !!! info "Phase 2 — Firmware Foundation (C on Pico W)"
-    Phase 1 (hardware + tooling) is complete. The octopus has 16 emotional states, 17 standalone firmware programs, custom body shapes, and runtime math-based rendering — all in ~100KB. Next up: user input (serial commands and GPIO buttons) and the pet state machine.
+    Phase 1 (hardware + tooling) is complete. The octopus has 16 emotional states, 18 standalone firmware programs, custom body shapes, and runtime math-based rendering — all in ~100KB. GPIO joystick input is now live.
 
-    **Done:** Runtime rendering engine | 16 emotions | Body animations | Custom fat/lazy bodies | 823 quotes | C-faithful preview renderer | DevTool with firmware size estimation
+    **Done:** Runtime rendering engine | 16 emotions | Body animations | Custom fat/lazy bodies | 823 quotes | C-faithful preview renderer | DevTool with firmware size estimation | **GPIO joystick input** | On-screen input indicator
 
-    **Next:** Serial command input | GPIO buttons | Game loop with state machine
+    **Next:** Battery power (LiPo on VSYS) | Game loop with state machine
+
+<figure markdown="span">
+  ![Joystick mood selector running on real hardware](assets/images/hardware/build-session/joystick-selector-tired-mood.jpg){ width="500" loading=lazy }
+  <figcaption>Joystick Mood Selector running on real hardware — TIRED mood, triggered by joystick UP input</figcaption>
+</figure>
 
 ---
 
