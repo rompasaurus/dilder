@@ -10,8 +10,6 @@ Dilder is a Tamagotchi-style device built on a Raspberry Pi Pico W, a Waveshare 
 
 ## The Origin Story — How Jamal Was Found
 
-<div class="grid" markdown>
-
 <figure markdown="span">
   ![Jamal the plush octopus, lounging in a chair like he owns the place](assets/images/jamal-the-original.jpg){ width="420" loading=lazy }
   <figcaption>Jamal. Chair thief. Hat enthusiast. The one who started it all.</figcaption>
@@ -32,8 +30,6 @@ Not literally — we're not mad scientists (yet). But what if we could build a t
 That's how Dilder was born. Not from a grand engineering vision or a product roadmap — from a plush octopus in a discount bin and two people who couldn't stop giving him a backstory on the walk home.
 
 Jamal still sits in the armchair. He still wears the hat. He watches us build his digital self from across the room, and honestly? He looks unimpressed. Which tracks.
-
-</div>
 
 ---
 

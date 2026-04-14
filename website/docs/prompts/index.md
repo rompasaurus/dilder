@@ -1198,3 +1198,13 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Input Tokens (est):** ~200
 - **Output Tokens (est):** ~12,000
 - **Files:** `assets/pictures/Jamal.heic` (deleted — replaced with JPEG), `website/docs/assets/images/jamal-the-original.jpg` (created from HEIC conversion), `website/docs/index.md` (added origin story with photo), `website/docs/blog/index.md` (added condensed backstory with photo), `website/docs/docs/index.md` (added "The Namesake" section), `README.md` (added "How It Started — Meet Jamal" with photo), `website/docs/about/index.md` (added full origin story), `PromptProgression.md` (#138), `website/docs/prompts/index.md` (#138)
+
+---
+
+## Prompt #139 — 2026-04-14
+
+**Prompt:** "The origin story formatting is a bit weird with the image — don't split the text in half, just make it all one block. Give the picture its own line without text wrapped around it."
+
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~1,500
+- **Files:** `website/docs/index.md` (removed grid div wrapper from origin story — image and text now flow as single column), `PromptProgression.md` (#139), `website/docs/prompts/index.md` (#139)

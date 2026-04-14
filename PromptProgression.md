@@ -1722,3 +1722,16 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `PromptProgression.md` (modified — added Prompt #138)
   - `website/docs/prompts/index.md` (modified — added Prompt #138)
   - All changes committed and pushed
+
+---
+
+## Prompt #139
+- **Date/Time:** 2026-04-14
+- **Prompt:** "The origin story formatting is a bit weird with the image — don't split the text in half, just make it all one block. Highlight the quote like you did, just place it on its own line and give the picture its own line without text wrapped around it."
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~1,500
+- **Files Created/Modified:**
+  - `website/docs/index.md` (modified — removed grid div wrapper from origin story so image and text flow as single column instead of side-by-side)
+  - `PromptProgression.md` (modified — added Prompt #139)
+  - `website/docs/prompts/index.md` (modified — added Prompt #139)
+  - All changes committed and pushed
