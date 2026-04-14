@@ -1248,3 +1248,14 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Input Tokens (est):** ~150
 - **Output Tokens (est):** ~20,000
 - **Files:** 16 HEIC images converted to named JPEGs in `build-session/` directory (joystick closeup, test bench, mood selector running with input indicators, LiPo battery, GPIO wiring, workspace). `website/docs/blog/posts/joystick-first-input.md` (created — build session blog post with 6 photos). Battery/joystick/wiring docs updated with hardware photos. Home page updated with Phase 2 joystick milestone and live hardware photo. README milestones updated. Battery confirmed: InnCraft Energy INS503450, 1000mAh, matches existing wiring guide. `PromptProgression.md` (#143), `website/docs/prompts/index.md` (#143)
+
+---
+
+## Prompt #144 — 2026-04-14 to 2026-04-15
+
+**Prompt:** "Create a KiCad setup, component selection, schematic, and PCB board design for custom Dilder hardware." (Multi-session, ~30 follow-up prompts evolving through RP2040 to ESP32-S3 transition, autorouting attempts, display connector research.)
+
+- **Input Tokens (est):** ~5,000
+- **Output Tokens (est):** ~200,000
+- **Key Decisions:** RP2040 → ESP32-S3-WROOM-1-N16R8 (WiFi+BLE, 16MB flash, 8MB PSRAM). 2-layer → 4-layer PCB. 24-pin FPC → 8-pin header for Waveshare display. Board target: ~30x75mm. FreeRouting autorouter installed. JLCPCB for fabrication.
+- **Files:** `docs/esp32-s3-pcb-research.md` (created — module research, antenna keep-out, reference designs, layout strategy). `hardware-design/pcb-design-plan.md` (major update — ESP32-S3 transition). `hardware-design/setup-kicad-jlcpcb.py` (KiCad + JLCPCB plugin installer). `hardware-design/Board Design kicad/` (KiCad project: .kicad_pro, .kicad_sch, .kicad_pcb, build scripts). `website/docs/docs/reference/esp32-s3-wroom1.md` (ESP32-S3 reference page). Website nav + design docs updated. Commit: `PENDING`

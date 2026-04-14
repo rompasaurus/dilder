@@ -437,6 +437,9 @@ A capable but niche tool with a unique pool-based library system.
 
 ## 5. The RP2040 Minimal Circuit
 
+!!! warning "Update: Transition to ESP32-S3"
+    The Dilder project has transitioned from the RP2040 to the **ESP32-S3-WROOM-1-N16R8** module for built-in WiFi and BLE support. The RP2040 minimal circuit below is retained for historical reference. See the [ESP32-S3 WROOM-1 reference page](../reference/esp32-s3-wroom1.md) for current hardware details.
+
 The RP2040 chip needs a specific supporting circuit to function. This is well-documented by Raspberry Pi.
 
 ### 5.1 Required Components

@@ -135,6 +135,7 @@ nav:
           - Pico W: docs/reference/pico-w.md
           - Pi Zero WH (future): docs/reference/pi-zero-wh.md
           - Waveshare e-Paper HAT: docs/reference/waveshare-eink.md
+          - ESP32-S3 WROOM-1: docs/reference/esp32-s3-wroom1.md
   - Community:
       - Overview: community/index.md
       - Discord: community/discord.md

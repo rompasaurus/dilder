@@ -1813,3 +1813,33 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `website/docs/prompts/index.md` (modified — added Prompt #143)
   - Battery identified: InnCraft Energy INS503450, 1000mAh, 3.7V, Molex 51021-0200 — matches existing battery wiring guide exactly. Wiring plan: direct to VSYS (pin 39) for breadboard testing, TP4056 for permanent build.
   - All changes committed and pushed
+
+---
+
+## Prompt #144
+- **Date/Time:** 2026-04-14 to 2026-04-15
+- **Prompt:** "Create a setup script for KiCad to pull in the JLCPCB tools so that we can begin to model out the schematics and then board design... we basically need to copy out the Pico WH schematic and add a battery connection and charging circuit and a joystick input along with an accelerometer and GPS module... begin with a planning document, pull in the tools, make the schematic, then get the board modelled." (Multi-session — evolved through ~30 follow-up prompts covering PCB design, component selection, autorouting, MCU change from RP2040 to ESP32-S3, display connector research.)
+- **Input Tokens (est):** ~5,000 (across ~30 prompts)
+- **Output Tokens (est):** ~200,000
+- **Commit:** `PENDING`
+- **Key Decisions Made:**
+  - Switched MCU from RP2040 to **ESP32-S3-WROOM-1-N16R8** (WiFi+BLE, 16MB flash, 8MB PSRAM built in)
+  - Eliminated 7 components (external flash, crystal, caps, USB resistors) by using module
+  - Switched from 2-layer to **4-layer PCB** (required for routing under ESP32 ground pad)
+  - Display connector: 8-pin 2.54mm header (connects to Waveshare HAT via ribbon cable, NOT raw 24-pin FPC)
+  - Board target: ~30x75mm, 4-layer
+  - Installed FreeRouting autorouter (downloaded portable Linux binary)
+  - JLCPCB selected for fabrication (ships to Germany)
+- **Files Created/Modified:**
+  - `docs/esp32-s3-pcb-research.md` (created — ESP32-S3 module research: specs, antenna keep-out, ground pad routing, reference designs, 4-layer stackup, component placement strategy)
+  - `hardware-design/pcb-design-plan.md` (major rewrite — RP2040 to ESP32-S3, updated BOM, GPIO pinout, layout strategy, fabrication steps)
+  - `hardware-design/setup-kicad-jlcpcb.py` (created — automated KiCad + JLCPCB plugin setup)
+  - `hardware-design/Board Design kicad/dilder.kicad_pro` (created — KiCad project file)
+  - `hardware-design/Board Design kicad/dilder.kicad_sch` (created — schematic with all components + net labels)
+  - `hardware-design/Board Design kicad/dilder.kicad_pcb` (created — 4-layer PCB, 27 components placed via pcbnew API)
+  - `hardware-design/Board Design kicad/build_esp32s3.py` (created — builds PCB with real footprints, multiple iterations v1-v6)
+  - `hardware-design/Board Design kicad/generate_schematic.py` (created — generates wired KiCad schematic)
+  - `website/docs/docs/reference/esp32-s3-wroom1.md` (created — ESP32-S3 reference page)
+  - `website/docs/docs/design/custom-pcb-design-research.md` (modified — added ESP32-S3 transition notice)
+  - `website/mkdocs.yml` (modified — added ESP32-S3 reference nav entry)
+  - `PromptProgression.md` (modified — added Prompt #144)
