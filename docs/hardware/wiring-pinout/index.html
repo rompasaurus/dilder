@@ -1111,27 +1111,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#display-wiring-jumper-wires" class="md-nav__link">
+  <a href="#display-hardware-waveshare-pico-epaper-213" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Display Wiring (Jumper Wires)
+        Display Hardware — Waveshare Pico-ePaper-2.13
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Display Wiring (Jumper Wires)">
+    <nav class="md-nav" aria-label="Display Hardware — Waveshare Pico-ePaper-2.13">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#display-pin-mapping" class="md-nav__link">
+  <a href="#display-pin-mapping-pico-w" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Display Pin Mapping
+        Display Pin Mapping (Pico W)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Display Pin Mapping">
+    <nav class="md-nav" aria-label="Display Pin Mapping (Pico W)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2393,27 +2393,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#display-wiring-jumper-wires" class="md-nav__link">
+  <a href="#display-hardware-waveshare-pico-epaper-213" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Display Wiring (Jumper Wires)
+        Display Hardware — Waveshare Pico-ePaper-2.13
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Display Wiring (Jumper Wires)">
+    <nav class="md-nav" aria-label="Display Hardware — Waveshare Pico-ePaper-2.13">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#display-pin-mapping" class="md-nav__link">
+  <a href="#display-pin-mapping-pico-w" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Display Pin Mapping
+        Display Pin Mapping (Pico W)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Display Pin Mapping">
+    <nav class="md-nav" aria-label="Display Pin Mapping (Pico W)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2545,20 +2545,20 @@
 <p>Full official hardware reference docs:</p>
 <ul>
 <li><a href="../../reference/pico-w/">Raspberry Pi Pico W reference</a></li>
-<li><a href="../../reference/waveshare-eink/">Waveshare 2.13" e-Paper HAT reference</a></li>
+<li><a href="../../reference/waveshare-eink/">Waveshare Pico-ePaper-2.13 reference</a></li>
 </ul>
 <hr />
-<h2 id="display-wiring-jumper-wires">Display Wiring (Jumper Wires)<a class="headerlink" href="#display-wiring-jumper-wires" title="Permanent link">&para;</a></h2>
-<p>The Waveshare 2.13" e-Paper HAT is designed for the Pi Zero's 40-pin header, but the Pico W has a different pinout. Connect the display to the Pico W using <strong>female-to-male jumper wires</strong> from the HAT's 8-pin header.</p>
+<h2 id="display-hardware-waveshare-pico-epaper-213">Display Hardware — Waveshare Pico-ePaper-2.13<a class="headerlink" href="#display-hardware-waveshare-pico-epaper-213" title="Permanent link">&para;</a></h2>
+<p>The Waveshare Pico-ePaper-2.13 is a <strong>Pico-native module</strong> with a <strong>40-pin female GPIO header</strong> on the back — designed to plug directly onto the Raspberry Pi Pico W's male header pins. When seated on the Pico, all SPI, control, and power connections are made automatically through the header.</p>
 <div class="admonition tip">
-<p class="admonition-title">Finding the 8-pin header</p>
-<p>The HAT has an 8-pin 2.54mm pitch header along one edge, labeled: VCC, GND, DIN, CLK, CS, DC, RST, BUSY. Use F-M jumper wires from these pins to the Pico W on your breadboard.</p>
+<p class="admonition-title">Direct plug vs. breadboard</p>
+<p>You can plug the module straight onto the Pico W for a compact setup with no wiring. For breadboard prototyping (where you need access to all Pico pins for other peripherals like the joystick, GPS, etc.), use the module's <strong>8-pin breakout header</strong> with female-to-male jumper wires instead.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Power off before wiring</p>
 <p>Always disconnect USB before connecting or disconnecting jumper wires. The e-ink panel can be damaged by voltage spikes.</p>
 </div>
-<h3 id="display-pin-mapping">Display Pin Mapping<a class="headerlink" href="#display-pin-mapping" title="Permanent link">&para;</a></h3>
+<h3 id="display-pin-mapping-pico-w">Display Pin Mapping (Pico W)<a class="headerlink" href="#display-pin-mapping-pico-w" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2571,10 +2571,10 @@
 </thead>
 <tbody>
 <tr>
-<td>VCC</td>
-<td>3.3V power</td>
-<td>3V3(OUT)</td>
-<td>36</td>
+<td>VSYS</td>
+<td>System power (1.8-5.5V)</td>
+<td>VSYS</td>
+<td>39</td>
 <td>→ display</td>
 </tr>
 <tr>
@@ -2779,10 +2779,10 @@
 <td>Digital in</td>
 </tr>
 <tr>
-<td>e-ink VCC</td>
-<td>3V3(OUT)</td>
-<td>36</td>
-<td>Power</td>
+<td>e-ink VSYS</td>
+<td>VSYS</td>
+<td>39</td>
+<td>Power (onboard regulator)</td>
 </tr>
 <tr>
 <td>e-ink GND</td>
@@ -2854,17 +2854,17 @@
 </table>
 <div class="admonition tip">
 <p class="admonition-title">Battery power</p>
-<p>The 3.7V LiPo connects to VSYS (pin 39) and GND (pin 38) — no GPIO pins consumed. See the dedicated <a href="../battery-wiring/">Battery Wiring Guide</a> for full setup instructions, charging options, and voltage monitoring.</p>
+<p>The 3.7V LiPo connects to VSYS (pin 39) and GND (pin 38) — shared with the e-Paper module's power rail. See the dedicated <a href="../battery-wiring/">Battery Wiring Guide</a> for full setup instructions, charging options, and voltage monitoring.</p>
 </div>
 <hr />
 <h2 id="pico-w-pin-map-visual">Pico W Pin Map (Visual)<a class="headerlink" href="#pico-w-pin-map-visual" title="Permanent link">&para;</a></h2>
 <p>Pins used by this project are highlighted. Full electrical specs in the <a href="../../reference/pico-w/">Pico W reference</a>.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>               ┌───USB───┐
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>   GP0  [ 1]   │         │  [40]  VBUS
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>   GP1  [ 2]   │  PICO   │  [39]  VSYS
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>   GP1  [ 2]   │  PICO   │  [39]  VSYS      ◄── e-ink VSYS
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>   GND  [ 3]   │    W    │  [38]  GND       ◄── e-ink GND
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>▶  GP2  [ 4]   │         │  [37]  3V3_EN
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>▶  GP3  [ 5]   │         │  [36]  3V3(OUT)  ◄── e-ink VCC
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>▶  GP3  [ 5]   │         │  [36]  3V3(OUT)
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>▶  GP4  [ 6]   │         │  [35]  ADC_VREF
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>▶  GP5  [ 7]   │         │  [34]  GP28
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>   GND  [ 8]   │         │  [33]  AGND
@@ -2884,14 +2884,14 @@
 </span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>▶ = used by Dilder
 </span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>
 </span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>Left side (pins 4–17):  Buttons (GP2–GP6) + Display SPI (GP8–GP13)
-</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>Right side (pin 36):    3V3 power to display
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>Right side (pin 39):    VSYS power to display (onboard regulator)
 </span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>Right side (pin 38):    GND to display
 </span></code></pre></div>
 <hr />
 <h2 id="wiring-diagram-text">Wiring Diagram (Text)<a class="headerlink" href="#wiring-diagram-text" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Pico W (on breadboard)
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>│
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├─ Pin 36 (3V3 OUT) ──────────── e-Paper VCC
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├─ Pin 39 (VSYS)    ──────────── e-Paper VSYS
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>├─ Pin 38 (GND)     ──────────── e-Paper GND ── breadboard GND rail
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>├─ Pin 15 (GP11 / SPI1 TX)  ──── e-Paper DIN
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>├─ Pin 14 (GP10 / SPI1 SCK) ──── e-Paper CLK
@@ -2908,7 +2908,7 @@
 </span></code></pre></div>
 <hr />
 <h2 id="spi-configuration">SPI Configuration<a class="headerlink" href="#spi-configuration" title="Permanent link">&para;</a></h2>
-<p>The e-ink display uses SPI1 on the Pico W. No kernel configuration needed — SPI is set up in MicroPython code.</p>
+<p>The e-ink display uses <strong>SPI1</strong> on the Pico W. No kernel configuration needed — SPI is set up in MicroPython code.</p>
 <table>
 <thead>
 <tr>
@@ -2957,7 +2957,7 @@
 <tbody>
 <tr>
 <td>Display shows nothing</td>
-<td>Wiring correct? VCC on 3V3(OUT) not VBUS? SPI pins correct?</td>
+<td>Wiring correct? VSYS on pin 39? SPI pins correct?</td>
 </tr>
 <tr>
 <td>Garbage output</td>

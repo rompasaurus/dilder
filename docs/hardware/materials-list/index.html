@@ -1150,10 +1150,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#waveshare-213-e-paper-hat-v3" class="md-nav__link">
+  <a href="#waveshare-pico-epaper-213" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Waveshare 2.13" e-Paper HAT V3
+        Waveshare Pico-ePaper-2.13
       
     </span>
   </a>
@@ -2426,10 +2426,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#waveshare-213-e-paper-hat-v3" class="md-nav__link">
+  <a href="#waveshare-pico-epaper-213" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Waveshare 2.13" e-Paper HAT V3
+        Waveshare Pico-ePaper-2.13
       
     </span>
   </a>
@@ -2496,9 +2496,9 @@
 <td>RP2040 dual-core, 264KB SRAM, 2MB flash, WiFi + BLE. Micro-USB for power and programming.</td>
 </tr>
 <tr>
-<td>Waveshare 2.13" e-Paper HAT V3</td>
+<td>Waveshare Pico-ePaper-2.13</td>
 <td>~€15</td>
-<td>SSD1680 driver, 250×122px, black/white. Connected to Pico W via <strong>jumper wires</strong> (not HAT connector).</td>
+<td>SSD1680 driver, 250×122px, black/white. Pico-native module — plugs directly onto the Pico W's 40-pin header, or connect via <strong>8-pin breakout header</strong> with jumper wires for breadboard use.</td>
 </tr>
 <tr>
 <td>Micro-USB cable</td>
@@ -2513,7 +2513,7 @@
 <tr>
 <td>Jumper wire kit (M-F and M-M)</td>
 <td>~€4</td>
-<td><strong>Required</strong> — the display HAT cannot plug directly into the Pico W. Use F-M wires from the HAT's 8-pin header to the breadboard.</td>
+<td>Needed for breadboard wiring (joystick, GPS, HC-SR04). Display can plug directly onto Pico or use F-M wires from its 8-pin breakout header.</td>
 </tr>
 <tr>
 <td>6×6mm tactile buttons (pack of 20)</td>
@@ -2658,7 +2658,7 @@
 </tbody>
 </table>
 <p>Full reference: <a href="../../reference/pico-w/">Pico W Reference</a></p>
-<h3 id="waveshare-213-e-paper-hat-v3">Waveshare 2.13" e-Paper HAT V3<a class="headerlink" href="#waveshare-213-e-paper-hat-v3" title="Permanent link">&para;</a></h3>
+<h3 id="waveshare-pico-epaper-213">Waveshare Pico-ePaper-2.13<a class="headerlink" href="#waveshare-pico-epaper-213" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2689,11 +2689,15 @@
 </tr>
 <tr>
 <td>Interface</td>
-<td>SPI (4-wire, Mode 0)</td>
+<td>SPI1 (4-wire, Mode 0)</td>
 </tr>
 <tr>
-<td>Operating voltage</td>
-<td>3.3V / 5V (onboard translator)</td>
+<td>Power</td>
+<td>VSYS (1.8-5.5V, onboard regulator)</td>
+</tr>
+<tr>
+<td>Form factor</td>
+<td>Pico-native — 40-pin female header plugs directly onto Pico W</td>
 </tr>
 <tr>
 <td>Full refresh time</td>
