@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://dilder.dev/blog/esp32-s3-pcb-design/">
       
       
-        <link rel="prev" href="../custom-pcb-research/">
+        <link rel="prev" href="../esp32-schematic-complete/">
       
       
       
@@ -769,6 +769,36 @@
     
   
     Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../category/manufacturing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manufacturing
   
 
     
@@ -1548,6 +1578,34 @@
     
   
     Open-Source Board Designs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../docs/design/motion-location-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Motion & Location Detection
   
 
     
@@ -2616,8 +2674,8 @@
 <td>MCU — WiFi, BLE, flash, PSRAM</td>
 </tr>
 <tr>
-<td>MPU-6050</td>
-<td>6-axis IMU (accelerometer + gyroscope)</td>
+<td>LIS2DH12TR</td>
+<td>3-axis accelerometer (built-in pedometer)</td>
 </tr>
 <tr>
 <td>AMS1117-3.3</td>
@@ -2647,12 +2705,12 @@
 </table>
 <p>27 components total, including passives. Compare that to the ~34+ we would have needed with a bare RP2040.</p>
 <h3 id="the-schematic">The Schematic<a class="headerlink" href="#the-schematic" title="Permanent link">&para;</a></h3>
-<p>The schematic was built in sections: power (USB-C to TP4056 charger to battery protection to AMS1117 LDO), MCU (ESP32-S3 with boot/reset buttons and USB data lines), peripherals (MPU-6050 on I2C, joystick on GPIO, ePaper connector with SPI signals). Net labels keep the schematic readable — no rats' nest of wires crossing the sheet.</p>
+<p>The schematic was built in sections: power (USB-C to TP4056 charger to battery protection to AMS1117 LDO), MCU (ESP32-S3 with boot/reset buttons and USB data lines), peripherals (LIS2DH12TR on I2C, joystick on GPIO, ePaper connector with SPI signals). Net labels keep the schematic readable — no rats' nest of wires crossing the sheet.</p>
 <h3 id="board-layout-iteration-after-iteration">Board Layout — Iteration After Iteration<a class="headerlink" href="#board-layout-iteration-after-iteration" title="Permanent link">&para;</a></h3>
 <p>Layout is where the real decisions happen. We went through multiple placement iterations, optimizing based on signal flow, antenna requirements, and mechanical constraints:</p>
 <ul>
 <li><strong>ESP32-S3 at the top</strong> — antenna overhanging the board edge for best RF performance</li>
-<li><strong>MPU-6050 below-left</strong> — close to the MCU for clean I2C routing</li>
+<li><strong>LIS2DH12TR below-left</strong> — close to the MCU for clean I2C routing</li>
 <li><strong>ePaper connector below-right</strong> — 8-pin JST-SH header for the display ribbon cable</li>
 <li><strong>Power section in the middle</strong> — AMS1117, TP4056, battery protection clustered together</li>
 <li><strong>5-way joystick centered above USB-C at the bottom</strong> — ergonomic thumb position</li>
@@ -2757,7 +2815,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../custom-pcb-research/" class="md-footer__link md-footer__link--prev" aria-label="Previous: From Breadboard to Custom PCB — The Research">
+          <a href="../esp32-schematic-complete/" class="md-footer__link md-footer__link--prev" aria-label="Previous: The ESP32-S3 Schematic is Fully Wired">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2767,7 +2825,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                From Breadboard to Custom PCB — The Research
+                The ESP32-S3 Schematic is Fully Wired
               </div>
             </div>
           </a>

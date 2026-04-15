@@ -12,13 +12,13 @@
         <meta name="author" content="rompasaurus">
       
       
-        <link rel="canonical" href="https://dilder.dev/docs/tools/devtool/">
+        <link rel="canonical" href="https://dilder.dev/docs/design/motion-location-detection/">
       
       
-        <link rel="prev" href="../../software/emotion-states/">
+        <link rel="prev" href="../open-board-designs/">
       
       
-        <link rel="next" href="../setup-cli/">
+        <link rel="next" href="../../software/project-structure/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>DevTool (GUI) - Dilder</title>
+        <title>Motion & Location Detection - Dilder</title>
       
     
     
@@ -92,7 +92,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#devtool-pico-w-development-companion" class="md-skip">
+        <a href="#motion-location-detection-design-plan" class="md-skip">
           Skip to content
         </a>
       
@@ -126,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              DevTool (GUI)
+              Motion & Location Detection
             
           </span>
         </div>
@@ -1429,6 +1429,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1444,11 +1446,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
         
           
           <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
@@ -1469,7 +1471,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1487,7 +1489,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/user-engagement-plan/" class="md-nav__link">
+      <a href="../user-engagement-plan/" class="md-nav__link">
         
   
   
@@ -1515,7 +1517,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/custom-pcb-design-research/" class="md-nav__link">
+      <a href="../custom-pcb-design-research/" class="md-nav__link">
         
   
   
@@ -1543,7 +1545,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/pcb-assembly-and-prototyping/" class="md-nav__link">
+      <a href="../pcb-assembly-and-prototyping/" class="md-nav__link">
         
   
   
@@ -1571,7 +1573,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/open-board-designs/" class="md-nav__link">
+      <a href="../open-board-designs/" class="md-nav__link">
         
   
   
@@ -1596,10 +1598,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../design/motion-location-detection/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Motion & Location Detection
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1615,6 +1644,464 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-design-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Design Goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-hardware-lis2dh12tr-accelerometer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Hardware — LIS2DH12TR Accelerometer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Hardware — LIS2DH12TR Accelerometer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-lis2dh12tr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why LIS2DH12TR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specifications
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pin-connections-dilder-board" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pin Connections (Dilder Board)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-savings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost Savings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-motion-detection-what-the-accelerometer-provides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Motion Detection — What the Accelerometer Provides
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Motion Detection — What the Accelerometer Provides">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-step-counting-hardware-pedometer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Step Counting (Hardware Pedometer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-shake-tap-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Shake / Tap Detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-activity-inactivity-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Activity / Inactivity Detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-orientation-detection-6d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Orientation Detection (6D)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-free-fall-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Free-Fall Detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-location-detection-wifi-fingerprinting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Location Detection — WiFi Fingerprinting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Location Detection — WiFi Fingerprinting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accuracy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accuracy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power Cost
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-it-cant-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What It Can't Do
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-location-detection-ble-scanning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Location Detection — BLE Scanning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Location Detection — BLE Scanning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-cost_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power Cost
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#best-used-for" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Used For
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-integration-with-pet-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Integration with Pet Logic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Integration with Pet Logic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sensor-events-pet-behaviors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensor Events → Pet Behaviors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-persistence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Persistence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-power-budget" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Power Budget
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Power Budget">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#motion-location-detection-power" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motion + Location Detection Power
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comparison-with-gps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison with GPS
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-why-not-gps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Why Not GPS?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-implementation-phases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Implementation Phases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Implementation Phases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-current-hardware-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2 (Current) — Hardware Foundation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-pet-logic-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 — Pet Logic (Firmware)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-location-awareness-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Location Awareness (Firmware)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-7-optional-gps-expansion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 7 — Optional GPS Expansion
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1751,8 +2238,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1768,11 +2253,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
         
           
           <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
@@ -1793,7 +2278,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1808,37 +2293,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DevTool (GUI)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../tools/devtool/" class="md-nav__link">
         
   
   
@@ -1854,669 +2312,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requirements
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Installation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#install-system-dependencies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Install System Dependencies
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#install-python-dependencies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Install Python Dependencies
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verify
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#launching-the-devtool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Launching the DevTool
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tab-1-display-emulator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tab 1 — Display Emulator
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Tab 1 — Display Emulator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#drawing-tools" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Drawing Tools
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Drawing Tools">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pencil-tool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pencil Tool
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#eraser-tool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Eraser Tool
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#line-tool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Line Tool
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rectangle-tool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rectangle Tool
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#filled-rectangle-tool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Filled Rectangle Tool
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#text-tool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Text Tool
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#drawing-demo" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Drawing Demo
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#invert-function" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Invert Function
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#text-tool_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Text Tool
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#saving-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Saving Images
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#loading-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Loading Images
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#send-to-pico" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Send to Pico
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tab-2-serial-monitor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tab 2 — Serial Monitor
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Tab 2 — Serial Monitor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#connecting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Connecting
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#viewing-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Viewing Output
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#sending-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sending Commands
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#saving-logs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Saving Logs
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tab-3-flash-firmware" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tab 3 — Flash Firmware
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Tab 3 — Flash Firmware">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#selecting-a-uf2-file" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Selecting a UF2 File
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#flashing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Flashing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#building-from-source" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Building from Source
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tab-4-asset-manager" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tab 4 — Asset Manager
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Tab 4 — Asset Manager">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#browsing-assets" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Browsing Assets
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#previewing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Previewing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#deleting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Deleting
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tab-5-programs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tab 5 — Programs
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Tab 5 — Programs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#program-list" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Program List
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#previewing_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Previewing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#deploy-to-pico-streaming" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Deploy to Pico (Streaming)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#deploy-standalone" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Deploy Standalone
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#available-programs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Available Programs
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tab-6-gpio-pin-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tab 6 — GPIO Pin Reference
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tab-7-connection-utility" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tab 7 — Connection Utility
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Tab 7 — Connection Utility">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#usb-serial-walkthrough" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        USB Serial Walkthrough
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#wi-fi-walkthrough" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Wi-Fi Walkthrough
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tab-8-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tab 8 — Documentation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#file-formats" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        File Formats
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="File Formats">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pbm-portable-bitmap-p4-binary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        PBM (Portable Bitmap — P4 Binary)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#bin-raw-display-buffer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        BIN (Raw Display Buffer)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#png-portable-network-graphics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        PNG (Portable Network Graphics)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#architecture-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Architecture Overview
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Architecture Overview">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Class Structure
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#startup-behavior" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Startup Behavior
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#threading" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Threading
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2529,7 +2324,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../setup-cli/" class="md-nav__link">
+      <a href="../../tools/setup-cli/" class="md-nav__link">
         
   
   
@@ -2557,7 +2352,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../website-dev/" class="md-nav__link">
+      <a href="../../tools/website-dev/" class="md-nav__link">
         
   
   
@@ -3080,10 +2875,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
+  <a href="#table-of-contents" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Requirements
+        Table of Contents
       
     </span>
   </a>
@@ -3091,22 +2886,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#1-design-goals" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        1. Design Goals
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Installation">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-hardware-lis2dh12tr-accelerometer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Hardware — LIS2DH12TR Accelerometer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Hardware — LIS2DH12TR Accelerometer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#install-system-dependencies" class="md-nav__link">
+  <a href="#why-lis2dh12tr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install System Dependencies
+        Why LIS2DH12TR
       
     </span>
   </a>
@@ -3114,10 +2920,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#install-python-dependencies" class="md-nav__link">
+  <a href="#specifications" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install Python Dependencies
+        Specifications
       
     </span>
   </a>
@@ -3125,10 +2931,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
+  <a href="#pin-connections-dilder-board" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verify
+        Pin Connections (Dilder Board)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-savings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost Savings
       
     </span>
   </a>
@@ -3141,45 +2958,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#launching-the-devtool" class="md-nav__link">
+  <a href="#3-motion-detection-what-the-accelerometer-provides" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Launching the DevTool
+        3. Motion Detection — What the Accelerometer Provides
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tab-1-display-emulator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tab 1 — Display Emulator
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Tab 1 — Display Emulator">
+    <nav class="md-nav" aria-label="3. Motion Detection — What the Accelerometer Provides">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#drawing-tools" class="md-nav__link">
+  <a href="#31-step-counting-hardware-pedometer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Drawing Tools
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Drawing Tools">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pencil-tool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pencil Tool
+        3.1 Step Counting (Hardware Pedometer)
       
     </span>
   </a>
@@ -3187,10 +2981,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#eraser-tool" class="md-nav__link">
+  <a href="#32-shake-tap-detection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Eraser Tool
+        3.2 Shake / Tap Detection
       
     </span>
   </a>
@@ -3198,10 +2992,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#line-tool" class="md-nav__link">
+  <a href="#33-activity-inactivity-detection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Line Tool
+        3.3 Activity / Inactivity Detection
       
     </span>
   </a>
@@ -3209,10 +3003,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#rectangle-tool" class="md-nav__link">
+  <a href="#34-orientation-detection-6d" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rectangle Tool
+        3.4 Orientation Detection (6D)
       
     </span>
   </a>
@@ -3220,92 +3014,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#filled-rectangle-tool" class="md-nav__link">
+  <a href="#35-free-fall-detection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Filled Rectangle Tool
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#text-tool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Text Tool
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#drawing-demo" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Drawing Demo
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#invert-function" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Invert Function
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#text-tool_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Text Tool
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#saving-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Saving Images
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#loading-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Loading Images
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#send-to-pico" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Send to Pico
+        3.5 Free-Fall Detection
       
     </span>
   </a>
@@ -3318,22 +3030,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tab-2-serial-monitor" class="md-nav__link">
+  <a href="#4-location-detection-wifi-fingerprinting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tab 2 — Serial Monitor
+        4. Location Detection — WiFi Fingerprinting
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Tab 2 — Serial Monitor">
+    <nav class="md-nav" aria-label="4. Location Detection — WiFi Fingerprinting">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#connecting" class="md-nav__link">
+  <a href="#how-it-works" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Connecting
+        How It Works
       
     </span>
   </a>
@@ -3341,10 +3053,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#viewing-output" class="md-nav__link">
+  <a href="#algorithm" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Viewing Output
+        Algorithm
       
     </span>
   </a>
@@ -3352,10 +3064,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sending-commands" class="md-nav__link">
+  <a href="#accuracy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sending Commands
+        Accuracy
       
     </span>
   </a>
@@ -3363,10 +3075,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#saving-logs" class="md-nav__link">
+  <a href="#power-cost" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Saving Logs
+        Power Cost
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-it-cant-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What It Can't Do
       
     </span>
   </a>
@@ -3379,22 +3102,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tab-3-flash-firmware" class="md-nav__link">
+  <a href="#5-location-detection-ble-scanning" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tab 3 — Flash Firmware
+        5. Location Detection — BLE Scanning
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Tab 3 — Flash Firmware">
+    <nav class="md-nav" aria-label="5. Location Detection — BLE Scanning">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#selecting-a-uf2-file" class="md-nav__link">
+  <a href="#how-it-works_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Selecting a UF2 File
+        How It Works
       
     </span>
   </a>
@@ -3402,10 +3125,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#flashing" class="md-nav__link">
+  <a href="#power-cost_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Flashing
+        Power Cost
       
     </span>
   </a>
@@ -3413,10 +3136,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#building-from-source" class="md-nav__link">
+  <a href="#best-used-for" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Building from Source
+        Best Used For
       
     </span>
   </a>
@@ -3429,22 +3152,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tab-4-asset-manager" class="md-nav__link">
+  <a href="#6-integration-with-pet-logic" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tab 4 — Asset Manager
+        6. Integration with Pet Logic
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Tab 4 — Asset Manager">
+    <nav class="md-nav" aria-label="6. Integration with Pet Logic">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#browsing-assets" class="md-nav__link">
+  <a href="#sensor-events-pet-behaviors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Browsing Assets
+        Sensor Events → Pet Behaviors
       
     </span>
   </a>
@@ -3452,21 +3175,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#previewing" class="md-nav__link">
+  <a href="#data-persistence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Previewing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#deleting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Deleting
+        Data Persistence
       
     </span>
   </a>
@@ -3479,22 +3191,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tab-5-programs" class="md-nav__link">
+  <a href="#7-power-budget" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tab 5 — Programs
+        7. Power Budget
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Tab 5 — Programs">
+    <nav class="md-nav" aria-label="7. Power Budget">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#program-list" class="md-nav__link">
+  <a href="#motion-location-detection-power" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Program List
+        Motion + Location Detection Power
       
     </span>
   </a>
@@ -3502,43 +3214,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#previewing_1" class="md-nav__link">
+  <a href="#comparison-with-gps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Previewing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#deploy-to-pico-streaming" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Deploy to Pico (Streaming)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#deploy-standalone" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Deploy Standalone
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#available-programs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Available Programs
+        Comparison with GPS
       
     </span>
   </a>
@@ -3551,10 +3230,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tab-6-gpio-pin-reference" class="md-nav__link">
+  <a href="#8-why-not-gps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tab 6 — GPIO Pin Reference
+        8. Why Not GPS?
       
     </span>
   </a>
@@ -3562,22 +3241,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tab-7-connection-utility" class="md-nav__link">
+  <a href="#9-implementation-phases" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tab 7 — Connection Utility
+        9. Implementation Phases
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Tab 7 — Connection Utility">
+    <nav class="md-nav" aria-label="9. Implementation Phases">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#usb-serial-walkthrough" class="md-nav__link">
+  <a href="#phase-2-current-hardware-foundation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        USB Serial Walkthrough
+        Phase 2 (Current) — Hardware Foundation
       
     </span>
   </a>
@@ -3585,10 +3264,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#wi-fi-walkthrough" class="md-nav__link">
+  <a href="#phase-3-pet-logic-firmware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Wi-Fi Walkthrough
+        Phase 3 — Pet Logic (Firmware)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-location-awareness-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Location Awareness (Firmware)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-7-optional-gps-expansion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 7 — Optional GPS Expansion
       
     </span>
   </a>
@@ -3601,121 +3302,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tab-8-documentation" class="md-nav__link">
+  <a href="#10-sources" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tab 8 — Documentation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#file-formats" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        File Formats
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="File Formats">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pbm-portable-bitmap-p4-binary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        PBM (Portable Bitmap — P4 Binary)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#bin-raw-display-buffer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        BIN (Raw Display Buffer)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#png-portable-network-graphics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        PNG (Portable Network Graphics)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#architecture-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Architecture Overview
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Architecture Overview">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Class Structure
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#startup-behavior" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Startup Behavior
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#threading" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Threading
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
+        10. Sources
       
     </span>
   </a>
@@ -3742,725 +3332,631 @@
   
 
 
-<h1 id="devtool-pico-w-development-companion">DevTool — Pico W Development Companion<a class="headerlink" href="#devtool-pico-w-development-companion" title="Permanent link">&para;</a></h1>
-<p>A Tkinter GUI application for developing on the Raspberry Pi Pico W with the Waveshare 2.13" e-ink display. Provides a display emulator, serial monitor, firmware flash utility, asset manager, GPIO reference, USB/Wi-Fi connection walkthrough, and built-in documentation — all in one window.</p>
+<h1 id="motion-location-detection-design-plan">Motion &amp; Location Detection — Design Plan<a class="headerlink" href="#motion-location-detection-design-plan" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>How the Dilder detects movement, counts steps, senses gestures, and knows when you've gone somewhere new — all without GPS, using a $0.46 accelerometer and the ESP32-S3's built-in WiFi and BLE.</p>
+</blockquote>
 <hr />
-<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#1-design-goals">Design Goals</a></li>
+<li><a href="#2-hardware--lis2dh12tr-accelerometer">Hardware — LIS2DH12TR Accelerometer</a></li>
+<li><a href="#3-motion-detection--what-the-accelerometer-provides">Motion Detection — What the Accelerometer Provides</a></li>
+<li><a href="#4-location-detection--wifi-fingerprinting">Location Detection — WiFi Fingerprinting</a></li>
+<li><a href="#5-location-detection--ble-scanning">Location Detection — BLE Scanning</a></li>
+<li><a href="#6-integration-with-pet-logic">Integration with Pet Logic</a></li>
+<li><a href="#7-power-budget">Power Budget</a></li>
+<li><a href="#8-why-not-gps">Why Not GPS?</a></li>
+<li><a href="#9-implementation-phases">Implementation Phases</a></li>
+<li><a href="#10-sources">Sources</a></li>
+</ol>
+<hr />
+<h2 id="1-design-goals">1. Design Goals<a class="headerlink" href="#1-design-goals" title="Permanent link">&para;</a></h2>
+<p>The Dilder is a virtual pet. It doesn't need to know its precise latitude and longitude. It needs to answer simpler questions:</p>
 <table>
 <thead>
 <tr>
-<th>Requirement</th>
+<th>Question</th>
+<th>Method</th>
+<th>Hardware</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Is the user walking?</strong></td>
+<td>Step counter (hardware pedometer)</td>
+<td>LIS2DH12</td>
+</tr>
+<tr>
+<td><strong>Did the user shake me?</strong></td>
+<td>Tap/shake interrupt</td>
+<td>LIS2DH12</td>
+</tr>
+<tr>
+<td><strong>Am I being carried or sitting still?</strong></td>
+<td>Activity/inactivity detection</td>
+<td>LIS2DH12</td>
+</tr>
+<tr>
+<td><strong>Am I at the same place as before?</strong></td>
+<td>WiFi AP fingerprint delta</td>
+<td>ESP32-S3 WiFi (built-in)</td>
+</tr>
+<tr>
+<td><strong>Are other Dilders nearby?</strong></td>
+<td>BLE scan for peer devices</td>
+<td>ESP32-S3 BLE (built-in)</td>
+</tr>
+<tr>
+<td><strong>Am I upside down?</strong></td>
+<td>Orientation detection</td>
+<td>LIS2DH12</td>
+</tr>
+</tbody>
+</table>
+<p>All of this is achieved with <strong>zero additional hardware beyond the LIS2DH12</strong> — the ESP32-S3 provides WiFi and BLE natively.</p>
+<hr />
+<h2 id="2-hardware-lis2dh12tr-accelerometer">2. Hardware — LIS2DH12TR Accelerometer<a class="headerlink" href="#2-hardware-lis2dh12tr-accelerometer" title="Permanent link">&para;</a></h2>
+<h3 id="why-lis2dh12tr">Why LIS2DH12TR<a class="headerlink" href="#why-lis2dh12tr" title="Permanent link">&para;</a></h3>
+<p>The original design used the MPU-6050 (6-axis IMU with gyroscope) at <strong>$6.88</strong>. The gyroscope is unnecessary for step counting and gesture detection. The LIS2DH12TR is a 3-axis accelerometer with a <strong>built-in hardware pedometer</strong> that handles step counting in silicon, waking the MCU only when needed.</p>
+<h3 id="specifications">Specifications<a class="headerlink" href="#specifications" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Part</strong></td>
+<td>STMicroelectronics LIS2DH12TR</td>
+</tr>
+<tr>
+<td><strong>Axes</strong></td>
+<td>3 (X, Y, Z accelerometer only — no gyroscope)</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>12-bit (high-resolution mode), 10-bit, or 8-bit selectable</td>
+</tr>
+<tr>
+<td><strong>Range</strong></td>
+<td>+/-2g, +/-4g, +/-8g, +/-16g selectable</td>
+</tr>
+<tr>
+<td><strong>Interface</strong></td>
+<td>I2C (up to 400kHz) / SPI (up to 10MHz)</td>
+</tr>
+<tr>
+<td><strong>Address</strong></td>
+<td>0x18 (SA0=GND) or 0x19 (SA0=VCC)</td>
+</tr>
+<tr>
+<td><strong>Package</strong></td>
+<td>LGA-12 (2x2mm) — same footprint as MPU-6050's QFN-24 is larger, this is smaller</td>
+</tr>
+<tr>
+<td><strong>Supply</strong></td>
+<td>1.71V to 3.6V</td>
+</tr>
+<tr>
+<td><strong>Current (normal)</strong></td>
+<td>185uA @ 400Hz ODR</td>
+</tr>
+<tr>
+<td><strong>Current (low power)</strong></td>
+<td>2uA @ 1Hz ODR</td>
+</tr>
+<tr>
+<td><strong>Current (power down)</strong></td>
+<td>0.5uA</td>
+</tr>
+<tr>
+<td><strong>Built-in features</strong></td>
+<td>Pedometer (step counter + step detector interrupt), click/double-click detection, free-fall detection, wake-up/activity recognition, 6D/4D orientation detection, temperature sensor</td>
+</tr>
+<tr>
+<td><strong>FIFO</strong></td>
+<td>32-level, reduces I2C/SPI traffic</td>
+</tr>
+<tr>
+<td><strong>LCSC</strong></td>
+<td><a href="https://www.lcsc.com/product-detail/C110926.html">C110926</a></td>
+</tr>
+<tr>
+<td><strong>Price</strong></td>
+<td><strong>$0.46</strong> (qty 5)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pin-connections-dilder-board">Pin Connections (Dilder Board)<a class="headerlink" href="#pin-connections-dilder-board" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>LIS2DH12 Pin</th>
+<th>ESP32-S3 GPIO</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SDA/SDI</td>
+<td>GPIO16</td>
+<td>I2C data</td>
+</tr>
+<tr>
+<td>SCL/SPC</td>
+<td>GPIO17</td>
+<td>I2C clock</td>
+</tr>
+<tr>
+<td>SA0/SDO</td>
+<td>GND</td>
+<td>Sets I2C address to 0x18</td>
+</tr>
+<tr>
+<td>CS</td>
+<td>VCC (3.3V)</td>
+<td>Pulled high to select I2C mode (not SPI)</td>
+</tr>
+<tr>
+<td>INT1</td>
+<td>GPIO18 (TBD)</td>
+<td>Step detector interrupt / activity wakeup</td>
+</tr>
+<tr>
+<td>INT2</td>
+<td>N/C</td>
+<td>Not connected (single interrupt sufficient)</td>
+</tr>
+<tr>
+<td>VDD</td>
+<td>3.3V</td>
+<td>Power</td>
+</tr>
+<tr>
+<td>GND</td>
+<td>GND</td>
+<td>Ground</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cost-savings">Cost Savings<a class="headerlink" href="#cost-savings" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Old</th>
+<th>New</th>
+<th>Savings</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sensor IC</td>
+<td>MPU-6050 ($6.88)</td>
+<td>LIS2DH12TR ($0.46)</td>
+<td><strong>-$6.42</strong></td>
+</tr>
+<tr>
+<td>I2C pull-ups</td>
+<td>2x 10k (same)</td>
+<td>2x 10k (same)</td>
+<td>$0.00</td>
+</tr>
+<tr>
+<td>GPS module</td>
+<td>ATGM336H ($1.80 planned)</td>
+<td>Dropped</td>
+<td><strong>-$1.80</strong></td>
+</tr>
+<tr>
+<td><strong>Total sensor savings</strong></td>
+<td></td>
+<td></td>
+<td><strong>-$8.22/board</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-motion-detection-what-the-accelerometer-provides">3. Motion Detection — What the Accelerometer Provides<a class="headerlink" href="#3-motion-detection-what-the-accelerometer-provides" title="Permanent link">&para;</a></h2>
+<h3 id="31-step-counting-hardware-pedometer">3.1 Step Counting (Hardware Pedometer)<a class="headerlink" href="#31-step-counting-hardware-pedometer" title="Permanent link">&para;</a></h3>
+<p>The LIS2DH12 has a <strong>built-in step counter</strong> that runs in hardware even when the ESP32-S3 is in deep sleep:</p>
+<ul>
+<li>The pedometer algorithm runs inside the LIS2DH12 at ~2uA</li>
+<li>A step counter register (16-bit) accumulates steps</li>
+<li>INT1 can fire a <strong>step detector interrupt</strong> on each detected step, or a <strong>significant motion interrupt</strong> after a configurable threshold</li>
+<li>The ESP32-S3 reads the step count register during each wake cycle (e.g. every 10 minutes in Tamagotchi mode)</li>
+</ul>
+<p><strong>No software step-counting algorithm needed.</strong> The LIS2DH12 handles it in silicon.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ESP32-S3 (deep sleep, 10uA)     LIS2DH12 (pedometer active, 2uA)
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>         |                                |
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>         |     [user walks 500 steps]     |
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>         |                                | step_count += 500
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>         |                                |
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    [wake every 10 min] ────── I2C read ──► step_count = 500
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>         |                                |
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    &quot;You walked 500 steps!&quot;               |
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    [update display, sleep]               |
+</span></code></pre></div>
+<h3 id="32-shake-tap-detection">3.2 Shake / Tap Detection<a class="headerlink" href="#32-shake-tap-detection" title="Permanent link">&para;</a></h3>
+<p>The LIS2DH12 has hardware <strong>click/double-click detection</strong> on all three axes:</p>
+<ul>
+<li><strong>Single tap</strong> — user taps the device (e.g. "pet the octopus")</li>
+<li><strong>Double tap</strong> — user double-taps (e.g. "feed the octopus")</li>
+<li><strong>Shake</strong> — high-g activity on multiple axes (e.g. "wake up!" or "you're scaring me")</li>
+</ul>
+<p>Each generates a hardware interrupt — the ESP32-S3 doesn't need to poll.</p>
+<h3 id="33-activity-inactivity-detection">3.3 Activity / Inactivity Detection<a class="headerlink" href="#33-activity-inactivity-detection" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Activity interrupt</strong> — fires when acceleration exceeds a threshold (user picked up the device)</li>
+<li><strong>Inactivity interrupt</strong> — fires when acceleration stays below threshold for N seconds (device put down)</li>
+</ul>
+<p>This lets the pet know:
+- "I'm being carried" (activity + steps)
+- "I'm sitting on a desk" (inactivity)
+- "I'm in a pocket" (occasional movement but no steps)</p>
+<h3 id="34-orientation-detection-6d">3.4 Orientation Detection (6D)<a class="headerlink" href="#34-orientation-detection-6d" title="Permanent link">&para;</a></h3>
+<p>The LIS2DH12 can detect which face of the device is pointing up:</p>
+<ul>
+<li><strong>Face up</strong> — display visible (normal operation)</li>
+<li><strong>Face down</strong> — display hidden (sleep mode? privacy mode?)</li>
+<li><strong>Tilted left/right/forward/back</strong> — could map to pet interactions</li>
+</ul>
+<h3 id="35-free-fall-detection">3.5 Free-Fall Detection<a class="headerlink" href="#35-free-fall-detection" title="Permanent link">&para;</a></h3>
+<p>Detects when the device is in free fall (all axes read ~0g). Could trigger:
+- "You dropped me!" reaction
+- Save state before potential impact</p>
+<hr />
+<h2 id="4-location-detection-wifi-fingerprinting">4. Location Detection — WiFi Fingerprinting<a class="headerlink" href="#4-location-detection-wifi-fingerprinting" title="Permanent link">&para;</a></h2>
+<h3 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
+<p>The ESP32-S3 scans for nearby WiFi access points and records their BSSIDs (MAC addresses) and signal strengths (RSSI). This creates a "fingerprint" of the current location.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Location A (home):          Location B (office):
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  BSSID_1: -45 dBm           BSSID_5: -30 dBm
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  BSSID_2: -60 dBm           BSSID_6: -55 dBm
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  BSSID_3: -70 dBm           BSSID_7: -70 dBm
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  Hash: 0xA3F2                Hash: 0x7C91
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  → Different hashes = different location!
+</span></code></pre></div>
+<h3 id="algorithm">Algorithm<a class="headerlink" href="#algorithm" title="Permanent link">&para;</a></h3>
+<ol>
+<li>During each active wake cycle, scan WiFi (takes ~2 seconds)</li>
+<li>Collect top-5 strongest BSSIDs + their RSSI values</li>
+<li>Hash the BSSID list → produces a location fingerprint</li>
+<li>Compare with the previous fingerprint:</li>
+<li><strong>Same hash</strong> → same location → pet is stationary</li>
+<li><strong>Different hash</strong> → new location → pet was taken somewhere!</li>
+<li><strong>No APs found</strong> → outdoors or rural → pet is on an adventure</li>
+</ol>
+<h3 id="accuracy">Accuracy<a class="headerlink" href="#accuracy" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Environment</th>
+<th>Accuracy</th>
 <th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Python 3.9+</td>
-<td>Comes with most Linux distributions</td>
+<td>Dense urban</td>
+<td>~20-50m</td>
+<td>Many overlapping APs</td>
 </tr>
 <tr>
-<td>Tkinter</td>
-<td>Usually included with Python. On Arch: <code>sudo pacman -S tk</code></td>
+<td>Suburban</td>
+<td>~50-100m</td>
+<td>Fewer APs, wider spacing</td>
 </tr>
 <tr>
-<td>pyserial</td>
-<td>For USB serial communication with the Pico W</td>
+<td>Rural / outdoors</td>
+<td>Cannot detect</td>
+<td>No WiFi APs to fingerprint</td>
 </tr>
 <tr>
-<td>Pillow (optional)</td>
-<td>For PNG export/import and better text rendering</td>
+<td>Indoors (same building)</td>
+<td>Room-level</td>
+<td>Different rooms have distinct RSSI patterns</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<h3 id="install-system-dependencies">Install System Dependencies<a class="headerlink" href="#install-system-dependencies" title="Permanent link">&para;</a></h3>
-<p>Tkinter is a Python binding to Tcl/Tk. It's usually bundled with Python, but some distros package it separately.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Arch / CachyOS</label><label for="__tabbed_1_2">Ubuntu / Debian</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sudo<span class="w"> </span>pacman<span class="w"> </span>-S<span class="w"> </span>tk<span class="w"> </span>python
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-tk
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="install-python-dependencies">Install Python Dependencies<a class="headerlink" href="#install-python-dependencies" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>DevTool/
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
-</span></code></pre></div>
-<p>This installs:</p>
+<h3 id="power-cost">Power Cost<a class="headerlink" href="#power-cost" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>pyserial</code> — required for the serial monitor and image upload</li>
-<li><code>Pillow</code> — optional but recommended for PNG support and better text rendering</li>
+<li>WiFi scan: ~80mA for ~2 seconds = <strong>~0.044 mAh per scan</strong></li>
+<li>At 1 scan per 30 minutes: <strong>~0.088 mAh/hour</strong> — negligible impact on battery life</li>
+<li>Compare to GPS: 25mA continuous tracking = orders of magnitude more power</li>
 </ul>
-<h3 id="verify">Verify<a class="headerlink" href="#verify" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import tkinter; import serial; print(&#39;OK&#39;)&quot;</span>
-</span></code></pre></div>
-<p>If this prints <code>OK</code>, you're ready to go.</p>
-<div class="admonition tip">
-<p class="admonition-title">Automatic dependency gate</p>
-<p>When you run <code>python3 DevTool/devtool.py</code> directly, the DevTool automatically detects missing dependencies and offers to install them for your distro. You don't need to install manually if you prefer.</p>
-</div>
+<h3 id="what-it-cant-do">What It Can't Do<a class="headerlink" href="#what-it-cant-do" title="Permanent link">&para;</a></h3>
+<ul>
+<li>No absolute coordinates (lat/lon) — just "same place" vs "different place"</li>
+<li>Doesn't work in areas with no WiFi coverage</li>
+<li>Can't measure distance traveled</li>
+</ul>
+<p>For absolute coordinates, use the <strong>WiFi Geolocation API</strong> (Option 3 below) which sends the BSSID list to a cloud service and gets back approximate lat/lon. This requires an internet connection but is free (Google: 40k requests/month, Mozilla Location Service: unlimited).</p>
 <hr />
-<h2 id="launching-the-devtool">Launching the DevTool<a class="headerlink" href="#launching-the-devtool" title="Permanent link">&para;</a></h2>
-<p>From the project root:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>DevTool/devtool.py
-</span></code></pre></div>
-<p>The application opens with eight tabs across the top:</p>
-<table>
-<thead>
-<tr>
-<th>Tab</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Display Emulator</strong></td>
-<td>Draw and design 250x122 e-ink images</td>
-</tr>
-<tr>
-<td><strong>Serial Monitor</strong></td>
-<td>View live printf output from the Pico W</td>
-</tr>
-<tr>
-<td><strong>Flash Firmware</strong></td>
-<td>Flash .uf2 files to the Pico W</td>
-</tr>
-<tr>
-<td><strong>Assets</strong></td>
-<td>Browse and manage saved display images</td>
-</tr>
-<tr>
-<td><strong>Programs</strong></td>
-<td>Preview, stream, or deploy animated programs to the display</td>
-</tr>
-<tr>
-<td><strong>GPIO Pins</strong></td>
-<td>Visual pin assignment reference</td>
-</tr>
-<tr>
-<td><strong>Connect</strong></td>
-<td>Step-by-step USB serial and Wi-Fi connection walkthrough</td>
-</tr>
-<tr>
-<td><strong>Docs</strong></td>
-<td>Searchable built-in documentation for the entire application</td>
-</tr>
-</tbody>
-</table>
-<p>A log bar at the bottom shows status messages and timestamps. At startup, the DevTool runs a Docker health check in the background and reports the status of the build toolchain.</p>
-<hr />
-<h2 id="tab-1-display-emulator">Tab 1 — Display Emulator<a class="headerlink" href="#tab-1-display-emulator" title="Permanent link">&para;</a></h2>
-<p>The display emulator is a 250x122 pixel canvas (scaled 3x for visibility) that exactly matches the Waveshare 2.13" V3 e-ink display. Everything you draw here is a 1-bit monochrome image — black or white only, just like the real display.</p>
-<p><img alt="Display Emulator — blank canvas" src="../../../assets/images/devtool/devtool_tab_display_emulator.png" /></p>
-<h3 id="drawing-tools">Drawing Tools<a class="headerlink" href="#drawing-tools" title="Permanent link">&para;</a></h3>
-<p>The toolbar at the top provides six tools:</p>
-<table>
-<thead>
-<tr>
-<th>Tool</th>
-<th>Description</th>
-<th>Shortcut</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Pencil</strong></td>
-<td>Freehand draw in black. Click or drag.</td>
-<td>Default</td>
-</tr>
-<tr>
-<td><strong>Eraser</strong></td>
-<td>Freehand erase to white. Click or drag.</td>
-<td></td>
-</tr>
-<tr>
-<td><strong>Line</strong></td>
-<td>Click start point, drag to end point, release.</td>
-<td></td>
-</tr>
-<tr>
-<td><strong>Rect</strong></td>
-<td>Draw a rectangle outline. Click one corner, drag to opposite.</td>
-<td></td>
-</tr>
-<tr>
-<td><strong>Fill Rect</strong></td>
-<td>Draw a filled black rectangle. Same interaction as Rect.</td>
-<td></td>
-</tr>
-<tr>
-<td><strong>Text</strong></td>
-<td>Click a position, type text in the dialog. Renders to pixels.</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Size</strong> controls the brush width (pencil/eraser) and line thickness (line/rect).</p>
-<p><strong>Clear</strong> resets the canvas to all white.</p>
-<p><strong>Invert</strong> flips every pixel (black becomes white, white becomes black). Useful for creating white-on-black designs.</p>
-<h4 id="pencil-tool">Pencil Tool<a class="headerlink" href="#pencil-tool" title="Permanent link">&para;</a></h4>
-<p><img alt="Pencil tool selected" src="../../../assets/images/devtool/devtool_display_tool_pencil.png" /></p>
-<h4 id="eraser-tool">Eraser Tool<a class="headerlink" href="#eraser-tool" title="Permanent link">&para;</a></h4>
-<p><img alt="Eraser tool selected" src="../../../assets/images/devtool/devtool_display_tool_eraser.png" /></p>
-<h4 id="line-tool">Line Tool<a class="headerlink" href="#line-tool" title="Permanent link">&para;</a></h4>
-<p><img alt="Line tool selected" src="../../../assets/images/devtool/devtool_display_tool_line.png" /></p>
-<h4 id="rectangle-tool">Rectangle Tool<a class="headerlink" href="#rectangle-tool" title="Permanent link">&para;</a></h4>
-<p><img alt="Rectangle tool selected" src="../../../assets/images/devtool/devtool_display_tool_rectangle.png" /></p>
-<h4 id="filled-rectangle-tool">Filled Rectangle Tool<a class="headerlink" href="#filled-rectangle-tool" title="Permanent link">&para;</a></h4>
-<p><img alt="Filled rectangle tool selected" src="../../../assets/images/devtool/devtool_display_tool_filled_rect.png" /></p>
-<h4 id="text-tool">Text Tool<a class="headerlink" href="#text-tool" title="Permanent link">&para;</a></h4>
-<p><img alt="Text tool selected" src="../../../assets/images/devtool/devtool_display_tool_text.png" /></p>
-<h3 id="drawing-demo">Drawing Demo<a class="headerlink" href="#drawing-demo" title="Permanent link">&para;</a></h3>
-<p>Here's an example using the line, rectangle, and filled rectangle tools together:</p>
-<p><img alt="Drawing tools in action" src="../../../assets/images/devtool/devtool_display_drawing_tools.png" /></p>
-<h3 id="invert-function">Invert Function<a class="headerlink" href="#invert-function" title="Permanent link">&para;</a></h3>
-<p>The invert function flips all pixels — useful for creating white-on-black designs:</p>
-<p><img alt="Inverted canvas" src="../../../assets/images/devtool/devtool_display_inverted.png" /></p>
-<h3 id="text-tool_1">Text Tool<a class="headerlink" href="#text-tool_1" title="Permanent link">&para;</a></h3>
+<h2 id="5-location-detection-ble-scanning">5. Location Detection — BLE Scanning<a class="headerlink" href="#5-location-detection-ble-scanning" title="Permanent link">&para;</a></h2>
+<h3 id="how-it-works_1">How It Works<a class="headerlink" href="#how-it-works_1" title="Permanent link">&para;</a></h3>
+<p>The ESP32-S3 scans for nearby BLE advertisements. This serves two purposes:</p>
 <ol>
-<li>Select <strong>Text</strong> from the toolbar.</li>
-<li>Set the <strong>Font</strong> size (8–48 px).</li>
-<li>Click anywhere on the canvas.</li>
-<li>A dialog appears — type your text and press OK.</li>
-<li>The text is rasterized into the pixel buffer.</li>
+<li><strong>Peer discovery</strong> — Find other Dilder devices for social interactions (already planned for the engagement system)</li>
+<li><strong>Environment fingerprinting</strong> — BLE devices (phones, smart watches, fitness trackers) create a rough signature of the current environment</li>
 </ol>
-<p>If Pillow is installed, text renders using the DejaVu Sans Mono font at the exact pixel size. Without Pillow, text renders as filled blocks (approximate).</p>
-<h3 id="saving-images">Saving Images<a class="headerlink" href="#saving-images" title="Permanent link">&para;</a></h3>
-<p>Click <strong>Save</strong> in the toolbar. Enter a name (no extension). Three files are created in the <code>assets/</code> directory:</p>
+<h3 id="power-cost_1">Power Cost<a class="headerlink" href="#power-cost_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>BLE scan: ~15mA for ~3 seconds = <strong>~0.012 mAh per scan</strong></li>
+<li>~5x more power-efficient than WiFi scanning</li>
+</ul>
+<h3 id="best-used-for">Best Used For<a class="headerlink" href="#best-used-for" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Detecting other Dilders nearby (mating system, social interactions)</li>
+<li>Counting nearby BLE devices as a proxy for "busy location" vs "quiet location"</li>
+<li>Augmenting WiFi fingerprinting with BLE data for better location delta detection</li>
+</ul>
+<hr />
+<h2 id="6-integration-with-pet-logic">6. Integration with Pet Logic<a class="headerlink" href="#6-integration-with-pet-logic" title="Permanent link">&para;</a></h2>
+<h3 id="sensor-events-pet-behaviors">Sensor Events → Pet Behaviors<a class="headerlink" href="#sensor-events-pet-behaviors" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>File</th>
-<th>Format</th>
-<th>Purpose</th>
+<th>Sensor Event</th>
+<th>Pet Interpretation</th>
+<th>Game Effect</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>name.pbm</code></td>
-<td>PBM binary (P4)</td>
-<td>Standard 1-bit image format, viewable in any image viewer</td>
+<td>Steps &gt; 500 in a wake cycle</td>
+<td>"We went for a walk!"</td>
+<td>+happiness, +health, unlock "adventure" dialogue</td>
 </tr>
 <tr>
-<td><code>name.bin</code></td>
-<td>Raw packed bytes</td>
-<td>Direct upload format for the Pico W display buffer</td>
+<td>Steps &gt; 2000 in a day</td>
+<td>"Big adventure!"</td>
+<td>+XP, possible evolution trigger, treasure hunt progress</td>
 </tr>
 <tr>
-<td><code>name.png</code></td>
-<td>PNG (if Pillow installed)</td>
-<td>Easy to view and share</td>
+<td>Shake detected</td>
+<td>"Hey! That's rude!" or "Wheee!"</td>
+<td>Mood-dependent reaction</td>
+</tr>
+<tr>
+<td>Single tap</td>
+<td>"Oh, a pet!"</td>
+<td>+happiness (if not angry)</td>
+</tr>
+<tr>
+<td>Double tap</td>
+<td>"Feed me!"</td>
+<td>Trigger feeding interaction</td>
+</tr>
+<tr>
+<td>Free fall</td>
+<td>"AAAAAHHH!"</td>
+<td>-happiness, panic expression</td>
+</tr>
+<tr>
+<td>Face down</td>
+<td>"It's dark in here..."</td>
+<td>Enter sleep/sulk mode</td>
+</tr>
+<tr>
+<td>WiFi fingerprint changed</td>
+<td>"New place! What's this?"</td>
+<td>+curiosity, new location dialogue, exploration XP</td>
+</tr>
+<tr>
+<td>WiFi fingerprint same (24h+)</td>
+<td>"We never go anywhere..."</td>
+<td>-happiness (homesick/bored)</td>
+</tr>
+<tr>
+<td>BLE: other Dilder found</td>
+<td>"A friend!"</td>
+<td>Trigger peer interaction / mating</td>
+</tr>
+<tr>
+<td>Inactivity &gt; 1 hour</td>
+<td>"...hello? Anyone there?"</td>
+<td>Lonely mood, attention-seeking quotes</td>
 </tr>
 </tbody>
 </table>
-<p><img alt="Save workflow — image ready to export" src="../../../assets/images/devtool/devtool_display_save_workflow.png" /></p>
-<p><strong>PBM</strong> is the primary format — it's a standard image format that needs no dependencies to read or write.</p>
-<p><strong>BIN</strong> is the raw display buffer in the same byte layout the Waveshare driver uses: each byte holds 8 horizontal pixels, MSB first, row by row. This can be loaded directly into the display framebuffer in C code.</p>
-<h3 id="loading-images">Loading Images<a class="headerlink" href="#loading-images" title="Permanent link">&para;</a></h3>
-<p>Click <strong>Load</strong> to open any <code>.pbm</code>, <code>.bin</code>, or <code>.png</code> file. The image is loaded into the canvas and can be further edited.</p>
-<h3 id="send-to-pico">Send to Pico<a class="headerlink" href="#send-to-pico" title="Permanent link">&para;</a></h3>
-<p>Click <strong>Send to Pico</strong> to transmit the current canvas image to the Pico W over USB serial. This sends a raw byte stream with an <code>IMG:</code> header followed by the width, height, and pixel data.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This requires firmware on the Pico W that listens for the <code>IMG:</code> protocol. The hello world examples don't include this — it's for future firmware development.</p>
-</div>
+<h3 id="data-persistence">Data Persistence<a class="headerlink" href="#data-persistence" title="Permanent link">&para;</a></h3>
+<p>Store in ESP32-S3 NVS (non-volatile storage):
+- <code>daily_steps</code> — reset at midnight
+- <code>total_steps</code> — lifetime counter
+- <code>last_wifi_hash</code> — for location delta comparison
+- <code>locations_visited</code> — count of unique WiFi fingerprints seen
+- <code>last_activity_time</code> — for inactivity detection</p>
 <hr />
-<h2 id="tab-2-serial-monitor">Tab 2 — Serial Monitor<a class="headerlink" href="#tab-2-serial-monitor" title="Permanent link">&para;</a></h2>
-<p>A full-featured serial terminal for communicating with the Pico W over USB.</p>
-<p><img alt="Serial Monitor — disconnected" src="../../../assets/images/devtool/devtool_tab_serial_monitor.png" /></p>
-<h3 id="connecting">Connecting<a class="headerlink" href="#connecting" title="Permanent link">&para;</a></h3>
-<ol>
-<li>The <strong>Port</strong> dropdown auto-detects available serial devices. The Pico W typically appears as <code>/dev/ttyACM0</code>.</li>
-<li><strong>Baud rate</strong> defaults to 115200 (matching the Pico W's USB serial configuration).</li>
-<li>Click <strong>Connect</strong> to open the connection.</li>
-<li>The status indicator turns green when connected.</li>
-</ol>
-<p>If no ports appear, click <strong>Refresh</strong>. Make sure the Pico W is plugged in and running firmware (not in BOOTSEL mode).</p>
-<p><img alt="Serial Monitor — connected" src="../../../assets/images/devtool/devtool_serial_connected.png" /></p>
-<h3 id="viewing-output">Viewing Output<a class="headerlink" href="#viewing-output" title="Permanent link">&para;</a></h3>
-<p>Serial data from the Pico W appears in the output area in real time. This is where you see <code>printf()</code> output from your C programs.</p>
-<ul>
-<li><strong>Auto-scroll</strong> keeps the view at the bottom as new lines arrive. Uncheck to freeze the view for reading.</li>
-<li><strong>Clear</strong> empties the output area.</li>
-</ul>
-<p><img alt="Serial Monitor — with output" src="../../../assets/images/devtool/devtool_serial_with_output.png" /></p>
-<h3 id="sending-commands">Sending Commands<a class="headerlink" href="#sending-commands" title="Permanent link">&para;</a></h3>
-<p>Type in the input bar at the bottom and press <strong>Enter</strong> or click <strong>Send</strong>. The text is sent to the Pico W followed by <code>\r\n</code>.</p>
-<p>Special buttons:</p>
-<ul>
-<li><strong>Ctrl+C</strong> — sends an interrupt signal (useful for stopping running code)</li>
-<li><strong>Reset</strong> — sends a soft-reset signal (Ctrl+D)</li>
-</ul>
-<h3 id="saving-logs">Saving Logs<a class="headerlink" href="#saving-logs" title="Permanent link">&para;</a></h3>
-<p>Click <strong>Save Log</strong> to save the entire output history to a text file with a timestamped filename.</p>
-<hr />
-<h2 id="tab-3-flash-firmware">Tab 3 — Flash Firmware<a class="headerlink" href="#tab-3-flash-firmware" title="Permanent link">&para;</a></h2>
-<p>A visual interface for flashing <code>.uf2</code> firmware files to the Pico W.</p>
-<p><img alt="Flash Firmware tab" src="../../../assets/images/devtool/devtool_tab_flash_firmware.png" /></p>
-<h3 id="selecting-a-uf2-file">Selecting a UF2 File<a class="headerlink" href="#selecting-a-uf2-file" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Browse</strong> — open a file picker to select any <code>.uf2</code> file.</li>
-<li><strong>Quick Flash</strong> buttons — one-click selection of the pre-built hello world programs (if they've been built):<ul>
-<li><strong>Hello Serial</strong> — <code>dev-setup/hello-world-serial/build/hello_serial.uf2</code></li>
-<li><strong>Hello Display</strong> — <code>dev-setup/hello-world/build/hello_dilder.uf2</code></li>
-</ul>
-</li>
-</ul>
-<h3 id="flashing">Flashing<a class="headerlink" href="#flashing" title="Permanent link">&para;</a></h3>
-<ol>
-<li>Put the Pico W in <strong>BOOTSEL mode</strong> (unplug, hold BOOTSEL, plug in, release).</li>
-<li>Click <strong>Detect RPI-RP2</strong> — the tool searches for the mounted USB drive.</li>
-<li>Click <strong>Flash</strong> — the <code>.uf2</code> file is copied to the drive.</li>
-<li>The Pico W reboots automatically.</li>
-</ol>
-<p><img alt="Flash Firmware — BOOTSEL mount detected" src="../../../assets/images/devtool/devtool_flash_mount_detected.png" /></p>
-<h3 id="building-from-source">Building from Source<a class="headerlink" href="#building-from-source" title="Permanent link">&para;</a></h3>
-<p>The <strong>Build Projects</strong> section has buttons to compile each hello world project directly from the DevTool:</p>
-<ul>
-<li><strong>Build Hello Serial</strong> — runs CMake + Ninja in <code>dev-setup/hello-world-serial/</code></li>
-<li><strong>Build Hello Display</strong> — runs CMake + Ninja in <code>dev-setup/hello-world/</code></li>
-</ul>
-<p>Build output appears in the log bar at the bottom. The buttons handle copying <code>pico_sdk_import.cmake</code> and creating the build directory automatically.</p>
-<hr />
-<h2 id="tab-4-asset-manager">Tab 4 — Asset Manager<a class="headerlink" href="#tab-4-asset-manager" title="Permanent link">&para;</a></h2>
-<p>Browse and manage the 1-bit display images saved in the <code>assets/</code> directory.</p>
-<p><img alt="Asset Manager — file list" src="../../../assets/images/devtool/devtool_tab_asset_manager.png" /></p>
-<h3 id="browsing-assets">Browsing Assets<a class="headerlink" href="#browsing-assets" title="Permanent link">&para;</a></h3>
-<p>The file list on the left shows all <code>.pbm</code>, <code>.bin</code>, and <code>.png</code> files in <code>assets/</code>. Click <strong>Refresh</strong> to reload the list.</p>
-<h3 id="previewing">Previewing<a class="headerlink" href="#previewing" title="Permanent link">&para;</a></h3>
-<p>Click any file to see a 2x scaled preview on the right. The preview shows the image as it would appear on the e-ink display.</p>
-<p>File info (name, size, dimensions) is shown below the preview.</p>
-<p><img alt="Asset Manager — preview with checkerboard pattern" src="../../../assets/images/devtool/devtool_asset_manager_preview.png" /></p>
-<h3 id="deleting">Deleting<a class="headerlink" href="#deleting" title="Permanent link">&para;</a></h3>
-<p>Select a file and click <strong>Delete</strong> to remove it. A confirmation dialog appears first.</p>
-<p><strong>Open Folder</strong> opens the <code>assets/</code> directory in your system file manager.</p>
-<hr />
-<h2 id="tab-5-programs">Tab 5 — Programs<a class="headerlink" href="#tab-5-programs" title="Permanent link">&para;</a></h2>
-<p>Preview, stream, or permanently deploy any of 16 animated programs to the Pico W display.</p>
-<p><img alt="Programs tab — Sassy Octopus selected" src="../../../assets/images/devtool/devtool_tab_programs.png" /></p>
-<h3 id="program-list">Program List<a class="headerlink" href="#program-list" title="Permanent link">&para;</a></h3>
-<p>Select a program from the list on the left. The preview canvas on the right shows a static frame.</p>
-<p><img alt="Programs — list with description" src="../../../assets/images/devtool/devtool_programs_list.png" /></p>
-<h3 id="previewing_1">Previewing<a class="headerlink" href="#previewing_1" title="Permanent link">&para;</a></h3>
-<p>Click <strong>Preview</strong> to run the animation in the emulator. Click <strong>Stop</strong> to halt.</p>
-<p><img alt="Programs — preview canvas" src="../../../assets/images/devtool/devtool_programs_preview_area.png" /></p>
-<h3 id="deploy-to-pico-streaming">Deploy to Pico (Streaming)<a class="headerlink" href="#deploy-to-pico-streaming" title="Permanent link">&para;</a></h3>
-<p>Click <strong>Deploy to Pico</strong> to stream frames over USB serial. Requires IMG-receiver firmware — use <strong>Flash IMG Receiver</strong> to build and flash it via Docker.</p>
-<h3 id="deploy-standalone">Deploy Standalone<a class="headerlink" href="#deploy-standalone" title="Permanent link">&para;</a></h3>
-<p>Click <strong>Deploy Standalone</strong> to bake the animation into standalone firmware:</p>
-<ol>
-<li>Pre-renders all frames in Python</li>
-<li>Writes <code>frames.h</code> C header with pixel data</li>
-<li>Builds firmware via Docker ARM cross-compiler</li>
-<li>Flashes <code>.uf2</code> to Pico BOOTSEL mount</li>
-</ol>
-<p>After flashing, the Pico runs independently — no PC needed.</p>
-<p><img alt="Programs — deploy buttons" src="../../../assets/images/devtool/devtool_programs_deploy_buttons.png" /></p>
-<h3 id="available-programs">Available Programs<a class="headerlink" href="#available-programs" title="Permanent link">&para;</a></h3>
-<p>The DevTool ships with 16 octopus programs, each with unique facial expressions, body animations, and themed quote lists:</p>
+<h2 id="7-power-budget">7. Power Budget<a class="headerlink" href="#7-power-budget" title="Permanent link">&para;</a></h2>
+<h3 id="motion-location-detection-power">Motion + Location Detection Power<a class="headerlink" href="#motion-location-detection-power" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Program</th>
-<th>Eyes</th>
-<th>Mouth</th>
-<th>Body Animation</th>
-<th>Quotes</th>
+<th>Source</th>
+<th>Current</th>
+<th>Duration</th>
+<th>Frequency</th>
+<th>Avg mA</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Sassy</td>
-<td>Normal</td>
-<td>Smirk/smile</td>
-<td>Gentle breathing</td>
-<td>196</td>
+<td>LIS2DH12 pedometer (always on)</td>
+<td>2uA</td>
+<td>Continuous</td>
+<td>Always</td>
+<td>0.002</td>
 </tr>
 <tr>
-<td>Supportive</td>
-<td>Normal</td>
-<td>Smirk/smile</td>
-<td>Gentle breathing</td>
-<td>160</td>
+<td>LIS2DH12 interrupt wake</td>
+<td>0uA (ESP32 handles)</td>
+<td>—</td>
+<td>Per-step</td>
+<td>0.000</td>
 </tr>
 <tr>
-<td>Angry</td>
-<td>V-brows, glaring</td>
-<td>Frown</td>
-<td>Puffed up, tremble</td>
-<td>45</td>
+<td>WiFi scan (location fingerprint)</td>
+<td>80mA</td>
+<td>2 sec</td>
+<td>Every 30 min</td>
+<td>0.089</td>
 </tr>
 <tr>
-<td>Conspiratorial</td>
-<td>Misaligned</td>
-<td>Wobbly sine</td>
-<td>Lean + wave</td>
-<td>47</td>
+<td>BLE scan (peer discovery)</td>
+<td>15mA</td>
+<td>3 sec</td>
+<td>Every 30 min</td>
+<td>0.025</td>
 </tr>
 <tr>
-<td>Sad</td>
-<td>Droopy brows</td>
-<td>Gentle frown</td>
-<td>Drooped, deflated</td>
-<td>35</td>
+<td>I2C step count read</td>
+<td>5mA</td>
+<td>10ms</td>
+<td>Every 10 min</td>
+<td>0.000</td>
 </tr>
 <tr>
-<td>Chaotic</td>
-<td>Spiral rings</td>
-<td>Zigzag</td>
-<td>Wild distortion</td>
-<td>40</td>
-</tr>
-<tr>
-<td>Hungry</td>
-<td>Looking up</td>
-<td>Drooling oval</td>
-<td>Lean upward</td>
-<td>30</td>
-</tr>
-<tr>
-<td>Tired</td>
-<td>Half-closed lids</td>
-<td>Yawn</td>
-<td>Sagging, melting</td>
-<td>30</td>
-</tr>
-<tr>
-<td>Slap Happy</td>
-<td>One squint, one manic</td>
-<td>Wobbly grin</td>
-<td>Sway side to side</td>
-<td>30</td>
-</tr>
-<tr>
-<td>Lazy</td>
-<td>Nearly shut</td>
-<td>Flat line</td>
-<td>Custom body: tentacles draped right</td>
-<td>30</td>
-</tr>
-<tr>
-<td>Fat</td>
-<td>Wide happy</td>
-<td>Smile + cheek puffs</td>
-<td>Custom body: wider dome, thicker tentacles</td>
-<td>30</td>
-</tr>
-<tr>
-<td>Chill</td>
-<td>Side-glancing</td>
-<td>Half-smile</td>
-<td>Subtle lean</td>
-<td>30</td>
-</tr>
-<tr>
-<td>Horny</td>
-<td>Heart-shaped</td>
-<td>Tongue out</td>
-<td>Rhythmic pulse</td>
-<td>30</td>
-</tr>
-<tr>
-<td>Excited</td>
-<td>Sparkle crosses</td>
-<td>Wide grin</td>
-<td>Bouncing</td>
-<td>30</td>
-</tr>
-<tr>
-<td>Nostalgic</td>
-<td>Looking up-right</td>
-<td>Wistful smile</td>
-<td>Gentle sway</td>
-<td>30</td>
-</tr>
-<tr>
-<td>Homesick</td>
-<td>Teary</td>
-<td>Wobbly line</td>
-<td>Curled inward</td>
-<td>30</td>
+<td><strong>Total detection overhead</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>~0.116 mA</strong></td>
 </tr>
 </tbody>
 </table>
-<p>Each program can be previewed in the emulator, streamed to the Pico via USB, or deployed as standalone firmware.</p>
-<hr />
-<h2 id="tab-6-gpio-pin-reference">Tab 6 — GPIO Pin Reference<a class="headerlink" href="#tab-6-gpio-pin-reference" title="Permanent link">&para;</a></h2>
-<p>A read-only visual reference showing the Pico W's 40-pin header with all Dilder project assignments highlighted:</p>
-<p><img alt="GPIO Pin Viewer" src="../../../assets/images/devtool/devtool_tab_gpio_pins.png" /></p>
-<ul>
-<li><strong>Display pins</strong> (SPI1): GP8–GP13</li>
-<li><strong>Button pins</strong>: GP2–GP6</li>
-<li><strong>Power</strong>: 3V3(OUT), GND</li>
-<li><strong>SPI configuration</strong>: Mode 0, 4 MHz, MSB first</li>
-</ul>
-<p><img alt="Pin diagram detail" src="../../../assets/images/devtool/devtool_gpio_pin_diagram.png" /></p>
-<p>This tab is a quick reference so you don't need to switch to the documentation while developing.</p>
-<hr />
-<h2 id="tab-7-connection-utility">Tab 7 — Connection Utility<a class="headerlink" href="#tab-7-connection-utility" title="Permanent link">&para;</a></h2>
-<p>A guided walkthrough for connecting the Pico W to your computer. Switch between USB Serial and Wi-Fi modes using the radio buttons at the top.</p>
-<h3 id="usb-serial-walkthrough">USB Serial Walkthrough<a class="headerlink" href="#usb-serial-walkthrough" title="Permanent link">&para;</a></h3>
-<p><img alt="Connection Utility — USB mode" src="../../../assets/images/devtool/devtool_tab_connection_utility.png" /></p>
-<p>Four steps, each with a live <strong>Check</strong> button that verifies the current state:</p>
+<p>This adds <strong>~0.1 mA average</strong> to the power budget — less than 2% of the Tamagotchi mode baseline (~5.5 mA average). Battery life impact: effectively zero.</p>
+<h3 id="comparison-with-gps">Comparison with GPS<a class="headerlink" href="#comparison-with-gps" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Step</th>
-<th>What it checks</th>
+<th>Method</th>
+<th>Avg current</th>
+<th>Battery impact (1000mAh)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Step 1 — Plug in the Pico W</strong></td>
-<td>Runs <code>lsusb</code> to detect the Pico W USB device (vendor ID <code>2e8a</code>). Confirms the cable is a data cable.</td>
+<td><strong>LIS2DH12 + WiFi/BLE scans</strong></td>
+<td><strong>~0.1 mA</strong></td>
+<td><strong>Negligible (&lt;2%)</strong></td>
 </tr>
 <tr>
-<td><strong>Step 2 — Verify serial port</strong></td>
-<td>Checks if <code>/dev/ttyACM0</code> exists. If not, explains why (BOOTSEL mode, charge-only cable, no firmware).</td>
+<td>GPS (always tracking)</td>
+<td>25 mA</td>
+<td>-4.3 days battery life</td>
 </tr>
 <tr>
-<td><strong>Step 3 — Check permissions</strong></td>
-<td>Verifies your user is in the <code>uucp</code> (Arch) or <code>dialout</code> (Debian) group. Shows the fix command if not.</td>
-</tr>
-<tr>
-<td><strong>Step 4 — Open Serial Monitor</strong></td>
-<td>Links directly to the Serial Monitor tab. One click to switch over and connect.</td>
+<td>GPS (periodic fix, 1/30min)</td>
+<td>~1.5 mA avg</td>
+<td>-1.1 days battery life</td>
 </tr>
 </tbody>
 </table>
-<p>Each check button gives a green checkmark, yellow warning, or red error with a specific explanation.</p>
-<p><img alt="USB connection walkthrough — all steps" src="../../../assets/images/devtool/devtool_connection_usb_walkthrough.png" /></p>
-<p>The <strong>"Fix: Add me to serial group"</strong> button auto-detects the correct group, tries <code>pkexec</code> for a graphical sudo prompt first, falls back to opening a terminal emulator with the command, and shows a confirmation dialog before running.</p>
-<h3 id="wi-fi-walkthrough">Wi-Fi Walkthrough<a class="headerlink" href="#wi-fi-walkthrough" title="Permanent link">&para;</a></h3>
-<p><img alt="Connection Utility — Wi-Fi mode" src="../../../assets/images/devtool/devtool_connection_wifi_mode.png" /></p>
-<p>Guides you through adding Wi-Fi support to your Pico W firmware:</p>
+<hr />
+<h2 id="8-why-not-gps">8. Why Not GPS?<a class="headerlink" href="#8-why-not-gps" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Step</th>
-<th>What it covers</th>
+<th>Factor</th>
+<th>GPS</th>
+<th>WiFi + Accelerometer</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Overview</strong></td>
-<td>Explains the CYW43439 Wi-Fi chip, 802.11n 2.4 GHz capability.</td>
+<td><strong>Component cost</strong></td>
+<td>$1.80-4.00</td>
+<td>$0.00 (WiFi built-in)</td>
 </tr>
 <tr>
-<td><strong>Step 1 — Add Wi-Fi credentials</strong></td>
-<td>Provides the exact C code to initialise Wi-Fi and connect to a network. Copy-paste ready.</td>
+<td><strong>Power draw</strong></td>
+<td>20-45mA active</td>
+<td>0.1mA average</td>
 </tr>
 <tr>
-<td><strong>Step 2 — CMake configuration</strong></td>
-<td>Shows which library to link: <code>pico_cyw43_arch_lwip_threadsafe_background</code>.</td>
+<td><strong>Board space</strong></td>
+<td>~12x12mm module + antenna</td>
+<td>0mm (no additional component)</td>
 </tr>
 <tr>
-<td><strong>Step 3 — Find Pico on network</strong></td>
-<td>Network scan button that checks the ARP table for reachable devices. Shows how to print the IP from firmware.</td>
+<td><strong>Works indoors</strong></td>
+<td>No (needs sky view)</td>
+<td>Yes</td>
 </tr>
 <tr>
-<td><strong>Step 4 — Communication options</strong></td>
-<td>Explains TCP sockets, HTTP server, UDP broadcast, and mDNS discovery.</td>
+<td><strong>Cold start time</strong></td>
+<td>30-60 seconds</td>
+<td>Instant</td>
 </tr>
 <tr>
-<td><strong>Quick Connect</strong></td>
-<td>Enter an IP and port to test a live TCP connection to the Pico W. Shows success, timeout, or connection refused.</td>
+<td><strong>Accuracy outdoors</strong></td>
+<td>2.5m</td>
+<td>~50-100m (WiFi), or step count only</td>
+</tr>
+<tr>
+<td><strong>Accuracy indoors</strong></td>
+<td>Doesn't work</td>
+<td>Room-level (WiFi fingerprint)</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>UART driver + NMEA parsing + antenna design</td>
+<td>WiFi scan API (built-in)</td>
 </tr>
 </tbody>
 </table>
+<p>GPS is overkill for a virtual pet. The pet doesn't need to know it's at 48.1351°N, 11.5820°E. It needs to know "you took me somewhere new" and "you're walking." WiFi fingerprinting + step counting provides exactly that at zero additional cost and negligible power.</p>
+<p><strong>GPS stays in the design as a Phase 7 optional add-on</strong> for users who want real geocaching/treasure-hunt features. The board can be designed with unpopulated GPS pads for future hand-soldering.</p>
 <hr />
-<h2 id="tab-8-documentation">Tab 8 — Documentation<a class="headerlink" href="#tab-8-documentation" title="Permanent link">&para;</a></h2>
-<p>Built-in searchable documentation for the entire DevTool application.</p>
-<p><img alt="Documentation tab" src="../../../assets/images/devtool/devtool_tab_documentation.png" /></p>
-<p><strong>Layout:</strong></p>
+<h2 id="9-implementation-phases">9. Implementation Phases<a class="headerlink" href="#9-implementation-phases" title="Permanent link">&para;</a></h2>
+<h3 id="phase-2-current-hardware-foundation">Phase 2 (Current) — Hardware Foundation<a class="headerlink" href="#phase-2-current-hardware-foundation" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Left sidebar</strong> — Table of contents. Click any section to jump to it.</li>
-<li><strong>Right panel</strong> — Full documentation text with syntax-highlighted headings and code blocks.</li>
-<li><strong>Search bar</strong> — Type a keyword and press Find. All matches are highlighted in yellow. Click Clear to reset.</li>
+<li>[x] LIS2DH12TR selected and added to BOM ($0.46 replaces $6.88 MPU-6050)</li>
+<li>[x] I2C wiring planned (GPIO16/17, same bus as the old MPU-6050 plan)</li>
+<li>[ ] Update KiCad schematic with LIS2DH12 footprint and connections</li>
+<li>[ ] Verify LIS2DH12 LCSC stock and JLCPCB assembly compatibility</li>
 </ul>
-<p><img alt="Documentation — search in action" src="../../../assets/images/devtool/devtool_documentation_search.png" /></p>
-<p><strong>Sections covered:</strong></p>
+<h3 id="phase-3-pet-logic-firmware">Phase 3 — Pet Logic (Firmware)<a class="headerlink" href="#phase-3-pet-logic-firmware" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Display Emulator (all tools, saving, loading, send to Pico)</li>
-<li>Serial Monitor (connecting, sending, special buttons, log saving)</li>
-<li>Flash Firmware (BOOTSEL steps, build buttons)</li>
-<li>Assets (browse, preview, delete)</li>
-<li>GPIO Pins (pin assignments)</li>
-<li>Connection Utility (USB and Wi-Fi)</li>
-<li>Keyboard Shortcuts</li>
-<li>File Formats (PBM, BIN, PNG with byte layout)</li>
-<li>Troubleshooting (common errors and fixes)</li>
+<li>[ ] Initialize LIS2DH12 over I2C (set ODR, range, enable pedometer)</li>
+<li>[ ] Enable step detector interrupt on INT1</li>
+<li>[ ] Read step count register during each wake cycle</li>
+<li>[ ] Implement shake/tap detection via click interrupt</li>
+<li>[ ] Map accelerometer events to pet mood changes</li>
 </ul>
-<p>This tab means you never need to leave the DevTool to look up how something works.</p>
-<hr />
-<h2 id="file-formats">File Formats<a class="headerlink" href="#file-formats" title="Permanent link">&para;</a></h2>
-<h3 id="pbm-portable-bitmap-p4-binary">PBM (Portable Bitmap — P4 Binary)<a class="headerlink" href="#pbm-portable-bitmap-p4-binary" title="Permanent link">&para;</a></h3>
-<p>Standard 1-bit image format. Header followed by packed binary data.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>P4
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>250 122
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>&lt;binary data: ceil(250/8) * 122 = 3904 bytes&gt;
-</span></code></pre></div>
-<p>Each byte holds 8 pixels, MSB = leftmost pixel. <code>1</code> = black, <code>0</code> = white.</p>
-<h3 id="bin-raw-display-buffer">BIN (Raw Display Buffer)<a class="headerlink" href="#bin-raw-display-buffer" title="Permanent link">&para;</a></h3>
-<p>No header — just the raw packed bytes in the same format the Waveshare display driver uses.</p>
+<h3 id="phase-4-location-awareness-firmware">Phase 4 — Location Awareness (Firmware)<a class="headerlink" href="#phase-4-location-awareness-firmware" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Byte width: <code>ceil(250/8)</code> = 32 bytes per row</li>
-<li>Total: 32 x 122 = 3,904 bytes</li>
-<li>Bit order: MSB first within each byte</li>
-<li><code>1</code> = black pixel, <code>0</code> = white pixel</li>
+<li>[ ] Implement WiFi AP scan during active wake</li>
+<li>[ ] Hash top-5 BSSIDs into location fingerprint</li>
+<li>[ ] Store fingerprint in NVS, compare with previous</li>
+<li>[ ] Trigger "new location" pet event on fingerprint delta</li>
+<li>[ ] Implement BLE scan for peer Dilder discovery</li>
 </ul>
-<p>To use in C code on the Pico W:</p>
-<div class="language-c highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Load from filesystem or embed as a const array</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">image_data</span><span class="p">[</span><span class="mi">3904</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* bin file contents */</span><span class="w"> </span><span class="p">};</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">EPD_2in13_V3_Display</span><span class="p">(</span><span class="n">image_data</span><span class="p">);</span>
-</span></code></pre></div>
-<h3 id="png-portable-network-graphics">PNG (Portable Network Graphics)<a class="headerlink" href="#png-portable-network-graphics" title="Permanent link">&para;</a></h3>
-<p>Standard PNG format, 250x122 pixels, 1-bit depth. Requires Pillow to export. Can be opened in any image viewer or editor.</p>
-<hr />
-<h2 id="architecture-overview">Architecture Overview<a class="headerlink" href="#architecture-overview" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>DevTool/
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    devtool.py          # Single-file application (~3400 lines)
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    requirements.txt    # Python dependencies
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    README.md           # Full documentation
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>assets/                 # Saved display images (created automatically)
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    *.pbm               # PBM binary 1-bit images
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    *.bin               # Raw display buffer bytes
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    *.png               # PNG exports (if Pillow available)
-</span></code></pre></div>
-<h3 id="class-structure">Class Structure<a class="headerlink" href="#class-structure" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Class</th>
-<th>Parent</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>DilderDevTool</code></td>
-<td><code>tk.Tk</code></td>
-<td>Main application window, notebook tabs, log bar, Docker health check</td>
-</tr>
-<tr>
-<td><code>DisplayEmulator</code></td>
-<td><code>ttk.Frame</code></td>
-<td>E-ink canvas, drawing tools, save/load/send</td>
-</tr>
-<tr>
-<td><code>SerialMonitor</code></td>
-<td><code>ttk.Frame</code></td>
-<td>Serial connection, read thread, output display</td>
-</tr>
-<tr>
-<td><code>FlashUtility</code></td>
-<td><code>ttk.Frame</code></td>
-<td>UF2 selection, BOOTSEL detection, flash copy</td>
-</tr>
-<tr>
-<td><code>AssetManager</code></td>
-<td><code>ttk.Frame</code></td>
-<td>File list, preview canvas, delete/open</td>
-</tr>
-<tr>
-<td><code>ProgramsTab</code></td>
-<td><code>ttk.Frame</code></td>
-<td>Animated programs, Docker builds, deploy buttons</td>
-</tr>
-<tr>
-<td><code>PinViewer</code></td>
-<td><code>ttk.Frame</code></td>
-<td>Static GPIO reference text</td>
-</tr>
-<tr>
-<td><code>ConnectionUtility</code></td>
-<td><code>ttk.Frame</code></td>
-<td>USB/Wi-Fi setup walkthrough with live checks</td>
-</tr>
-<tr>
-<td><code>DocumentationTab</code></td>
-<td><code>ttk.Frame</code></td>
-<td>Searchable built-in documentation with TOC sidebar</td>
-</tr>
-</tbody>
-</table>
-<h3 id="startup-behavior">Startup Behavior<a class="headerlink" href="#startup-behavior" title="Permanent link">&para;</a></h3>
-<p>At launch, the DevTool:</p>
-<ol>
-<li>Checks for missing dependencies (Tkinter, pyserial) and offers to install them</li>
-<li>Creates the 8-tab UI with a resizable log bar</li>
-<li>Runs a background Docker health check (500ms after UI ready) that verifies:<ul>
-<li>Docker binary exists</li>
-<li>Docker daemon is running</li>
-<li>docker-compose is available</li>
-<li>Build files exist (docker-compose.yml, Dockerfile)</li>
-<li>Shared display library directory exists</li>
+<h3 id="phase-7-optional-gps-expansion">Phase 7 — Optional GPS Expansion<a class="headerlink" href="#phase-7-optional-gps-expansion" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Design unpopulated GPS pads on PCB (ATGM336H footprint)</li>
+<li>[ ] Implement UART GPS driver (for users who hand-solder the module)</li>
+<li>[ ] WiFi Geolocation API integration (cloud-based lat/lon from BSSID list)</li>
+<li>[ ] Geocaching / treasure hunt features using approximate coordinates</li>
 </ul>
-</li>
-</ol>
-<p>Results appear in the log bar as <code>[startup] Docker toolchain ready.</code> or with specific issues listed.</p>
-<h3 id="threading">Threading<a class="headerlink" href="#threading" title="Permanent link">&para;</a></h3>
-<p>The serial monitor runs a background daemon thread (<code>_read_loop</code>) that continuously reads from the serial port. All UI updates from the thread go through <code>winfo_toplevel().after(0, callback)</code> to stay on the Tkinter main thread.</p>
-<p>Build operations in the flash utility, Docker image builds, and serial send also run in background threads. All build output is now logged directly without keyword filtering — every line from Docker and Ninja appears in the log bar for full transparency.</p>
 <hr />
-<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Problem</th>
-<th>Solution</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>ModuleNotFoundError: No module named 'tkinter'</code></td>
-<td>Install Tk: <code>sudo pacman -S tk</code> (Arch) or <code>sudo apt install python3-tk</code> (Debian)</td>
-</tr>
-<tr>
-<td><code>ModuleNotFoundError: No module named 'serial'</code></td>
-<td><code>pip install pyserial</code> (not <code>serial</code> — that's a different package)</td>
-</tr>
-<tr>
-<td>Text tool renders blocks instead of letters</td>
-<td>Install Pillow: <code>pip install Pillow</code></td>
-</tr>
-<tr>
-<td>Serial monitor can't connect</td>
-<td>Check that the Pico W is plugged in and running firmware. Verify with <code>ls /dev/ttyACM*</code>. Check serial group membership.</td>
-</tr>
-<tr>
-<td>No serial ports in dropdown</td>
-<td>Click Refresh. If still empty, the Pico W may be in BOOTSEL mode or not connected.</td>
-</tr>
-<tr>
-<td>Flash button says "not detected"</td>
-<td>Put the Pico W in BOOTSEL mode: unplug, hold BOOTSEL, plug in, release. Then click Detect.</td>
-</tr>
-<tr>
-<td>Build buttons fail</td>
-<td>Verify <code>PICO_SDK_PATH</code> is set and <code>arm-none-eabi-gcc</code> is installed. Run <code>python3 setup.py --status</code> to check.</td>
-</tr>
-<tr>
-<td>Docker builds fail</td>
-<td>Check <code>[startup]</code> messages in the log bar. Run <code>python3 setup.py --step 15</code> to set up Docker.</td>
-</tr>
-<tr>
-<td>Canvas drawing is slow</td>
-<td>The canvas uses individual rectangles per pixel at 3x scale. For large fills, there may be brief lag — this is a Tkinter limitation, not a bug.</td>
-</tr>
-<tr>
-<td>PNG save/load not working</td>
-<td>Install Pillow: <code>pip install Pillow</code>. PBM and BIN formats work without it.</td>
-</tr>
-</tbody>
-</table>
+<h2 id="10-sources">10. Sources<a class="headerlink" href="#10-sources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://www.st.com/resource/en/datasheet/lis2dh12.pdf">LIS2DH12TR Datasheet (STMicroelectronics)</a></li>
+<li><a href="https://www.lcsc.com/product-detail/C110926.html">LIS2DH12 on LCSC — C110926</a> — $0.46</li>
+<li><a href="https://www.analog.com/en/resources/app-notes/an-2554.html">AN-2554: Step Counting Using ADXL367 (Analog Devices)</a> — pedometer algorithm reference</li>
+<li><a href="https://community.st.com/t5/mems-sensors/ultra-low-power-imu-for-step-counting/td-p/176779">Ultra-low power IMU for step counting (ST Community)</a></li>
+<li><a href="https://github.com/ani8897/RSSI-based-Localization-using-ESP32">WiFi RSSI-Based Localization Using ESP32 (IIT Bombay)</a></li>
+<li><a href="https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/">WiFi Indoor Positioning on Arduino</a></li>
+<li><a href="https://developers.google.com/maps/documentation/geolocation/overview">Google Geolocation API</a> — free tier: 40k requests/month</li>
+<li><a href="https://location.services.mozilla.com/">Mozilla Location Service</a> — fully free, open-source</li>
+</ul>
+<hr />
+<p><em>Document version: 1.0 — 2026-04-15</em></p>
 
 
 
@@ -4500,7 +3996,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../software/emotion-states/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Emotion States">
+          <a href="../open-board-designs/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Open-Source Board Designs">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -4510,20 +4006,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Emotion States
+                Open-Source Board Designs
               </div>
             </div>
           </a>
         
         
           
-          <a href="../setup-cli/" class="md-footer__link md-footer__link--next" aria-label="Next: Setup CLI">
+          <a href="../../software/project-structure/" class="md-footer__link md-footer__link--next" aria-label="Next: Project Structure">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Setup CLI
+                Project Structure
               </div>
             </div>
             <div class="md-footer__button md-icon">

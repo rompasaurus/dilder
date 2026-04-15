@@ -776,6 +776,36 @@
   
   
     <li class="md-nav__item">
+      <a href="../blog/category/manufacturing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manufacturing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
       <a href="../blog/category/pcb-design/" class="md-nav__link">
         
   
@@ -1533,6 +1563,34 @@
     
   
     Open-Source Board Designs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/design/motion-location-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Motion & Location Detection
   
 
     
@@ -3736,6 +3794,50 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#prompt-149-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #149 — 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-150-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #150 — 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-151-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #151 — 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-152-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #152 — 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -5189,6 +5291,50 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#prompt-149-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #149 — 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-150-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #150 — 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-151-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #151 — 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-152-2026-04-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #152 — 2026-04-15
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -6248,7 +6394,40 @@
 <ul>
 <li><strong>Input Tokens (est):</strong> ~100</li>
 <li><strong>Output Tokens (est):</strong> ~25,000</li>
-<li><strong>Files:</strong> <code>hardware-design/reference-boards/</code> (7 KiCad projects cloned: rp2040-pico-usbc, rp2040-minimal-jlcpcb, rp2040-designguide, esp32s3-basic-devboard, esp32s3-ducky-epaper, espressif-kicad-libs, opentama-virtual-pet). <code>hardware-design/reference-boards/README.md</code> (master index). 7 images in <code>website/docs/assets/images/reference-boards/</code>. <code>website/docs/docs/design/open-board-designs.md</code> (created — comprehensive walkthroughs with images, component overlap analysis, comparison matrix). <code>website/mkdocs.yml</code> (added nav). <code>website/docs/docs/index.md</code> (added link). Commits: <code>a6df12f</code> (repos), current commit (docs + images)</li>
+<li><strong>Files:</strong> <code>hardware-design/reference-boards/</code> (7 KiCad projects cloned: rp2040-pico-usbc, rp2040-minimal-jlcpcb, rp2040-designguide, esp32s3-basic-devboard, esp32s3-ducky-epaper, espressif-kicad-libs, opentama-virtual-pet). <code>hardware-design/reference-boards/README.md</code> (master index). 7 images in <code>website/docs/assets/images/reference-boards/</code>. <code>website/docs/docs/design/open-board-designs.md</code> (created — comprehensive walkthroughs with images, component overlap analysis, comparison matrix). <code>website/mkdocs.yml</code> (added nav). <code>website/docs/docs/index.md</code> (added link). Commits: <code>a6df12f</code> (repos), <code>3f46a7b</code> (docs + images)</li>
+</ul>
+<hr />
+<h2 id="prompt-149-2026-04-15">Prompt #149 — 2026-04-15<a class="headerlink" href="#prompt-149-2026-04-15" title="Permanent link">&para;</a></h2>
+<p><strong>Prompt:</strong> "Update the schematics — get rid of the RP2040, use the ESP32, add a parts list, and wire up all the components."</p>
+<ul>
+<li><strong>Input Tokens (est):</strong> ~50</li>
+<li><strong>Output Tokens (est):</strong> ~25,000</li>
+<li><strong>Files:</strong> <code>hardware-design/Board Design kicad/generate_schematic.py</code> (rewritten — RP2040→ESP32-S3-WROOM-1-N16R8, removed flash/crystal/GPS/USB resistors, rewired all nets, component count 33→20, BOM in docstring). <code>hardware-design/Board Design kicad/dilder.kicad_sch</code> (regenerated rev 0.3). <code>hardware-design/BOM.md</code> (created — full BOM with LCSC numbers and costs). <code>hardware-design/Measurements.md</code> (updated with ESP32-S3 dimensions). Commit: <code>04cecb3</code></li>
+</ul>
+<hr />
+<h2 id="prompt-150-2026-04-15">Prompt #150 — 2026-04-15<a class="headerlink" href="#prompt-150-2026-04-15" title="Permanent link">&para;</a></h2>
+<p><strong>Prompt:</strong> "Pull in example schematics and KiCad files into a new examples folder — ESP32 designs with similar functions. Find as many as possible, each in their own folder with an MD describing origin, backstory, details, links, and TOC."</p>
+<ul>
+<li><strong>Input Tokens (est):</strong> ~80</li>
+<li><strong>Output Tokens (est):</strong> ~15,000</li>
+<li><strong>Files:</strong> <code>hardware-design/examples/</code> (11 open-source ESP32/ESP32-S3 KiCad projects: PocketMage PDA, Lilka console, Ducky e-paper, OLIMEX S3+ESP32 DevKit-LiPo, Unexpected Maker S3, WhirlingBits S3, esp-rs Rust board, BitwiseAjeet TP4056, KLP-5e sensor board, AeonLabs S3 template). Each with <code>ABOUT.md</code>. <code>hardware-design/examples/INDEX.md</code> (master TOC + cross-reference). Commit: <code>2e5e0a8</code></li>
+</ul>
+<hr />
+<h2 id="prompt-151-2026-04-15">Prompt #151 — 2026-04-15<a class="headerlink" href="#prompt-151-2026-04-15" title="Permanent link">&para;</a></h2>
+<p><strong>Prompt:</strong> "The MPU-6050 is pricey — just need steps and shakes. Ditch GPS, go LIS2DH12TR, use WiFi fingerprinting + BLE for location. Create a motion/location document, update hardware planning, pics, and pricing."</p>
+<ul>
+<li><strong>Input Tokens (est):</strong> ~200</li>
+<li><strong>Output Tokens (est):</strong> ~30,000</li>
+<li><strong>Key Decision:</strong> MPU-6050 ($6.88) → LIS2DH12TR ($0.46). GPS dropped. BOM: $11.14 → $4.72/board.</li>
+<li><strong>Files:</strong> <code>docs/motion-location-detection.md</code> (created — 10-section plan: HW pedometer, WiFi fingerprinting, BLE scanning, sensor→pet behavior, power budget). <code>website/docs/docs/design/motion-location-detection.md</code> (website copy). <code>lis2dh12-accelerometer.jpg</code> (new), <code>mpu-6050-imu.jpg</code> (deleted). BOM/pricing docs updated across <code>pcb-assembly-and-prototyping.md</code>, <code>BOM.md</code>, <code>pcb-design-plan.md</code>. Website nav + index updated.</li>
+</ul>
+<hr />
+<h2 id="prompt-152-2026-04-15">Prompt #152 — 2026-04-15<a class="headerlink" href="#prompt-152-2026-04-15" title="Permanent link">&para;</a></h2>
+<p><strong>Prompt:</strong> "Make a parts-sheets folder with MD file for each component and import official datasheets."</p>
+<ul>
+<li><strong>Input Tokens (est):</strong> ~50</li>
+<li><strong>Output Tokens (est):</strong> ~15,000</li>
+<li><strong>Files:</strong> <code>hardware-design/parts-sheets/README.md</code> (index). 11 part sheet MDs: ESP32-S3, LIS2DH12, TP4056, DW01A, FS8205A, AMS1117, SS34, SKRHABE010, USB-C, JST PH, red/green LEDs. Each with specs, pin connections, application notes, datasheet links. <code>manufacturer-datasheets/ESP32-S3-WROOM-1-datasheet.pdf</code> (1.3MB Espressif official).</li>
 </ul>
 
 

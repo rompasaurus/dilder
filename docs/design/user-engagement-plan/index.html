@@ -778,6 +778,36 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../blog/category/manufacturing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manufacturing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
       <a href="../../../blog/category/pcb-design/" class="md-nav__link">
         
   
@@ -2928,6 +2958,34 @@
     
   
     Open-Source Board Designs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../motion-location-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Motion & Location Detection
   
 
     
@@ -7014,9 +7072,9 @@
 <tbody>
 <tr>
 <td><strong>Accelerometer/Pedometer</strong></td>
-<td>LSM6DSO</td>
-<td>I2C (0x6A)</td>
-<td>~$6</td>
+<td>LIS2DH12TR</td>
+<td>I2C (0x18)</td>
+<td>~$0.46</td>
 <td>High</td>
 </tr>
 <tr>
@@ -7096,23 +7154,23 @@
 <tbody>
 <tr>
 <td><strong>Essential</strong></td>
-<td>LSM6DSO + MPR121 + BH1750 + MAX9814 + Battery + TP4056</td>
-<td><strong>~$22.50</strong></td>
+<td>LIS2DH12TR + MPR121 + BH1750 + MAX9814 + Battery + TP4056</td>
+<td><strong>~$16.96</strong></td>
 </tr>
 <tr>
 <td><strong>Recommended</strong></td>
 <td>Essential + BME280</td>
-<td><strong>~$26.50</strong></td>
+<td><strong>~$20.96</strong></td>
 </tr>
 <tr>
 <td><strong>Explorer</strong></td>
-<td>Recommended + PA1010D + QMC5883L (treasure hunts)</td>
-<td><strong>~$40.50</strong></td>
+<td>Recommended + QMC5883L (compass, WiFi/BLE location)</td>
+<td><strong>~$24.96</strong></td>
 </tr>
 <tr>
 <td><strong>Full</strong></td>
 <td>Explorer + APDS-9960 + LIS3MDL upgrade</td>
-<td><strong>~$49.50</strong></td>
+<td><strong>~$33.96</strong></td>
 </tr>
 </tbody>
 </table>
@@ -7150,7 +7208,7 @@
 <td>0</td>
 </tr>
 <tr>
-<td>LSM6DSO (pedometer mode)</td>
+<td>LIS2DH12TR (pedometer mode)</td>
 <td>0.02</td>
 <td>0.003</td>
 </tr>
@@ -7204,10 +7262,10 @@
 <td>Ultra-low power (14uA with step counter). Best power efficiency.</td>
 </tr>
 <tr>
-<td><strong>MPU6050</strong></td>
-<td>~$2</td>
-<td>No (software needed)</td>
-<td>Cheapest. Well-documented. Requires software step algorithm.</td>
+<td><strong>LIS2DH12TR</strong></td>
+<td>~$0.46</td>
+<td>Yes (built-in pedometer)</td>
+<td>Cheapest. Built-in step counter, LGA-12 (2x2mm), ultra-low power. <strong>Selected for Dilder BOM.</strong></td>
 </tr>
 <tr>
 <td><strong>LIS3DH</strong></td>
@@ -7223,7 +7281,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Recommendation</strong>: LSM6DSO or BMA400 for built-in step counter. MPU6050 if budget-constrained (requires ~50 lines of step detection code).</p>
+<p><strong>Recommendation</strong>: LIS2DH12TR selected for Dilder — $0.46, built-in pedometer, ultra-low power, smallest footprint (LGA-12, 2x2mm). LSM6DSO or BMA400 are alternatives if 6-axis IMU is needed later.</p>
 <h3 id="software-step-counting-algorithm-for-chips-without-built-in-pedometer">Software Step Counting Algorithm (for chips without built-in pedometer)<a class="headerlink" href="#software-step-counting-algorithm-for-chips-without-built-in-pedometer" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>1. Sample accelerometer at 25-50Hz
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>2. Compute magnitude: mag = sqrt(ax² + ay² + az²)
@@ -7457,7 +7515,7 @@
 <tr>
 <td><strong>Step counting accuracy</strong></td>
 <td>Medium</td>
-<td>Use LSM6DSO built-in pedometer (hardware). If software: tune threshold per user weight/gait.</td>
+<td>Use LIS2DH12TR built-in pedometer (hardware). If software: tune threshold per user weight/gait.</td>
 </tr>
 <tr>
 <td><strong>WiFi geolocation latency</strong></td>
@@ -7609,12 +7667,12 @@
 </thead>
 <tbody>
 <tr>
-<td>Integrate LSM6DSO step counter</td>
-<td>LSM6DSO (~$6)</td>
+<td>Integrate LIS2DH12TR step counter</td>
+<td>LIS2DH12TR (~$0.46, on-board)</td>
 </tr>
 <tr>
 <td>Implement step milestone rewards</td>
-<td>LSM6DSO</td>
+<td>LIS2DH12TR</td>
 </tr>
 <tr>
 <td>Implement WiFi geolocation for location awareness</td>
@@ -7737,8 +7795,8 @@
 <td>Pi Zero WH</td>
 </tr>
 <tr>
-<td>GPS location tracking (optional)</td>
-<td>PA1010D (~$12)</td>
+<td>Enhanced location tracking (optional)</td>
+<td>WiFi fingerprinting + BLE scanning (built-in)</td>
 </tr>
 <tr>
 <td>Web dashboard / companion app</td>

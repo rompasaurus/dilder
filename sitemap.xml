@@ -37,11 +37,19 @@
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
+         <loc>https://dilder.dev/blog/esp32-schematic-complete/</loc>
+         <lastmod>2026-04-15</lastmod>
+    </url>
+    <url>
          <loc>https://dilder.dev/blog/hardware-arrives/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
          <loc>https://dilder.dev/blog/joystick-first-input/</loc>
+         <lastmod>2026-04-15</lastmod>
+    </url>
+    <url>
+         <loc>https://dilder.dev/blog/pcb-fab-pricing-research/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
@@ -94,6 +102,10 @@
     </url>
     <url>
          <loc>https://dilder.dev/docs/design/custom-pcb-design-research/</loc>
+         <lastmod>2026-04-15</lastmod>
+    </url>
+    <url>
+         <loc>https://dilder.dev/docs/design/motion-location-detection/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
@@ -198,6 +210,10 @@
     </url>
     <url>
          <loc>https://dilder.dev/blog/category/pcb-design/</loc>
+         <lastmod>2026-04-15</lastmod>
+    </url>
+    <url>
+         <loc>https://dilder.dev/blog/category/manufacturing/</loc>
          <lastmod>2026-04-15</lastmod>
     </url>
     <url>
