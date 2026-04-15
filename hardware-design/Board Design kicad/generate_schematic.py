@@ -1,12 +1,64 @@
 #!/usr/bin/env python3
 """
 Generate a fully-wired KiCad schematic for the Dilder PCB.
+ESP32-S3-WROOM-1-N16R8 version — replaces RP2040.
+
+Removed vs old design:
+  - RP2040 (replaced by ESP32-S3 module with integrated flash/PSRAM/crystal/RF)
+  - W25Q16JV external flash (integrated in module)
+  - 12MHz crystal + load caps (integrated in module)
+  - 27R USB series resistors (ESP32-S3 has native USB-OTG)
+  - ATGM336H GPS module (deferred to later phase)
 
 Uses net labels on wire stubs to create all electrical connections.
-This approach is more reliable than routing long wires between distant components.
 
 Run from the 'Board Design kicad/' directory:
   python3 generate_schematic.py
+
+═══════════════════════════════════════════════════════════════════
+BILL OF MATERIALS (BOM) — 20 components
+═══════════════════════════════════════════════════════════════════
+Ref   | Value               | Package                    | LCSC     | ~Cost
+------+---------------------+----------------------------+----------+------
+U1    | ESP32-S3-WROOM-1    | RF_Module (18x25.5mm)      | C2913196 | $2.80
+      |   -N16R8            |                            |          |
+U2    | TP4056              | ESOP-8                     | C382139  | $0.07
+U3    | DW01A               | SOT-23-6                   | C351410  | $0.05
+Q1    | FS8205A             | SOT-23-6                   | C908265  | $0.05
+U4    | AMS1117-3.3         | SOT-223-3                  | C6186    | $0.05
+U6    | MPU-6050            | QFN-24 (4x4mm)             | C24112   | $6.88
+J1    | USB-C 16-pin        | HRO TYPE-C-31-M-12         | C2765186 | $0.10
+J2    | JST PH 2-pin        | JST_PH_S2B-PH-SM4-TB      | C131337  | $0.03
+J3    | ePaper 8-pin        | JST_SH 1mm horiz           | —        | $0.05
+D1    | SS34 Schottky       | SMA                        | C8678    | $0.03
+D2    | RED LED             | 0402                       | C84256   | $0.01
+D3    | GREEN LED           | 0402                       | C72043   | $0.01
+SW1   | SKRHABE010 5-way    | SMD                        | C139794  | $0.38
+R1    | 1.2k (TP4056 PROG)  | 0402                       | C25752   | $0.01
+R2    | 1k (charge LED)     | 0402                       | C25585   | $0.01
+R3    | 1k (standby LED)    | 0402                       | C25585   | $0.01
+R4    | 10k (I2C SDA pull)  | 0402                       | C25744   | $0.01
+R5    | 10k (I2C SCL pull)  | 0402                       | C25744   | $0.01
+R8    | 5.1k (USB CC1)      | 0402                       | —        | $0.01
+R9    | 5.1k (USB CC2)      | 0402                       | —        | $0.01
+R10   | 10k (EN pull-up)    | 0402                       | C25744   | $0.01
+C3    | 100nF (ESP32 decap) | 0402                       | C14663   | $0.01
+C4    | 10uF (ESP32 bulk)   | 0402                       | C19702   | $0.01
+C5    | 10uF (LDO input)    | 0402                       | C19702   | $0.01
+C6    | 10uF (LDO output)   | 0402                       | C19702   | $0.01
+C7    | 100nF (IMU decap)   | 0402                       | C14663   | $0.01
+C9    | 100nF (IMU REGOUT)  | 0402                       | C14663   | $0.01
+------+---------------------+----------------------------+----------+------
+                                              TOTAL per board: ~$10.60
+
+GPIO Pin Assignment (ESP32-S3-WROOM-1):
+  GPIO3  → EPD_DC        GPIO4-8  → Joystick (UP/DN/LT/RT/CTR)
+  GPIO9  → EPD_CLK (SCK) GPIO10   → EPD_MOSI
+  GPIO11 → EPD_RST       GPIO12   → EPD_BUSY
+  GPIO16 → I2C_SDA       GPIO17   → I2C_SCL
+  GPIO19 → USB_D-        GPIO20   → USB_D+
+  GPIO46 → EPD_CS
+═══════════════════════════════════════════════════════════════════
 """
 
 import uuid as _uuid
@@ -26,89 +78,300 @@ def wire(x1, y1, x2, y2):
 def label(name, x, y, angle=0):
     return f'  (label "{name}" (at {x} {y} {angle}) (effects (font (size 1.27 1.27))) (uuid "{uid()}"))'
 
-def pwr_flag(x, y):
-    """Power flag symbol to suppress ERC warnings."""
-    return f'''  (symbol (lib_id "PWR_FLAG") (at {x} {y} 0) (unit 1) (exclude_from_sim no) (in_bom no) (on_board no)
-    (uuid "{uid()}")
-    (property "Reference" "#FLG0{_uuid_counter}" (at {x} {y-2} 0) (effects (font (size 1.27 1.27)) hide))
-    (property "Value" "PWR_FLAG" (at {x} {y-4} 0) (effects (font (size 1.27 1.27)) hide))
-    (pin "1" (uuid "{uid()}"))
-  )'''
 
 # ── Component placement coordinates ───────────────────────────────────
 # Organized into functional blocks on an A3 sheet (420x297mm)
 
-# POWER SECTION (top area, y=40-100)
-USB_C   = (45,  68)     # J1 - USB-C connector
-SCHOTTKY= (80,  55)     # D1 - SS34
-TP4056  = (115, 68)     # U2 - charger
-DW01A   = (170, 68)     # U3 - protection
-FS8205A = (170, 100)    # Q1 - MOSFETs
-JST_BAT = (220, 68)     # J2 - battery connector
-LDO     = (115, 115)    # U4 - AMS1117-3.3
-RPROG   = (100, 82)     # R1 - 1.2k prog resistor
-LED_CHG = (140, 58)     # D2 - charge LED
-LED_DONE= (140, 48)     # D3 - done LED
-RLED1   = (152, 58)     # R2 - LED resistor
-RLED2   = (152, 48)     # R3 - LED resistor
-C_LDO_IN= (100, 115)   # C5 - LDO input cap
-C_LDO_OUT=(132, 115)    # C6 - LDO output cap
+# POWER SECTION (top area, y=40-120)
+USB_C    = (45,  68)     # J1 - USB-C connector
+SCHOTTKY = (80,  55)     # D1 - SS34
+TP4056   = (115, 68)     # U2 - charger
+DW01A    = (170, 68)     # U3 - protection
+FS8205A  = (170, 100)    # Q1 - MOSFETs
+JST_BAT  = (220, 68)     # J2 - battery connector
+LDO      = (115, 115)    # U4 - AMS1117-3.3
+RPROG    = (100, 82)     # R1 - 1.2k prog resistor
+LED_CHG  = (140, 58)     # D2 - charge LED
+LED_DONE = (140, 48)     # D3 - done LED
+RLED1    = (152, 58)     # R2 - LED resistor
+RLED2    = (152, 48)     # R3 - LED resistor
+C_LDO_IN = (100, 115)   # C5 - LDO input cap
+C_LDO_OUT= (132, 115)   # C6 - LDO output cap
 
-# MCU SECTION (center, y=150-240)
-RP2040  = (160, 195)    # U1 - main MCU
-FLASH   = (90,  210)    # U5 - W25Q16JV
-CRYSTAL = (205, 215)    # Y1 - 12MHz
-C_XTAL1 = (198, 228)   # C1 - 15pF load cap
-C_XTAL2 = (212, 228)   # C2 - 15pF load cap
-C_DEC1  = (145, 150)    # C3 - 100nF decoupling
-C_DEC2  = (155, 150)    # C4 - 10uF bulk
-R_USB_DP= (120, 185)    # R6 - 27R USB
-R_USB_DM= (120, 190)    # R7 - 27R USB
-R_CC1   = (35,  82)     # R8 - 5.1k CC1
-R_CC2   = (45,  82)     # R9 - 5.1k CC2
-R_RUN   = (200, 178)    # R10 - 10k RUN pull-up
+# MCU SECTION (center, y=150-230)
+ESP32    = (160, 190)    # U1 - ESP32-S3-WROOM-1-N16R8
+C_DEC1   = (145, 155)   # C3 - 100nF decoupling
+C_DEC2   = (155, 155)   # C4 - 10uF bulk
+R_CC1    = (35,  82)    # R8 - 5.1k CC1
+R_CC2    = (45,  82)    # R9 - 5.1k CC2
+R_EN     = (200, 170)   # R10 - 10k EN pull-up
 
 # PERIPHERALS (left and right sides)
-JOYSTICK= (50,  175)    # SW1 - 5-way nav switch
-EPAPER  = (280, 175)    # J3 - e-Paper 8-pin header
-IMU     = (280, 220)    # U6 - MPU-6050
-GPS     = (280, 265)    # U7 - ATGM336H
-R_I2C_SDA=(265, 208)   # R4 - 10k I2C pull-up
-R_I2C_SCL=(272, 208)   # R5 - 10k I2C pull-up
-C_IMU   = (298, 210)    # C7 - 100nF IMU decoupling
-C_GPS   = (298, 255)    # C8 - 100nF GPS decoupling
-C_REGOUT= (298, 225)    # C9 - 100nF IMU REGOUT
+JOYSTICK = (50,  185)   # SW1 - 5-way nav switch
+EPAPER   = (280, 175)   # J3 - e-Paper 8-pin header
+IMU      = (280, 220)   # U6 - MPU-6050
+R_I2C_SDA= (265, 208)  # R4 - 10k I2C pull-up
+R_I2C_SCL= (272, 208)  # R5 - 10k I2C pull-up
+C_IMU    = (298, 210)   # C7 - 100nF IMU decoupling
+C_REGOUT = (298, 225)   # C9 - 100nF IMU REGOUT
 
 
-# ── Net definitions ───────────────────────────────────────────────────
-# Each net: list of (component_ref, pin_name, x, y, label_angle)
-# Wires go from pin to label position
-
-NETS = {}
-
-def add_net(net_name, connections):
-    """connections: list of (x, y, wire_dx, wire_dy, label_angle)"""
-    NETS[net_name] = connections
-
-
-# ── Build the schematic ───────────────────────────────────────────────
+# ── Build lib_symbols inline ─────────────────────────────────────────
 
 def build_lib_symbols():
-    """Return the lib_symbols block (reuse from existing file)."""
-    with open("dilder.kicad_sch") as f:
-        content = f.read()
-    start = content.index("(lib_symbols")
-    depth = 0
-    i = start
-    while i < len(content):
-        if content[i] == '(':
-            depth += 1
-        elif content[i] == ')':
-            depth -= 1
-            if depth == 0:
-                break
-        i += 1
-    return content[start:i+1]
+    return """(lib_symbols
+
+    (symbol "ESP32-S3-WROOM-1" (in_bom yes) (on_board yes)
+      (property "Reference" "U" (at 0 26.67 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "ESP32-S3-WROOM-1-N16R8" (at 0 -26.67 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "RF_Module:ESP32-S3-WROOM-1" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (property "LCSC" "C2913196" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "ESP32-S3-WROOM-1_0_1"
+        (rectangle (start -15.24 25.4) (end 15.24 -25.4) (stroke (width 0.254) (type default)) (fill (type background)))
+      )
+      (symbol "ESP32-S3-WROOM-1_1_1"
+        (pin power_in line (at 0 27.94 270) (length 2.54) (name "3V3" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+        (pin input line (at -17.78 22.86 0) (length 2.54) (name "EN" (effects (font (size 1.016 1.016)))) (number "3" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -17.78 17.78 0) (length 2.54) (name "GPIO4" (effects (font (size 1.016 1.016)))) (number "4" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -17.78 15.24 0) (length 2.54) (name "GPIO5" (effects (font (size 1.016 1.016)))) (number "5" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -17.78 12.7 0) (length 2.54) (name "GPIO6" (effects (font (size 1.016 1.016)))) (number "6" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -17.78 10.16 0) (length 2.54) (name "GPIO7" (effects (font (size 1.016 1.016)))) (number "7" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -17.78 7.62 0) (length 2.54) (name "GPIO8" (effects (font (size 1.016 1.016)))) (number "8" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -17.78 2.54 0) (length 2.54) (name "GPIO16/SDA" (effects (font (size 1.016 1.016)))) (number "9" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -17.78 0 0) (length 2.54) (name "GPIO17/SCL" (effects (font (size 1.016 1.016)))) (number "10" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -17.78 -5.08 0) (length 2.54) (name "GPIO19/D-" (effects (font (size 1.016 1.016)))) (number "13" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -17.78 -7.62 0) (length 2.54) (name "GPIO20/D+" (effects (font (size 1.016 1.016)))) (number "14" (effects (font (size 1.016 1.016)))))
+        (pin output line (at 17.78 17.78 180) (length 2.54) (name "GPIO9/SCK" (effects (font (size 1.016 1.016)))) (number "15" (effects (font (size 1.016 1.016)))))
+        (pin output line (at 17.78 15.24 180) (length 2.54) (name "GPIO10/MOSI" (effects (font (size 1.016 1.016)))) (number "16" (effects (font (size 1.016 1.016)))))
+        (pin output line (at 17.78 12.7 180) (length 2.54) (name "GPIO3/DC" (effects (font (size 1.016 1.016)))) (number "17" (effects (font (size 1.016 1.016)))))
+        (pin output line (at 17.78 10.16 180) (length 2.54) (name "GPIO11/RST" (effects (font (size 1.016 1.016)))) (number "18" (effects (font (size 1.016 1.016)))))
+        (pin output line (at 17.78 7.62 180) (length 2.54) (name "GPIO46/CS" (effects (font (size 1.016 1.016)))) (number "19" (effects (font (size 1.016 1.016)))))
+        (pin input line (at 17.78 5.08 180) (length 2.54) (name "GPIO12/BUSY" (effects (font (size 1.016 1.016)))) (number "20" (effects (font (size 1.016 1.016)))))
+        (pin power_in line (at 0 -27.94 90) (length 2.54) (name "GND" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "TP4056" (in_bom yes) (on_board yes)
+      (property "Reference" "U" (at 0 8.89 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "TP4056" (at 0 -8.89 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "Package_SO:ESOP-8_3.9x4.9mm_P1.27mm" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (property "LCSC" "C382139" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "TP4056_0_1"
+        (rectangle (start -7.62 7.62) (end 7.62 -7.62) (stroke (width 0.254) (type default)) (fill (type background)))
+      )
+      (symbol "TP4056_1_1"
+        (pin input line (at -10.16 5.08 0) (length 2.54) (name "VCC" (effects (font (size 1.016 1.016)))) (number "8" (effects (font (size 1.016 1.016)))))
+        (pin output line (at 10.16 5.08 180) (length 2.54) (name "BAT" (effects (font (size 1.016 1.016)))) (number "3" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -10.16 2.54 0) (length 2.54) (name "PROG" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+        (pin input line (at -10.16 0 0) (length 2.54) (name "TEMP" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin open_collector line (at 10.16 2.54 180) (length 2.54) (name "~{STDBY}" (effects (font (size 1.016 1.016)))) (number "6" (effects (font (size 1.016 1.016)))))
+        (pin open_collector line (at 10.16 0 180) (length 2.54) (name "~{CHRG}" (effects (font (size 1.016 1.016)))) (number "7" (effects (font (size 1.016 1.016)))))
+        (pin input line (at -10.16 -2.54 0) (length 2.54) (name "CE" (effects (font (size 1.016 1.016)))) (number "4" (effects (font (size 1.016 1.016)))))
+        (pin power_in line (at 0 -10.16 90) (length 2.54) (name "GND" (effects (font (size 1.016 1.016)))) (number "5" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "DW01A" (in_bom yes) (on_board yes)
+      (property "Reference" "U" (at 0 6.35 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "DW01A" (at 0 -6.35 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "Package_TO_SOT_SMD:SOT-23-6" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (property "LCSC" "C351410" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "DW01A_0_1"
+        (rectangle (start -6.35 5.08) (end 6.35 -5.08) (stroke (width 0.254) (type default)) (fill (type background)))
+      )
+      (symbol "DW01A_1_1"
+        (pin output line (at -8.89 2.54 0) (length 2.54) (name "OD" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin input line (at -8.89 0 0) (length 2.54) (name "CS" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+        (pin output line (at -8.89 -2.54 0) (length 2.54) (name "OC" (effects (font (size 1.016 1.016)))) (number "3" (effects (font (size 1.016 1.016)))))
+        (pin power_in line (at 8.89 2.54 180) (length 2.54) (name "VCC" (effects (font (size 1.016 1.016)))) (number "5" (effects (font (size 1.016 1.016)))))
+        (pin power_in line (at 8.89 -2.54 180) (length 2.54) (name "GND" (effects (font (size 1.016 1.016)))) (number "6" (effects (font (size 1.016 1.016)))))
+        (pin input line (at 8.89 0 180) (length 2.54) (name "TD" (effects (font (size 1.016 1.016)))) (number "4" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "FS8205A" (in_bom yes) (on_board yes)
+      (property "Reference" "Q" (at 0 6.35 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "FS8205A" (at 0 -6.35 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "Package_TO_SOT_SMD:SOT-23-6" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (property "LCSC" "C908265" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "FS8205A_0_1"
+        (rectangle (start -6.35 5.08) (end 6.35 -5.08) (stroke (width 0.254) (type default)) (fill (type background)))
+      )
+      (symbol "FS8205A_1_1"
+        (pin passive line (at -8.89 2.54 0) (length 2.54) (name "S1" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin input line (at -8.89 0 0) (length 2.54) (name "G1" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at 8.89 2.54 180) (length 2.54) (name "S2" (effects (font (size 1.016 1.016)))) (number "6" (effects (font (size 1.016 1.016)))))
+        (pin input line (at 8.89 0 180) (length 2.54) (name "G2" (effects (font (size 1.016 1.016)))) (number "5" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -8.89 -2.54 0) (length 2.54) (name "D12" (effects (font (size 1.016 1.016)))) (number "3" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at 8.89 -2.54 180) (length 2.54) (name "D12B" (effects (font (size 1.016 1.016)))) (number "4" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "AMS1117-3.3" (in_bom yes) (on_board yes)
+      (property "Reference" "U" (at 0 5.08 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "AMS1117-3.3" (at 0 -5.08 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (property "LCSC" "C6186" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "AMS1117-3.3_0_1"
+        (rectangle (start -5.08 3.81) (end 5.08 -3.81) (stroke (width 0.254) (type default)) (fill (type background)))
+      )
+      (symbol "AMS1117-3.3_1_1"
+        (pin power_in line (at -7.62 1.27 0) (length 2.54) (name "VIN" (effects (font (size 1.016 1.016)))) (number "3" (effects (font (size 1.016 1.016)))))
+        (pin power_out line (at 7.62 1.27 180) (length 2.54) (name "VOUT" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+        (pin power_in line (at 0 -6.35 90) (length 2.54) (name "GND" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "MPU-6050" (in_bom yes) (on_board yes)
+      (property "Reference" "U" (at 0 13.97 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "MPU-6050" (at 0 -13.97 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (property "LCSC" "C24112" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "MPU-6050_0_1"
+        (rectangle (start -7.62 12.7) (end 7.62 -12.7) (stroke (width 0.254) (type default)) (fill (type background)))
+      )
+      (symbol "MPU-6050_1_1"
+        (pin power_in line (at 0 15.24 270) (length 2.54) (name "VDD" (effects (font (size 1.016 1.016)))) (number "13" (effects (font (size 1.016 1.016)))))
+        (pin power_in line (at 0 -15.24 90) (length 2.54) (name "GND" (effects (font (size 1.016 1.016)))) (number "18" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -10.16 7.62 0) (length 2.54) (name "SDA" (effects (font (size 1.016 1.016)))) (number "24" (effects (font (size 1.016 1.016)))))
+        (pin input line (at -10.16 5.08 0) (length 2.54) (name "SCL" (effects (font (size 1.016 1.016)))) (number "23" (effects (font (size 1.016 1.016)))))
+        (pin output line (at 10.16 7.62 180) (length 2.54) (name "INT" (effects (font (size 1.016 1.016)))) (number "12" (effects (font (size 1.016 1.016)))))
+        (pin input line (at -10.16 2.54 0) (length 2.54) (name "AD0" (effects (font (size 1.016 1.016)))) (number "9" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at 10.16 -5.08 180) (length 2.54) (name "REGOUT" (effects (font (size 1.016 1.016)))) (number "10" (effects (font (size 1.016 1.016)))))
+        (pin power_in line (at 2.54 15.24 270) (length 2.54) (name "VLOGIC" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at 10.16 2.54 180) (length 2.54) (name "CPOUT" (effects (font (size 1.016 1.016)))) (number "20" (effects (font (size 1.016 1.016)))))
+        (pin input line (at -10.16 -2.54 0) (length 2.54) (name "FSYNC" (effects (font (size 1.016 1.016)))) (number "11" (effects (font (size 1.016 1.016)))))
+        (pin input line (at -10.16 -5.08 0) (length 2.54) (name "CLKIN" (effects (font (size 1.016 1.016)))) (number "8" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "SKRHABE010" (in_bom yes) (on_board yes)
+      (property "Reference" "SW" (at 0 8.89 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "SKRHABE010" (at 0 -8.89 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (property "LCSC" "C139794" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "SKRHABE010_0_1"
+        (rectangle (start -7.62 7.62) (end 7.62 -7.62) (stroke (width 0.254) (type default)) (fill (type background)))
+      )
+      (symbol "SKRHABE010_1_1"
+        (pin passive line (at -10.16 5.08 0) (length 2.54) (name "UP" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -10.16 2.54 0) (length 2.54) (name "DOWN" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -10.16 0 0) (length 2.54) (name "LEFT" (effects (font (size 1.016 1.016)))) (number "3" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -10.16 -2.54 0) (length 2.54) (name "RIGHT" (effects (font (size 1.016 1.016)))) (number "4" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -10.16 -5.08 0) (length 2.54) (name "CENTER" (effects (font (size 1.016 1.016)))) (number "5" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at 10.16 0 180) (length 2.54) (name "COM" (effects (font (size 1.016 1.016)))) (number "6" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "USB_C_16P" (in_bom yes) (on_board yes)
+      (property "Reference" "J" (at 0 10.16 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "USB-C" (at 0 -10.16 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (property "LCSC" "C2765186" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "USB_C_16P_0_1"
+        (rectangle (start -7.62 8.89) (end 7.62 -8.89) (stroke (width 0.254) (type default)) (fill (type background)))
+      )
+      (symbol "USB_C_16P_1_1"
+        (pin power_out line (at 0 11.43 270) (length 2.54) (name "VBUS" (effects (font (size 1.016 1.016)))) (number "A4" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -10.16 2.54 0) (length 2.54) (name "CC1" (effects (font (size 1.016 1.016)))) (number "A5" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -10.16 0 0) (length 2.54) (name "CC2" (effects (font (size 1.016 1.016)))) (number "B5" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -10.16 -2.54 0) (length 2.54) (name "D+" (effects (font (size 1.016 1.016)))) (number "A6" (effects (font (size 1.016 1.016)))))
+        (pin bidirectional line (at -10.16 -5.08 0) (length 2.54) (name "D-" (effects (font (size 1.016 1.016)))) (number "A7" (effects (font (size 1.016 1.016)))))
+        (pin power_in line (at 0 -11.43 90) (length 2.54) (name "GND" (effects (font (size 1.016 1.016)))) (number "A1" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at 10.16 0 180) (length 2.54) (name "SHIELD" (effects (font (size 1.016 1.016)))) (number "S1" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "JST_PH_2" (in_bom yes) (on_board yes)
+      (property "Reference" "J" (at 0 5.08 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "JST-PH-2" (at 0 -5.08 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "Connector_JST:JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (property "LCSC" "C131337" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "JST_PH_2_0_1"
+        (rectangle (start -3.81 3.81) (end 3.81 -3.81) (stroke (width 0.254) (type default)) (fill (type background)))
+      )
+      (symbol "JST_PH_2_1_1"
+        (pin passive line (at -6.35 1.27 0) (length 2.54) (name "+" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -6.35 -1.27 0) (length 2.54) (name "-" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "EPAPER_HEADER" (in_bom yes) (on_board yes)
+      (property "Reference" "J" (at 0 12.7 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "ePaper_8pin" (at 0 -12.7 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "Connector_JST:JST_SH_SM08B-SRSS-TB_1x08-1MP_P1.00mm_Horizontal" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "EPAPER_HEADER_0_1"
+        (rectangle (start -5.08 11.43) (end 5.08 -11.43) (stroke (width 0.254) (type default)) (fill (type background)))
+      )
+      (symbol "EPAPER_HEADER_1_1"
+        (pin passive line (at -7.62 8.89 0) (length 2.54) (name "VCC" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -7.62 6.35 0) (length 2.54) (name "GND" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -7.62 3.81 0) (length 2.54) (name "DIN" (effects (font (size 1.016 1.016)))) (number "3" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -7.62 1.27 0) (length 2.54) (name "CLK" (effects (font (size 1.016 1.016)))) (number "4" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -7.62 -1.27 0) (length 2.54) (name "CS" (effects (font (size 1.016 1.016)))) (number "5" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -7.62 -3.81 0) (length 2.54) (name "DC" (effects (font (size 1.016 1.016)))) (number "6" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -7.62 -6.35 0) (length 2.54) (name "RST" (effects (font (size 1.016 1.016)))) (number "7" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at -7.62 -8.89 0) (length 2.54) (name "BUSY" (effects (font (size 1.016 1.016)))) (number "8" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "C" (in_bom yes) (on_board yes)
+      (property "Reference" "C" (at 0 2.54 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "C" (at 0 -2.54 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "Capacitor_SMD:C_0402_1005Metric" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "C_0_1"
+        (polyline (pts (xy -1.27 0.635) (xy 1.27 0.635)) (stroke (width 0.254) (type default)) (fill (type none)))
+        (polyline (pts (xy -1.27 -0.635) (xy 1.27 -0.635)) (stroke (width 0.254) (type default)) (fill (type none)))
+      )
+      (symbol "C_1_1"
+        (pin passive line (at 0 2.54 270) (length 1.905) (name "1" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at 0 -2.54 90) (length 1.905) (name "2" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "R" (in_bom yes) (on_board yes)
+      (property "Reference" "R" (at 0 2.54 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "R" (at 0 -2.54 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "Resistor_SMD:R_0402_1005Metric" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "R_0_1"
+        (rectangle (start -1.016 1.778) (end 1.016 -1.778) (stroke (width 0.254) (type default)) (fill (type none)))
+      )
+      (symbol "R_1_1"
+        (pin passive line (at 0 2.54 270) (length 0.762) (name "1" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at 0 -2.54 90) (length 0.762) (name "2" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "LED" (in_bom yes) (on_board yes)
+      (property "Reference" "D" (at 0 3.81 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "LED" (at 0 -3.81 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "LED_SMD:LED_0402_1005Metric" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "LED_0_1"
+        (polyline (pts (xy -1.27 1.27) (xy -1.27 -1.27) (xy 1.27 0) (xy -1.27 1.27)) (stroke (width 0.254) (type default)) (fill (type none)))
+        (polyline (pts (xy 1.27 1.27) (xy 1.27 -1.27)) (stroke (width 0.254) (type default)) (fill (type none)))
+      )
+      (symbol "LED_1_1"
+        (pin passive line (at -3.81 0 0) (length 2.54) (name "A" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at 3.81 0 180) (length 2.54) (name "K" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+    (symbol "D_Schottky" (in_bom yes) (on_board yes)
+      (property "Reference" "D" (at 0 3.81 0) (effects (font (size 1.27 1.27))))
+      (property "Value" "SS34" (at 0 -3.81 0) (effects (font (size 1.27 1.27))))
+      (property "Footprint" "Diode_SMD:D_SMA" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (property "LCSC" "C8678" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+      (symbol "D_Schottky_0_1"
+        (polyline (pts (xy -1.27 1.27) (xy -1.27 -1.27) (xy 1.27 0) (xy -1.27 1.27)) (stroke (width 0.254) (type default)) (fill (type none)))
+        (polyline (pts (xy 1.27 1.27) (xy 1.27 -1.27)) (stroke (width 0.254) (type default)) (fill (type none)))
+      )
+      (symbol "D_Schottky_1_1"
+        (pin passive line (at -3.81 0 0) (length 2.54) (name "A" (effects (font (size 1.016 1.016)))) (number "1" (effects (font (size 1.016 1.016)))))
+        (pin passive line (at 3.81 0 180) (length 2.54) (name "K" (effects (font (size 1.016 1.016)))) (number "2" (effects (font (size 1.016 1.016)))))
+      )
+    )
+
+  )"""
 
 
 def component(lib_id, ref_prefix, ref_num, value, x, y, lcsc="", footprint="", pins=None, angle=0):
@@ -188,64 +451,43 @@ def build_schematic():
     add("C", "C", 5, "10uF", C_LDO_IN, "C19702", "Capacitor_SMD:C_0402_1005Metric", ["1", "2"])
     add("C", "C", 6, "10uF", C_LDO_OUT, "C19702", "Capacitor_SMD:C_0402_1005Metric", ["1", "2"])
 
-    # -- MCU Section --
-    add("RP2040", "U", 1, "RP2040", RP2040, "C2040",
-        "Package_DFN_QFN:QFN-56-1EP_7x7mm_P0.4mm_EP3.2x3.2mm",
-        ["2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17",
-         "27","28","29","30","31","32","33","34","35","36","37","38","39","40",
-         "47","46","24","21","22","23","25","26","20","19",
-         "1","48","50","43","57","18","42","41","44","45","49"])
-
-    add("W25Q16JV", "U", 5, "W25Q16JV", FLASH, "C131024",
-        "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
-        ["2", "5", "6", "1", "3", "7", "8", "4"])
-
-    add("Crystal_12MHz", "Y", 1, "12MHz", CRYSTAL, "C9002",
-        "Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm", ["1", "2"], angle=90)
+    # -- MCU Section: ESP32-S3-WROOM-1-N16R8 --
+    add("ESP32-S3-WROOM-1", "U", 1, "ESP32-S3-N16R8", ESP32, "C2913196",
+        "RF_Module:ESP32-S3-WROOM-1",
+        ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+         "13", "14", "15", "16", "17", "18", "19", "20"])
 
     # Passives - MCU
-    add("C", "C", 1, "15pF", C_XTAL1, "C1644", "Capacitor_SMD:C_0402_1005Metric", ["1", "2"])
-    add("C", "C", 2, "15pF", C_XTAL2, "C1644", "Capacitor_SMD:C_0402_1005Metric", ["1", "2"])
     add("C", "C", 3, "100nF", C_DEC1, "C14663", "Capacitor_SMD:C_0402_1005Metric", ["1", "2"])
     add("C", "C", 4, "10uF", C_DEC2, "C19702", "Capacitor_SMD:C_0402_1005Metric", ["1", "2"])
-    add("R", "R", 6, "27R", R_USB_DP, "C25105", "Resistor_SMD:R_0402_1005Metric", ["1", "2"], angle=90)
-    add("R", "R", 7, "27R", R_USB_DM, "C25105", "Resistor_SMD:R_0402_1005Metric", ["1", "2"], angle=90)
     add("R", "R", 8, "5.1k", R_CC1, "", "Resistor_SMD:R_0402_1005Metric", ["1", "2"])
     add("R", "R", 9, "5.1k", R_CC2, "", "Resistor_SMD:R_0402_1005Metric", ["1", "2"])
-    add("R", "R", 10, "10k", R_RUN, "C25744", "Resistor_SMD:R_0402_1005Metric", ["1", "2"])
+    add("R", "R", 10, "10k", R_EN, "C25744", "Resistor_SMD:R_0402_1005Metric", ["1", "2"])
 
     # -- Peripherals --
     add("SKRHABE010", "SW", 1, "5-Way Nav", JOYSTICK, "C139794", "",
         ["1", "2", "3", "4", "5", "6"])
 
     add("EPAPER_HEADER", "J", 3, "ePaper 8pin", EPAPER, "",
-        "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical",
+        "Connector_JST:JST_SH_SM08B-SRSS-TB_1x08-1MP_P1.00mm_Horizontal",
         ["1", "2", "3", "4", "5", "6", "7", "8"])
 
     add("MPU-6050", "U", 6, "MPU-6050", IMU, "C24112",
         "Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm",
         ["13", "18", "24", "23", "12", "9", "10", "1", "20", "11", "8"])
 
-    add("ATGM336H", "U", 7, "ATGM336H", GPS, "C90770", "",
-        ["6", "5", "2", "3", "1", "4", "7"])
-
     # Passives - Peripherals
     add("R", "R", 4, "10k", R_I2C_SDA, "C25744", "Resistor_SMD:R_0402_1005Metric", ["1", "2"])
     add("R", "R", 5, "10k", R_I2C_SCL, "C25744", "Resistor_SMD:R_0402_1005Metric", ["1", "2"])
     add("C", "C", 7, "100nF", C_IMU, "C14663", "Capacitor_SMD:C_0402_1005Metric", ["1", "2"])
-    add("C", "C", 8, "100nF", C_GPS, "C14663", "Capacitor_SMD:C_0402_1005Metric", ["1", "2"])
     add("C", "C", 9, "100nF", C_REGOUT, "C14663", "Capacitor_SMD:C_0402_1005Metric", ["1", "2"])
 
     # ════════════════════════════════════════════════════════════════
     # NET CONNECTIONS VIA LABELS
-    # Each net() call: place a wire stub from a pin and attach a label
-    # Matching labels = electrical connection
     # ════════════════════════════════════════════════════════════════
 
     # ── VBUS net: USB-C VBUS → Schottky anode ──
-    # J1 VBUS pin is at USB_C + (0, -11.43) = (45, 56.57)
     net("VBUS", USB_C[0], USB_C[1]-11.43, 0, -5, 0)
-    # D1 anode at SCHOTTKY + (-3.81, 0) = (76.19, 55)
     net("VBUS", SCHOTTKY[0]-3.81, SCHOTTKY[1], -5, 0, 180)
 
     # ── VBUS_CHG net: Schottky cathode → TP4056 VCC ──
@@ -261,42 +503,28 @@ def build_schematic():
     # ── 3V3 net: LDO VOUT → all 3.3V consumers ──
     net("3V3", LDO[0]+7.62, LDO[1]-1.27, 5, 0, 0)
     net("3V3", C_LDO_OUT[0], C_LDO_OUT[1]-2.54, 0, -3, 0)
-    # RP2040 power pins (IOVDD, DVDD, USB_VDD, ADC_AVDD)
-    net("3V3", RP2040[0]+0, RP2040[1]-40.64, 0, -5, 0)    # IOVDD
-    net("3V3", RP2040[0]+2.54, RP2040[1]-40.64, 0, -5, 0)  # DVDD
-    net("3V3", RP2040[0]+5.08, RP2040[1]-40.64, 0, -5, 0)  # USB_VDD
-    net("3V3", RP2040[0]+7.62, RP2040[1]-40.64, 0, -5, 0)  # ADC_AVDD
-    # RP2040 VREG_VIN
-    net("3V3", RP2040[0]+22.86, RP2040[1]+25.4, 5, 0, 0)
+    # ESP32-S3 3V3 power pin (pin 2, at top center)
+    net("3V3", ESP32[0], ESP32[1]-27.94, 0, -5, 0)
     # Decoupling caps
     net("3V3", C_DEC1[0], C_DEC1[1]-2.54, 0, -3, 0)
     net("3V3", C_DEC2[0], C_DEC2[1]-2.54, 0, -3, 0)
-    # Flash VCC
-    net("3V3", FLASH[0], FLASH[1]-7.62, 0, -3, 0)
     # IMU VDD + VLOGIC
     net("3V3", IMU[0], IMU[1]-15.24, 0, -3, 0)
     net("3V3", IMU[0]+2.54, IMU[1]-15.24, 0, -3, 0)
-    # GPS VCC + V_BCKP
-    net("3V3", GPS[0], GPS[1]-12.7, 0, -3, 0)
-    net("3V3", GPS[0]+10.16, GPS[1]-2.54, 5, 0, 0)
     # e-Paper VCC
     net("3V3", EPAPER[0]-7.62, EPAPER[1]-8.89, -5, 0, 180)
     # I2C pull-ups top
     net("3V3", R_I2C_SDA[0], R_I2C_SDA[1]-2.54, 0, -3, 0)
     net("3V3", R_I2C_SCL[0], R_I2C_SCL[1]-2.54, 0, -3, 0)
-    # RUN pull-up top
-    net("3V3", R_RUN[0], R_RUN[1]-2.54, 0, -3, 0)
+    # EN pull-up top
+    net("3V3", R_EN[0], R_EN[1]-2.54, 0, -3, 0)
     # LED anodes (through resistors)
     net("3V3", RLED1[0], RLED1[1]-2.54, 0, -3, 0)
     net("3V3", RLED2[0], RLED2[1]-2.54, 0, -3, 0)
-    # Decoupling - IMU and GPS
+    # IMU decoupling
     net("3V3", C_IMU[0], C_IMU[1]-2.54, 0, -3, 0)
-    net("3V3", C_GPS[0], C_GPS[1]-2.54, 0, -3, 0)
     # TP4056 CE (always enabled)
     net("3V3", TP4056[0]-10.16, TP4056[1]+2.54, -5, 0, 180)
-    # Flash WP and HOLD (disable)
-    net("3V3", FLASH[0]+10.16, FLASH[1], 5, 0, 0)       # WP
-    net("3V3", FLASH[0]+10.16, FLASH[1]-2.54, 5, 0, 0)   # HOLD
 
     # ── GND net ──
     # USB-C GND
@@ -313,20 +541,14 @@ def build_schematic():
     net("GND", LDO[0], LDO[1]+6.35, 0, 5, 180)
     # RPROG bottom
     net("GND", RPROG[0], RPROG[1]+2.54, 0, 5, 180)
-    # RP2040 GND
-    net("GND", RP2040[0], RP2040[1]+40.64, 0, 5, 180)
-    # Flash GND
-    net("GND", FLASH[0], FLASH[1]+7.62, 0, 5, 180)
-    # Crystal load caps GND
-    net("GND", C_XTAL1[0], C_XTAL1[1]+2.54, 0, 5, 180)
-    net("GND", C_XTAL2[0], C_XTAL2[1]+2.54, 0, 5, 180)
+    # ESP32-S3 GND (pin 1, at bottom center)
+    net("GND", ESP32[0], ESP32[1]+27.94, 0, 5, 180)
     # Decoupling caps GND
     net("GND", C_DEC1[0], C_DEC1[1]+2.54, 0, 5, 180)
     net("GND", C_DEC2[0], C_DEC2[1]+2.54, 0, 5, 180)
     net("GND", C_LDO_IN[0], C_LDO_IN[1]+2.54, 0, 5, 180)
     net("GND", C_LDO_OUT[0], C_LDO_OUT[1]+2.54, 0, 5, 180)
     net("GND", C_IMU[0], C_IMU[1]+2.54, 0, 5, 180)
-    net("GND", C_GPS[0], C_GPS[1]+2.54, 0, 5, 180)
     net("GND", C_REGOUT[0], C_REGOUT[1]+2.54, 0, 5, 180)
     # Joystick COM
     net("GND", JOYSTICK[0]+10.16, JOYSTICK[1], 5, 0, 0)
@@ -340,16 +562,13 @@ def build_schematic():
     net("GND", IMU[0]-10.16, IMU[1]+2.54, -5, 0, 180)
     # IMU CLKIN → GND
     net("GND", IMU[0]-10.16, IMU[1]+5.08, -5, 0, 180)
-    # GPS GND
-    net("GND", GPS[0], GPS[1]+12.7, 0, 5, 180)
     # CC resistors bottom
     net("GND", R_CC1[0], R_CC1[1]+2.54, 0, 5, 180)
     net("GND", R_CC2[0], R_CC2[1]+2.54, 0, 5, 180)
-    # RP2040 TESTEN → GND
-    net("GND", RP2040[0]+22.86, RP2040[1]+30.48, 5, 0, 0)
     # JST battery negative
     net("GND", JST_BAT[0]-6.35, JST_BAT[1]+1.27, -5, 0, 180)
-    # LED cathodes
+
+    # LED intermediate nets
     net("CHRG_LED", LED_CHG[0]-3.81, LED_CHG[1], -3, 0, 180)
     net("CHRG_LED", RLED1[0], RLED1[1]+2.54, 0, 3, 180)
     net("STDBY_LED", LED_DONE[0]-3.81, LED_DONE[1], -3, 0, 180)
@@ -366,34 +585,24 @@ def build_schematic():
     net("PROG", RPROG[0], RPROG[1]-2.54, 0, -3, 0)
 
     # ── Battery protection nets ──
-    # DW01A OD → FS8205A G1
     net("OD", DW01A[0]-8.89, DW01A[1]-2.54, -5, 0, 180)
     net("OD", FS8205A[0]-8.89, FS8205A[1], -5, 0, 180)
-    # DW01A OC → FS8205A G2
     net("OC", DW01A[0]-8.89, DW01A[1]+2.54, -5, 0, 180)
     net("OC", FS8205A[0]+8.89, FS8205A[1], 5, 0, 0)
-    # DW01A CS → FS8205A D1/D2 (drain common)
     net("CS_DRAIN", DW01A[0]-8.89, DW01A[1], -5, 0, 180)
     net("CS_DRAIN", FS8205A[0]-8.89, FS8205A[1]+2.54, -5, 0, 180)
-    net("CS_DRAIN", FS8205A[0]+8.89, FS8205A[1]+2.54, 5, 0, 0)  # D12B too
-    # FS8205A S1 → GND (through the protection IC)
+    net("CS_DRAIN", FS8205A[0]+8.89, FS8205A[1]+2.54, 5, 0, 0)
     net("GND", FS8205A[0]-8.89, FS8205A[1]-2.54, -5, 0, 180)
-    # FS8205A S2 → Battery+ (JST)
     net("BAT_PLUS", FS8205A[0]+8.89, FS8205A[1]-2.54, 5, 0, 0)
     net("BAT_PLUS", JST_BAT[0]-6.35, JST_BAT[1]-1.27, -5, 0, 180)
-    # DW01A TD → DW01A VCC (tie together per datasheet)
     net("VBAT", DW01A[0]+8.89, DW01A[1], 5, 0, 0)
 
-    # ── USB data: USB-C D+/D- → 27R → RP2040 ──
-    net("USB_DP_IN", USB_C[0]-10.16, USB_C[1]+2.54, -5, 0, 180)
-    net("USB_DP_IN", R_USB_DP[0], R_USB_DP[1]-2.54, -5, 0, 180)
-    net("USB_DP", R_USB_DP[0], R_USB_DP[1]+2.54, 5, 0, 0)
-    net("USB_DP", RP2040[0]-22.86, RP2040[1]+7.62, -5, 0, 180)
+    # ── USB data: USB-C D+/D- → ESP32-S3 directly (native USB-OTG) ──
+    net("USB_DP", USB_C[0]-10.16, USB_C[1]+2.54, -5, 0, 180)
+    net("USB_DP", ESP32[0]-17.78, ESP32[1]+7.62, -5, 0, 180)    # GPIO20/D+
 
-    net("USB_DM_IN", USB_C[0]-10.16, USB_C[1]+5.08, -5, 0, 180)
-    net("USB_DM_IN", R_USB_DM[0], R_USB_DM[1]-2.54, -5, 0, 180)
-    net("USB_DM", R_USB_DM[0], R_USB_DM[1]+2.54, 5, 0, 0)
-    net("USB_DM", RP2040[0]-22.86, RP2040[1]+10.16, -5, 0, 180)
+    net("USB_DM", USB_C[0]-10.16, USB_C[1]+5.08, -5, 0, 180)
+    net("USB_DM", ESP32[0]-17.78, ESP32[1]+5.08, -5, 0, 180)    # GPIO19/D-
 
     # USB CC pins → 5.1k → GND
     net("CC1", USB_C[0]-10.16, USB_C[1]-2.54, -5, 0, 180)
@@ -401,85 +610,59 @@ def build_schematic():
     net("CC2", USB_C[0]-10.16, USB_C[1], -5, 0, 180)
     net("CC2", R_CC2[0], R_CC2[1]-2.54, 0, -3, 0)
 
-    # ── QSPI Flash ──
-    net("QSPI_SCLK", RP2040[0]-22.86, RP2040[1]+15.24, -5, 0, 180)
-    net("QSPI_SCLK", FLASH[0]-10.16, FLASH[1]+2.54, -5, 0, 180)
+    # ── EN pull-up ──
+    net("EN", ESP32[0]-17.78, ESP32[1]-22.86, -5, 0, 180)       # pin 3
+    net("EN", R_EN[0], R_EN[1]+2.54, 0, 3, 180)
 
-    net("QSPI_SD0", RP2040[0]-22.86, RP2040[1]+17.78, -5, 0, 180)
-    net("QSPI_SD0", FLASH[0]-10.16, FLASH[1]-2.54, -5, 0, 180)  # DO
+    # ── Joystick GPIO4-8 (active LOW, internal pull-ups) ──
+    net("JOY_UP", JOYSTICK[0]-10.16, JOYSTICK[1]-5.08, -5, 0, 180)
+    net("JOY_UP", ESP32[0]-17.78, ESP32[1]-17.78, -5, 0, 180)       # GPIO4
 
-    net("QSPI_SD1", RP2040[0]-22.86, RP2040[1]+20.32, -5, 0, 180)
-    net("QSPI_SD1", FLASH[0]-10.16, FLASH[1], -5, 0, 180)  # DI
+    net("JOY_DOWN", JOYSTICK[0]-10.16, JOYSTICK[1]-2.54, -5, 0, 180)
+    net("JOY_DOWN", ESP32[0]-17.78, ESP32[1]-15.24, -5, 0, 180)     # GPIO5
 
-    net("QSPI_SS", RP2040[0]-22.86, RP2040[1]+27.94, -5, 0, 180)
-    net("QSPI_SS", FLASH[0]+10.16, FLASH[1]-2.54, 5, 0, 0)  # CS
+    net("JOY_LEFT", JOYSTICK[0]-10.16, JOYSTICK[1], -5, 0, 180)
+    net("JOY_LEFT", ESP32[0]-17.78, ESP32[1]-12.7, -5, 0, 180)      # GPIO6
 
-    # ── Crystal ──
-    net("XIN", RP2040[0]+22.86, RP2040[1]+7.62, 5, 0, 0)
-    net("XIN", CRYSTAL[0], CRYSTAL[1]-3.81, 0, -3, 0)
-    net("XIN", C_XTAL1[0], C_XTAL1[1]-2.54, 0, -3, 0)
+    net("JOY_RIGHT", JOYSTICK[0]-10.16, JOYSTICK[1]+2.54, -5, 0, 180)
+    net("JOY_RIGHT", ESP32[0]-17.78, ESP32[1]-10.16, -5, 0, 180)    # GPIO7
 
-    net("XOUT", RP2040[0]+22.86, RP2040[1]+10.16, 5, 0, 0)
-    net("XOUT", CRYSTAL[0], CRYSTAL[1]+3.81, 0, 3, 180)
-    net("XOUT", C_XTAL2[0], C_XTAL2[1]-2.54, 0, -3, 0)
+    net("JOY_CENTER", JOYSTICK[0]-10.16, JOYSTICK[1]+5.08, -5, 0, 180)
+    net("JOY_CENTER", ESP32[0]-17.78, ESP32[1]-7.62, -5, 0, 180)    # GPIO8
 
-    # ── RUN pull-up ──
-    net("RUN", RP2040[0]+22.86, RP2040[1]+15.24, 5, 0, 0)
-    net("RUN", R_RUN[0], R_RUN[1]+2.54, 0, 3, 180)
+    # ── e-Paper SPI: ESP32 → J3 connector ──
+    # GPIO9/SCK → J3 pin 4 (CLK)
+    net("EPD_CLK", ESP32[0]+17.78, ESP32[1]-17.78, 5, 0, 0)
+    net("EPD_CLK", EPAPER[0]-7.62, EPAPER[1]-1.27, -5, 0, 180)
 
-    # ── VREG_VOUT (internal 1.1V regulator - needs decoupling cap) ──
-    # We'll just label it; the decoupling is handled by C3/C4 placement
+    # GPIO10/MOSI → J3 pin 3 (DIN)
+    net("EPD_MOSI", ESP32[0]+17.78, ESP32[1]-15.24, 5, 0, 0)
+    net("EPD_MOSI", EPAPER[0]-7.62, EPAPER[1]-3.81, -5, 0, 180)
 
-    # ── Joystick GPIO2-6 ──
-    net("GPIO2", JOYSTICK[0]-10.16, JOYSTICK[1]-5.08, -5, 0, 180)
-    net("GPIO2", RP2040[0]-22.86, RP2040[1]-30.48, -5, 0, 180)
+    # GPIO3/DC → J3 pin 6 (DC)
+    net("EPD_DC", ESP32[0]+17.78, ESP32[1]-12.7, 5, 0, 0)
+    net("EPD_DC", EPAPER[0]-7.62, EPAPER[1]+3.81, -5, 0, 180)
 
-    net("GPIO3", JOYSTICK[0]-10.16, JOYSTICK[1]-2.54, -5, 0, 180)
-    net("GPIO3", RP2040[0]-22.86, RP2040[1]-27.94, -5, 0, 180)
+    # GPIO11/RST → J3 pin 7 (RST)
+    net("EPD_RST", ESP32[0]+17.78, ESP32[1]-10.16, 5, 0, 0)
+    net("EPD_RST", EPAPER[0]-7.62, EPAPER[1]+6.35, -5, 0, 180)
 
-    net("GPIO4", JOYSTICK[0]-10.16, JOYSTICK[1], -5, 0, 180)
-    net("GPIO4", RP2040[0]-22.86, RP2040[1]-25.4, -5, 0, 180)
+    # GPIO46/CS → J3 pin 5 (CS)
+    net("EPD_CS", ESP32[0]+17.78, ESP32[1]-7.62, 5, 0, 0)
+    net("EPD_CS", EPAPER[0]-7.62, EPAPER[1]+1.27, -5, 0, 180)
 
-    net("GPIO5", JOYSTICK[0]-10.16, JOYSTICK[1]+2.54, -5, 0, 180)
-    net("GPIO5", RP2040[0]-22.86, RP2040[1]-22.86, -5, 0, 180)
+    # GPIO12/BUSY → J3 pin 8 (BUSY)
+    net("EPD_BUSY", ESP32[0]+17.78, ESP32[1]-5.08, 5, 0, 0)
+    net("EPD_BUSY", EPAPER[0]-7.62, EPAPER[1]+8.89, -5, 0, 180)
 
-    net("GPIO6", JOYSTICK[0]-10.16, JOYSTICK[1]+5.08, -5, 0, 180)
-    net("GPIO6", RP2040[0]-22.86, RP2040[1]-20.32, -5, 0, 180)
+    # ── IMU I2C: GPIO16/17 ──
+    net("I2C_SDA", ESP32[0]-17.78, ESP32[1]-2.54, -5, 0, 180)      # GPIO16
+    net("I2C_SDA", IMU[0]-10.16, IMU[1]-7.62, -5, 0, 180)
+    net("I2C_SDA", R_I2C_SDA[0], R_I2C_SDA[1]+2.54, 0, 3, 180)
 
-    # ── e-Paper SPI1: GP8-GP13 ──
-    net("GPIO8", RP2040[0]-22.86, RP2040[1]-15.24, -5, 0, 180)   # DC
-    net("GPIO8", EPAPER[0]-7.62, EPAPER[1]+3.81, -5, 0, 180)
-
-    net("GPIO9", RP2040[0]-22.86, RP2040[1]-12.7, -5, 0, 180)    # CS
-    net("GPIO9", EPAPER[0]-7.62, EPAPER[1]+1.27, -5, 0, 180)
-
-    net("GPIO10", RP2040[0]-22.86, RP2040[1]-10.16, -5, 0, 180)  # CLK
-    net("GPIO10", EPAPER[0]-7.62, EPAPER[1]-1.27, -5, 0, 180)
-
-    net("GPIO11", RP2040[0]-22.86, RP2040[1]-7.62, -5, 0, 180)   # DIN/MOSI
-    net("GPIO11", EPAPER[0]-7.62, EPAPER[1]-3.81, -5, 0, 180)
-
-    net("GPIO12", RP2040[0]-22.86, RP2040[1]-5.08, -5, 0, 180)   # RST
-    net("GPIO12", EPAPER[0]-7.62, EPAPER[1]+6.35, -5, 0, 180)
-
-    net("GPIO13", RP2040[0]-22.86, RP2040[1]-2.54, -5, 0, 180)   # BUSY
-    net("GPIO13", EPAPER[0]-7.62, EPAPER[1]+8.89, -5, 0, 180)
-
-    # ── IMU I2C0: GP14/GP15 ──
-    net("GPIO14", RP2040[0]-22.86, RP2040[1], -5, 0, 180)        # SDA
-    net("GPIO14", IMU[0]-10.16, IMU[1]-7.62, -5, 0, 180)
-    net("GPIO14", R_I2C_SDA[0], R_I2C_SDA[1]+2.54, 0, 3, 180)
-
-    net("GPIO15", RP2040[0]-22.86, RP2040[1]+2.54, -5, 0, 180)   # SCL
-    net("GPIO15", IMU[0]-10.16, IMU[1]-5.08, -5, 0, 180)
-    net("GPIO15", R_I2C_SCL[0], R_I2C_SCL[1]+2.54, 0, 3, 180)
-
-    # ── GPS UART0: GP0/GP1 ──
-    net("GPIO0", RP2040[0]-22.86, RP2040[1]-35.56, -5, 0, 180)   # TX → GPS RX
-    net("GPIO0", GPS[0]-10.16, GPS[1]-2.54, -5, 0, 180)
-
-    net("GPIO1", RP2040[0]-22.86, RP2040[1]-33.02, -5, 0, 180)   # RX ← GPS TX
-    net("GPIO1", GPS[0]-10.16, GPS[1]-5.08, -5, 0, 180)
+    net("I2C_SCL", ESP32[0]-17.78, ESP32[1], -5, 0, 180)            # GPIO17
+    net("I2C_SCL", IMU[0]-10.16, IMU[1]-5.08, -5, 0, 180)
+    net("I2C_SCL", R_I2C_SCL[0], R_I2C_SCL[1]+2.54, 0, 3, 180)
 
     # ── IMU REGOUT cap ──
     net("REGOUT", IMU[0]+10.16, IMU[1]+5.08, 5, 0, 0)
@@ -492,8 +675,9 @@ def build_schematic():
     texts = []
     texts.append(f'  (text "POWER: USB-C > SS34 > TP4056 > DW01A/FS8205A > Battery" (exclude_from_sim no) (at 115 35 0) (effects (font (size 2.54 2.54)) (justify left)))')
     texts.append(f'  (text "VBAT > AMS1117-3.3 > 3V3 Rail > All ICs" (exclude_from_sim no) (at 115 40 0) (effects (font (size 2.54 2.54)) (justify left)))')
-    texts.append(f'  (text "MCU: RP2040 (C2040) + W25Q16JV Flash + 12MHz Crystal" (exclude_from_sim no) (at 115 140 0) (effects (font (size 2.54 2.54)) (justify left)))')
-    texts.append(f'  (text "GPIO0=GPS_RX  GPIO1=GPS_TX  GPIO2-6=Joystick  GPIO8-13=ePaper SPI1  GPIO14/15=IMU I2C0" (exclude_from_sim no) (at 50 285 0) (effects (font (size 1.8 1.8)) (justify left)))')
+    texts.append(f'  (text "MCU: ESP32-S3-WROOM-1-N16R8 (WiFi+BLE, 16MB flash, 8MB PSRAM)" (exclude_from_sim no) (at 115 140 0) (effects (font (size 2.54 2.54)) (justify left)))')
+    texts.append(f'  (text "GPIO4-8=Joystick  GPIO9/10=SPI(CLK/MOSI)  GPIO3=DC  GPIO11=RST  GPIO46=CS  GPIO12=BUSY" (exclude_from_sim no) (at 50 250 0) (effects (font (size 1.8 1.8)) (justify left)))')
+    texts.append(f'  (text "GPIO16/17=I2C(SDA/SCL)  GPIO19/20=USB(D-/D+)  Native USB-OTG, no series resistors" (exclude_from_sim no) (at 50 255 0) (effects (font (size 1.8 1.8)) (justify left)))')
 
     # ════════════════════════════════════════════════════════════════
     # ASSEMBLE THE FILE
@@ -507,11 +691,11 @@ def build_schematic():
   (paper "A3")
   (title_block
     (title "Dilder - Custom PCB")
-    (date "2026-04-14")
-    (rev "0.2")
+    (date "2026-04-15")
+    (rev "0.3")
     (company "Dilder Project")
-    (comment 1 "RP2040 + LiPo Charging + Joystick + IMU + GPS")
-    (comment 2 "Target: JLCPCB SMT Assembly — No WiFi (Option C)")
+    (comment 1 "ESP32-S3-WROOM-1-N16R8 + LiPo Charging + Joystick + IMU + ePaper")
+    (comment 2 "Target: JLCPCB SMT Assembly — WiFi+BLE integrated")
   )
   {lib_symbols}
 {chr(10).join(components)}
@@ -529,7 +713,7 @@ def build_schematic():
 if __name__ == "__main__":
     import subprocess
 
-    print("Generating Dilder schematic...")
+    print("Generating Dilder schematic (ESP32-S3 version)...")
     sch = build_schematic()
 
     outfile = "dilder.kicad_sch"
