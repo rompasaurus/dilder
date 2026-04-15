@@ -1979,4 +1979,34 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - 11 part sheet MD files: `esp32-s3-wroom1.md`, `lis2dh12.md`, `tp4056.md`, `dw01a.md`, `fs8205a.md`, `ams1117.md`, `ss34.md`, `skrhabe010.md`, `usb-c-connector.md`, `jst-ph-battery.md`, `led-red.md`, `led-green.md` (each with specs, pin connections, application notes, datasheet links)
   - `hardware-design/parts-sheets/manufacturer-datasheets/ESP32-S3-WROOM-1-datasheet.pdf` (1.3MB, official Espressif)
   - `PromptProgression.md` (#152), `website/docs/prompts/index.md` (#152)
-  - All changes committed and pushed
+  - All changes committed and pushed as `1a1de2a`
+
+---
+
+## Prompt #153
+- **Date/Time:** 2026-04-15
+- **Prompt:** "Continue on the parts sheets — ensure every needed part has a matching MD file and a manufacturer spec/datasheet in the datasheets folder. Each MD file needs to be robust and in-depth, well-researched — important background info, what it functions for, how it works, technologies behind it. The more advanced a part the more in-depth you need to be, dumb it down and make TOCs for everyone and provide sources."
+- **Input Tokens (est):** ~100
+- **Output Tokens (est):** ~40,000
+- **Files Created/Modified:**
+  - Rewrote all 12 existing part sheets from scratch with full Table of Contents, plain-English "What Is This Part?" intros, deep technology explainers (MEMS accelerometer physics, MOSFET field-effect operation, CC/CV lithium charging theory, Schottky metal-semiconductor junctions, LDO bandgap reference internals, MLCC multi-layer construction, LED photon emission, I2C/SPI protocol tutorials, USB-C CC negotiation), manufacturer/inventor history, and cited sources (Wikipedia, datasheets, application notes, tutorials)
+  - `hardware-design/parts-sheets/esp32-s3-wroom1.md` (62→230 lines — CPU architecture, WiFi OFDM, BLE, PSRAM vs SRAM, PCB antenna MIFA design, USB-OTG, module vs bare chip, Espressif history)
+  - `hardware-design/parts-sheets/tp4056.md` (61→230 lines — three charging phases, CC/CV with ASCII graph, internal block diagram, thermal regulation math, common mistakes)
+  - `hardware-design/parts-sheets/lis2dh12.md` (88→230 lines — MEMS proof mass, differential capacitive sensing, sigma-delta ADC, all HW features table, operating modes, I2C tutorial, register map, ST/MEMS history)
+  - `hardware-design/parts-sheets/dw01a.md` (52→170 lines — lithium chemistry dangers, copper dissolution/dendrites, thermal runaway, hysteresis thresholds, monitoring circuit internals)
+  - `hardware-design/parts-sheets/fs8205a.md` (53→170 lines — MOSFET physics, N-channel enhancement mode, Rds(on) power math, back-to-back body diode problem with diagrams)
+  - `hardware-design/parts-sheets/ams1117.md` (48→190 lines — linear vs switching regulators, bandgap voltage reference, dropout at different loads, thermal math, LDO vs buck tradeoff table, 1117 family history)
+  - `hardware-design/parts-sheets/ss34.md` (34→170 lines — PN junction physics, forward/reverse bias, Schottky metal-semiconductor junction, Walter Schottky bio)
+  - `hardware-design/parts-sheets/usb-c-connector.md` (35→170 lines — reversible dual-row design, CC orientation detection, power negotiation resistor values, 16 vs 24 pin, NRZI signaling, USB timeline 1996-2024)
+  - `hardware-design/parts-sheets/skrhabe010.md` (51→160 lines — rocker mechanism, tactile dome contacts, silver plating, debouncing, Alps Alpine history)
+  - `hardware-design/parts-sheets/jst-ph-battery.md` (27→100 lines — JST connector family comparison table, polarity warning, JST company history)
+  - `hardware-design/parts-sheets/led-red.md` (31→110 lines — LED physics, bandgap-to-wavelength table, current limiting math)
+  - `hardware-design/parts-sheets/led-green.md` (31→80 lines — InGaN, Shuji Nakamura Nobel Prize)
+  - `hardware-design/parts-sheets/jst-sh-epaper.md` (created — JST SH series, SPI interface tutorial, e-paper signal descriptions)
+  - `hardware-design/parts-sheets/resistors-0402.md` (created — Ohm's Law, thick/thin film manufacturing, each resistor's specific function, tolerance grades)
+  - `hardware-design/parts-sheets/capacitors-0402.md` (created — capacitor physics, MLCC construction, dielectric types, decoupling theory, 100nF+10uF combo)
+  - `hardware-design/parts-sheets/manufacturer-datasheets/DOWNLOAD-GUIDE.md` (created — browser-clickable links for all datasheet PDFs)
+  - `hardware-design/parts-sheets/README.md` (rewritten — comprehensive index with descriptions of each sheet's coverage, component count summary)
+  - `website/docs/docs/hardware/wiring-pinout.md` (modified — added ESP32-S3 custom PCB GPIO table, power chain diagram, block diagram)
+  - `website/docs/docs/hardware/materials-list.md` (modified — added ESP32-S3 PCB BOM section at top)
+  - Commit: `12829d6`

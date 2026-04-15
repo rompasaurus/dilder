@@ -1339,4 +1339,14 @@ This is part of the transparency experiment — showing AI-assisted development 
 
 - **Input Tokens (est):** ~50
 - **Output Tokens (est):** ~15,000
-- **Files:** `hardware-design/parts-sheets/README.md` (index). 11 part sheet MDs: ESP32-S3, LIS2DH12, TP4056, DW01A, FS8205A, AMS1117, SS34, SKRHABE010, USB-C, JST PH, red/green LEDs. Each with specs, pin connections, application notes, datasheet links. `manufacturer-datasheets/ESP32-S3-WROOM-1-datasheet.pdf` (1.3MB Espressif official).
+- **Files:** `hardware-design/parts-sheets/README.md` (index). 11 part sheet MDs: ESP32-S3, LIS2DH12, TP4056, DW01A, FS8205A, AMS1117, SS34, SKRHABE010, USB-C, JST PH, red/green LEDs. Each with specs, pin connections, application notes, datasheet links. `manufacturer-datasheets/ESP32-S3-WROOM-1-datasheet.pdf` (1.3MB Espressif official). Commit: `1a1de2a`
+
+---
+
+## Prompt #153 — 2026-04-15
+
+**Prompt:** "Continue on the parts sheets — ensure every part has a robust, in-depth MD file with background, how-it-works technology explainers, TOCs, and sources. Also add datasheets."
+
+- **Input Tokens (est):** ~100
+- **Output Tokens (est):** ~40,000
+- **Files:** Rewrote all 12 existing parts sheets from scratch with TOCs, technology deep-dives (MEMS physics, MOSFET operation, CC/CV charging, Schottky junctions, MLCC construction, LED photon emission, I2C/SPI protocols, USB-C negotiation), history, and cited sources. Created 3 new sheets: `jst-sh-epaper.md`, `resistors-0402.md`, `capacitors-0402.md`. Added `manufacturer-datasheets/DOWNLOAD-GUIDE.md`. Updated `wiring-pinout.md` (ESP32-S3 GPIO table + block diagram) and `materials-list.md` (ESP32-S3 BOM section). Commit: `12829d6`
