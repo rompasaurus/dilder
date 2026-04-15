@@ -195,9 +195,9 @@ Select a program and you get a live preview, estimated firmware size (~100KB), h
 
 The entire development process is public:
 
-- **Every prompt** submitted to the AI assistant is logged in the [Prompt Log](prompts/index.md) — 104+ and counting
+- **Every prompt** submitted to the AI assistant is logged in the [Prompt Log](prompts/index.md) — 150 and counting
 - **Every hardware decision** is documented in the [Docs](docs/index.md)
-- **Every build step** is written up in the [Blog](blog/index.md) — 9 posts so far
+- **Every build step** is written up in the [Blog](blog/index.md) — 17 posts so far
 - **Every drawing function** is verified pixel-by-pixel between C firmware and Python DevTool
 - **All source files** are on [GitHub](https://github.com/rompasaurus/dilder)
 

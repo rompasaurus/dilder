@@ -1298,4 +1298,24 @@ This is part of the transparency experiment — showing AI-assisted development 
 
 - **Input Tokens (est):** ~100
 - **Output Tokens (est):** ~25,000
-- **Files:** `hardware-design/reference-boards/` (7 KiCad projects cloned: rp2040-pico-usbc, rp2040-minimal-jlcpcb, rp2040-designguide, esp32s3-basic-devboard, esp32s3-ducky-epaper, espressif-kicad-libs, opentama-virtual-pet). `hardware-design/reference-boards/README.md` (master index). 7 images in `website/docs/assets/images/reference-boards/`. `website/docs/docs/design/open-board-designs.md` (created — comprehensive walkthroughs with images, component overlap analysis, comparison matrix). `website/mkdocs.yml` (added nav). `website/docs/docs/index.md` (added link). Commits: `a6df12f` (repos), current commit (docs + images)
+- **Files:** `hardware-design/reference-boards/` (7 KiCad projects cloned: rp2040-pico-usbc, rp2040-minimal-jlcpcb, rp2040-designguide, esp32s3-basic-devboard, esp32s3-ducky-epaper, espressif-kicad-libs, opentama-virtual-pet). `hardware-design/reference-boards/README.md` (master index). 7 images in `website/docs/assets/images/reference-boards/`. `website/docs/docs/design/open-board-designs.md` (created — comprehensive walkthroughs with images, component overlap analysis, comparison matrix). `website/mkdocs.yml` (added nav). `website/docs/docs/index.md` (added link). Commits: `a6df12f` (repos), `3f46a7b` (docs + images)
+
+---
+
+## Prompt #149 — 2026-04-15
+
+**Prompt:** "Update the schematics — get rid of the RP2040, use the ESP32, add a parts list, and wire up all the components."
+
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~25,000
+- **Files:** `hardware-design/Board Design kicad/generate_schematic.py` (rewritten — RP2040→ESP32-S3-WROOM-1-N16R8, removed flash/crystal/GPS/USB resistors, rewired all nets, component count 33→20, BOM in docstring). `hardware-design/Board Design kicad/dilder.kicad_sch` (regenerated rev 0.3). `hardware-design/BOM.md` (created — full BOM with LCSC numbers and costs). `hardware-design/Measurements.md` (updated with ESP32-S3 dimensions). Commit: `04cecb3`
+
+---
+
+## Prompt #150 — 2026-04-15
+
+**Prompt:** "Pull in example schematics and KiCad files into a new examples folder — ESP32 designs with similar functions. Find as many as possible, each in their own folder with an MD describing origin, backstory, details, links, and TOC."
+
+- **Input Tokens (est):** ~80
+- **Output Tokens (est):** ~15,000
+- **Files:** `hardware-design/examples/` (11 open-source ESP32/ESP32-S3 KiCad projects: PocketMage PDA, Lilka console, Ducky e-paper, OLIMEX S3+ESP32 DevKit-LiPo, Unexpected Maker S3, WhirlingBits S3, esp-rs Rust board, BitwiseAjeet TP4056, KLP-5e sensor board, AeonLabs S3 template). Each with `ABOUT.md`. `hardware-design/examples/INDEX.md` (master TOC + cross-reference). Commit: `2e5e0a8`

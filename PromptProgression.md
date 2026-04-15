@@ -1906,4 +1906,42 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `website/docs/docs/index.md` (modified — added link in Design section)
   - `PromptProgression.md` (modified — added Prompts #147-148)
   - `website/docs/prompts/index.md` (modified — added Prompts #147-148)
-  - All changes committed and pushed
+  - All changes committed and pushed as `3f46a7b`
+
+---
+
+## Prompt #149
+- **Date/Time:** 2026-04-15
+- **Prompt:** "I need to update the schematics get rid of the rp2040 use the esp32 add a parts list and wire up all the components on this if you can"
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~25,000
+- **Files Created/Modified:**
+  - `hardware-design/Board Design kicad/generate_schematic.py` (rewritten — replaced RP2040 with ESP32-S3-WROOM-1-N16R8 symbol and wiring; removed W25Q16JV flash, 12MHz crystal + load caps, 27R USB resistors, ATGM336H GPS; added ESP32-S3 lib symbol with 17 pins; rewired all nets: SPI e-paper GPIO9/10/3/11/46/12, I2C IMU GPIO16/17, USB-OTG GPIO19/20 direct to USB-C, joystick GPIO4-8, EN pull-up; component count 33→20; added full BOM table in docstring)
+  - `hardware-design/Board Design kicad/dilder.kicad_sch` (regenerated — rev 0.3, ESP32-S3 schematic with all nets wired, validated with kicad-cli)
+  - `hardware-design/BOM.md` (created — full bill of materials with LCSC part numbers, costs per component, GPIO pin assignment table, cost summary, changelog from v0.2)
+  - `hardware-design/Measurements.md` (updated — replaced Pico board with ESP32-S3-WROOM-1 module dimensions, added PCB, joystick, USB-C, JST, MPU-6050 measurements)
+  - Commit: `04cecb3`
+
+---
+
+## Prompt #150
+- **Date/Time:** 2026-04-15
+- **Prompt:** "ok pull in some example schematics and kicad files in to a new example folder in hardware design that use the esp32 and somewhat similar functions find as many related examples as possible put them in their own folder and create an md file for each to describe the use of each design and origin and backstory and details and links and toc"
+- **Input Tokens (est):** ~80
+- **Output Tokens (est):** ~15,000
+- **Files Created/Modified:**
+  - `hardware-design/examples/` (created — 11 open-source ESP32/ESP32-S3 KiCad projects cloned as reference designs)
+  - `hardware-design/examples/01-pocketmage-pda/` (ESP32-S3 e-ink PDA, ~1800 stars, Apache-2.0)
+  - `hardware-design/examples/02-lilka-console/` (ESP32-S3 DIY gaming console, Ukraine, GPL-2.0)
+  - `hardware-design/examples/03-ducky-board-epaper/` (ESP32-S3 + 1.52" e-paper + Li-Ion, GPL-3.0)
+  - `hardware-design/examples/04-olimex-s3-devkit-lipo/` (OLIMEX ESP32-S3 + LiPo, OSHW, GPL-3.0)
+  - `hardware-design/examples/05-olimex-devkit-lipo/` (OLIMEX ESP32 + LiPo, 4 hardware revisions, Apache-2.0)
+  - `hardware-design/examples/06-unexpected-maker-s3/` (Unexpected Maker ESP32-S3 carrier boards)
+  - `hardware-design/examples/07-whirlingbits-s3-platform/` (ESP32-S3 + SD + e-paper schematic, MIT)
+  - `hardware-design/examples/08-esp-rust-board/` (Espressif-affiliated Feather board, CERN-OHL-S-2.0)
+  - `hardware-design/examples/09-bitwiseajeet-tp4056/` (ESP32-C3 + TP4056 exact charger match, MIT)
+  - `hardware-design/examples/10-klp5e-sensor-board/` (educational ESP32-C3 + TP4056 + sensors)
+  - `hardware-design/examples/11-aeonlabs-s3-template/` (minimal ESP32-S3 template, CC0)
+  - Each folder has `ABOUT.md` with origin, backstory, feature comparison table, key takeaways, KiCad file listing, and links
+  - `hardware-design/examples/INDEX.md` (created — master TOC with 3-tier relevance ranking, feature cross-reference table, usage guide)
+  - Commit: `2e5e0a8`
