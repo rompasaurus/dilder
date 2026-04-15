@@ -134,6 +134,7 @@ nav:
           - Motion & Location Detection: docs/design/motion-location-detection.md
       - Software:
           - Project Structure: docs/software/project-structure.md
+          - Firmware Game Engine: docs/software/firmware-engine.md
           - Emotion States: docs/software/emotion-states.md
       - Tools:
           - DevTool (GUI): docs/tools/devtool.md

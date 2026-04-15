@@ -69,15 +69,31 @@ dilder/
 │   ├── DEPLOY.md                # GitHub Pages deployment guide
 │   └── docs/                    # Site content (Markdown)
 │
-└── firmware/                    # C firmware for Pico W (Phase 2+)
-    ├── main.c                   # Entry point
-    ├── core/                    # Display, input, game loop
-    ├── pet/                     # Pet state machine, mood, animations
-    └── assets/                  # Sprites and fonts
+├── firmware/                    # C game engine (compiles to .so + CLI)
+│   ├── CMakeLists.txt           # Build system (shared lib + standalone CLI)
+│   ├── FIRMWARE.md              # Architecture guide, reading order, debugging
+│   ├── include/                 # Headers: all types, API declarations
+│   │   ├── dilder.h             # Public API (called from Python via ctypes)
+│   │   ├── game/                # game_state.h, event.h, stat.h, emotion.h, life.h, etc.
+│   │   ├── sensor/              # sensor.h (emulation layer)
+│   │   └── ui/                  # input.h, render.h, ui.h
+│   └── src/                     # Implementation
+│       ├── game/                # stat.c, emotion.c, life.c, dialog.c, event.c, game_loop.c
+│       ├── sensor/              # sensor.c (emulated sensor values)
+│       ├── ui/                  # render.c (bitmap font, octopus), ui.c (menus), input.c
+│       └── platform/desktop/    # dilder_api.c (Python bridge), main_desktop.c (CLI)
+│
+└── Gameplay Planning/           # 13 design documents (11,000+ lines)
+    ├── 00-architecture-overview.md
+    ├── 01-core-game-loop.md
+    ├── 02-stat-system.md
+    ├── 03-emotion-engine.md
+    ├── 04-sensor-interfaces.md
+    └── ... (through 13-feature-menus-achievements.md)
 ```
 
-!!! note "Firmware not yet written"
-    The `firmware/` directory structure above is the planned layout. Phase 2 will establish this scaffold.
+!!! success "Firmware implemented"
+    The `firmware/` directory contains a complete, working game engine. Build with `cd firmware/build && cmake .. && make`. Run the Dilder tab in the DevTool or test with `./dilder_cli`. See [Firmware Game Engine](firmware-engine.md) for full documentation.
 
 !!! warning "Flash storage limits"
     The Pico W has 2MB of flash. C firmware is much smaller than MicroPython, but keep sprite files small — use 1-bit monochrome bitmaps, not PNGs with metadata.

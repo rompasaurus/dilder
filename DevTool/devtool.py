@@ -5478,6 +5478,489 @@ class ProgramsTab(ttk.Frame):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Dilder Game Emulator Tab
+# ─────────────────────────────────────────────────────────────────────────────
+
+class DilderEmulatorTab(ttk.Frame):
+    """
+    Full game emulator: loads the compiled C firmware as a shared library,
+    renders the 250x122 e-ink display, accepts joystick input, and provides
+    sliders for sensor emulation (light, temperature, humidity, pedometer).
+    """
+
+    SCALE = 3  # pixels per e-ink dot
+    FB_SIZE = (DISPLAY_W + 7) // 8 * DISPLAY_H  # 3904 bytes
+    TICK_MS = 1000  # default: 1 game-second per real second
+
+    def __init__(self, parent, app):
+        super().__init__(parent)
+        self.app = app
+        self.lib = None
+        self.running = False
+        self.tick_timer = None
+        self.speed_factor = 1  # 1x, 2x, 5x, 10x
+        self._build_ui()
+        self._try_load_lib()
+
+    # ── Library Loading ─────────────────────────────────────────────────
+
+    def _try_load_lib(self):
+        """Attempt to load the compiled libdilder.so."""
+        import ctypes
+        lib_path = PROJECT_ROOT / "firmware" / "build" / "libdilder.so"
+        if not lib_path.exists():
+            self._set_status(f"Library not found: {lib_path}", "red")
+            self._log(f"[Dilder] libdilder.so not found at {lib_path}")
+            self._log("[Dilder] Build it: cd firmware/build && cmake .. && make")
+            return
+
+        try:
+            self.lib = ctypes.CDLL(str(lib_path))
+            self._setup_ctypes()
+            self.lib.dilder_init()
+            self._set_status("Loaded libdilder.so — ready", "green")
+            self._log("[Dilder] Firmware loaded successfully")
+            self._render_framebuffer()
+            self._update_state_display()
+        except Exception as e:
+            self._set_status(f"Load error: {e}", "red")
+            self._log(f"[Dilder] Load error: {e}")
+
+    def _setup_ctypes(self):
+        """Configure ctypes return types and argument types."""
+        import ctypes
+        lib = self.lib
+
+        lib.dilder_get_emotion_name.restype = ctypes.c_char_p
+        lib.dilder_get_state_name.restype = ctypes.c_char_p
+        lib.dilder_get_stage_name.restype = ctypes.c_char_p
+        lib.dilder_get_dialogue_text.restype = ctypes.c_char_p
+        lib.dilder_get_framebuffer.restype = ctypes.POINTER(ctypes.c_uint8)
+        lib.dilder_get_sensor_light.restype = ctypes.c_float
+        lib.dilder_get_sensor_temp.restype = ctypes.c_float
+        lib.dilder_get_sensor_humidity.restype = ctypes.c_float
+
+        lib.dilder_set_light.argtypes = [ctypes.c_float]
+        lib.dilder_set_temperature.argtypes = [ctypes.c_float]
+        lib.dilder_set_humidity.argtypes = [ctypes.c_float]
+
+    # ── UI Construction ─────────────────────────────────────────────────
+
+    def _build_ui(self):
+        # ── Top Controls ──
+        ctrl_frame = ttk.Frame(self)
+        ctrl_frame.pack(fill=tk.X, padx=5, pady=(5, 2))
+
+        self.btn_play = ttk.Button(ctrl_frame, text="Play",
+                                   command=self._toggle_play, width=8)
+        self.btn_play.pack(side=tk.LEFT, padx=2)
+
+        ttk.Button(ctrl_frame, text="Step", command=self._step_tick,
+                   width=6).pack(side=tk.LEFT, padx=2)
+
+        ttk.Button(ctrl_frame, text="Reset", command=self._reset_game,
+                   width=6).pack(side=tk.LEFT, padx=2)
+
+        ttk.Separator(ctrl_frame, orient=tk.VERTICAL).pack(
+            side=tk.LEFT, fill=tk.Y, padx=8)
+
+        ttk.Label(ctrl_frame, text="Speed:").pack(side=tk.LEFT, padx=(0, 3))
+        self.speed_var = tk.StringVar(value="1x")
+        speed_combo = ttk.Combobox(ctrl_frame, textvariable=self.speed_var,
+                                   values=["1x", "2x", "5x", "10x", "30x"],
+                                   width=4, state="readonly")
+        speed_combo.pack(side=tk.LEFT, padx=2)
+        speed_combo.bind("<<ComboboxSelected>>", self._on_speed_change)
+
+        ttk.Separator(ctrl_frame, orient=tk.VERTICAL).pack(
+            side=tk.LEFT, fill=tk.Y, padx=8)
+
+        ttk.Button(ctrl_frame, text="Rebuild", command=self._rebuild_lib,
+                   width=8).pack(side=tk.LEFT, padx=2)
+
+        # Status label
+        self.status_label = ttk.Label(ctrl_frame, text="Not loaded",
+                                      foreground=FG_DIM)
+        self.status_label.pack(side=tk.RIGHT, padx=5)
+
+        # ── Main Content: left=display+joystick, right=sensors+state ──
+        content = ttk.Frame(self)
+        content.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+        # Left panel: display + joystick
+        left = ttk.Frame(content)
+        left.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Display canvas
+        canvas_w = DISPLAY_W * self.SCALE
+        canvas_h = DISPLAY_H * self.SCALE
+        canvas_frame = ttk.LabelFrame(left, text="Display (250x122)")
+        canvas_frame.pack(padx=5, pady=5)
+
+        self.canvas = tk.Canvas(canvas_frame, width=canvas_w, height=canvas_h,
+                                bg="#e8e8e8", highlightthickness=1,
+                                highlightbackground=FG_DIM)
+        self.canvas.pack(padx=5, pady=5)
+
+        # Joystick buttons
+        joy_frame = ttk.LabelFrame(left, text="Joystick Input")
+        joy_frame.pack(padx=5, pady=5, fill=tk.X)
+
+        joy_inner = ttk.Frame(joy_frame)
+        joy_inner.pack(pady=5)
+
+        # Grid layout for d-pad + action buttons
+        ttk.Button(joy_inner, text="UP", width=8,
+                   command=lambda: self._button_press(1, 1)).grid(
+                       row=0, column=1, padx=2, pady=2)
+        ttk.Button(joy_inner, text="BACK", width=8,
+                   command=lambda: self._button_press(4, 1)).grid(
+                       row=1, column=0, padx=2, pady=2)
+        ttk.Button(joy_inner, text="SELECT", width=8,
+                   command=lambda: self._button_press(3, 1)).grid(
+                       row=1, column=1, padx=2, pady=2)
+        ttk.Button(joy_inner, text="ACTION", width=8,
+                   command=lambda: self._button_press(5, 1)).grid(
+                       row=1, column=2, padx=2, pady=2)
+        ttk.Button(joy_inner, text="DOWN", width=8,
+                   command=lambda: self._button_press(2, 1)).grid(
+                       row=2, column=1, padx=2, pady=2)
+
+        # Long press variants
+        long_frame = ttk.Frame(joy_frame)
+        long_frame.pack(pady=(0, 5))
+        ttk.Label(long_frame, text="Long:").pack(side=tk.LEFT, padx=3)
+        ttk.Button(long_frame, text="SEL (menu)", width=10,
+                   command=lambda: self._button_press(3, 2)).pack(
+                       side=tk.LEFT, padx=2)
+        ttk.Button(long_frame, text="ACT (scold)", width=10,
+                   command=lambda: self._button_press(5, 2)).pack(
+                       side=tk.LEFT, padx=2)
+
+        # Right panel: sensors + game state
+        right = ttk.Frame(content)
+        right.pack(side=tk.RIGHT, fill=tk.BOTH, padx=(5, 0))
+
+        # Sensor Controls
+        sensor_frame = ttk.LabelFrame(right, text="Sensor Emulation")
+        sensor_frame.pack(fill=tk.X, pady=5)
+
+        self.sensor_vars = {}
+        sensors = [
+            ("Light (lux)", "light", 0, 2000, 300),
+            ("Temp (C)", "temp", -10, 50, 22),
+            ("Humidity (%)", "humidity", 0, 100, 50),
+            ("Mic Level", "mic", 0, 4095, 0),
+            ("Steps", "steps", 0, 50000, 0),
+        ]
+
+        for label, key, lo, hi, default in sensors:
+            row = ttk.Frame(sensor_frame)
+            row.pack(fill=tk.X, padx=5, pady=2)
+
+            ttk.Label(row, text=label, width=14).pack(side=tk.LEFT)
+
+            var = tk.DoubleVar(value=default)
+            self.sensor_vars[key] = var
+
+            scale = ttk.Scale(row, from_=lo, to=hi, variable=var,
+                              orient=tk.HORIZONTAL,
+                              command=lambda v, k=key: self._on_sensor_change(k))
+            scale.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=3)
+
+            val_label = ttk.Label(row, text=str(default), width=6)
+            val_label.pack(side=tk.RIGHT)
+            var._label = val_label
+
+        # Toggle sensors
+        toggle_frame = ttk.Frame(sensor_frame)
+        toggle_frame.pack(fill=tk.X, padx=5, pady=2)
+
+        self.shake_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(toggle_frame, text="Shaking",
+                        variable=self.shake_var,
+                        command=self._on_toggle_sensor).pack(side=tk.LEFT, padx=5)
+
+        self.walk_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(toggle_frame, text="Walking",
+                        variable=self.walk_var,
+                        command=self._on_toggle_sensor).pack(side=tk.LEFT, padx=5)
+
+        self.home_var = tk.BooleanVar(value=True)
+        ttk.Checkbutton(toggle_frame, text="At Home",
+                        variable=self.home_var,
+                        command=self._on_toggle_sensor).pack(side=tk.LEFT, padx=5)
+
+        # Game State Display
+        state_frame = ttk.LabelFrame(right, text="Game State")
+        state_frame.pack(fill=tk.BOTH, expand=True, pady=5)
+
+        self.state_text = tk.Text(state_frame, height=12, width=35,
+                                  wrap=tk.WORD, state=tk.DISABLED,
+                                  bg=BG_DARK, fg=FG_TEXT,
+                                  font=("JetBrains Mono", 9))
+        self.state_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+        # Keyboard shortcuts
+        self.winfo_toplevel().bind("<Key>", self._on_key)
+
+    # ── Game Control ────────────────────────────────────────────────────
+
+    def _toggle_play(self):
+        if not self.lib:
+            self._try_load_lib()
+            if not self.lib:
+                return
+
+        self.running = not self.running
+        self.btn_play.config(text="Pause" if self.running else "Play")
+
+        if self.running:
+            self._set_status("Running", "green")
+            self._schedule_tick()
+        else:
+            self._set_status("Paused", "yellow")
+            if self.tick_timer:
+                self.after_cancel(self.tick_timer)
+                self.tick_timer = None
+
+    def _schedule_tick(self):
+        if not self.running:
+            return
+        self._do_tick()
+        interval = max(16, self.TICK_MS // self.speed_factor)
+        self.tick_timer = self.after(interval, self._schedule_tick)
+
+    def _step_tick(self):
+        if not self.lib:
+            self._try_load_lib()
+            if not self.lib:
+                return
+        self._do_tick()
+
+    def _do_tick(self):
+        if not self.lib:
+            return
+        self.lib.dilder_tick()
+        self._render_framebuffer()
+        self._update_state_display()
+
+    def _reset_game(self):
+        if not self.lib:
+            return
+        self.running = False
+        self.btn_play.config(text="Play")
+        if self.tick_timer:
+            self.after_cancel(self.tick_timer)
+            self.tick_timer = None
+        self.lib.dilder_reset()
+        self._render_framebuffer()
+        self._update_state_display()
+        self._set_status("Game reset", "green")
+        self._log("[Dilder] Game reset to new egg")
+
+    def _on_speed_change(self, event=None):
+        txt = self.speed_var.get().replace("x", "")
+        self.speed_factor = int(txt)
+
+    def _rebuild_lib(self):
+        """Rebuild the firmware shared library."""
+        self._set_status("Building...", "yellow")
+        self._log("[Dilder] Rebuilding firmware...")
+
+        def _build():
+            build_dir = PROJECT_ROOT / "firmware" / "build"
+            build_dir.mkdir(exist_ok=True)
+            result = subprocess.run(
+                ["sh", "-c", f"cd {build_dir} && cmake .. && make -j$(nproc)"],
+                capture_output=True, text=True
+            )
+            return result
+
+        def _on_done(result):
+            if result.returncode == 0:
+                self._set_status("Build OK — reloading", "green")
+                self._log("[Dilder] Build successful")
+                # Reload library
+                self.lib = None
+                self._try_load_lib()
+            else:
+                self._set_status("Build FAILED", "red")
+                self._log(f"[Dilder] Build failed:\n{result.stderr[-500:]}")
+
+        def _thread():
+            result = _build()
+            self.after(0, lambda: _on_done(result))
+
+        threading.Thread(target=_thread, daemon=True).start()
+
+    # ── Display Rendering ───────────────────────────────────────────────
+
+    def _render_framebuffer(self):
+        """Read the C framebuffer and render it onto the Tk canvas."""
+        if not self.lib:
+            return
+
+        import ctypes
+        fb_ptr = self.lib.dilder_get_framebuffer()
+        scale = self.SCALE
+        self.canvas.delete("all")
+
+        # Read framebuffer into Python bytes
+        row_bytes = (DISPLAY_W + 7) // 8
+        fb = bytes(fb_ptr[i] for i in range(self.FB_SIZE))
+
+        # Draw pixels (batch black rectangles for performance)
+        rects = []
+        for y in range(DISPLAY_H):
+            for x in range(DISPLAY_W):
+                byte_idx = y * row_bytes + x // 8
+                bit = (fb[byte_idx] >> (7 - (x & 7))) & 1
+                if bit:  # black pixel
+                    rects.append((x * scale, y * scale,
+                                  x * scale + scale, y * scale + scale))
+
+        # Draw in batches using canvas rectangles
+        for x0, y0, x1, y1 in rects:
+            self.canvas.create_rectangle(x0, y0, x1, y1,
+                                         fill="black", outline="")
+
+    # ── State Display ───────────────────────────────────────────────────
+
+    def _update_state_display(self):
+        if not self.lib:
+            return
+
+        state = self.lib.dilder_get_state_name().decode()
+        emotion = self.lib.dilder_get_emotion_name().decode()
+        stage = self.lib.dilder_get_stage_name().decode()
+        tick = self.lib.dilder_get_tick_count()
+        age = self.lib.dilder_get_age_seconds()
+
+        hun = self.lib.dilder_get_hunger()
+        hap = self.lib.dilder_get_happiness()
+        ene = self.lib.dilder_get_energy()
+        hyg = self.lib.dilder_get_hygiene()
+        hea = self.lib.dilder_get_health()
+        wgt = self.lib.dilder_get_weight()
+
+        bond_xp = self.lib.dilder_get_bond_xp()
+        bond_lv = self.lib.dilder_get_bond_level()
+        disc = self.lib.dilder_get_discipline()
+
+        dlg = self.lib.dilder_get_dialogue_text()
+        dlg_text = dlg.decode() if dlg else ""
+
+        lines = [
+            f"State: {state}",
+            f"Emotion: {emotion}",
+            f"Life Stage: {stage}",
+            f"Tick: {tick}  Age: {age}s ({age//86400}d)",
+            "",
+            f"  Hunger:    {hun:3d} {'*' * (hun // 5)}",
+            f"  Happiness: {hap:3d} {'*' * (hap // 5)}",
+            f"  Energy:    {ene:3d} {'*' * (ene // 5)}",
+            f"  Hygiene:   {hyg:3d} {'*' * (hyg // 5)}",
+            f"  Health:    {hea:3d} {'*' * (hea // 5)}",
+            f"  Weight:    {wgt:3d}",
+            "",
+            f"Bond XP: {bond_xp}  Lv: {bond_lv}",
+            f"Discipline: {disc}",
+        ]
+        if dlg_text:
+            lines.append("")
+            lines.append(f'"{dlg_text}"')
+
+        text = "\n".join(lines)
+        self.state_text.config(state=tk.NORMAL)
+        self.state_text.delete("1.0", tk.END)
+        self.state_text.insert("1.0", text)
+        self.state_text.config(state=tk.DISABLED)
+
+    # ── Input Handling ──────────────────────────────────────────────────
+
+    def _button_press(self, btn_id, press_type):
+        if not self.lib:
+            return
+        self.lib.dilder_button_press(btn_id, press_type)
+        if not self.running:
+            # Single-step on input when paused
+            self._do_tick()
+
+    def _on_key(self, event):
+        """Keyboard shortcuts for joystick."""
+        key_map = {
+            "Up": (1, 1), "w": (1, 1),
+            "Down": (2, 1), "s": (2, 1),
+            "Return": (3, 1), "space": (3, 1),   # select
+            "Escape": (4, 1), "BackSpace": (4, 1),  # back
+            "e": (5, 1), "f": (5, 1),            # action
+        }
+        # Long press with shift
+        shift_map = {
+            "Return": (3, 2),  # long select = menu
+            "e": (5, 2),       # long action = scold
+        }
+
+        key = event.keysym
+        if event.state & 0x1 and key in shift_map:  # Shift held
+            btn_id, press_type = shift_map[key]
+        elif key in key_map:
+            btn_id, press_type = key_map[key]
+        else:
+            return
+
+        self._button_press(btn_id, press_type)
+
+    # ── Sensor Updates ──────────────────────────────────────────────────
+
+    def _on_sensor_change(self, key):
+        if not self.lib:
+            return
+
+        val = self.sensor_vars[key].get()
+        # Update label
+        label = self.sensor_vars[key]._label
+        if key in ("temp",):
+            label.config(text=f"{val:.1f}")
+        elif key in ("light", "humidity"):
+            label.config(text=f"{val:.0f}")
+        else:
+            label.config(text=f"{int(val)}")
+
+        # Send to firmware
+        if key == "light":
+            self.lib.dilder_set_light(float(val))
+        elif key == "temp":
+            self.lib.dilder_set_temperature(float(val))
+        elif key == "humidity":
+            self.lib.dilder_set_humidity(float(val))
+        elif key == "mic":
+            self.lib.dilder_set_mic_level(int(val))
+        elif key == "steps":
+            self.lib.dilder_set_steps(int(val))
+
+    def _on_toggle_sensor(self):
+        if not self.lib:
+            return
+        self.lib.dilder_set_shaking(1 if self.shake_var.get() else 0)
+        self.lib.dilder_set_walking(1 if self.walk_var.get() else 0)
+        self.lib.dilder_set_at_home(1 if self.home_var.get() else 0)
+
+    # ── Helpers ─────────────────────────────────────────────────────────
+
+    def _set_status(self, text, color="dim"):
+        color_map = {"green": FG_GREEN, "red": FG_RED, "yellow": FG_YELLOW,
+                     "dim": FG_DIM}
+        self.status_label.config(text=text,
+                                 foreground=color_map.get(color, FG_DIM))
+
+    def _log(self, msg):
+        if hasattr(self.app, 'log'):
+            self.app.log(msg)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Main Application
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -5541,6 +6024,10 @@ class DilderDevTool(tk.Tk):
 
         # ── Notebook (tabs) ──
         self.notebook = ttk.Notebook(paned)
+
+        # Tab 0: Dilder Game Emulator
+        self.dilder_tab = DilderEmulatorTab(self.notebook, self)
+        self.notebook.add(self.dilder_tab, text="  Dilder  ")
 
         # Tab 1: Display Emulator
         self.display_tab = DisplayEmulator(self.notebook, self)
