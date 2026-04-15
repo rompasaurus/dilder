@@ -1143,10 +1143,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#development-platform" class="md-nav__link">
+  <a href="#custom-pcb-esp32-s3-production" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Development Platform
+        Custom PCB — ESP32-S3 (Production)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#breadboard-prototype-pico-w-phase-1-legacy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breadboard Prototype — Pico W (Phase 1 Legacy)
       
     </span>
   </a>
@@ -2531,10 +2542,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#development-platform" class="md-nav__link">
+  <a href="#custom-pcb-esp32-s3-production" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Development Platform
+        Custom PCB — ESP32-S3 (Production)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#breadboard-prototype-pico-w-phase-1-legacy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breadboard Prototype — Pico W (Phase 1 Legacy)
       
     </span>
   </a>
@@ -2645,10 +2667,110 @@
 
 
 <h1 id="materials-list">Materials List<a class="headerlink" href="#materials-list" title="Permanent link">&para;</a></h1>
-<p>All components needed to build a Dilder test bench. This list assumes you are building a breadboard prototype — no soldering required at this stage.</p>
+<p>Components for both the <strong>custom PCB</strong> (production) and the <strong>breadboard prototype</strong> (Phase 1 legacy).</p>
 <hr />
-<h2 id="development-platform">Development Platform<a class="headerlink" href="#development-platform" title="Permanent link">&para;</a></h2>
-<p><strong>Phase 1 (current):</strong> Raspberry Pi Pico W with MicroPython. Cheap, fast to iterate, instant boot.</p>
+<h2 id="custom-pcb-esp32-s3-production">Custom PCB — ESP32-S3 (Production)<a class="headerlink" href="#custom-pcb-esp32-s3-production" title="Permanent link">&para;</a></h2>
+<p>The production Dilder runs on a custom 45x80mm 4-layer PCB. All 27 components are surface-mount, assembled by JLCPCB. Total BOM cost: ~$4.18/board.</p>
+<table>
+<thead>
+<tr>
+<th>Ref</th>
+<th>Part</th>
+<th>LCSC</th>
+<th>~Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U1</td>
+<td>ESP32-S3-WROOM-1-N16R8 (MCU)</td>
+<td>C2913196</td>
+<td>$2.80</td>
+</tr>
+<tr>
+<td>U2</td>
+<td>TP4056 (LiPo charger)</td>
+<td>C382139</td>
+<td>$0.07</td>
+</tr>
+<tr>
+<td>U3</td>
+<td>DW01A (battery protection)</td>
+<td>C351410</td>
+<td>$0.05</td>
+</tr>
+<tr>
+<td>Q1</td>
+<td>FS8205A (dual MOSFET)</td>
+<td>C908265</td>
+<td>$0.05</td>
+</tr>
+<tr>
+<td>U4</td>
+<td>AMS1117-3.3 (3.3V LDO)</td>
+<td>C6186</td>
+<td>$0.05</td>
+</tr>
+<tr>
+<td>U5</td>
+<td>LIS2DH12TR (3-axis accelerometer)</td>
+<td>C110926</td>
+<td>$0.46</td>
+</tr>
+<tr>
+<td>J1</td>
+<td>USB-C 16-pin receptacle</td>
+<td>C2765186</td>
+<td>$0.10</td>
+</tr>
+<tr>
+<td>J2</td>
+<td>JST PH 2-pin (battery)</td>
+<td>C131337</td>
+<td>$0.03</td>
+</tr>
+<tr>
+<td>J3</td>
+<td>JST SH 8-pin (e-paper)</td>
+<td>—</td>
+<td>$0.05</td>
+</tr>
+<tr>
+<td>SW1</td>
+<td>SKRHABE010 (5-way joystick)</td>
+<td>C139794</td>
+<td>$0.38</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>SS34 Schottky diode</td>
+<td>C8678</td>
+<td>$0.03</td>
+</tr>
+<tr>
+<td>D2, D3</td>
+<td>Red + Green LEDs (0805/0603)</td>
+<td>C84256, C72043</td>
+<td>$0.02</td>
+</tr>
+<tr>
+<td>R1-R10</td>
+<td>0402 resistors (1.2k, 1k, 10k, 5.1k)</td>
+<td>various</td>
+<td>$0.08</td>
+</tr>
+<tr>
+<td>C3-C9</td>
+<td>0402 capacitors (100nF, 10uF)</td>
+<td>C14663, C19702</td>
+<td>$0.06</td>
+</tr>
+</tbody>
+</table>
+<p>Full details: <a href="../../../hardware-design/BOM.md">BOM</a> | <a href="../../../hardware-design/parts-sheets/README.md">Parts Sheets</a></p>
+<hr />
+<h2 id="breadboard-prototype-pico-w-phase-1-legacy">Breadboard Prototype — Pico W (Phase 1 Legacy)<a class="headerlink" href="#breadboard-prototype-pico-w-phase-1-legacy" title="Permanent link">&para;</a></h2>
+<p><strong>Phase 1:</strong> Raspberry Pi Pico W with MicroPython. Cheap, fast to iterate, instant boot.</p>
 <p><strong>Future (Phase 5):</strong> Raspberry Pi Zero WH with Linux. Upgrade when you need a filesystem, SSH, or more compute.</p>
 <hr />
 <h2 id="essential-components">Essential Components<a class="headerlink" href="#essential-components" title="Permanent link">&para;</a></h2>

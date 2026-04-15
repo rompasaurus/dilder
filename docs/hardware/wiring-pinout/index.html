@@ -1171,6 +1171,67 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#custom-pcb-esp32-s3-wroom-1-n16r8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom PCB — ESP32-S3-WROOM-1-N16R8
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom PCB — ESP32-S3-WROOM-1-N16R8">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#esp32-s3-gpio-assignments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ESP32-S3 GPIO Assignments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power Chain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#block-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Block Diagram
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#breadboard-prototype-pico-w-legacy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breadboard Prototype — Pico W (Legacy)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#display-hardware-waveshare-pico-epaper-213" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2565,6 +2626,67 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#custom-pcb-esp32-s3-wroom-1-n16r8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom PCB — ESP32-S3-WROOM-1-N16R8
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom PCB — ESP32-S3-WROOM-1-N16R8">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#esp32-s3-gpio-assignments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ESP32-S3 GPIO Assignments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power Chain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#block-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Block Diagram
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#breadboard-prototype-pico-w-legacy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breadboard Prototype — Pico W (Legacy)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#display-hardware-waveshare-pico-epaper-213" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2713,7 +2835,156 @@
 
 
 <h1 id="wiring-pinout">Wiring &amp; Pinout<a class="headerlink" href="#wiring-pinout" title="Permanent link">&para;</a></h1>
-<p>GPIO assignments and breadboard wiring for the Dilder test bench (Pico W).</p>
+<p>This page covers wiring for both the <strong>custom PCB (ESP32-S3)</strong> and the legacy <strong>breadboard prototype (Pico W)</strong>.</p>
+<hr />
+<h2 id="custom-pcb-esp32-s3-wroom-1-n16r8">Custom PCB — ESP32-S3-WROOM-1-N16R8<a class="headerlink" href="#custom-pcb-esp32-s3-wroom-1-n16r8" title="Permanent link">&para;</a></h2>
+<p>The production Dilder uses a custom 4-layer PCB (45x80mm) with all components surface-mounted. No manual wiring needed — everything is routed on the board.</p>
+<h3 id="esp32-s3-gpio-assignments">ESP32-S3 GPIO Assignments<a class="headerlink" href="#esp32-s3-gpio-assignments" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>GPIO</th>
+<th>Function</th>
+<th>Interface</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPIO3</td>
+<td>e-Paper DC (data/command)</td>
+<td>Digital</td>
+<td>Output</td>
+</tr>
+<tr>
+<td>GPIO4</td>
+<td>Joystick UP</td>
+<td>Digital</td>
+<td>Input (pull-up)</td>
+</tr>
+<tr>
+<td>GPIO5</td>
+<td>Joystick DOWN</td>
+<td>Digital</td>
+<td>Input (pull-up)</td>
+</tr>
+<tr>
+<td>GPIO6</td>
+<td>Joystick LEFT</td>
+<td>Digital</td>
+<td>Input (pull-up)</td>
+</tr>
+<tr>
+<td>GPIO7</td>
+<td>Joystick RIGHT</td>
+<td>Digital</td>
+<td>Input (pull-up)</td>
+</tr>
+<tr>
+<td>GPIO8</td>
+<td>Joystick CENTER</td>
+<td>Digital</td>
+<td>Input (pull-up)</td>
+</tr>
+<tr>
+<td>GPIO9</td>
+<td>e-Paper CLK (SCK)</td>
+<td>SPI</td>
+<td>Output</td>
+</tr>
+<tr>
+<td>GPIO10</td>
+<td>e-Paper MOSI</td>
+<td>SPI</td>
+<td>Output</td>
+</tr>
+<tr>
+<td>GPIO11</td>
+<td>e-Paper RST</td>
+<td>Digital</td>
+<td>Output</td>
+</tr>
+<tr>
+<td>GPIO12</td>
+<td>e-Paper BUSY</td>
+<td>Digital</td>
+<td>Input</td>
+</tr>
+<tr>
+<td>GPIO16</td>
+<td>LIS2DH12 SDA</td>
+<td>I2C</td>
+<td>Bidirectional</td>
+</tr>
+<tr>
+<td>GPIO17</td>
+<td>LIS2DH12 SCL</td>
+<td>I2C</td>
+<td>Output</td>
+</tr>
+<tr>
+<td>GPIO18</td>
+<td>LIS2DH12 INT1</td>
+<td>Interrupt</td>
+<td>Input</td>
+</tr>
+<tr>
+<td>GPIO19</td>
+<td>USB D-</td>
+<td>USB-OTG</td>
+<td>Bidirectional</td>
+</tr>
+<tr>
+<td>GPIO20</td>
+<td>USB D+</td>
+<td>USB-OTG</td>
+<td>Bidirectional</td>
+</tr>
+<tr>
+<td>GPIO46</td>
+<td>e-Paper CS</td>
+<td>SPI CS</td>
+<td>Output</td>
+</tr>
+</tbody>
+</table>
+<h3 id="power-chain">Power Chain<a class="headerlink" href="#power-chain" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>USB-C (5V) ──►|── SS34 Schottky ── TP4056 Charger ── LiPo Battery
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                                         │
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                                    DW01A + FS8205A
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                                    (protection)
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                                         │
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                                    AMS1117-3.3 LDO
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                                         │
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                                      3.3V Rail
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                              ┌──────────┼──────────┐
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                           ESP32-S3   LIS2DH12   e-Paper
+</span></code></pre></div>
+<h3 id="block-diagram">Block Diagram<a class="headerlink" href="#block-diagram" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>                    ┌─────────────────────────────────┐
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                    │        ESP32-S3-WROOM-1          │
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>                    │       (WiFi + BLE 5.0)           │
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>                    │                                   │
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>     SPI (6 lines)  │  GPIO3,9,10,11,12,46            │
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  ┌─────────────────┤                                   │
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  │                 │  GPIO4-8         GPIO16,17,18     │
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>  │                 │     │                 │           │
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  │                 │     │            I2C (2 lines)    │
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>  │                 │  GPIO19,20            │           │
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>  │                 └──────┬────────────────┼───────────┘
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>  │                        │                │
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>  ▼                        ▼                ▼
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>e-Paper 2.13&quot;        USB-C (OTG)      LIS2DH12TR
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>(Waveshare)          J1               Accelerometer
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>J3 (JST-SH 8p)                       U5
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>                    5-Way Joystick
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>                    SW1 (SKRHABE010)
+</span></code></pre></div>
+<p>For full component details, see the <a href="../../../hardware-design/parts-sheets/README.md">Parts Sheets</a> and <a href="../../../hardware-design/BOM.md">BOM</a>.</p>
+<hr />
+<h2 id="breadboard-prototype-pico-w-legacy">Breadboard Prototype — Pico W (Legacy)<a class="headerlink" href="#breadboard-prototype-pico-w-legacy" title="Permanent link">&para;</a></h2>
+<p>GPIO assignments and breadboard wiring for the Phase 1 test bench (Pico W).</p>
 <figure>
   <img alt="Pico W with jumper wires connected to e-Paper display" loading="lazy" src="../../../assets/images/hardware/build-session/pico-w-gpio-wiring-top.jpg" width="500" />
 <br />
@@ -2845,8 +3116,8 @@
 <p>The DollaTek 5-Way Navigation Button Module can replace the five individual tactile buttons with identical wiring (same GPIOs, same pull-up config). See the dedicated <a href="../joystick-wiring/">Joystick Wiring Guide</a> for full setup instructions.</p>
 </div>
 <p><strong>Per-button wiring:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Pico GPIO pin ──── button leg A
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                   button leg B ──── GND rail
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Pico GPIO pin ──── button leg A
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>                   button leg B ──── GND rail
 </span></code></pre></div></p>
 <p>When the button is pressed it pulls the GPIO line LOW → software reads as pressed.</p>
 <h3 id="button-gpio-assignments">Button GPIO Assignments<a class="headerlink" href="#button-gpio-assignments" title="Permanent link">&para;</a></h3>
@@ -2893,19 +3164,19 @@
 </tr>
 </tbody>
 </table>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">BUTTONS</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="s1">&#39;up&#39;</span><span class="p">:</span>     <span class="n">Pin</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="s1">&#39;down&#39;</span><span class="p">:</span>   <span class="n">Pin</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="s1">&#39;left&#39;</span><span class="p">:</span>   <span class="n">Pin</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="s1">&#39;right&#39;</span><span class="p">:</span>  <span class="n">Pin</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="s1">&#39;center&#39;</span><span class="p">:</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">}</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># Read a button (0 = pressed, 1 = released)</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="k">if</span> <span class="n">BUTTONS</span><span class="p">[</span><span class="s1">&#39;center&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Center pressed!&quot;</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">BUTTONS</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s1">&#39;up&#39;</span><span class="p">:</span>     <span class="n">Pin</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="s1">&#39;down&#39;</span><span class="p">:</span>   <span class="n">Pin</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s1">&#39;left&#39;</span><span class="p">:</span>   <span class="n">Pin</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="s1">&#39;right&#39;</span><span class="p">:</span>  <span class="n">Pin</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="s1">&#39;center&#39;</span><span class="p">:</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">PULL_UP</span><span class="p">),</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">}</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1"># Read a button (0 = pressed, 1 = released)</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">if</span> <span class="n">BUTTONS</span><span class="p">[</span><span class="s1">&#39;center&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Center pressed!&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <hr />
 <h2 id="full-gpio-pin-budget">Full GPIO Pin Budget<a class="headerlink" href="#full-gpio-pin-budget" title="Permanent link">&para;</a></h2>
@@ -3036,52 +3307,52 @@
 <hr />
 <h2 id="pico-w-pin-map-visual">Pico W Pin Map (Visual)<a class="headerlink" href="#pico-w-pin-map-visual" title="Permanent link">&para;</a></h2>
 <p>Pins used by this project are highlighted. Full electrical specs in the <a href="../../reference/pico-w/">Pico W reference</a>.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>               ┌───USB───┐
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>   GP0  [ 1]   │         │  [40]  VBUS
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>   GP1  [ 2]   │  PICO   │  [39]  VSYS      ◄── e-ink VSYS
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>   GND  [ 3]   │    W    │  [38]  GND       ◄── e-ink GND
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>▶  GP2  [ 4]   │         │  [37]  3V3_EN
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>▶  GP3  [ 5]   │         │  [36]  3V3(OUT)
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>▶  GP4  [ 6]   │         │  [35]  ADC_VREF
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>▶  GP5  [ 7]   │         │  [34]  GP28
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>   GND  [ 8]   │         │  [33]  AGND
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>▶  GP6  [ 9]   │         │  [32]  GP27
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>   GP7  [10]   │         │  [31]  GP26
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>▶  GP8  [11]   │         │  [30]  RUN
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>▶  GP9  [12]   │         │  [29]  GP22
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>   GND  [13]   │         │  [28]  GND
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>▶ GP10  [14]   │         │  [27]  GP21
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>▶ GP11  [15]   │         │  [26]  GP20
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>▶ GP12  [16]   │         │  [25]  GP19
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>▶ GP13  [17]   │         │  [24]  GP18
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>   GND  [18]   │         │  [23]  GND
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>  GP14  [19]   │         │  [22]  GP17
-</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>  GP15  [20]   └─────────┘  [21]  GP16
-</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>
-</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>▶ = used by Dilder
-</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>
-</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>Left side (pins 4–17):  Buttons (GP2–GP6) + Display SPI (GP8–GP13)
-</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>Right side (pin 39):    VSYS power to display (onboard regulator)
-</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>Right side (pin 38):    GND to display
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>               ┌───USB───┐
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>   GP0  [ 1]   │         │  [40]  VBUS
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>   GP1  [ 2]   │  PICO   │  [39]  VSYS      ◄── e-ink VSYS
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>   GND  [ 3]   │    W    │  [38]  GND       ◄── e-ink GND
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>▶  GP2  [ 4]   │         │  [37]  3V3_EN
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>▶  GP3  [ 5]   │         │  [36]  3V3(OUT)
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>▶  GP4  [ 6]   │         │  [35]  ADC_VREF
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>▶  GP5  [ 7]   │         │  [34]  GP28
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>   GND  [ 8]   │         │  [33]  AGND
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>▶  GP6  [ 9]   │         │  [32]  GP27
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>   GP7  [10]   │         │  [31]  GP26
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>▶  GP8  [11]   │         │  [30]  RUN
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>▶  GP9  [12]   │         │  [29]  GP22
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>   GND  [13]   │         │  [28]  GND
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>▶ GP10  [14]   │         │  [27]  GP21
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>▶ GP11  [15]   │         │  [26]  GP20
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>▶ GP12  [16]   │         │  [25]  GP19
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>▶ GP13  [17]   │         │  [24]  GP18
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>   GND  [18]   │         │  [23]  GND
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>  GP14  [19]   │         │  [22]  GP17
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>  GP15  [20]   └─────────┘  [21]  GP16
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>▶ = used by Dilder
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>Left side (pins 4–17):  Buttons (GP2–GP6) + Display SPI (GP8–GP13)
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>Right side (pin 39):    VSYS power to display (onboard regulator)
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>Right side (pin 38):    GND to display
 </span></code></pre></div>
 <hr />
 <h2 id="wiring-diagram-text">Wiring Diagram (Text)<a class="headerlink" href="#wiring-diagram-text" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Pico W (on breadboard)
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>│
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├─ Pin 39 (VSYS)    ──────────── e-Paper VSYS
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>├─ Pin 38 (GND)     ──────────── e-Paper GND ── breadboard GND rail
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>├─ Pin 15 (GP11 / SPI1 TX)  ──── e-Paper DIN
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>├─ Pin 14 (GP10 / SPI1 SCK) ──── e-Paper CLK
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>├─ Pin 12 (GP9  / SPI1 CSn) ──── e-Paper CS
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>├─ Pin 11 (GP8)  ─────────────── e-Paper DC
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>├─ Pin 16 (GP12) ─────────────── e-Paper RST
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>├─ Pin 17 (GP13) ─────────────── e-Paper BUSY
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>│
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>├─ Pin 4  (GP2)  ─── [BTN UP]     ─── GND
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>├─ Pin 5  (GP3)  ─── [BTN DOWN]   ─── GND
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>├─ Pin 6  (GP4)  ─── [BTN LEFT]   ─── GND
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>├─ Pin 7  (GP5)  ─── [BTN RIGHT]  ─── GND
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>└─ Pin 9  (GP6)  ─── [BTN CENTER] ─── GND
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Pico W (on breadboard)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>│
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>├─ Pin 39 (VSYS)    ──────────── e-Paper VSYS
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>├─ Pin 38 (GND)     ──────────── e-Paper GND ── breadboard GND rail
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>├─ Pin 15 (GP11 / SPI1 TX)  ──── e-Paper DIN
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>├─ Pin 14 (GP10 / SPI1 SCK) ──── e-Paper CLK
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>├─ Pin 12 (GP9  / SPI1 CSn) ──── e-Paper CS
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├─ Pin 11 (GP8)  ─────────────── e-Paper DC
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>├─ Pin 16 (GP12) ─────────────── e-Paper RST
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>├─ Pin 17 (GP13) ─────────────── e-Paper BUSY
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>│
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>├─ Pin 4  (GP2)  ─── [BTN UP]     ─── GND
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>├─ Pin 5  (GP3)  ─── [BTN DOWN]   ─── GND
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>├─ Pin 6  (GP4)  ─── [BTN LEFT]   ─── GND
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>├─ Pin 7  (GP5)  ─── [BTN RIGHT]  ─── GND
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>└─ Pin 9  (GP6)  ─── [BTN CENTER] ─── GND
 </span></code></pre></div>
 <hr />
 <h2 id="spi-configuration">SPI Configuration<a class="headerlink" href="#spi-configuration" title="Permanent link">&para;</a></h2>
@@ -3116,11 +3387,11 @@
 </tr>
 </tbody>
 </table>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span><span class="p">,</span> <span class="n">SPI</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">spi</span> <span class="o">=</span> <span class="n">SPI</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">4_000_000</span><span class="p">,</span> <span class="n">polarity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>          <span class="n">sck</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">mosi</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">11</span><span class="p">))</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">cs</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">OUT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># active LOW, start HIGH</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span><span class="p">,</span> <span class="n">SPI</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">spi</span> <span class="o">=</span> <span class="n">SPI</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">4_000_000</span><span class="p">,</span> <span class="n">polarity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>          <span class="n">sck</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">mosi</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">11</span><span class="p">))</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">cs</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">OUT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># active LOW, start HIGH</span>
 </span></code></pre></div>
 <hr />
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
