@@ -1,0 +1,3800 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="An open-source AI-assisted virtual pet built with a Raspberry Pi Pico W, e-ink display, and 3D-printed case. Follow the build in real time.">
+      
+      
+        <meta name="author" content="rompasaurus">
+      
+      
+        <link rel="canonical" href="https://dilder.dev/docs/design/open-board-designs/">
+      
+      
+        <link rel="prev" href="../pcb-assembly-and-prototyping/">
+      
+      
+        <link rel="next" href="../../software/project-structure/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Open-Source Board Designs - Dilder</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-PLACEHOLDER"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-PLACEHOLDER",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-PLACEHOLDER",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#open-source-board-design-research" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Dilder" class="md-header__button md-logo" aria-label="Dilder" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73A2 2 0 1 0 10 4c0 .74.4 1.39 1 1.73V7h-1c-3.87 0-7 3.13-7 7H2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h1v1a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2v-1h1c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1M9.7 15.45l-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45m9 0-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Dilder
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Open-Source Board Designs
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/rompasaurus/dilder" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    rompasaurus/dilder
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../blog/" class="md-tabs__link">
+          
+  
+  
+  Blog
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Docs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../community/" class="md-tabs__link">
+          
+  
+  
+  Community
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/" class="md-tabs__link">
+          
+  
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../prompts/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Prompt Log
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Dilder" class="md-nav__button md-logo" aria-label="Dilder" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73A2 2 0 1 0 10 4c0 .74.4 1.39 1 1.73V7h-1c-3.87 0-7 3.13-7 7H2c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h1v1a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2v-1h1c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1M9.7 15.45l-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45m9 0-.73.73-1.47 1.47-2.2-2.2c-.4-.4-.4-1.06 0-1.45.41-.42 1.06-.42 1.47 0l.73.72.73-.72c.41-.42 1.06-.42 1.47 0 .4.39.4 1.05 0 1.45"/></svg>
+
+    </a>
+    Dilder
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/rompasaurus/dilder" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    rompasaurus/dilder
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Blog
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Build Journal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Archive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Archive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/archive/2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2026
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Categories
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Categories
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/firmware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/pcb-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PCB Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/category/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Docs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Hardware
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/materials-list/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materials List
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/wiring-pinout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiring & Pinout
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/joystick-wiring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Joystick Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/battery-wiring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/enclosure-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enclosure Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/3d-printing-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D Printing Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/first-time-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    First-Time Setup (C SDK)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/pi-zero-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/display-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Display Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/dev-environment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dev Environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-engagement-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Engagement Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-pcb-design-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom PCB Design Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pcb-assembly-and-prototyping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PCB Assembly & Prototyping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Open-Source Board Designs
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Open-Source Board Designs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-study-other-boards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Study Other Boards?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#esp32-s3-designs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ESP32-S3 Designs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ESP32-S3 Designs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ducky-board-esp32-s3-e-paper-battery-charger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ducky Board — ESP32-S3 + e-Paper + Battery Charger
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ducky Board — ESP32-S3 + e-Paper + Battery Charger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Available
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#basic-esp32-s3-dev-board-minimal-reference-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic ESP32-S3 Dev Board — Minimal Reference Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic ESP32-S3 Dev Board — Minimal Reference Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-available_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Available
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#official-espressif-kicad-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Official Espressif KiCad Libraries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Official Espressif KiCad Libraries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rp2040-pico-designs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RP2040 / Pico Designs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RP2040 / Pico Designs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reverse-engineered-pico-with-usb-c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reverse-Engineered Pico with USB-C
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reverse-Engineered Pico with USB-C">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sub-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sub-Projects
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rp2040-minimal-design-jlcpcb-ready" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RP2040 Minimal Design (JLCPCB-Ready)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RP2040 Minimal Design (JLCPCB-Ready)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rp2040-hardware-design-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RP2040 Hardware Design Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RP2040 Hardware Design Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#virtual-pet-designs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Virtual Pet Designs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Virtual Pet Designs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#opentama-tamagotchi-reference-board-jlcpcb-ready" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenTama — Tamagotchi Reference Board (JLCPCB-Ready)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenTama — Tamagotchi Reference Board (JLCPCB-Ready)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#component-overlap-with-dilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Overlap with Dilder
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison Matrix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-open-these-designs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to Open These Designs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Software
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../software/project-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../software/emotion-states/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emotion States
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tools
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/devtool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevTool (GUI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/setup-cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/website-dev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Website Dev CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/pico-w/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pico W
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/pi-zero-wh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pi Zero WH (future)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/waveshare-eink/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waveshare e-Paper HAT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/esp32-s3-wroom1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ESP32-S3 WROOM-1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../community/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../community/discord/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../community/support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Support on Patreon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Dilder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/contact/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contact
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompt Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-study-other-boards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Study Other Boards?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#esp32-s3-designs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ESP32-S3 Designs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ESP32-S3 Designs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ducky-board-esp32-s3-e-paper-battery-charger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ducky Board — ESP32-S3 + e-Paper + Battery Charger
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ducky Board — ESP32-S3 + e-Paper + Battery Charger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Available
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#basic-esp32-s3-dev-board-minimal-reference-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic ESP32-S3 Dev Board — Minimal Reference Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic ESP32-S3 Dev Board — Minimal Reference Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-available_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Available
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#official-espressif-kicad-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Official Espressif KiCad Libraries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Official Espressif KiCad Libraries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rp2040-pico-designs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RP2040 / Pico Designs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RP2040 / Pico Designs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reverse-engineered-pico-with-usb-c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reverse-Engineered Pico with USB-C
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reverse-Engineered Pico with USB-C">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sub-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sub-Projects
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rp2040-minimal-design-jlcpcb-ready" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RP2040 Minimal Design (JLCPCB-Ready)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RP2040 Minimal Design (JLCPCB-Ready)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rp2040-hardware-design-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RP2040 Hardware Design Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RP2040 Hardware Design Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#virtual-pet-designs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Virtual Pet Designs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Virtual Pet Designs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#opentama-tamagotchi-reference-board-jlcpcb-ready" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenTama — Tamagotchi Reference Board (JLCPCB-Ready)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenTama — Tamagotchi Reference Board (JLCPCB-Ready)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-study_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What to Study
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#component-overlap-with-dilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Overlap with Dilder
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison Matrix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-open-these-designs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to Open These Designs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="open-source-board-design-research">Open-Source Board Design Research<a class="headerlink" href="#open-source-board-design-research" title="Permanent link">&para;</a></h1>
+<p>A curated collection of open-source KiCad board designs that share components, circuits, or design goals with the Dilder custom PCB. Each project is analyzed for what we can learn from it, with images of the actual board layouts and schematics.</p>
+<p>All designs have been cloned into the project's <code>hardware-design/reference-boards/</code> directory and can be opened directly in KiCad.</p>
+<hr />
+<h2 id="why-study-other-boards">Why Study Other Boards?<a class="headerlink" href="#why-study-other-boards" title="Permanent link">&para;</a></h2>
+<p>Designing a custom PCB from scratch is hard. Studying existing open-source boards lets us:</p>
+<ul>
+<li><strong>Validate our circuit design</strong> against proven, manufactured boards</li>
+<li><strong>Learn routing techniques</strong> for tricky components (USB differential pairs, antenna keep-out zones, ground planes)</li>
+<li><strong>Copy proven power management circuits</strong> rather than designing from first principles</li>
+<li><strong>Verify component choices</strong> against what others have successfully manufactured at JLCPCB/PCBWay</li>
+<li><strong>Avoid common mistakes</strong> that others have already debugged</li>
+</ul>
+<p>Each design below is analyzed for its relevance to the Dilder board (ESP32-S3, e-ink display, LiPo battery, joystick input, IMU sensor).</p>
+<hr />
+<h2 id="esp32-s3-designs">ESP32-S3 Designs<a class="headerlink" href="#esp32-s3-designs" title="Permanent link">&para;</a></h2>
+<h3 id="ducky-board-esp32-s3-e-paper-battery-charger">Ducky Board — ESP32-S3 + e-Paper + Battery Charger<a class="headerlink" href="#ducky-board-esp32-s3-e-paper-battery-charger" title="Permanent link">&para;</a></h3>
+<div class="admonition tip">
+<p class="admonition-title">Closest match to the Dilder board</p>
+</div>
+<figure>
+  <img alt="Ducky Board — assembled PCB with 1.52&quot; e-ink display" loading="lazy" src="../../../assets/images/reference-boards/esp32s3-ducky-epaper-preview.png" width="500" />
+<br />
+<figcaption>Ducky Board assembled and running — ESP32-S3 module with 1.52" 3-color e-ink display, USB-C, and LiPo charging. Photo from the project repo.</figcaption>
+</figure>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MCU</strong></td>
+<td>ESP32-S3 module</td>
+</tr>
+<tr>
+<td><strong>Display</strong></td>
+<td>GDEM0154Z91 (1.52" e-ink, 3-color, Good Display)</td>
+</tr>
+<tr>
+<td><strong>Power</strong></td>
+<td>USB-C input, integrated Li-Ion battery charger with status LEDs</td>
+</tr>
+<tr>
+<td><strong>Design tool</strong></td>
+<td>KiCad 9</td>
+</tr>
+<tr>
+<td><strong>License</strong></td>
+<td>GPL-3.0</td>
+</tr>
+<tr>
+<td><strong>Source</strong></td>
+<td><a href="https://github.com/MakersFunDuck/Ducky-board-ESP32-S3-with-1.52-inch-e-paper-display">MakersFunDuck/Ducky-board-ESP32-S3</a></td>
+</tr>
+<tr>
+<td><strong>Local path</strong></td>
+<td><code>hardware-design/reference-boards/esp32s3-ducky-epaper/</code></td>
+</tr>
+<tr>
+<td><strong>KiCad files</strong></td>
+<td><code>hardware.kicad_sch</code>, <code>hardware.kicad_pcb</code>, <code>hardware.kicad_pro</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="what-to-study">What to Study<a class="headerlink" href="#what-to-study" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Battery charging circuit</strong> — The Ducky Board integrates a single-cell Li-Ion charger with charge status LEDs, the same architecture as the Dilder's TP4056 + DW01A design. Compare their component choices with ours.</li>
+<li><strong>ESP32-S3 power sequencing</strong> — How the module's EN pin is handled, decoupling cap placement, and 3.3V regulation.</li>
+<li><strong>e-Paper display connector</strong> — How the display is interfaced via SPI, including the DC/RST/BUSY control line routing.</li>
+<li><strong>USB-C implementation</strong> — CC pull-down resistors, VBUS protection, and data line routing.</li>
+<li><strong>Board form factor</strong> — Compact breakout form factor optimized for the e-ink display footprint.</li>
+</ul>
+<h4 id="files-available">Files Available<a class="headerlink" href="#files-available" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>hardware.kicad_sch</code> — Full schematic with all component values</li>
+<li><code>hardware.kicad_pcb</code> — Complete routed PCB layout</li>
+<li><code>Schematic.pdf</code> — Exported schematic for quick viewing without KiCad</li>
+<li><code>PCB.pdf</code> — PCB layout export</li>
+</ul>
+<hr />
+<h3 id="basic-esp32-s3-dev-board-minimal-reference-design">Basic ESP32-S3 Dev Board — Minimal Reference Design<a class="headerlink" href="#basic-esp32-s3-dev-board-minimal-reference-design" title="Permanent link">&para;</a></h3>
+<figure>
+  <img alt="ESP32-S3 Basic Dev Board — 3D render" loading="lazy" src="../../../assets/images/reference-boards/esp32s3-basic-devboard-3d.png" width="500" />
+<br />
+<figcaption>3D render of the basic ESP32-S3 dev board — ESP32-S3-WROOM-1 module, USB-C, LDO regulator, reset/boot buttons, status LEDs, all GPIO broken out to castellated pads.</figcaption>
+</figure>
+<figure>
+  <img alt="ESP32-S3 Basic Dev Board — PCB layout" loading="lazy" src="../../../assets/images/reference-boards/esp32s3-basic-devboard-pcb.png" width="500" />
+<br />
+<figcaption>PCB layout — note the clean routing, USB-C at the bottom edge, ESP32-S3 module centered with antenna pointing off-board, decoupling caps close to power pins.</figcaption>
+</figure>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MCU</strong></td>
+<td>ESP32-S3-WROOM-1 module</td>
+</tr>
+<tr>
+<td><strong>Features</strong></td>
+<td>USB-C (with 5.1k CC pull-downs, differential pair routing), 3.3V LDO, reset/boot buttons, 3 status LEDs (5V, 3.3V, GPIO blinker), all GPIO broken out</td>
+</tr>
+<tr>
+<td><strong>Design tool</strong></td>
+<td>KiCad</td>
+</tr>
+<tr>
+<td><strong>License</strong></td>
+<td>MIT</td>
+</tr>
+<tr>
+<td><strong>Source</strong></td>
+<td><a href="https://github.com/atomic14/basic-esp32s3-dev-board">atomic14/basic-esp32s3-dev-board</a></td>
+</tr>
+<tr>
+<td><strong>Local path</strong></td>
+<td><code>hardware-design/reference-boards/esp32s3-basic-devboard/</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="what-to-study_1">What to Study<a class="headerlink" href="#what-to-study_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>USB-C done right</strong> — This is the cleanest ESP32-S3 USB-C implementation in our reference collection. The 5.1k CC1/CC2 pull-downs, differential pair routing for D+/D-, and series resistors are all textbook. Compare directly with the Dilder's USB-C circuit.</li>
+<li><strong>LDO selection and placement</strong> — Uses an LD117 with proper input/output decoupling. Shows recommended cap values and placement distance from the IC.</li>
+<li><strong>Antenna keep-out</strong> — Note how the PCB copper is cleared around the ESP32-S3 antenna area (top-left of the module). The Dilder board must maintain this same keep-out zone.</li>
+<li><strong>GPIO breakout pattern</strong> — Castellated edge pads with clear silkscreen labeling. Good reference for our e-Paper header connector placement.</li>
+</ul>
+<h4 id="files-available_1">Files Available<a class="headerlink" href="#files-available_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>dev-board.kicad_sch</code> — Schematic (also exported as PDF)</li>
+<li><code>dev-board.kicad_pcb</code> — PCB layout (also exported as SVG)</li>
+<li><code>docs/dev-board.step</code> — 3D STEP model for mechanical integration</li>
+<li><code>docs/schematic.pdf</code> — Printable schematic</li>
+</ul>
+<hr />
+<h3 id="official-espressif-kicad-libraries">Official Espressif KiCad Libraries<a class="headerlink" href="#official-espressif-kicad-libraries" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Contents</strong></td>
+<td>Symbols, footprints, and 3D models for ALL Espressif chips and modules</td>
+</tr>
+<tr>
+<td><strong>Includes</strong></td>
+<td>ESP32, ESP32-S2, ESP32-S3, ESP32-C3, ESP32-C6, ESP32-H2 — bare chips, WROOM modules, MINI modules, and DevKit boards</td>
+</tr>
+<tr>
+<td><strong>License</strong></td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td><strong>Source</strong></td>
+<td><a href="https://github.com/espressif/kicad-libraries">espressif/kicad-libraries</a></td>
+</tr>
+<tr>
+<td><strong>Local path</strong></td>
+<td><code>hardware-design/reference-boards/espressif-kicad-libs/</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="what-to-study_2">What to Study<a class="headerlink" href="#what-to-study_2" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Authoritative footprints</strong> — These are the official pad dimensions, pin assignments, and courtyard sizes for the ESP32-S3-WROOM-1-N16R8. If our custom KiCad footprint differs from these, the official version is correct.</li>
+<li><strong>Antenna keep-out zones</strong> — The footprint includes the manufacturer-specified copper keep-out for the PCB antenna.</li>
+<li><strong>3D models</strong> — STEP files for mechanical clearance verification in the 3D-printed enclosure.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Installation</p>
+<p>These libraries can be installed automatically via KiCad's Plugin and Content Manager (PCM). Search for "Espressif" in the PCM. The local copy in this repo is for offline reference.</p>
+</div>
+<hr />
+<h2 id="rp2040-pico-designs">RP2040 / Pico Designs<a class="headerlink" href="#rp2040-pico-designs" title="Permanent link">&para;</a></h2>
+<h3 id="reverse-engineered-pico-with-usb-c">Reverse-Engineered Pico with USB-C<a class="headerlink" href="#reverse-engineered-pico-with-usb-c" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MCU</strong></td>
+<td>RP2040 (standard Pico), RP2040 + CYW43439 WiFi (Pico WH), RP2350 (Pico 2)</td>
+</tr>
+<tr>
+<td><strong>Features</strong></td>
+<td>Faithful reproduction of the official Raspberry Pi Pico circuit in KiCad, upgraded with USB-C</td>
+</tr>
+<tr>
+<td><strong>License</strong></td>
+<td>WTFPL (unrestricted — do anything you want)</td>
+</tr>
+<tr>
+<td><strong>Source</strong></td>
+<td><a href="https://github.com/sabogalc/project-piCo">sabogalc/project-piCo</a></td>
+</tr>
+<tr>
+<td><strong>Local path</strong></td>
+<td><code>hardware-design/reference-boards/rp2040-pico-usbc/</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="what-to-study_3">What to Study<a class="headerlink" href="#what-to-study_3" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Official Pico circuit</strong> — This is the most faithful KiCad reproduction of the Raspberry Pi Pico. The original design files are in Cadence Allegro (proprietary); this project reverse-engineered them into KiCad. Use this to understand the RP2040's power path: how VSYS, VBUS, and the Schottky diode interact.</li>
+<li><strong>WiFi variant (Pico WH)</strong> — The <code>Pico WH</code> sub-project includes the CYW43439 WiFi/BLE chip wiring — useful for understanding how the Pico W differs from the standard Pico at the circuit level.</li>
+<li><strong>USB-C upgrade</strong> — Shows how to replace micro-USB with USB-C on an RP2040 board while maintaining the same power path.</li>
+</ul>
+<h4 id="sub-projects">Sub-Projects<a class="headerlink" href="#sub-projects" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>Board</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KiCad Projects/Pico C/</code></td>
+<td>Standard Pico with USB-C</td>
+<td>RP2040 + W25Q16 flash</td>
+</tr>
+<tr>
+<td><code>KiCad Projects/Pico WH - No License/</code></td>
+<td>Pico WH with USB-C</td>
+<td>RP2040 + CYW43439 WiFi/BLE</td>
+</tr>
+<tr>
+<td><code>KiCad Projects/Pico 2 C/</code></td>
+<td>Pico 2 with USB-C</td>
+<td>RP2350 (next-gen)</td>
+</tr>
+</tbody>
+</table>
+<p>Each sub-project contains exported schematic PDFs for quick viewing without opening KiCad.</p>
+<hr />
+<h3 id="rp2040-minimal-design-jlcpcb-ready">RP2040 Minimal Design (JLCPCB-Ready)<a class="headerlink" href="#rp2040-minimal-design-jlcpcb-ready" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MCU</strong></td>
+<td>RP2040 (bare chip — not a module)</td>
+</tr>
+<tr>
+<td><strong>Origin</strong></td>
+<td>Raspberry Pi's official "Minimal Viable Board" example, ported to KiCad 7 with JLCPCB assembly files</td>
+</tr>
+<tr>
+<td><strong>License</strong></td>
+<td>BSD-3-Clause</td>
+</tr>
+<tr>
+<td><strong>Source</strong></td>
+<td><a href="https://github.com/tommy-gilligan/RP2040-minimal-design">tommy-gilligan/RP2040-minimal-design</a></td>
+</tr>
+<tr>
+<td><strong>Local path</strong></td>
+<td><code>hardware-design/reference-boards/rp2040-minimal-jlcpcb/</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="what-to-study_4">What to Study<a class="headerlink" href="#what-to-study_4" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Absolute minimum RP2040 circuit</strong> — This is the smallest possible working RP2040 board: just the chip, a 12MHz crystal, a W25Q16 flash chip, decoupling caps, and USB. Nothing else. Use this to understand which components are <em>mandatory</em> for the RP2040 to boot.</li>
+<li><strong>JLCPCB compatibility</strong> — Includes BOM and CPL files formatted for JLCPCB's assembly service. Good reference for how to export and format assembly files from KiCad.</li>
+<li><strong>Contrast with the Dilder's ESP32-S3 approach</strong> — The bare RP2040 requires ~15 external components (crystal, flash, caps, resistors). The ESP32-S3-WROOM-1 module integrates all of this, which is why the Dilder switched MCUs.</li>
+</ul>
+<hr />
+<h3 id="rp2040-hardware-design-guide">RP2040 Hardware Design Guide<a class="headerlink" href="#rp2040-hardware-design-guide" title="Permanent link">&para;</a></h3>
+<figure>
+  <img alt="RP2040 Design Guide — KiCad schematic" loading="lazy" src="../../../assets/images/reference-boards/rp2040-designguide-schematic.png" width="600" />
+<br />
+<figcaption>Full RP2040 schematic from the design guide — RP2040 chip, crystal, flash, voltage regulator, USB, and GPIO breakout. All component values and LCSC part numbers annotated.</figcaption>
+</figure>
+<figure>
+  <img alt="RP2040 Design Guide — PCB front render" loading="lazy" src="../../../assets/images/reference-boards/rp2040-designguide-front.png" width="300" />
+<br />
+<figcaption>Front side — RP2040 chip centered, USB at top, GPIO pins along both edges. Green solder mask with ENIG (gold) finish.</figcaption>
+</figure>
+<figure>
+  <img alt="RP2040 Design Guide — PCB back render" loading="lazy" src="../../../assets/images/reference-boards/rp2040-designguide-back.png" width="300" />
+<br />
+<figcaption>Back side — ground plane with thermal reliefs around component pads. Silkscreen shows pin labels and design info.</figcaption>
+</figure>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MCU</strong></td>
+<td>RP2040 (bare chip)</td>
+</tr>
+<tr>
+<td><strong>Features</strong></td>
+<td>Complete design guide with component selection rationale, custom KiCad libraries, schematic PDF</td>
+</tr>
+<tr>
+<td><strong>License</strong></td>
+<td>MIT</td>
+</tr>
+<tr>
+<td><strong>Source</strong></td>
+<td><a href="https://github.com/Sleepdealr/RP2040-designguide">Sleepdealr/RP2040-designguide</a></td>
+</tr>
+<tr>
+<td><strong>Local path</strong></td>
+<td><code>hardware-design/reference-boards/rp2040-designguide/</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="what-to-study_5">What to Study<a class="headerlink" href="#what-to-study_5" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Component selection rationale</strong> — The README explains <em>why</em> each component was chosen: XC6206 LDO for low quiescent current, specific 12MHz crystal for JLCPCB availability (C9002), flash chip options. This reasoning applies to any microcontroller board design.</li>
+<li><strong>Custom KiCad libraries</strong> — Includes purpose-built symbols and footprints in <code>PCB/Libraries/</code>. Useful if you need to create custom footprints for components not in KiCad's default libraries.</li>
+<li><strong>Ground plane strategy</strong> — The PCB renders show solid ground plane coverage with proper via stitching. Good reference for the Dilder's inner ground plane (In1.Cu).</li>
+<li><strong>Includes official Pico datasheets</strong> — The <code>Pico-Resources/</code> folder contains the official Pico schematic PDF, RP2040 datasheet, and the hardware design guide PDF from Raspberry Pi.</li>
+</ul>
+<hr />
+<h2 id="virtual-pet-designs">Virtual Pet Designs<a class="headerlink" href="#virtual-pet-designs" title="Permanent link">&para;</a></h2>
+<h3 id="opentama-tamagotchi-reference-board-jlcpcb-ready">OpenTama — Tamagotchi Reference Board (JLCPCB-Ready)<a class="headerlink" href="#opentama-tamagotchi-reference-board-jlcpcb-ready" title="Permanent link">&para;</a></h3>
+<div class="admonition tip">
+<p class="admonition-title">Same product category as Dilder</p>
+</div>
+<figure>
+  <img alt="OpenTama PCB layout — egg-shaped board" loading="lazy" src="../../../assets/images/reference-boards/opentama-pcb.png" width="400" />
+<br />
+<figcaption>OpenTama v1.1 PCB layout — egg-shaped board with STM32L072 MCU, SSD1306 OLED and UC1701x LCD connectors, 3 buttons, buzzer (LS1), battery connector, and SWD debug header. All components on one side for JLCPCB assembly. Note the Sparkr bunny logo in the silkscreen.</figcaption>
+</figure>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MCU</strong></td>
+<td>STM32L072 (ARM Cortex-M0+, ultra-low-power)</td>
+</tr>
+<tr>
+<td><strong>Display</strong></td>
+<td>SPI SSD1306 OLED (128x64) or SPI UC1701x LCD</td>
+</tr>
+<tr>
+<td><strong>Battery</strong></td>
+<td>1000mAh LiPo (40x30x12mm) — same capacity as Dilder</td>
+</tr>
+<tr>
+<td><strong>Input</strong></td>
+<td>3 tactile buttons (SW1-SW3)</td>
+</tr>
+<tr>
+<td><strong>Audio</strong></td>
+<td>Piezo buzzer (LS1)</td>
+</tr>
+<tr>
+<td><strong>Protection</strong></td>
+<td>Battery over-discharge/charge protection circuit</td>
+</tr>
+<tr>
+<td><strong>Design tool</strong></td>
+<td>KiCad</td>
+</tr>
+<tr>
+<td><strong>License</strong></td>
+<td>CERN-OHL-S v2 (open hardware — permits derivative works)</td>
+</tr>
+<tr>
+<td><strong>Source</strong></td>
+<td><a href="https://github.com/Sparkr-tech/opentama">Sparkr-tech/opentama</a></td>
+</tr>
+<tr>
+<td><strong>Local path</strong></td>
+<td><code>hardware-design/reference-boards/opentama-virtual-pet/</code></td>
+</tr>
+<tr>
+<td><strong>Blog</strong></td>
+<td><a href="http://blog.rona.fr/post/2022/04/21/OpenTama-an-open-source-reference-design-for-MCUGotchi">Design notes</a></td>
+</tr>
+</tbody>
+</table>
+<h4 id="what-to-study_6">What to Study<a class="headerlink" href="#what-to-study_6" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Battery protection circuit</strong> — Uses <strong>DW01A + FS8205A</strong> — the exact same protection ICs as the Dilder board. Compare their schematic implementation with ours to verify our circuit is correct. This is the most directly applicable reference we have for the battery protection subsystem.</li>
+<li><strong>JLCPCB assembly optimization</strong> — All components placed on the top side for single-side assembly. LCSC part numbers pre-assigned for every component. The designer notes that "JLCPCB references for all the components have been provided."</li>
+<li><strong>Single-side placement</strong> — The egg-shaped PCB places everything on one side, matching JLCPCB's Economic PCBA service (which only supports single-side SMT). The Dilder board follows the same constraint.</li>
+<li><strong>Button debouncing</strong> — Simple button input circuit with hardware debounce. Compare with the Dilder's software debounce approach (200ms in firmware).</li>
+<li><strong>Buzzer integration</strong> — Shows how to wire a piezo buzzer to a GPIO pin with appropriate series resistor. Directly applicable to the Dilder's planned Phase 7 audio output.</li>
+<li><strong>Form factor</strong> — The egg shape is creative but the component density and routing strategies work for any small board. Pay attention to how traces route around the button footprints.</li>
+</ul>
+<h4 id="component-overlap-with-dilder">Component Overlap with Dilder<a class="headerlink" href="#component-overlap-with-dilder" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>OpenTama</th>
+<th>Dilder</th>
+<th>Same?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Battery protection IC</td>
+<td>DW01A</td>
+<td>DW01A</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Protection MOSFET</td>
+<td>FS8205A</td>
+<td>FS8205A</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Battery capacity</td>
+<td>1000mAh</td>
+<td>1000mAh</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Battery connector</td>
+<td>JST PH 2.0mm</td>
+<td>Molex 1.25mm</td>
+<td>Different</td>
+</tr>
+<tr>
+<td>MCU</td>
+<td>STM32L072</td>
+<td>ESP32-S3</td>
+<td>Different</td>
+</tr>
+<tr>
+<td>Display interface</td>
+<td>SPI</td>
+<td>SPI</td>
+<td>Same protocol</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="comparison-matrix">Comparison Matrix<a class="headerlink" href="#comparison-matrix" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Ducky Board</th>
+<th>ESP32-S3 Basic</th>
+<th>OpenTama</th>
+<th>RP2040 Minimal</th>
+<th>RP2040 Guide</th>
+<th>Pico USB-C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MCU</strong></td>
+<td>ESP32-S3</td>
+<td>ESP32-S3</td>
+<td>STM32L072</td>
+<td>RP2040</td>
+<td>RP2040</td>
+<td>RP2040</td>
+</tr>
+<tr>
+<td><strong>Display</strong></td>
+<td>e-Paper</td>
+<td>None</td>
+<td>OLED/LCD</td>
+<td>None</td>
+<td>None</td>
+<td>None</td>
+</tr>
+<tr>
+<td><strong>Battery</strong></td>
+<td>Li-Ion charger</td>
+<td>None</td>
+<td>LiPo + protection</td>
+<td>None</td>
+<td>None</td>
+<td>VSYS input</td>
+</tr>
+<tr>
+<td><strong>USB</strong></td>
+<td>USB-C</td>
+<td>USB-C</td>
+<td>Micro-USB</td>
+<td>USB</td>
+<td>USB</td>
+<td>USB-C</td>
+</tr>
+<tr>
+<td><strong>Joystick/Input</strong></td>
+<td>None</td>
+<td>None</td>
+<td>3 buttons</td>
+<td>None</td>
+<td>None</td>
+<td>None</td>
+</tr>
+<tr>
+<td><strong>IMU</strong></td>
+<td>None</td>
+<td>None</td>
+<td>None</td>
+<td>None</td>
+<td>None</td>
+<td>None</td>
+</tr>
+<tr>
+<td><strong>JLCPCB-ready</strong></td>
+<td>Likely</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>License</strong></td>
+<td>GPL-3.0</td>
+<td>MIT</td>
+<td>CERN-OHL-S</td>
+<td>BSD-3</td>
+<td>MIT</td>
+<td>WTFPL</td>
+</tr>
+</tbody>
+</table>
+<p>The Dilder board combines elements from multiple references: ESP32-S3 core from the Ducky/Basic boards, battery protection from OpenTama, USB-C from the Basic dev board, and JLCPCB manufacturing approach from both OpenTama and the RP2040 Minimal design.</p>
+<hr />
+<h2 id="how-to-open-these-designs">How to Open These Designs<a class="headerlink" href="#how-to-open-these-designs" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Install KiCad 7+</strong> — all projects are KiCad 7 or later format</li>
+<li>Navigate to <code>hardware-design/reference-boards/&lt;project&gt;/</code></li>
+<li>Open the <code>.kicad_pro</code> file — this loads both the schematic and PCB</li>
+<li><strong>Schematic:</strong> <code>Tools &gt; Schematic Editor</code> to view the circuit</li>
+<li><strong>PCB:</strong> <code>Tools &gt; PCB Editor</code> to view the board layout</li>
+<li><strong>3D View:</strong> In the PCB editor, press <code>Alt+3</code> to see a 3D render</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">Quick viewing without KiCad</p>
+<p>Most projects include exported PDFs of schematics in their <code>docs/</code> folder. Open these for a quick look without launching KiCad.</p>
+</div>
+<hr />
+<h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/MakersFunDuck/Ducky-board-ESP32-S3-with-1.52-inch-e-paper-display">Ducky Board — ESP32-S3 + e-Paper (GPL-3.0)</a></li>
+<li><a href="https://github.com/atomic14/basic-esp32s3-dev-board">Basic ESP32-S3 Dev Board (MIT)</a></li>
+<li><a href="https://github.com/espressif/kicad-libraries">Official Espressif KiCad Libraries (Apache-2.0)</a></li>
+<li><a href="https://github.com/sabogalc/project-piCo">Project piCo — Reverse-Engineered Pico (WTFPL)</a></li>
+<li><a href="https://github.com/tommy-gilligan/RP2040-minimal-design">RP2040 Minimal Design for JLCPCB (BSD-3)</a></li>
+<li><a href="https://github.com/Sleepdealr/RP2040-designguide">RP2040 Hardware Design Guide (MIT)</a></li>
+<li><a href="https://github.com/Sparkr-tech/opentama">OpenTama — Virtual Pet Reference Board (CERN-OHL-S v2)</a></li>
+<li><a href="http://blog.rona.fr/post/2022/04/21/OpenTama-an-open-source-reference-design-for-MCUGotchi">OpenTama Design Blog Post</a></li>
+<li><a href="https://docs.espressif.com/projects/esp-hardware-design-guidelines/en/latest/esp32s3/schematic-checklist.html">Espressif ESP32-S3 Hardware Design Guidelines</a></li>
+<li><a href="https://datasheets.raspberrypi.com/rp2040/hardware-design-with-rp2040.pdf">Raspberry Pi RP2040 Hardware Design Guide (PDF)</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../pcb-assembly-and-prototyping/" class="md-footer__link md-footer__link--prev" aria-label="Previous: PCB Assembly &amp; Prototyping">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                PCB Assembly & Prototyping
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../software/project-structure/" class="md-footer__link md-footer__link--next" aria-label="Next: Project Structure">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Project Structure
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/rompasaurus/dilder" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://discord.gg/PLACEHOLDER" target="_blank" rel="noopener" title="Discord" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://patreon.com/MchenrysDevelopment" target="_blank" rel="noopener" title="Patreon" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M490 153.8c-.1-65.4-51-119-110.7-138.3-74.2-24-172-20.5-242.9 12.9C50.6 68.9 23.6 157.7 22.6 246.2 21.8 319 29 510.6 137.2 512c80.3 1 92.3-102.5 129.5-152.3 26.4-35.5 60.5-45.5 102.4-55.9 72-17.8 121.1-74.7 121-150z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://youtube.com/@rompasaurus" target="_blank" rel="noopener" title="YouTube" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M549.7 124.1c-6.2-23.7-24.8-42.3-48.3-48.6C458.9 64 288.1 64 288.1 64S117.3 64 74.7 75.5c-23.5 6.3-42 24.9-48.3 48.6C15 167 15 256.4 15 256.4s0 89.4 11.4 132.3c6.3 23.6 24.8 41.5 48.3 47.8C117.3 448 288.1 448 288.1 448s170.8 0 213.4-11.5c23.5-6.3 42-24.2 48.3-47.8 11.4-42.9 11.4-132.3 11.4-132.3s0-89.4-11.4-132.3zM232.2 337.6V175.2l142.7 81.2z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/octopus-banner.js"></script>
+      
+    
+  </body>
+</html>
