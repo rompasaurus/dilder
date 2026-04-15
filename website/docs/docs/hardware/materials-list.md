@@ -1,12 +1,37 @@
 # Materials List
 
-All components needed to build a Dilder test bench. This list assumes you are building a breadboard prototype — no soldering required at this stage.
+Components for both the **custom PCB** (production) and the **breadboard prototype** (Phase 1 legacy).
 
 ---
 
-## Development Platform
+## Custom PCB — ESP32-S3 (Production)
 
-**Phase 1 (current):** Raspberry Pi Pico W with MicroPython. Cheap, fast to iterate, instant boot.
+The production Dilder runs on a custom 45x80mm 4-layer PCB. All 27 components are surface-mount, assembled by JLCPCB. Total BOM cost: ~$4.18/board.
+
+| Ref | Part | LCSC | ~Cost |
+|-----|------|------|-------|
+| U1 | ESP32-S3-WROOM-1-N16R8 (MCU) | C2913196 | $2.80 |
+| U2 | TP4056 (LiPo charger) | C382139 | $0.07 |
+| U3 | DW01A (battery protection) | C351410 | $0.05 |
+| Q1 | FS8205A (dual MOSFET) | C908265 | $0.05 |
+| U4 | AMS1117-3.3 (3.3V LDO) | C6186 | $0.05 |
+| U5 | LIS2DH12TR (3-axis accelerometer) | C110926 | $0.46 |
+| J1 | USB-C 16-pin receptacle | C2765186 | $0.10 |
+| J2 | JST PH 2-pin (battery) | C131337 | $0.03 |
+| J3 | JST SH 8-pin (e-paper) | — | $0.05 |
+| SW1 | SKRHABE010 (5-way joystick) | C139794 | $0.38 |
+| D1 | SS34 Schottky diode | C8678 | $0.03 |
+| D2, D3 | Red + Green LEDs (0805/0603) | C84256, C72043 | $0.02 |
+| R1-R10 | 0402 resistors (1.2k, 1k, 10k, 5.1k) | various | $0.08 |
+| C3-C9 | 0402 capacitors (100nF, 10uF) | C14663, C19702 | $0.06 |
+
+Full details: [BOM](../../../hardware-design/BOM.md) | [Parts Sheets](../../../hardware-design/parts-sheets/README.md)
+
+---
+
+## Breadboard Prototype — Pico W (Phase 1 Legacy)
+
+**Phase 1:** Raspberry Pi Pico W with MicroPython. Cheap, fast to iterate, instant boot.
 
 **Future (Phase 5):** Raspberry Pi Zero WH with Linux. Upgrade when you need a filesystem, SSH, or more compute.
 

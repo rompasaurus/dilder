@@ -1,6 +1,80 @@
 # Wiring & Pinout
 
-GPIO assignments and breadboard wiring for the Dilder test bench (Pico W).
+This page covers wiring for both the **custom PCB (ESP32-S3)** and the legacy **breadboard prototype (Pico W)**.
+
+---
+
+## Custom PCB — ESP32-S3-WROOM-1-N16R8
+
+The production Dilder uses a custom 4-layer PCB (45x80mm) with all components surface-mounted. No manual wiring needed — everything is routed on the board.
+
+### ESP32-S3 GPIO Assignments
+
+| GPIO | Function | Interface | Direction |
+|------|----------|-----------|-----------|
+| GPIO3 | e-Paper DC (data/command) | Digital | Output |
+| GPIO4 | Joystick UP | Digital | Input (pull-up) |
+| GPIO5 | Joystick DOWN | Digital | Input (pull-up) |
+| GPIO6 | Joystick LEFT | Digital | Input (pull-up) |
+| GPIO7 | Joystick RIGHT | Digital | Input (pull-up) |
+| GPIO8 | Joystick CENTER | Digital | Input (pull-up) |
+| GPIO9 | e-Paper CLK (SCK) | SPI | Output |
+| GPIO10 | e-Paper MOSI | SPI | Output |
+| GPIO11 | e-Paper RST | Digital | Output |
+| GPIO12 | e-Paper BUSY | Digital | Input |
+| GPIO16 | LIS2DH12 SDA | I2C | Bidirectional |
+| GPIO17 | LIS2DH12 SCL | I2C | Output |
+| GPIO18 | LIS2DH12 INT1 | Interrupt | Input |
+| GPIO19 | USB D- | USB-OTG | Bidirectional |
+| GPIO20 | USB D+ | USB-OTG | Bidirectional |
+| GPIO46 | e-Paper CS | SPI CS | Output |
+
+### Power Chain
+
+```
+USB-C (5V) ──►|── SS34 Schottky ── TP4056 Charger ── LiPo Battery
+                                         │
+                                    DW01A + FS8205A
+                                    (protection)
+                                         │
+                                    AMS1117-3.3 LDO
+                                         │
+                                      3.3V Rail
+                              ┌──────────┼──────────┐
+                           ESP32-S3   LIS2DH12   e-Paper
+```
+
+### Block Diagram
+
+```
+                    ┌─────────────────────────────────┐
+                    │        ESP32-S3-WROOM-1          │
+                    │       (WiFi + BLE 5.0)           │
+                    │                                   │
+     SPI (6 lines)  │  GPIO3,9,10,11,12,46            │
+  ┌─────────────────┤                                   │
+  │                 │  GPIO4-8         GPIO16,17,18     │
+  │                 │     │                 │           │
+  │                 │     │            I2C (2 lines)    │
+  │                 │  GPIO19,20            │           │
+  │                 └──────┬────────────────┼───────────┘
+  │                        │                │
+  ▼                        ▼                ▼
+e-Paper 2.13"        USB-C (OTG)      LIS2DH12TR
+(Waveshare)          J1               Accelerometer
+J3 (JST-SH 8p)                       U5
+
+                    5-Way Joystick
+                    SW1 (SKRHABE010)
+```
+
+For full component details, see the [Parts Sheets](../../../hardware-design/parts-sheets/README.md) and [BOM](../../../hardware-design/BOM.md).
+
+---
+
+## Breadboard Prototype — Pico W (Legacy)
+
+GPIO assignments and breadboard wiring for the Phase 1 test bench (Pico W).
 
 <figure markdown="span">
   ![Pico W with jumper wires connected to e-Paper display](../../assets/images/hardware/build-session/pico-w-gpio-wiring-top.jpg){ width="500" loading=lazy }
