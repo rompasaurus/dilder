@@ -219,8 +219,8 @@ The ESP32-S3 has a built-in USB-OTG peripheral — no external USB PHY or series
 | 6 | GPIO6 | Joystick LEFT | LEFT |
 | 7 | GPIO7 | Joystick RIGHT | LEFT |
 | 8 | GPIO15 | Joystick CENTER | LEFT |
-| 9 | GPIO16 | MPU-6050 SDA (I2C) | LEFT |
-| 10 | GPIO17 | MPU-6050 SCL (I2C) | LEFT |
+| 9 | GPIO16 | LIS2DH12TR SDA (I2C) | LEFT |
+| 10 | GPIO17 | LIS2DH12TR SCL (I2C) | LEFT |
 | 13 | GPIO19 | USB D- | LEFT |
 | 14 | GPIO20 | USB D+ | LEFT |
 | 15 | GPIO3 | e-Paper CLK (SPI) | BOTTOM |
@@ -235,9 +235,9 @@ The ESP32-S3 has a built-in USB-OTG peripheral — no external USB PHY or series
 
 - **LEFT side pins** → route to components on the LEFT and BELOW the module
 - **BOTTOM pins** → route straight down to the FPC connector below the module
-- **RIGHT side pins** → currently unused (available for future expansion: GPS, audio, etc.)
+- **RIGHT side pins** → currently unused (available for future expansion: audio, etc.)
 - Joystick and USB-C at BOTTOM of board → traces from LEFT pins run DOWN along the left edge
-- IMU (I2C) → place on LEFT side near pins 9-10
+- Accelerometer (I2C) → place on LEFT side near pins 9-10
 
 ---
 
@@ -304,7 +304,7 @@ For the Dilder prototype, **Option A (vertical header)** matches the existing Wa
 1. **ESP32 at top edge** — antenna overhangs or touches the board edge
 2. **No copper in antenna zone** — 15mm clear zone above module on ALL layers
 3. **FPC connector directly below module** — shortest path from BOTTOM pins to connector
-4. **IMU on LEFT** — near I2C pins (9-10) for short traces
+4. **Accelerometer on LEFT** — near I2C pins (9-10) for short traces
 5. **Power section BELOW FPC** — middle of board, away from RF
 6. **USB-C and joystick at BOTTOM** — user-facing, accessible in enclosure
 7. **Decoupling caps within 3mm** of every IC power pin
@@ -319,7 +319,7 @@ For the Dilder prototype, **Option A (vertical header)** matches the existing Wa
 │  [C3][C4]  ┌──────────────────┐              │
 │  [R10]     │  ESP32-S3-WROOM  │              │
 │            │     (U1)         │              │
-│  [U6 IMU]  │                  │    [C7][C9]  │
+│  [U6 ACCEL]│                  │    [C7][C9]  │
 │  [R4][R5]  └──────────────────┘              │
 │                                              │
 │  ┌────── 24-pin FPC (J3) ──────┐             │

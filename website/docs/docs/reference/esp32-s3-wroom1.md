@@ -219,8 +219,8 @@ The ESP32-S3 has a built-in USB-OTG peripheral — no external USB PHY or series
 | 6 | GPIO6 | Joystick LEFT | LEFT |
 | 7 | GPIO7 | Joystick RIGHT | LEFT |
 | 8 | GPIO15 | Joystick CENTER | LEFT |
-| 9 | GPIO16 | MPU-6050 SDA (I2C) | LEFT |
-| 10 | GPIO17 | MPU-6050 SCL (I2C) | LEFT |
+| 9 | GPIO16 | LIS2DH12TR SDA (I2C) | LEFT |
+| 10 | GPIO17 | LIS2DH12TR SCL (I2C) | LEFT |
 | 13 | GPIO19 | USB D- | LEFT |
 | 14 | GPIO20 | USB D+ | LEFT |
 | 15 | GPIO3 | e-Paper CLK (SPI) | BOTTOM |

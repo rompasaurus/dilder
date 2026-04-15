@@ -25,7 +25,7 @@ For a small prototype run of 5 boards with SMT assembly, JLCPCB comes out ahead:
 
 - **PCB fabrication:** ~$2 for 5 boards (yes, really)
 - **SMT assembly:** ~$8 setup + component costs
-- **Components:** ~$10-11 per board (the ESP32-S3 module and MPU-6050 are the big-ticket items)
+- **Components:** ~$4-5 per board (the ESP32-S3 module is the big-ticket item at $2.80; the LIS2DH12TR accelerometer is just $0.46)
 - **Total:** ~$35-50 for 5 assembled boards
 
 The catch is shipping from China (7-14 days). If you're in Europe, Aisler is interesting — more expensive per board but no customs delays or 19% VAT surprise.

@@ -30,14 +30,14 @@ Every net is connected via labeled wire stubs in the KiCad schematic:
 
 - **Power:** USB-C VBUS through SS34 Schottky to TP4056 charger, battery protection (DW01A + FS8205A), through AMS1117-3.3 LDO to the 3.3V rail that feeds everything
 - **E-Paper SPI:** GPIO9 (CLK), GPIO10 (MOSI), GPIO3 (DC), GPIO11 (RST), GPIO46 (CS), GPIO12 (BUSY) to the 8-pin JST-SH connector
-- **IMU I2C:** GPIO16 (SDA), GPIO17 (SCL) to MPU-6050 with 10k pull-ups
+- **Accelerometer I2C:** GPIO16 (SDA), GPIO17 (SCL) to LIS2DH12TR with 10k pull-ups
 - **Joystick:** GPIO4-8 for UP/DOWN/LEFT/RIGHT/CENTER, active LOW with internal pull-ups
 - **USB:** GPIO19 (D-) and GPIO20 (D+) wired directly to USB-C — no series resistors needed thanks to native USB-OTG
 - **EN:** 10k pull-up to keep the module running
 
 ## The BOM
 
-A full bill of materials is now tracked in `hardware-design/BOM.md` with LCSC part numbers for every component. Total cost per board: ~$10.60. The most expensive parts are the MPU-6050 IMU ($6.88) and the ESP32-S3 module ($2.80) — everything else is pennies.
+A full bill of materials is now tracked in `hardware-design/BOM.md` with LCSC part numbers for every component. Total cost per board: ~$4.18. The most expensive part is the ESP32-S3 module ($2.80) — the LIS2DH12TR accelerometer is just $0.46, and everything else is pennies.
 
 ## 11 Reference Designs
 

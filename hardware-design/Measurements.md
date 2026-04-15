@@ -23,5 +23,5 @@ USB-C connector (HRO TYPE-C-31-M-12):
 JST PH 2-pin battery connector:
     6mm x 4.5mm x 6mm
 
-MPU-6050 IMU (QFN-24):
-    4mm x 4mm x 0.9mm
+LIS2DH12TR Accelerometer (LGA-12):
+    2mm x 2mm x 1mm

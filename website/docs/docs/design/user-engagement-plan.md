@@ -947,7 +947,7 @@ Steps don't just give rewards — they continuously affect Dilder's mood:
 
 | Component | Part | Interface | Cost (USD) | Priority |
 |-----------|------|-----------|-----------|----------|
-| **Accelerometer/Pedometer** | LSM6DSO | I2C (0x6A) | ~$6 | High |
+| **Accelerometer/Pedometer** | LIS2DH12TR | I2C (0x18) | ~$0.46 | High |
 | **Capacitive Touch** | MPR121 (12-channel) | I2C (0x5A) | ~$4 | High |
 | **Ambient Light** | BH1750 | I2C (0x23) | ~$2 | High |
 | **Microphone** | MAX9814 (analog) | ADC (GP26) | ~$4 | High |
@@ -962,10 +962,10 @@ Steps don't just give rewards — they continuously affect Dilder's mood:
 
 | Tier | Components | Total Cost |
 |------|-----------|-----------|
-| **Essential** | LSM6DSO + MPR121 + BH1750 + MAX9814 + Battery + TP4056 | **~$22.50** |
-| **Recommended** | Essential + BME280 | **~$26.50** |
-| **Explorer** | Recommended + PA1010D + QMC5883L (treasure hunts) | **~$40.50** |
-| **Full** | Explorer + APDS-9960 + LIS3MDL upgrade | **~$49.50** |
+| **Essential** | LIS2DH12TR + MPR121 + BH1750 + MAX9814 + Battery + TP4056 | **~$16.96** |
+| **Recommended** | Essential + BME280 | **~$20.96** |
+| **Explorer** | Recommended + QMC5883L (compass, WiFi/BLE location) | **~$24.96** |
+| **Full** | Explorer + APDS-9960 + LIS3MDL upgrade | **~$33.96** |
 
 *Costs are for breakout boards from AliExpress/generic sources. Adafruit/SparkFun branded boards typically 2-3x more.*
 
@@ -991,7 +991,7 @@ All sensors on a single I2C bus with no address conflicts. Pico W's I2C1 availab
 |-----------|------------|-----------|
 | Pico W (WiFi off) | 30 | 0.8 |
 | E-ink display | 5 (refresh) / 0 (static) | 0 |
-| LSM6DSO (pedometer mode) | 0.02 | 0.003 |
+| LIS2DH12TR (pedometer mode) | 0.02 | 0.003 |
 | MPR121 | 0.03 | 0.003 |
 | BH1750 | 0.12 | 0.01 |
 | MAX9814 | 3.0 | 0 (power gate) |
@@ -1010,11 +1010,11 @@ If LSM6DSO is unavailable or too expensive:
 | Part | Cost | Built-in Pedometer? | Notes |
 |------|------|---------------------|-------|
 | **BMA400** | ~$4 | Yes | Ultra-low power (14uA with step counter). Best power efficiency. |
-| **MPU6050** | ~$2 | No (software needed) | Cheapest. Well-documented. Requires software step algorithm. |
+| **LIS2DH12TR** | ~$0.46 | Yes (built-in pedometer) | Cheapest. Built-in step counter, LGA-12 (2x2mm), ultra-low power. **Selected for Dilder BOM.** |
 | **LIS3DH** | ~$3 | No | Good low-power option. Hardware high-pass filter helps. |
 | **ADXL345** | ~$3 | No | Activity/inactivity detection assists pedometer logic. |
 
-**Recommendation**: LSM6DSO or BMA400 for built-in step counter. MPU6050 if budget-constrained (requires ~50 lines of step detection code).
+**Recommendation**: LIS2DH12TR selected for Dilder — $0.46, built-in pedometer, ultra-low power, smallest footprint (LGA-12, 2x2mm). LSM6DSO or BMA400 are alternatives if 6-axis IMU is needed later.
 
 ### Software Step Counting Algorithm (for chips without built-in pedometer)
 
@@ -1233,7 +1233,7 @@ A survey of 449 videogames using voice identified these categories:
 |-----------|----------|-----------|
 | **State machine complexity** | High | Hierarchical FSM — top level (life stage), mid (activity state), low (emotion) |
 | **Persistent storage** | High | Pico W flash wear leveling for stats/progress. Save every 5 min, not every tick. Use EEPROM-like library or flash filesystem (LittleFS). |
-| **Step counting accuracy** | Medium | Use LSM6DSO built-in pedometer (hardware). If software: tune threshold per user weight/gait. |
+| **Step counting accuracy** | Medium | Use LIS2DH12TR built-in pedometer (hardware). If software: tune threshold per user weight/gait. |
 | **WiFi geolocation latency** | Medium | Cache last-known location. Only re-resolve when WiFi environment changes significantly. |
 | **Emotion blending algorithm** | Medium | Weight-based priority system with hysteresis (don't flip-flop between emotions). Minimum dwell time per emotion (30 seconds). |
 | **Dialogue management** | Medium | Indexed quote arrays per mood/stage. Random selection with recency filter (don't repeat within last 10). |
@@ -1286,8 +1286,8 @@ A survey of 449 videogames using voice identified these categories:
 
 | Task | Hardware Needed |
 |------|----------------|
-| Integrate LSM6DSO step counter | LSM6DSO (~$6) |
-| Implement step milestone rewards | LSM6DSO |
+| Integrate LIS2DH12TR step counter | LIS2DH12TR (~$0.46, on-board) |
+| Implement step milestone rewards | LIS2DH12TR |
 | Implement WiFi geolocation for location awareness | Built-in WiFi |
 | Implement home detection and exploration tracking | WiFi |
 
@@ -1330,7 +1330,7 @@ A survey of 449 videogames using voice identified these categories:
 | Speech recognition (cloud API or local keyword spotting) | Pi Zero WH + mic |
 | Weather API integration | Pi Zero WH + internet |
 | OTA firmware updates | Pi Zero WH |
-| GPS location tracking (optional) | PA1010D (~$12) |
+| Enhanced location tracking (optional) | WiFi fingerprinting + BLE scanning (built-in) |
 | Web dashboard / companion app | Pi Zero WH + WiFi |
 | Social features (multiple Dilders interacting) | WiFi |
 

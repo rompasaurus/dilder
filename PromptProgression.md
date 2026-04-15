@@ -1945,3 +1945,38 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - Each folder has `ABOUT.md` with origin, backstory, feature comparison table, key takeaways, KiCad file listing, and links
   - `hardware-design/examples/INDEX.md` (created — master TOC with 3-tier relevance ranking, feature cross-reference table, usage guide)
   - Commit: `2e5e0a8`
+
+---
+
+## Prompt #151
+- **Date/Time:** 2026-04-15
+- **Prompt:** "The MPU-6050 accelerometer is a bit pricey — we really just want to track steps and aggressive motions. Price out GPS and brainstorm location detection. Ditch the GPS, go 3-axis LIS2DH12TR, put WiFi fingerprinting and BLE scanning on the software plan. Create a document, update hardware planning, pics, and pricing."
+- **Input Tokens (est):** ~200
+- **Output Tokens (est):** ~30,000
+- **Key Decision:** MPU-6050 ($6.88, 6-axis IMU) → LIS2DH12TR ($0.46, 3-axis accel + HW pedometer). GPS dropped — WiFi fingerprinting + BLE scanning (free, built into ESP32-S3) handle location. BOM total: $11.14 → $4.72/board.
+- **Files Created/Modified:**
+  - `docs/motion-location-detection.md` (created — 10-section plan: LIS2DH12 specs, HW pedometer, tap/shake/freefall/orientation, WiFi fingerprinting algo, BLE scanning, sensor→pet behavior map, power budget, GPS comparison, implementation phases)
+  - `website/docs/docs/design/motion-location-detection.md` (website copy)
+  - `website/docs/assets/images/components/lis2dh12-accelerometer.jpg` (created — LCSC product photo)
+  - `website/docs/assets/images/components/mpu-6050-imu.jpg` (deleted)
+  - `docs/pcb-assembly-and-prototyping.md` (modified — sensor swap, updated all BOM/cost tables)
+  - `website/docs/docs/design/pcb-assembly-and-prototyping.md` (synced)
+  - `hardware-design/pcb-design-plan.md` (modified — LIS2DH12 replaces MPU-6050, GPS dropped)
+  - `hardware-design/BOM.md` (modified — sensor swap, GPS removed, totals updated)
+  - `website/mkdocs.yml` (added Motion & Location Detection nav)
+  - `website/docs/docs/index.md` (added motion detection link)
+  - `PromptProgression.md` (#151), `website/docs/prompts/index.md` (#151)
+
+---
+
+## Prompt #152
+- **Date/Time:** 2026-04-15
+- **Prompt:** "Make a parts-sheets folder in hardware with an MD file for each component and import official datasheets into a manufacturer-datasheets subfolder."
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~15,000
+- **Files Created/Modified:**
+  - `hardware-design/parts-sheets/README.md` (created — index of all 11 component part sheets)
+  - 11 part sheet MD files: `esp32-s3-wroom1.md`, `lis2dh12.md`, `tp4056.md`, `dw01a.md`, `fs8205a.md`, `ams1117.md`, `ss34.md`, `skrhabe010.md`, `usb-c-connector.md`, `jst-ph-battery.md`, `led-red.md`, `led-green.md` (each with specs, pin connections, application notes, datasheet links)
+  - `hardware-design/parts-sheets/manufacturer-datasheets/ESP32-S3-WROOM-1-datasheet.pdf` (1.3MB, official Espressif)
+  - `PromptProgression.md` (#152), `website/docs/prompts/index.md` (#152)
+  - All changes committed and pushed

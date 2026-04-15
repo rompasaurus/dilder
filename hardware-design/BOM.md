@@ -11,7 +11,7 @@ ESP32-S3-WROOM-1-N16R8 design, 27 components, target fab: JLCPCB
 | U3 | DW01A (battery protection) | SOT-23-6 | C351410 | 1 | $0.05 |
 | Q1 | FS8205A (dual MOSFET) | SOT-23-6 | C908265 | 1 | $0.05 |
 | U4 | AMS1117-3.3 (3.3V LDO) | SOT-223-3 | C6186 | 1 | $0.05 |
-| U6 | MPU-6050 (6-axis IMU) | QFN-24 4x4mm | C24112 | 1 | $6.88 |
+| U6 | LIS2DH12TR (3-axis accelerometer) | LGA-12 2x2mm | C110926 | 1 | $0.46 |
 
 ## Connectors
 
@@ -58,7 +58,7 @@ ESP32-S3-WROOM-1-N16R8 design, 27 components, target fab: JLCPCB
 
 | Category | Cost/board |
 |----------|-----------|
-| Components (total) | ~$10.60 |
+| Components (total) | ~$4.18 |
 | PCB fabrication (5 boards) | ~$2.00 |
 | SMT assembly (5 boards) | ~$8.00 + parts |
 | **Estimated total (5 boards)** | **~$35-50** |
@@ -77,8 +77,8 @@ ESP32-S3-WROOM-1-N16R8 design, 27 components, target fab: JLCPCB
 | GPIO10 | EPD_MOSI | SPI |
 | GPIO11 | EPD_RST | Digital out |
 | GPIO12 | EPD_BUSY | Digital in |
-| GPIO16 | I2C SDA (MPU-6050) | I2C |
-| GPIO17 | I2C SCL (MPU-6050) | I2C |
+| GPIO16 | I2C SDA (LIS2DH12TR) | I2C |
+| GPIO17 | I2C SCL (LIS2DH12TR) | I2C |
 | GPIO19 | USB D- | USB-OTG |
 | GPIO20 | USB D+ | USB-OTG |
 | GPIO46 | EPD_CS | SPI CS |
@@ -90,7 +90,7 @@ Removed:
 - W25Q16JV external flash (16MB integrated in module)
 - 12MHz crystal + 2x 15pF load caps (integrated in module)
 - 2x 27R USB series resistors (ESP32-S3 native USB-OTG)
-- ATGM336H GPS module + decoupling cap (deferred to Phase 5)
+- ATGM336H GPS module + decoupling cap (dropped — using WiFi fingerprinting + BLE scanning)
 
 Added:
 - ESP32-S3-WROOM-1-N16R8 module (WiFi + BLE 5.0, 16MB flash, 8MB PSRAM)

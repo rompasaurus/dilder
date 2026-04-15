@@ -47,7 +47,7 @@ Which example to look at for each Dilder feature:
 | AMS1117-3.3 LDO | 04, 05, 08 |
 | USB-C connector | 01, 03, 04, 06, 08 |
 | Joystick / buttons | **02**, 09 |
-| MPU-6050 / IMU | 09 (sensors sheet) |
+| LIS2DH12TR / Accelerometer | 09 (sensors sheet) |
 | Compact PCB layout | 03, 06, 08 |
 | Hierarchical schematics | 07, 09, 10 |
 | Design revision history | **05** (4 revisions!) |

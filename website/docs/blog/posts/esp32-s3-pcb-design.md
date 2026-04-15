@@ -49,7 +49,7 @@ The full BOM came together around the ESP32-S3:
 | Component | Purpose |
 |-----------|---------|
 | ESP32-S3-WROOM-1-N16R8 | MCU — WiFi, BLE, flash, PSRAM |
-| MPU-6050 | 6-axis IMU (accelerometer + gyroscope) |
+| LIS2DH12TR | 3-axis accelerometer (built-in pedometer) |
 | AMS1117-3.3 | 3.3V LDO regulator |
 | TP4056 | LiPo charging IC (USB-C input) |
 | DW01A + FS8205A | Battery protection (over-discharge, over-current) |
@@ -61,14 +61,14 @@ The full BOM came together around the ESP32-S3:
 
 ### The Schematic
 
-The schematic was built in sections: power (USB-C to TP4056 charger to battery protection to AMS1117 LDO), MCU (ESP32-S3 with boot/reset buttons and USB data lines), peripherals (MPU-6050 on I2C, joystick on GPIO, ePaper connector with SPI signals). Net labels keep the schematic readable — no rats' nest of wires crossing the sheet.
+The schematic was built in sections: power (USB-C to TP4056 charger to battery protection to AMS1117 LDO), MCU (ESP32-S3 with boot/reset buttons and USB data lines), peripherals (LIS2DH12TR on I2C, joystick on GPIO, ePaper connector with SPI signals). Net labels keep the schematic readable — no rats' nest of wires crossing the sheet.
 
 ### Board Layout — Iteration After Iteration
 
 Layout is where the real decisions happen. We went through multiple placement iterations, optimizing based on signal flow, antenna requirements, and mechanical constraints:
 
 - **ESP32-S3 at the top** — antenna overhanging the board edge for best RF performance
-- **MPU-6050 below-left** — close to the MCU for clean I2C routing
+- **LIS2DH12TR below-left** — close to the MCU for clean I2C routing
 - **ePaper connector below-right** — 8-pin JST-SH header for the display ribbon cable
 - **Power section in the middle** — AMS1117, TP4056, battery protection clustered together
 - **5-way joystick centered above USB-C at the bottom** — ergonomic thumb position

@@ -2,7 +2,7 @@
 
 > Comprehensive research on manufacturing the Dilder custom PCB: provider comparison, assembly pricing breakdown, cost estimates, and open-source hardware designs that can serve as reference or starting points.
 
-**Board spec:** ESP32-S3-WROOM-1-N16R8, 4-layer, 45x80mm, ~27 components, SPI e-ink display, 5-way joystick, MPU-6050 IMU, TP4056 LiPo charger, USB-C.
+**Board spec:** ESP32-S3-WROOM-1-N16R8, 4-layer, 45x80mm, ~27 components, SPI e-ink display, 5-way joystick, LIS2DH12TR accelerometer, TP4056 LiPo charger, USB-C.
 
 ---
 
@@ -96,8 +96,8 @@ LiPo battery connector (SMD)<br/>
 ### Sensors
 
 <figure>
-  <img src="../website/docs/assets/images/components/mpu-6050-imu.jpg" width="200" />
-  <figcaption><strong>U5 — MPU-6050</strong><br/>6-axis accelerometer + gyroscope, I2C @ 0x68, QFN-24 (4×4mm), 3.3V<br/><a href="https://www.lcsc.com/product-detail/C24112.html">LCSC C24112</a> · <strong>$6.88</strong></figcaption>
+  <img src="../website/docs/assets/images/components/lis2dh12-accelerometer.jpg" width="200" />
+  <figcaption><strong>U5 — LIS2DH12TR</strong><br/>3-axis accelerometer, I2C, LGA-12 (2×2mm), built-in pedometer<br/><a href="https://www.lcsc.com/product-detail/C110926.html">LCSC C110926</a> · <strong>$0.46</strong></figcaption>
 </figure>
 
 ### Status LEDs
@@ -125,7 +125,7 @@ Charge complete indicator (from TP4056 STDBY)<br/>
 |-----|-------|---------|--------|-------|
 | R1 | 1.2kΩ | TP4056 charge current (~1A) | C25752 | $0.001 |
 | R2, R3 | 1kΩ | LED current limiting | C25585 | $0.001 |
-| R4, R5 | 10kΩ | I2C pull-ups (MPU-6050) | C25744 | $0.001 |
+| R4, R5 | 10kΩ | I2C pull-ups (LIS2DH12TR) | C25744 | $0.001 |
 | R6, R7 | 27Ω | USB D+/D- series resistors | — | $0.001 |
 | R8, R9 | 5.1kΩ | USB-C CC pins to GND | — | $0.001 |
 | R10 | 10kΩ | Pull-up/config | — | $0.001 |
@@ -339,20 +339,20 @@ Charge complete indicator (from TP4056 STDBY)<br/>
 | ESP32-S3-WROOM-1-N16R8 | $2.80 |
 | Power (TP4056, DW01A, FS8205A, AMS1117-3.3, SS34 diode) | $0.28 |
 | Input (SKRHABE010 Alps joystick) | $0.38 |
-| Sensors (MPU-6050) | $6.88 |
+| Sensors (LIS2DH12TR) | $0.46 |
 | Connectors (USB-C, JST PH 2-pin, 8-pin header) | $0.30 |
 | Passives (10x resistors, 9x caps, 2x LEDs) | $0.50 |
-| **Total BOM per board** | **~$11.14** |
+| **Total BOM per board** | **~$4.72** |
 
 ### Total Order Estimates (5 Assembled Boards)
 
 | Provider | PCB Fab | Assembly | Components | Shipping (DE) | **Total** | **Per Board** |
 |----------|---------|----------|------------|---------------|-----------|---------------|
-| **JLCPCB** | ~$10 | ~$15 | ~$56 | ~$15-20 (DHL) | **~$96-101** | **~$19-20** |
-| **PCBWay** | ~$20 | ~$35 | ~$56 | ~$15-20 | **~$126-131** | **~$25-26** |
-| **Aisler** (EU) | ~€20 | ~€134 | ~€50 | ~€5-10 | **~€209-214** | **~€42-43** |
-| **Seeed Fusion** | ~$30 | ~$25 | ~$56 | ~$15-20 | **~$126-131** | **~$25-26** |
-| **OSH Park** (fab only) | ~$84 | N/A (DIY) | ~$56 (self-source) | ~$10 | **~$150** | **~$50** (+ your soldering time) |
+| **JLCPCB** | ~$10 | ~$15 | ~$24 | ~$15-20 (DHL) | **~$64-69** | **~$13-14** |
+| **PCBWay** | ~$20 | ~$35 | ~$24 | ~$15-20 | **~$94-99** | **~$19-20** |
+| **Aisler** (EU) | ~€20 | ~€134 | ~€21 | ~€5-10 | **~€180-185** | **~€36-37** |
+| **Seeed Fusion** | ~$30 | ~$25 | ~$24 | ~$15-20 | **~$94-99** | **~$19-20** |
+| **OSH Park** (fab only) | ~$84 | N/A (DIY) | ~$24 (self-source) | ~$10 | **~$118** | **~$39** (+ your soldering time) |
 
 > **Notes:**
 >
@@ -489,7 +489,7 @@ These open-source hardware projects share significant overlap with the Dilder's 
 
 **JLCPCB** is the clear winner for the first prototype run:
 
-1. **Lowest cost:** ~$96-101 for 5 fully assembled boards ($19-20/board)
+1. **Lowest cost:** ~$64-69 for 5 fully assembled boards ($13-14/board)
 2. **Integrated workflow:** KiCad → JLCPCB Tools plugin → Gerber + BOM/CPL export → upload → order
 3. **Parts availability:** All Dilder BOM components are in-stock on LCSC with assigned part numbers
 4. **Speed:** 2-5 day fab + 3-5 day assembly + 5-7 day DHL to Germany = **~10-17 days total**

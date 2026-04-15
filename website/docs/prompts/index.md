@@ -1319,3 +1319,24 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Input Tokens (est):** ~80
 - **Output Tokens (est):** ~15,000
 - **Files:** `hardware-design/examples/` (11 open-source ESP32/ESP32-S3 KiCad projects: PocketMage PDA, Lilka console, Ducky e-paper, OLIMEX S3+ESP32 DevKit-LiPo, Unexpected Maker S3, WhirlingBits S3, esp-rs Rust board, BitwiseAjeet TP4056, KLP-5e sensor board, AeonLabs S3 template). Each with `ABOUT.md`. `hardware-design/examples/INDEX.md` (master TOC + cross-reference). Commit: `2e5e0a8`
+
+---
+
+## Prompt #151 — 2026-04-15
+
+**Prompt:** "The MPU-6050 is pricey — just need steps and shakes. Ditch GPS, go LIS2DH12TR, use WiFi fingerprinting + BLE for location. Create a motion/location document, update hardware planning, pics, and pricing."
+
+- **Input Tokens (est):** ~200
+- **Output Tokens (est):** ~30,000
+- **Key Decision:** MPU-6050 ($6.88) → LIS2DH12TR ($0.46). GPS dropped. BOM: $11.14 → $4.72/board.
+- **Files:** `docs/motion-location-detection.md` (created — 10-section plan: HW pedometer, WiFi fingerprinting, BLE scanning, sensor→pet behavior, power budget). `website/docs/docs/design/motion-location-detection.md` (website copy). `lis2dh12-accelerometer.jpg` (new), `mpu-6050-imu.jpg` (deleted). BOM/pricing docs updated across `pcb-assembly-and-prototyping.md`, `BOM.md`, `pcb-design-plan.md`. Website nav + index updated.
+
+---
+
+## Prompt #152 — 2026-04-15
+
+**Prompt:** "Make a parts-sheets folder with MD file for each component and import official datasheets."
+
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~15,000
+- **Files:** `hardware-design/parts-sheets/README.md` (index). 11 part sheet MDs: ESP32-S3, LIS2DH12, TP4056, DW01A, FS8205A, AMS1117, SS34, SKRHABE010, USB-C, JST PH, red/green LEDs. Each with specs, pin connections, application notes, datasheet links. `manufacturer-datasheets/ESP32-S3-WROOM-1-datasheet.pdf` (1.3MB Espressif official).

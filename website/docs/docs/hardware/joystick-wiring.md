@@ -379,7 +379,7 @@ The joystick wiring was designed to leave key interfaces free for planned periph
 | Future Peripheral | Interface | GPIO Pins | Status |
 |-------------------|-----------|-----------|--------|
 | GPS module (e.g., NEO-6M) | UART0 | GP0 (TX), GP1 (RX) | Available |
-| Accelerometer (e.g., MPU-6050) | I2C0 | GP16 (SDA), GP17 (SCL) | Available |
+| Accelerometer (LIS2DH12TR) | I2C0 | GP16 (SDA), GP17 (SCL) | Available |
 | External flash / MicroSD | SPI0 | GP16–GP19 | Available |
 | Piezo buzzer | PWM | GP15 | Reserved (Phase 7) |
 | Battery monitoring | ADC | GP29 (ADC3) | Available |

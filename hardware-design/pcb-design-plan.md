@@ -127,11 +127,11 @@ All components selected for JLCPCB SMT assembly availability. LCSC part numbers 
 
 | Component | Part | LCSC # | Package | Price (ea.) | Notes |
 |-----------|------|--------|---------|-------------|-------|
-| Accelerometer/Gyro | MPU-6050 | C24112 | QFN-24 (4x4mm) | ~$6.88 | 6-axis IMU, I2C (0x68/0x69), 3.3V |
+| Accelerometer | LIS2DH12TR | C110926 | LGA-12 (2x2mm) | ~$0.46 | 3-axis accelerometer, I2C, built-in pedometer |
 
-- MPU-6050: I2C on GPIO16 (SDA) + GPIO17 (SCL)
+- LIS2DH12TR: I2C on GPIO16 (SDA) + GPIO17 (SCL)
 
-> **GPS dropped for v1:** The ATGM336H-5N31 has been removed from the initial board revision to simplify the design. WiFi-based location or GPS can be added in a future revision.
+> **GPS dropped:** The ATGM336H-5N31 has been removed. Location detection uses WiFi fingerprinting and BLE scanning (built into the ESP32-S3).
 
 ### Passive Components
 
@@ -151,9 +151,9 @@ All components selected for JLCPCB SMT assembly availability. LCSC part numbers 
 | ESP32-S3-WROOM-1-N16R8 | ~$2.80 |
 | Power (TP4056, protection, LDO) | ~$0.28 |
 | Input (joystick switch) | ~$0.38 |
-| Sensors (MPU-6050) | ~$6.88 |
+| Sensors (LIS2DH12TR) | ~$0.46 |
 | Connectors + passives | ~$0.80 |
-| **Total per board** | **~$11.14** |
+| **Total per board** | **~$4.72** |
 | PCB fabrication (5 boards) | ~$2.00 |
 | SMT assembly (5 boards) | ~$8.00 setup + parts |
 | Shipping to Germany | ~$15-25 (DHL) |
@@ -175,7 +175,7 @@ All components selected for JLCPCB SMT assembly availability. LCSC part numbers 
            │        │                                              │
            │        │ GPIO4-8 ◀────────── 5-Way Joystick           │
            │        │                                              │
-           │        │ I2C (GPIO16/17) ◀────── MPU-6050             │
+           │        │ I2C (GPIO16/17) ◀────── LIS2DH12TR           │
            │        │                                              │
            │        │ ADC ◀──── VSYS/3 (batt monitor)              │
            │        │                                              │
@@ -202,8 +202,8 @@ All components selected for JLCPCB SMT assembly availability. LCSC part numbers 
 | GPIO10 | e-Paper MOSI | SPI MOSI | Out |
 | GPIO11 | e-Paper RST | Digital | Out |
 | GPIO12 | e-Paper BUSY | Digital | In |
-| GPIO16 | MPU-6050 SDA | I2C SDA | Bidir |
-| GPIO17 | MPU-6050 SCL | I2C SCL | Bidir |
+| GPIO16 | LIS2DH12TR SDA | I2C SDA | Bidir |
+| GPIO17 | LIS2DH12TR SCL | I2C SCL | Bidir |
 | GPIO19 | USB D- | USB | Bidir |
 | GPIO20 | USB D+ | USB | Bidir |
 | GPIO46 | e-Paper CS | SPI CS | Out |
@@ -218,7 +218,7 @@ Components for the updated schematic:
 | U2 | TP4056 | TP4056 (local) | C382139 |
 | U3 | DW01A | DW01A (local) | C351410 |
 | U4 | AMS1117-3.3 | AMS1117-3.3 (local) | C6186 |
-| U5 | MPU-6050 | MPU-6050 (local) | C24112 |
+| U5 | LIS2DH12TR | LIS2DH12TR (local) | C110926 |
 | Q1 | FS8205A | FS8205A (local) | C908265 |
 | D1 | SS34 | D_Schottky (local) | C8678 |
 | SW1 | SKRHABE010 | SKRHABE010 (local) | C139794 |
@@ -285,15 +285,14 @@ kicad 'hardware-design/Board Design kicad/dilder.kicad_pro'
    - J3 BUSY → U1 GPIO12
    - J3 VCC → 3V3, J3 GND → GND
 
-7. **Wire the MPU-6050** (right side):
+7. **Wire the LIS2DH12TR** (right side):
    - U5 SDA → U1 GPIO16 (I2C SDA)
    - U5 SCL → U1 GPIO17 (I2C SCL)
    - R4 (10k) from SDA to 3V3, R5 (10k) from SCL to 3V3 — I2C pull-ups
-   - U5 VDD → 3V3, U5 VLOGIC → 3V3
-   - U5 GND → GND, U5 AD0 → GND (I2C address 0x68)
-   - U5 FSYNC → GND, U5 CLKIN → GND
-   - C6 (100nF) from VDD to GND, C7 (100nF) from REGOUT to GND
-   - U5 INT → leave unconnected (or route to spare GPIO for interrupt-driven reads)
+   - U5 VDD_I/O → 3V3, U5 VDD → 3V3
+   - U5 GND → GND, U5 SDO/SA0 → GND (I2C address 0x18)
+   - C6 (100nF) from VDD to GND, C7 (100nF) from VDD_I/O to GND
+   - U5 INT1 → leave unconnected (or route to spare GPIO for interrupt-driven reads)
 
 8. **Add power symbols** — place VCC/GND power flags on the power nets
 
@@ -306,7 +305,7 @@ For a cleaner layout, consider splitting into sub-sheets:
 1. **MCU** — ESP32-S3-WROOM-1, decoupling, USB
 2. **Power** — USB-C input, TP4056, battery protection, LDO, power path
 3. **Input/Output** — 5-way joystick, e-Paper header, status LEDs
-4. **Sensors** — MPU-6050 (I2C)
+4. **Sensors** — LIS2DH12TR (I2C)
 
 ---
 
@@ -344,7 +343,7 @@ For a cleaner layout, consider splitting into sub-sheets:
    │ [U1 ESP32-S3-WROOM-1]  │  ← module (18x25.5mm), keep
    │                        │    antenna area clear at top
    │                        │
-   │ [U5 MPU-6050]          │
+   │ [U5 LIS2DH12TR]        │
    │                        │
    │ [SW1 Joystick]         │
    │                        │
@@ -369,7 +368,7 @@ For a cleaner layout, consider splitting into sub-sheets:
 
 5. **Route remaining signals**:
    - SPI to e-Paper header (GPIO3/46/9/10/11/12)
-   - I2C to MPU-6050 (GPIO16/17)
+   - I2C to LIS2DH12TR (GPIO16/17)
    - Joystick GPIO4-8
 
 6. **Add copper pours**:
@@ -468,11 +467,11 @@ For a cleaner layout, consider splitting into sub-sheets:
 - Combined with DW01A provides complete charging + protection
 - No boost converter needed (VSYS accepts 3.7V directly)
 
-### Why no GPS in v1?
+### Why no GPS?
 
-- ATGM336H-5N31 dropped to simplify the initial board revision
-- WiFi-based location (via ESP32-S3) can serve as a rough alternative
-- GPS can be added in a future revision via spare UART pins
+- ATGM336H-5N31 dropped entirely
+- Location detection uses WiFi fingerprinting and BLE scanning (built into the ESP32-S3)
+- No additional hardware needed for location awareness
 
 ---
 
