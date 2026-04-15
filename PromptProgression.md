@@ -2148,3 +2148,70 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `Gamplay Planning/13-feature-menus-achievements.md` (from Prompt #161)
   - Hardware changes from earlier session: KiCad schematic/PCB updates (AHT20+BH1750 sensors added), BOM updates, board-design-v04 updates, wiring-pinout updates, materials-list updates, KiCad lib tables, ERC report
   - `PromptProgression.md` (updated — added Prompts #161, #162)
+
+---
+
+## Prompt #163
+- **Date/Time:** 2026-04-15
+- **Prompt:** "This board is not good at all. Things are drawn off the board, you don't have the microcontroller in there, not sure this is salvageable. Also the schematic is not wired up properly and you didn't pull actual schematics that already exist via addon."
+- **Input Tokens (est):** ~60
+- **Output Tokens (est):** ~80,000
+- **Files Created/Modified:**
+  - `hardware-design/Board Design kicad/sym-lib-table` (created — Espressif symbol library registration)
+  - `hardware-design/Board Design kicad/fp-lib-table` (created — Espressif footprint library registration)
+  - `hardware-design/Board Design kicad/generate_schematic_v2.py` (created — schematic generator using real KiCad library symbols and footprints)
+  - `hardware-design/Board Design kicad/dilder.kicad_sch` (regenerated — 27 components with correct pin mappings, real footprint references, net label wiring)
+  - `hardware-design/Board Design kicad/dilder.kicad_pcb` (regenerated — 27 real footprints from KiCad standard libraries, 4-layer board with zone pours, 101 net assignments, 43 stitching vias)
+
+---
+
+## Prompt #164
+- **Date/Time:** 2026-04-15
+- **Prompt:** "This is bad. I need to do this manually obviously. Give me an MD user document instead and explain it to me as if this is my first time using CAD software. I need an extensive how-to document on how to design schematics, best practices, guide me through each component and how to draw it properly and how to account for the wiring of each. Then I will need an in-depth PCB walkthrough, exhaustive as possible with a huge list of steps that I can follow one by one until completion. Expound on the important electronics principles behind it when necessary and provide further resources and learning material at the end, and definitions as well."
+- **Input Tokens (est):** ~120
+- **Output Tokens (est):** ~45,000
+- **Files Created/Modified:**
+  - `website/docs/docs/design/kicad-schematic-pcb-guide.md` (created — 1,300-line beginner-to-gerber KiCad guide: 5 parts, 13 schematic subcircuits, 10 PCB layout sections, electronics principles reference, 40+ term glossary, learning resources)
+  - `website/mkdocs.yml` (modified — added KiCad guide to Design nav)
+
+---
+
+## Prompt #165
+- **Date/Time:** 2026-04-15
+- **Prompt:** "Let's add a light and temp and humidity sensor to the list of hardware requirements. Find the best part or parts to do this as well. Ensure it will work with the controller we have planned to use, then add it to the docs and the planning and pull in the datasheet and create an MD doc for it following the parts sheets that exist format."
+- **Input Tokens (est):** ~70
+- **Output Tokens (est):** ~60,000
+- **Files Created/Modified:**
+  - `hardware-design/parts-sheets/aht20.md` (created — 436-line parts sheet: AHT20 temp/humidity sensor, capacitive sensing physics, comparison table, I2C bus sharing)
+  - `hardware-design/parts-sheets/bh1750fvi.md` (created — 487-line parts sheet: BH1750FVI-TR ambient light sensor, photodiode theory, lux reference, operating modes)
+  - `hardware-design/parts-sheets/manufacturer-datasheets/DOWNLOAD-GUIDE.md` (modified — added AHT20 and BH1750 datasheet links)
+  - `hardware-design/board-design-v04.md` (modified — BOM +U6/U7, GPIO table, Zone D, cost $5.20)
+  - `hardware-design/BOM.md` (modified — +U7 AHT20, +U8 BH1750, +C10/C11, cost $5.12)
+  - `hardware-design/parts-sheets/README.md` (modified — +2 sensor entries, count 27→31)
+  - `website/docs/docs/hardware/materials-list.md` (modified — +U6/U7 rows)
+  - `website/docs/docs/hardware/wiring-pinout.md` (modified — I2C address map, 3-sensor block diagram)
+  - `website/docs/docs/design/board-design.md` (modified — 30 components, Zone D sensors, ASCII layout)
+  - `website/docs/docs/design/kicad-schematic-pcb-guide.md` (modified — added sections 2.9 AHT20 and 2.10 BH1750)
+  - `README.md` (modified — 30 components, sensor list)
+  - `PromptProgression.md` (updated)
+
+---
+
+## Prompt #166
+- **Date/Time:** 2026-04-15
+- **Prompt:** "Pull the pictures for this component and update the hardware plan and website documents. Also update the prompts and all relevant documentation."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~20,000
+- **Files Created/Modified:**
+  - All sensor documentation verified and cross-referenced across 12 files (see Prompt #165 for full list)
+  - `PromptProgression.md` (updated — spelling/grammar cleanup, added Prompts #163-167)
+
+---
+
+## Prompt #167
+- **Date/Time:** 2026-04-15
+- **Prompt:** "Add that board design guide you made to the website docs and commit last change and update the prompts. Also be sure to clean up the spelling and grammar in the prompt progression as well."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~5,000
+- **Files Created/Modified:**
+  - `PromptProgression.md` (modified — spelling/grammar cleanup across all 167 entries, added Prompts #163-167)
