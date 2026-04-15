@@ -1350,3 +1350,24 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Input Tokens (est):** ~100
 - **Output Tokens (est):** ~40,000
 - **Files:** Rewrote all 12 existing parts sheets from scratch with TOCs, technology deep-dives (MEMS physics, MOSFET operation, CC/CV charging, Schottky junctions, MLCC construction, LED photon emission, I2C/SPI protocols, USB-C negotiation), history, and cited sources. Created 3 new sheets: `jst-sh-epaper.md`, `resistors-0402.md`, `capacitors-0402.md`. Added `manufacturer-datasheets/DOWNLOAD-GUIDE.md`. Updated `wiring-pinout.md` (ESP32-S3 GPIO table + block diagram) and `materials-list.md` (ESP32-S3 BOM section). Commit: `12829d6`
+
+---
+
+## Prompt #154 — 2026-04-15
+
+**Prompt:** "Create a breadboard prototype guide with EU/US sourcing and alpha board plans."
+
+- **Input Tokens (est):** ~80
+- **Output Tokens (est):** ~20,000
+- **Files:** `hardware-design/breadboard-prototype-guide.md` (created — 7 ESP32-S3 dev board options, GPIO wiring map matching custom PCB, breadboard assembly steps, shopping lists optimized for German/EU retailers: Botland, Eckstein, BerryBase, Olimex, EXP-Tech, Amazon). Three compact alpha board approaches: Feather stack, protoboard solder build, 3D-printed bracket with Olimex DevKit-Lipo. `.gitignore` updated for `.history/` dirs. Commit: `a5aec52`
+
+---
+
+## Prompt #155 — 2026-04-15
+
+**Prompt:** "Continue where you left off — look at the staged changes and the planning and go from there."
+
+- **Input Tokens (est):** ~150
+- **Output Tokens (est):** ~60,000
+- **Key Work:** PCB routing (Phase 4). Wrote `route_v04.py` — a 4-layer router for the v0.4 board using B.Cu vertical channels for long signals, staggered B.Cu L-routes for ePaper/joystick (crossing-free), custom routes for USB/EN/BOOT/battery protection, and F.Cu for power chain and local nets. Added In1.Cu GND plane and In2.Cu 3V3 plane. Iteratively fixed channel collisions (EN vs I2C_SDA), VBUS path crossings, and 3V3 via placement. Created comprehensive board design document.
+- **Files:** `hardware-design/Board Design kicad/route_v04.py` (created — v0.4 router, ~400 lines). `hardware-design/Board Design kicad/build_esp32s3.py` (modified — regenerated placement). `hardware-design/Board Design kicad/dilder.kicad_pcb` (routed board). `hardware-design/board-design-v04.md` (created — complete board design document with BOM, zones, GPIO map, routing strategy, DRC status, fab workflow). KiCad project files updated (`.kicad_prl`, `.kicad_pro`, `.kicad_sch`). `website/docs/prompts/index.md` (updated with Prompts #154-155).
