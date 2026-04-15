@@ -1919,17 +1919,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#touch-petting-mpr121-capacitive-touch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Touch / Petting (MPR121 Capacitive Touch)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#microphone-interactions-max9814-analog-mic" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3267,6 +3256,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../software/firmware-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firmware Game Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../software/emotion-states/" class="md-nav__link">
         
   
@@ -4191,17 +4208,6 @@
   
     <nav class="md-nav" aria-label="6. User Interactions — Physical (Sensors)">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#touch-petting-mpr121-capacitive-touch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Touch / Petting (MPR121 Capacitive Touch)
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#microphone-interactions-max9814-analog-mic" class="md-nav__link">
@@ -5362,7 +5368,7 @@
 <h3 id="the-micro-loop-every-1-5-minutes">The Micro-Loop (Every 1-5 Minutes)<a class="headerlink" href="#the-micro-loop-every-1-5-minutes" title="Permanent link">&para;</a></h3>
 <p>Each tick (configurable, default 60 seconds):
 1. Decay stats (hunger, happiness, energy, hygiene)
-2. Read sensor inputs (light, sound, motion, touch, temp)
+2. Read sensor inputs (light, sound, motion, temp)
 3. Evaluate emotional state based on stats + sensor context
 4. Update display if state changed
 5. Check for trigger events (thresholds, time-based, environmental)
@@ -5370,7 +5376,7 @@
 <h3 id="the-engagement-loop-hourlysession">The Engagement Loop (Hourly/Session)<a class="headerlink" href="#the-engagement-loop-hourlysession" title="Permanent link">&para;</a></h3>
 <ol>
 <li>User checks on Dilder → sees current state</li>
-<li>Takes an action (feed, pet, play, talk)</li>
+<li>Takes an action (feed, interact, play, talk)</li>
 <li>Sees immediate response (mood shift, animation, dialogue)</li>
 <li>Gets feedback on progress (XP, stat bars, unlock hints)</li>
 <li>Leaves with anticipation (what will happen next? will it evolve?)</li>
@@ -5400,7 +5406,7 @@
 <td><strong>Happiness</strong></td>
 <td>0-100</td>
 <td>-1/15min</td>
-<td>Pet, play, talk, walk</td>
+<td>Interact, play, talk, walk</td>
 <td>&lt;20 → Sad mood</td>
 </tr>
 <tr>
@@ -5578,7 +5584,7 @@
 <tr>
 <td><strong>Chaotic</strong></td>
 <td>Rapidly changing inputs, conflicting stats</td>
-<td>Shaken + loud noise + touch</td>
+<td>Shaken + loud noise + tap</td>
 </tr>
 <tr>
 <td><strong>Weird</strong></td>
@@ -5634,7 +5640,7 @@
 <td>Startled → brief Excited or Angry; sustained → Annoyed</td>
 </tr>
 <tr>
-<td><strong>Gentle touch</strong></td>
+<td><strong>Gentle interaction</strong></td>
 <td>+happiness, calming effect</td>
 </tr>
 <tr>
@@ -5716,7 +5722,7 @@
 </tr>
 <tr>
 <td><strong>C (Action)</strong></td>
-<td>Context action (feed/pet/play)</td>
+<td>Context action (feed/interact/play)</td>
 <td>Scold</td>
 <td>Quick status view</td>
 </tr>
@@ -5760,49 +5766,6 @@
 </ul>
 <hr />
 <h2 id="6-user-interactions-physical-sensors">6. User Interactions — Physical (Sensors)<a class="headerlink" href="#6-user-interactions-physical-sensors" title="Permanent link">&para;</a></h2>
-<h3 id="touch-petting-mpr121-capacitive-touch">Touch / Petting (MPR121 Capacitive Touch)<a class="headerlink" href="#touch-petting-mpr121-capacitive-touch" title="Permanent link">&para;</a></h3>
-<p>Multiple touch zones on the octopus enclosure:</p>
-<table>
-<thead>
-<tr>
-<th>Zone</th>
-<th>Touch Effect</th>
-<th>Location on Case</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Head</strong></td>
-<td>+happiness (petting), calming</td>
-<td>Top of device</td>
-</tr>
-<tr>
-<td><strong>Side (left)</strong></td>
-<td>Tickle → brief Excited/Slap Happy</td>
-<td>Left panel</td>
-</tr>
-<tr>
-<td><strong>Side (right)</strong></td>
-<td>Tickle → brief Excited/Slap Happy</td>
-<td>Right panel</td>
-</tr>
-<tr>
-<td><strong>Back</strong></td>
-<td>Comfort → reduces Sad/Homesick faster</td>
-<td>Rear of device</td>
-</tr>
-<tr>
-<td><strong>Sustained hold</strong></td>
-<td>Maximum comfort. Dilder "purrs" (happy animation)</td>
-<td>Any zone, 5+ seconds</td>
-</tr>
-<tr>
-<td><strong>Rapid tapping</strong></td>
-<td>Annoyance → Angry if overdone</td>
-<td>Any zone</td>
-</tr>
-</tbody>
-</table>
 <h3 id="microphone-interactions-max9814-analog-mic">Microphone Interactions (MAX9814 Analog Mic)<a class="headerlink" href="#microphone-interactions-max9814-analog-mic" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -6095,7 +6058,7 @@
 <h2 id="8-life-stages-evolution">8. Life Stages &amp; Evolution<a class="headerlink" href="#8-life-stages-evolution" title="Permanent link">&para;</a></h2>
 <h3 id="life-stage-progression">Life Stage Progression<a class="headerlink" href="#life-stage-progression" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Stage 1: EGG          (Age 0-1 day)
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>   │ Hatches after warmth (touch), patience, gentle interaction
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>   │ Hatches after warmth (AHT20 temperature sensor), patience, gentle interaction
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>   ▼
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>Stage 2: HATCHLING    (Age 1-3 days)
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>   │ Tiny octopus, very needy, limited expressions
@@ -6188,8 +6151,8 @@
 <tbody>
 <tr>
 <td><strong>Egg</strong></td>
-<td>Warmth (touch)</td>
-<td>Must be held/touched periodically</td>
+<td>Warmth (AHT20 temperature sensor)</td>
+<td>Must be kept warm periodically</td>
 <td>Delayed hatching</td>
 </tr>
 <tr>
@@ -6219,7 +6182,7 @@
 <tr>
 <td><strong>Elder</strong></td>
 <td>Comfort + Routine</td>
-<td>Prefers familiar locations, gentle touch</td>
+<td>Prefers familiar locations, gentle interaction</td>
 <td>Accelerated aging</td>
 </tr>
 </tbody>
@@ -6242,7 +6205,7 @@
 <td>Care</td>
 </tr>
 <tr>
-<td>Pet (touch)</td>
+<td>Tap (interact)</td>
 <td>+2</td>
 <td>Bond</td>
 </tr>
@@ -6306,7 +6269,7 @@
 <tr>
 <td><strong>2: Acquaintance</strong></td>
 <td>100</td>
-<td>Petting response, more expressions</td>
+<td>Tap response, more expressions</td>
 </tr>
 <tr>
 <td><strong>3: Companion</strong></td>
@@ -6439,7 +6402,7 @@
 <td>"...that was loud. Are you okay?"</td>
 </tr>
 <tr>
-<td>After gentle sustained petting</td>
+<td>After gentle sustained interaction</td>
 <td>"Mmm... keep doing that. Eight arms of relaxation."</td>
 </tr>
 <tr>
@@ -7248,13 +7211,6 @@
 <td>High</td>
 </tr>
 <tr>
-<td><strong>Capacitive Touch</strong></td>
-<td>MPR121 (12-channel)</td>
-<td>I2C (0x5A)</td>
-<td>~$4</td>
-<td>High</td>
-</tr>
-<tr>
 <td><strong>Ambient Light</strong></td>
 <td>BH1750</td>
 <td>I2C (0x23)</td>
@@ -7324,13 +7280,13 @@
 <tbody>
 <tr>
 <td><strong>Essential</strong></td>
-<td>LIS2DH12TR + MPR121 + BH1750 + MAX9814 + Battery + TP4056</td>
-<td><strong>~$16.96</strong></td>
+<td>LIS2DH12TR + BH1750 + MAX9814 + Battery + TP4056</td>
+<td><strong>~$12.96</strong></td>
 </tr>
 <tr>
 <td><strong>Recommended</strong></td>
 <td>Essential + AHT20</td>
-<td><strong>~$17.39</strong></td>
+<td><strong>~$13.39</strong></td>
 </tr>
 <tr>
 <td><strong>Explorer</strong></td>
@@ -7350,11 +7306,10 @@
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>  ├── 0x10  PA1010D (GPS)
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>  ├── 0x23  BH1750  (Light)
 </span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>  ├── 0x39  APDS-9960 (Gesture)
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>  ├── 0x5A  MPR121  (Touch)
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>  ├── 0x6A  LSM6DSO (Accel/Gyro/Pedometer)
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>  └── 0x38  AHT20   (Temp/Humidity)
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
-</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>ADC (GP26): MAX9814 microphone analog output
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>  ├── 0x6A  LSM6DSO (Accel/Gyro/Pedometer)
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>  └── 0x38  AHT20   (Temp/Humidity)
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>ADC (GP26): MAX9814 microphone analog output
 </span></code></pre></div>
 <p>All sensors on a single I2C bus with no address conflicts. Pico W's I2C1 available as backup if needed.</p>
 <h3 id="power-budget">Power Budget<a class="headerlink" href="#power-budget" title="Permanent link">&para;</a></h3>
@@ -7380,11 +7335,6 @@
 <tr>
 <td>LIS2DH12TR (pedometer mode)</td>
 <td>0.02</td>
-<td>0.003</td>
-</tr>
-<tr>
-<td>MPR121</td>
-<td>0.03</td>
 <td>0.003</td>
 </tr>
 <tr>
@@ -7537,7 +7487,7 @@
 <li><strong>Voice recognition</strong>: Microphone teaches dogs their name and tricks ("sit," "roll over"). Adapted to multiple languages and accents.</li>
 <li><strong>23.96 million copies sold</strong> — demonstrated massive market for interactive pet simulation.</li>
 </ul>
-<p><strong>Relevance to Dilder</strong>: The capacitive touch zones directly mirror Nintendogs' touch interaction model. The voice element validates mic input as engaging.</p>
+<p><strong>Relevance to Dilder</strong>: The physical tap interaction (via accelerometer) mirrors Nintendogs' touch concept. The voice element validates mic input as engaging.</p>
 <h3 id="creatures-1996-artificial-life-game">Creatures (1996 Artificial Life Game)<a class="headerlink" href="#creatures-1996-artificial-life-game" title="Permanent link">&para;</a></h3>
 <p>The most technically sophisticated virtual pet:
 - <strong>Neural network brain</strong>: 952 neurons in 9 lobes, ~5,000 connections
@@ -7641,11 +7591,6 @@
 <td>Defer to WiFi geolocation; GPS only on Phase 5 with larger battery</td>
 </tr>
 <tr>
-<td><strong>Capacitive touch through case</strong></td>
-<td>Medium</td>
-<td>Test sensitivity per case material; adjustable thresholds in MPR121 registers</td>
-</tr>
-<tr>
 <td><strong>Sensor wiring in small enclosure</strong></td>
 <td>Medium</td>
 <td>Use Qwiic/STEMMA QT connectors for I2C daisy chain; design PCB in Phase 5</td>
@@ -7747,7 +7692,7 @@
 <tr>
 <td><strong>Sensor data overwhelming the game loop</strong></td>
 <td>Medium</td>
-<td>Sample sensors on different tick intervals: touch (every tick), sound (every 100ms), light (every 5s), temp (every 60s), steps (hardware counter, read every 10s).</td>
+<td>Sample sensors on different tick intervals: sound (every 100ms), light (every 5s), temp (every 60s), steps (hardware counter, read every 10s).</td>
 </tr>
 <tr>
 <td><strong>Scope creep</strong></td>
@@ -7777,7 +7722,7 @@
 <td>Stat system</td>
 </tr>
 <tr>
-<td>Implement care actions via serial/GPIO buttons (feed, pet, clean, sleep)</td>
+<td>Implement care actions via serial/GPIO buttons (feed, interact, clean, sleep)</td>
 <td>Input system (Phase 2)</td>
 </tr>
 <tr>
@@ -7811,10 +7756,6 @@
 <tr>
 <td>Integrate BH1750 light sensor → sleep/wake mechanics</td>
 <td>BH1750 (~$2)</td>
-</tr>
-<tr>
-<td>Integrate MPR121 touch → petting/interaction</td>
-<td>MPR121 (~$4)</td>
 </tr>
 <tr>
 <td>Integrate MAX9814 mic → volume-based reactions</td>
@@ -8009,7 +7950,6 @@
 <li>Raspberry Pi Pico W — https://datasheets.raspberrypi.com/picow/pico-w-datasheet.pdf</li>
 <li>RP2040 — https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf</li>
 <li>LSM6DSO — https://www.st.com/en/mems-and-sensors/lsm6dso.html</li>
-<li>MPR121 — https://www.adafruit.com/product/1982</li>
 <li>BH1750 — https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf</li>
 <li>MAX9814 — https://www.adafruit.com/product/1713</li>
 <li>AHT20 — https://www.adafruit.com/product/4566</li>
