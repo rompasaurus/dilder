@@ -94,7 +94,7 @@ Each phase maps to a section of the blog/YouTube series and can be followed inde
 - [x] Implement serial command input for interactive mood control
 - [x] Wire and test GPIO joystick input (DollaTek 5-way, GP2–GP6)
 - [x] Joystick Mood Selector firmware with on-screen input indicator
-- [ ] **Custom PCB design (in progress)** — switched MCU from RP2040 to ESP32-S3-WROOM-1-N16R8 (WiFi+BLE, 16MB flash, 8MB PSRAM). 4-layer board (45x80mm, 27 components) in KiCad, ready for routing. Target fab: JLCPCB.
+- [ ] **Custom PCB design (in progress)** — switched MCU from RP2040 to ESP32-S3-WROOM-1-N16R8 (WiFi+BLE, 16MB flash, 8MB PSRAM). 4-layer board (45x80mm, 30 components) in KiCad, ready for routing. Target fab: JLCPCB. Sensors: LIS2DH12TR (accelerometer), AHT20 (temperature/humidity), BH1750FVI-TR (ambient light) on shared I2C bus.
 - [ ] Battery power (LiPo on VSYS) — InnCraft 1000mAh acquired
 - [ ] Build game loop with state machine (idle, interact, sleep)
 

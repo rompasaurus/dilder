@@ -30,10 +30,10 @@ Complete design document for the Dilder custom PCB, covering placement, routing,
 | Board size | 30 x 70 mm |
 | Layers | 4 (F.Cu, In1.Cu, In2.Cu, B.Cu) |
 | Thickness | 1.6 mm |
-| Components | 28 unique (30 placed incl. duplicates) |
+| Components | 30 unique (34 placed incl. duplicates) |
 | Nets | 34 |
 | Pad connections | 125 |
-| BOM cost | ~$4.26/board |
+| BOM cost | ~$5.20/board |
 | Target fab | JLCPCB (SMT assembly) |
 
 ```
@@ -103,8 +103,10 @@ No copper on any layer. The ESP32-S3-WROOM-1 module antenna extends above the bo
 ### Zone D — Peripherals (y=42-54mm)
 
 - **U5** LIS2DH12TR accelerometer at (6, 47), LGA-12 2x2mm
+- **U6** AHT20 temp/humidity at (6, 52), DFN-6 3x3mm
+- **U7** BH1750FVI light sensor at (13, 52), WSOF-6 3x1.6mm
 - **J3** ePaper 8-pin JST-SH at (23, 47)
-- R4, R5 I2C pull-ups; C7 accel decoupling
+- R4, R5 I2C pull-ups; C7, C9, C10 sensor decoupling
 - **SW2** BOOT button at (8, 52)
 - **SW3** RESET button at (22, 52)
 - C8 EN debounce cap at (26, 52)
@@ -136,8 +138,8 @@ No copper on any layer. The ESP32-S3-WROOM-1 module antenna extends above the bo
 | GPIO10 | e-Paper MOSI | EPD_MOSI | SPI MOSI | Out |
 | GPIO11 | e-Paper RST | EPD_RST | Digital | Out |
 | GPIO12 | e-Paper BUSY | EPD_BUSY | Digital | In |
-| GPIO16 | Accelerometer SDA | I2C_SDA | I2C | Bidir |
-| GPIO17 | Accelerometer SCL | I2C_SCL | I2C | Bidir |
+| GPIO16 | I2C SDA (accel, temp, light) | I2C_SDA | I2C | Bidir |
+| GPIO17 | I2C SCL (accel, temp, light) | I2C_SCL | I2C | Bidir |
 | GPIO18 | Accelerometer INT1 | ACCEL_INT1 | Digital | In |
 | GPIO19 | USB D- | USB_DM | USB | Bidir |
 | GPIO20 | USB D+ | USB_DP | USB | Bidir |
@@ -156,6 +158,8 @@ No copper on any layer. The ESP32-S3-WROOM-1 module antenna extends above the bo
 | Q1 | FS8205A (dual MOSFET) | SOT-23-6 | C908265 | $0.05 |
 | U4 | AMS1117-3.3 (LDO) | SOT-223-3 | C6186 | $0.05 |
 | U5 | LIS2DH12TR (accelerometer) | LGA-12 2x2mm | C110926 | $0.46 |
+| U6 | AHT20 (temp/humidity) | DFN-6 3x3mm | C2757850 | $0.43 |
+| U7 | BH1750FVI-TR (light sensor) | WSOF-6 3x1.6mm | C78960 | $0.49 |
 | J1 | USB-C 16-pin | HRO TYPE-C-31-M-12 | C2765186 | $0.10 |
 | J2 | JST-PH 2-pin (battery) | SMD | C131337 | $0.03 |
 | J3 | JST-SH 8-pin (ePaper) | SMD | — | $0.05 |
@@ -170,9 +174,9 @@ No copper on any layer. The ESP32-S3-WROOM-1 module antenna extends above the bo
 | R4,R5 | 10k (I2C pull-up) | 0402 | C25744 | $0.01 |
 | R8,R9 | 5.1k (USB CC) | 0402 | — | $0.01 |
 | R10,R11 | 10k (EN/BOOT pull-up) | 0402 | C25744 | $0.01 |
-| C3,C7,C8 | 100nF (decoupling) | 0402 | C14663 | $0.01 |
+| C3,C7,C8,C9,C10 | 100nF (decoupling) | 0402 | C14663 | $0.01 |
 | C4,C5,C6 | 10uF (bulk) | 0402 | C19702 | $0.01 |
-| **Total** | | | | **~$4.26** |
+| **Total** | | | | **~$5.20** |
 
 ---
 

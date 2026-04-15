@@ -1,6 +1,6 @@
 # Board Design v0.4
 
-> Custom PCB design for the Dilder — 30x70mm, 4-layer, ESP32-S3, 28 components, ~$4.26/board BOM cost.
+> Custom PCB design for the Dilder — 30x70mm, 4-layer, ESP32-S3, 30 components, ~$5.18/board BOM cost.
 
 ---
 
@@ -11,9 +11,9 @@
 | Board size | 30 x 70 mm |
 | Layers | 4 (F.Cu, In1.Cu, In2.Cu, B.Cu) |
 | Thickness | 1.6 mm |
-| Components | 28 unique (30 placed) |
+| Components | 30 unique (34 placed) |
 | Nets | 34 |
-| BOM cost | ~$4.26/board |
+| BOM cost | ~$5.18/board |
 | Target fab | JLCPCB (SMT assembly) |
 
 ```
@@ -29,7 +29,7 @@ Board layout (30 x 70 mm, top view):
 |  [AMS1117]  [TP4056]        |
 |  [DW01A] [FS8205A] [Batt]   | Zone C
 |                              |
-| [Accel]  [ePaper connector]  |
+| [Accel][Temp][Light][ePaper]  |
 | [BOOT] [RESET]               | Zone D
 |                              |
 |     [5-Way Joystick]         | Zone E
@@ -71,7 +71,7 @@ AMS1117-3.3 LDO, TP4056 charger, DW01A + FS8205A battery protection, JST-PH batt
 
 ### Zone D — Peripherals (y=42-54mm)
 
-LIS2DH12TR accelerometer (I2C), 8-pin JST-SH ePaper connector (SPI), BOOT and RESET buttons.
+LIS2DH12TR accelerometer (U5), AHT20 temp/humidity sensor (U6), BH1750FVI light sensor (U7) — all on I2C bus. 8-pin JST-SH ePaper connector (SPI), BOOT and RESET buttons.
 
 ### Zone E — Joystick (y=54-62mm)
 
@@ -94,8 +94,8 @@ HRO TYPE-C-31-M-12 connector with 5.1k CC pull-down resistors.
 | GPIO10 | e-Paper MOSI | SPI MOSI |
 | GPIO11 | e-Paper RST | Digital |
 | GPIO12 | e-Paper BUSY | Digital |
-| GPIO16 | Accelerometer SDA | I2C |
-| GPIO17 | Accelerometer SCL | I2C |
+| GPIO16 | I2C SDA (LIS2DH12, AHT20, BH1750) | I2C |
+| GPIO17 | I2C SCL (LIS2DH12, AHT20, BH1750) | I2C |
 | GPIO18 | Accelerometer INT1 | Digital |
 | GPIO19 | USB D- | USB |
 | GPIO20 | USB D+ | USB |
@@ -113,6 +113,8 @@ HRO TYPE-C-31-M-12 connector with 5.1k CC pull-down resistors.
 | Q1 | FS8205A (dual MOSFET) | SOT-23-6 | $0.05 |
 | U4 | AMS1117-3.3 (LDO) | SOT-223-3 | $0.05 |
 | U5 | LIS2DH12TR (accelerometer) | LGA-12 2x2mm | $0.46 |
+| U6 | AHT20 (temp/humidity) | DFN-6 3x3mm | $0.43 |
+| U7 | BH1750FVI-TR (light sensor) | WSOF-6 3x1.6mm | $0.49 |
 | J1 | USB-C 16-pin | HRO TYPE-C-31-M-12 | $0.10 |
 | J2 | JST-PH 2-pin (battery) | SMD | $0.03 |
 | J3 | JST-SH 8-pin (ePaper) | SMD | $0.05 |
@@ -122,7 +124,7 @@ HRO TYPE-C-31-M-12 connector with 5.1k CC pull-down resistors.
 | SW2/SW3 | BOOT/RESET buttons | PTS810 | $0.05 |
 | R1-R11 | Resistors (various) | 0402 | $0.01 |
 | C3-C8 | Capacitors (100nF/10uF) | 0402 | $0.01 |
-| **Total** | | | **~$4.26** |
+| **Total** | | | **~$5.18** |
 
 ---
 

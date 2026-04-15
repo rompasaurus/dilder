@@ -2120,3 +2120,31 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `website/docs/blog/posts/custom-pcb-research.md` (modified — BME280 → AHT20 in sensor list)
   - `website/docs/blog/posts/gameplay-architecture.md` (created — blog post: gameplay loop architecture, stat decay math, emotion resolution, evolution system, MCU migration, AHT20 update)
   - `PromptProgression.md` (updated — added Prompts #158, #159, #160)
+
+---
+
+## Prompt #161
+- **Date/Time:** 2026-04-15
+- **Prompt:** "In this same folder for gameplay planning I want you to create a user guide to show off the planned features as if everything has been implemented. Use the existing images of the game to compose this and make an in-depth guide on the game, the story behind it, how to play, and the mechanisms behind it — the environments, the options, and a huge TOC to go along with it. Outline how the stats system works and an achievement system for the player to try to uncover every feature of the game. Let's also separately make an MD document to implement a feature systems and menu to view them as well."
+- **Input Tokens (est):** ~120
+- **Output Tokens (est):** ~40,000
+- **Files Created/Modified:**
+  - `Gamplay Planning/12-user-guide.md` (created — 1,207-line comprehensive player guide with 35-section TOC across 10 chapters: origin story, 16 emotions with images, stat system, care actions, sensor interactions, step tracking, life stages, 6 evolution forms, bond levels, dialogue, decor, treasure hunts, 64 achievements across 7 categories, environments, controls, tips)
+  - `Gamplay Planning/13-feature-menus-achievements.md` (created — 963-line implementation spec: 64 achievement definitions as C structs, achievement viewer UI, stats viewer, activity summaries, decor browser, emotion gallery, evolution bestiary, memorial viewer, toast notification system, settings menu, full hierarchical menu map with unlock gates)
+
+---
+
+## Prompt #162
+- **Date/Time:** 2026-04-15
+- **Prompt:** "OK we've implemented a ton of things in several sessions today. Go through all the changes, update the docs if needed, and commit them, then update the prompts and the webpage as well — add a few blogs and show off the asset images. Get that user guide posted up on the site in the docs and website too."
+- **Input Tokens (est):** ~80
+- **Output Tokens (est):** ~15,000
+- **Files Created/Modified:**
+  - `website/docs/assets/images/octopus/` (created — copied 24 asset images: 11 grid PNGs + 16 emotion preview PNGs from assets/ for website use)
+  - `website/docs/blog/posts/asset-rendering-system.md` (created — blog post: 22 environments, 42 outfits, 29 props, aura particles with grid image showcases)
+  - `website/docs/docs/design/user-guide.md` (created — website copy of user guide with fixed image paths)
+  - `website/mkdocs.yml` (modified — added user guide to Design nav section)
+  - `Gamplay Planning/12-user-guide.md` (from Prompt #161)
+  - `Gamplay Planning/13-feature-menus-achievements.md` (from Prompt #161)
+  - Hardware changes from earlier session: KiCad schematic/PCB updates (AHT20+BH1750 sensors added), BOM updates, board-design-v04 updates, wiring-pinout updates, materials-list updates, KiCad lib tables, ERC report
+  - `PromptProgression.md` (updated — added Prompts #161, #162)

@@ -1,6 +1,6 @@
 # Dilder PCB v0.3 — Bill of Materials
 
-ESP32-S3-WROOM-1-N16R8 design, 27 components, target fab: JLCPCB
+ESP32-S3-WROOM-1-N16R8 design, 31 components, target fab: JLCPCB
 
 ## ICs & Modules
 
@@ -12,6 +12,8 @@ ESP32-S3-WROOM-1-N16R8 design, 27 components, target fab: JLCPCB
 | Q1 | FS8205A (dual MOSFET) | SOT-23-6 | C908265 | 1 | $0.05 |
 | U4 | AMS1117-3.3 (3.3V LDO) | SOT-223-3 | C6186 | 1 | $0.05 |
 | U6 | LIS2DH12TR (3-axis accelerometer) | LGA-12 2x2mm | C110926 | 1 | $0.46 |
+| U7 | AHT20 (temp/humidity sensor) | DFN-6 3x3mm | C2757850 | 1 | $0.43 |
+| U8 | BH1750FVI-TR (ambient light sensor) | WSOF-6 3x1.6mm | C78960 | 1 | $0.49 |
 
 ## Connectors
 
@@ -53,15 +55,17 @@ ESP32-S3-WROOM-1-N16R8 design, 27 components, target fab: JLCPCB
 | C6 | 10uF | LDO output | C19702 | 1 | $0.01 |
 | C7 | 100nF | IMU VDD decoupling | C14663 | 1 | $0.01 |
 | C9 | 100nF | IMU REGOUT bypass | C14663 | 1 | $0.01 |
+| C10 | 100nF | AHT20 decoupling | C14663 | 1 | $0.01 |
+| C11 | 100nF | BH1750 decoupling | C14663 | 1 | $0.01 |
 
 ## Cost Summary
 
 | Category | Cost/board |
 |----------|-----------|
-| Components (total) | ~$4.18 |
+| Components (total) | ~$5.12 |
 | PCB fabrication (5 boards) | ~$2.00 |
 | SMT assembly (5 boards) | ~$8.00 + parts |
-| **Estimated total (5 boards)** | **~$35-50** |
+| **Estimated total (5 boards)** | **~$40-55** |
 
 ## GPIO Pin Assignment
 
@@ -77,8 +81,8 @@ ESP32-S3-WROOM-1-N16R8 design, 27 components, target fab: JLCPCB
 | GPIO10 | EPD_MOSI | SPI |
 | GPIO11 | EPD_RST | Digital out |
 | GPIO12 | EPD_BUSY | Digital in |
-| GPIO16 | I2C SDA (LIS2DH12TR) | I2C |
-| GPIO17 | I2C SCL (LIS2DH12TR) | I2C |
+| GPIO16 | I2C SDA (LIS2DH12TR, AHT20, BH1750) | I2C |
+| GPIO17 | I2C SCL (LIS2DH12TR, AHT20, BH1750) | I2C |
 | GPIO19 | USB D- | USB-OTG |
 | GPIO20 | USB D+ | USB-OTG |
 | GPIO46 | EPD_CS | SPI CS |
@@ -95,4 +99,4 @@ Removed:
 Added:
 - ESP32-S3-WROOM-1-N16R8 module (WiFi + BLE 5.0, 16MB flash, 8MB PSRAM)
 
-Net component count: 27 → 20 unique parts (simpler BOM, easier assembly)
+Net component count: 31 → 22 unique parts (simpler BOM, easier assembly)

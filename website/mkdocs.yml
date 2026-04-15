@@ -123,6 +123,8 @@ nav:
           - Display Setup: docs/setup/display-setup.md
           - Dev Environment: docs/setup/dev-environment.md
       - Design:
+          - KiCad Schematic & PCB Guide: docs/design/kicad-schematic-pcb-guide.md
+          - "User Guide: How to Play": docs/design/user-guide.md
           - User Engagement Plan: docs/design/user-engagement-plan.md
           - Custom PCB Design Research: docs/design/custom-pcb-design-research.md
           - Board Design v0.4: docs/design/board-design.md

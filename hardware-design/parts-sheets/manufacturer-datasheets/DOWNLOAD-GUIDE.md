@@ -18,6 +18,8 @@ Most datasheet hosts block automated downloads. Use these direct links in a brow
 | `AMS1117-datasheet.pdf` | Advanced Monolithic Systems | http://www.advanced-monolithic.com/pdf/ds1117.pdf |
 | `DW01A-datasheet.pdf` | LCSC product page | https://www.lcsc.com/product-detail/C351410.html (click Datasheet tab) |
 | `FS8205A-datasheet.pdf` | LCSC product page | https://www.lcsc.com/product-detail/C908265.html (click Datasheet tab) |
+| `AHT20-datasheet.pdf` | Aosong | http://www.aosong.com/userfiles/files/media/AHT20-datasheet-V1.0-EN.pdf |
+| `BH1750FVI-datasheet.pdf` | ROHM / Mouser | https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf |
 
 ### Diodes & LEDs
 

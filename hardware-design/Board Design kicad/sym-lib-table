@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Espressif") (type "KiCad") (uri "${KIPRJMOD}/../../reference-boards/espressif-kicad-libs/symbols/Espressif.kicad_sym") (options "") (descr "Espressif official symbols"))
+)

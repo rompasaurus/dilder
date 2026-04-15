@@ -22,8 +22,8 @@ The production Dilder uses a custom 4-layer PCB (45x80mm) with all components su
 | GPIO10 | e-Paper MOSI | SPI | Output |
 | GPIO11 | e-Paper RST | Digital | Output |
 | GPIO12 | e-Paper BUSY | Digital | Input |
-| GPIO16 | LIS2DH12 SDA | I2C | Bidirectional |
-| GPIO17 | LIS2DH12 SCL | I2C | Output |
+| GPIO16 | I2C SDA (LIS2DH12, AHT20, BH1750) | I2C | Bidirectional |
+| GPIO17 | I2C SCL (LIS2DH12, AHT20, BH1750) | I2C | Output |
 | GPIO18 | LIS2DH12 INT1 | Interrupt | Input |
 | GPIO19 | USB D- | USB-OTG | Bidirectional |
 | GPIO20 | USB D+ | USB-OTG | Bidirectional |
@@ -40,8 +40,8 @@ USB-C (5V) ──►|── SS34 Schottky ── TP4056 Charger ── LiPo Batt
                                     AMS1117-3.3 LDO
                                          │
                                       3.3V Rail
-                              ┌──────────┼──────────┐
-                           ESP32-S3   LIS2DH12   e-Paper
+                      ┌───────────┬──────┼──────┬───────────┐
+                   ESP32-S3   LIS2DH12  AHT20  BH1750   e-Paper
 ```
 
 ### Block Diagram
@@ -55,18 +55,28 @@ USB-C (5V) ──►|── SS34 Schottky ── TP4056 Charger ── LiPo Batt
   ┌─────────────────┤                                   │
   │                 │  GPIO4-8         GPIO16,17,18     │
   │                 │     │                 │           │
-  │                 │     │            I2C (2 lines)    │
-  │                 │  GPIO19,20            │           │
-  │                 └──────┬────────────────┼───────────┘
-  │                        │                │
-  ▼                        ▼                ▼
-e-Paper 2.13"        USB-C (OTG)      LIS2DH12TR
-(Waveshare)          J1               Accelerometer
-J3 (JST-SH 8p)                       U5
+  │                 │     │         I2C bus (2 lines)   │
+  │                 │  GPIO19,20     ┌──────┼──────┐    │
+  │                 └──────┬─────────┼──────┼──────┼───┘
+  │                        │         │      │      │
+  ▼                        ▼         ▼      ▼      ▼
+e-Paper 2.13"        USB-C (OTG)  LIS2DH12 AHT20  BH1750
+(Waveshare)          J1           U5 0x18  U6 0x38 U7 0x23
+J3 (JST-SH 8p)                   Accel    Temp/Hum Light
 
                     5-Way Joystick
                     SW1 (SKRHABE010)
 ```
+
+### I2C Address Map
+
+All three sensors share the I2C bus on GPIO16 (SDA) / GPIO17 (SCL) with 10k pull-up resistors.
+
+| Device | Ref | I2C Address | Function |
+|--------|-----|-------------|----------|
+| LIS2DH12TR | U5 | 0x18 | 3-axis accelerometer |
+| BH1750FVI-TR | U7 | 0x23 | Ambient light sensor |
+| AHT20 | U6 | 0x38 | Temperature / humidity |
 
 For full component details, see the [Parts Sheets](../../../hardware-design/parts-sheets/README.md) and [BOM](../../../hardware-design/BOM.md).
 

@@ -6,7 +6,7 @@ Components for both the **custom PCB** (production) and the **breadboard prototy
 
 ## Custom PCB — ESP32-S3 (Production)
 
-The production Dilder runs on a custom 45x80mm 4-layer PCB. All 27 components are surface-mount, assembled by JLCPCB. Total BOM cost: ~$4.18/board.
+The production Dilder runs on a custom 45x80mm 4-layer PCB. All 29 components are surface-mount, assembled by JLCPCB. Total BOM cost: ~$5.10/board.
 
 | Ref | Part | LCSC | ~Cost |
 |-----|------|------|-------|
@@ -16,6 +16,8 @@ The production Dilder runs on a custom 45x80mm 4-layer PCB. All 27 components ar
 | Q1 | FS8205A (dual MOSFET) | C908265 | $0.05 |
 | U4 | AMS1117-3.3 (3.3V LDO) | C6186 | $0.05 |
 | U5 | LIS2DH12TR (3-axis accelerometer) | C110926 | $0.46 |
+| U6 | AHT20 (temp/humidity sensor) | C2757850 | $0.43 |
+| U7 | BH1750FVI-TR (ambient light sensor) | C78960 | $0.49 |
 | J1 | USB-C 16-pin receptacle | C2765186 | $0.10 |
 | J2 | JST PH 2-pin (battery) | C131337 | $0.03 |
 | J3 | JST SH 8-pin (e-paper) | — | $0.05 |

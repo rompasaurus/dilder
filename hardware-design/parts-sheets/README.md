@@ -15,6 +15,8 @@ Manufacturer datasheets (PDF) are in the `manufacturer-datasheets/` folder. See 
 ## Sensors
 
 - [LIS2DH12TR](lis2dh12.md) — 3-axis MEMS accelerometer with hardware pedometer. Covers MEMS fabrication (proof mass, differential capacitors, sigma-delta ADC), all built-in features (step counter, click detection, free-fall, 6D orientation), operating modes and power, I2C protocol explanation, and STMicroelectronics/MEMS history.
+- [AHT20](aht20.md) — Temperature and humidity sensor (I2C, DFN-6). Covers capacitive humidity sensing, CMOS temperature measurement, factory calibration, and signal conditioning.
+- [BH1750FVI-TR](bh1750fvi.md) — Ambient light sensor (I2C, WSOF-6). Covers photodiode-based lux measurement, spectral response close to human eye, measurement modes, and adjustable sensitivity.
 
 ## Power Management
 
@@ -42,7 +44,7 @@ Manufacturer datasheets (PDF) are in the `manufacturer-datasheets/` folder. See 
 ## Passive Components
 
 - [Resistors (0402)](resistors-0402.md) — All 8 resistors on the board. Covers Ohm's Law, what physically creates resistance, thick film vs thin film manufacturing (ruthenium oxide screen printing, laser trimming), each resistor's specific function (charge current, LED limiting, I2C pull-up, USB CC, EN pull-up), and tolerance grades.
-- [Capacitors (0402)](capacitors-0402.md) — All 6 capacitors on the board. Covers capacitor physics (charge storage in electric fields), MLCC construction (hundreds of stacked layers), dielectric materials (X5R, X7R, C0G), why every IC needs decoupling caps (switching noise, trace inductance, local charge reservoir), the 100nF + 10uF combination, and DC bias effect.
+- [Capacitors (0402)](capacitors-0402.md) — All 8 capacitors on the board. Covers capacitor physics (charge storage in electric fields), MLCC construction (hundreds of stacked layers), dielectric materials (X5R, X7R, C0G), why every IC needs decoupling caps (switching noise, trace inductance, local charge reservoir), the 100nF + 10uF combination, and DC bias effect.
 
 ---
 
@@ -50,13 +52,13 @@ Manufacturer datasheets (PDF) are in the `manufacturer-datasheets/` folder. See 
 
 | Category | Count | Parts |
 |----------|-------|-------|
-| ICs & Modules | 6 | ESP32-S3, TP4056, DW01A, FS8205A, AMS1117, LIS2DH12 |
+| ICs & Modules | 8 | ESP32-S3, TP4056, DW01A, FS8205A, AMS1117, LIS2DH12, AHT20, BH1750 |
 | Connectors | 3 | USB-C, JST PH battery, JST SH e-paper |
 | Switch | 1 | SKRHABE010 5-way joystick |
 | Diodes & LEDs | 3 | SS34, Red LED, Green LED |
 | Resistors | 8 | 1.2k, 2x 1k, 3x 10k, 2x 5.1k |
-| Capacitors | 6 | 3x 100nF, 3x 10uF |
-| **Total** | **27** | |
+| Capacitors | 8 | 5x 100nF, 3x 10uF |
+| **Total** | **31** | |
 
 ---
 
