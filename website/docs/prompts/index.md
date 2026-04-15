@@ -1371,3 +1371,13 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Output Tokens (est):** ~60,000
 - **Key Work:** PCB routing (Phase 4). Wrote `route_v04.py` — a 4-layer router for the v0.4 board using B.Cu vertical channels for long signals, staggered B.Cu L-routes for ePaper/joystick (crossing-free), custom routes for USB/EN/BOOT/battery protection, and F.Cu for power chain and local nets. Added In1.Cu GND plane and In2.Cu 3V3 plane. Iteratively fixed channel collisions (EN vs I2C_SDA), VBUS path crossings, and 3V3 via placement. Created comprehensive board design document.
 - **Files:** `hardware-design/Board Design kicad/route_v04.py` (created — v0.4 router, ~400 lines). `hardware-design/Board Design kicad/build_esp32s3.py` (modified — regenerated placement). `hardware-design/Board Design kicad/dilder.kicad_pcb` (routed board). `hardware-design/board-design-v04.md` (created — complete board design document with BOM, zones, GPIO map, routing strategy, DRC status, fab workflow). KiCad project files updated (`.kicad_prl`, `.kicad_pro`, `.kicad_sch`). `website/docs/prompts/index.md` (updated with Prompts #154-155).
+
+---
+
+## Prompt #156 — 2026-04-15
+
+**Prompt:** "Commit the changes and push and update prompts, fix spelling."
+
+- **Input Tokens (est):** ~60
+- **Output Tokens (est):** ~5,000
+- **Files:** Website content commit: 3 blog posts (breadboard prototype guide, motion/location detection, PCB routing complete), 2 docs pages (board design v0.4, breadboard prototype), octopus SVG icon, mkdocs nav/logo updates. Fixed broken link in breadboard blog post. Updated `PromptProgression.md` with Prompts #154-156.

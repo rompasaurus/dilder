@@ -2010,3 +2010,53 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `website/docs/docs/hardware/wiring-pinout.md` (modified — added ESP32-S3 custom PCB GPIO table, power chain diagram, block diagram)
   - `website/docs/docs/hardware/materials-list.md` (modified — added ESP32-S3 PCB BOM section at top)
   - Commit: `12829d6`
+
+---
+
+## Prompt #154
+- **Date/Time:** 2026-04-15
+- **Prompt:** "Create a breadboard prototype guide with EU/US sourcing and alpha board plans."
+- **Input Tokens (est):** ~80
+- **Output Tokens (est):** ~20,000
+- **Files Created/Modified:**
+  - `hardware-design/breadboard-prototype-guide.md` (created — 7 ESP32-S3 dev board options with comparison table, GPIO wiring map matching custom PCB, breadboard assembly steps, shopping lists optimized for German/EU retailers: Botland, Eckstein, BerryBase, Olimex, EXP-Tech, Amazon)
+  - Three compact alpha board approaches: Feather stack, protoboard solder build, 3D-printed bracket with Olimex DevKit-Lipo
+  - `.gitignore` (updated for `.history/` dirs)
+  - `PromptProgression.md` (#154), `website/docs/prompts/index.md` (#154)
+  - Commit: `a5aec52`
+
+---
+
+## Prompt #155
+- **Date/Time:** 2026-04-15
+- **Prompt:** "Continue where you left off — look at the staged changes and the planning and go from there."
+- **Input Tokens (est):** ~150
+- **Output Tokens (est):** ~60,000
+- **Key Work:** PCB routing (Phase 4). Wrote `route_v04.py` — a 4-layer router for the v0.4 board using B.Cu vertical channels for long signals, staggered B.Cu L-routes for ePaper/joystick (crossing-free), custom routes for USB/EN/BOOT/battery protection, and F.Cu for power chain and local nets. Added In1.Cu GND plane and In2.Cu 3V3 plane. Iteratively fixed channel collisions (EN vs I2C_SDA), VBUS path crossings, and 3V3 via placement. Created comprehensive board design document.
+- **Files Created/Modified:**
+  - `hardware-design/Board Design kicad/route_v04.py` (created — v0.4 router, ~400 lines)
+  - `hardware-design/Board Design kicad/build_esp32s3.py` (modified — regenerated placement)
+  - `hardware-design/Board Design kicad/dilder.kicad_pcb` (routed board)
+  - `hardware-design/board-design-v04.md` (created — complete board design document with BOM, zones, GPIO map, routing strategy, DRC status, fab workflow)
+  - KiCad project files updated (`.kicad_prl`, `.kicad_pro`, `.kicad_sch`)
+  - `website/docs/prompts/index.md` (updated with Prompts #154-155)
+  - Commit: `dbc82c1`
+
+---
+
+## Prompt #156
+- **Date/Time:** 2026-04-15
+- **Prompt:** "Commit the changes and push and update prompts, fix spelling."
+- **Input Tokens (est):** ~60
+- **Output Tokens (est):** ~5,000
+- **Files Created/Modified:**
+  - `website/docs/blog/posts/breadboard-prototype-guide.md` (created — blog post: breadboard prototype build guide with parts list, GPIO wiring, regional sourcing, alpha board plans)
+  - `website/docs/blog/posts/motion-location-detection.md` (created — blog post: MPU-6050 to LIS2DH12TR swap, WiFi fingerprinting, BLE peer detection)
+  - `website/docs/blog/posts/pcb-routing-complete.md` (created — blog post: v0.4 PCB routing milestone, layer stack, zone layout, BOM cost)
+  - `website/docs/docs/design/board-design.md` (created — website doc: board design v0.4 overview with BOM, zones, GPIO, layer stack, fab workflow)
+  - `website/docs/docs/design/breadboard-prototype.md` (created — website doc: breadboard prototype guide with dev board comparison, wiring map, alpha board options)
+  - `website/docs/assets/images/dilder-icon.svg` (created — octopus SVG icon for site logo/favicon)
+  - `website/mkdocs.yml` (modified — added custom logo/favicon, board design and breadboard prototype to nav)
+  - Fixed broken link in breadboard blog post (pointed to `custom-pcb-design-research.md` instead of `breadboard-prototype.md`)
+  - `PromptProgression.md` (updated — added Prompts #154, #155, #156)
+  - `website/docs/prompts/index.md` (updated — added Prompt #156)

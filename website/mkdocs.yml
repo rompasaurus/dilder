@@ -33,8 +33,9 @@ theme:
     - content.tabs.link
     - content.code.annotation
     - content.code.copy
+  logo: assets/images/dilder-icon.svg
+  favicon: assets/images/dilder-icon.svg
   icon:
-    logo: material/robot-love
     repo: fontawesome/brands/github
   font:
     text: Inter
@@ -124,8 +125,10 @@ nav:
       - Design:
           - User Engagement Plan: docs/design/user-engagement-plan.md
           - Custom PCB Design Research: docs/design/custom-pcb-design-research.md
+          - Board Design v0.4: docs/design/board-design.md
           - PCB Assembly & Prototyping: docs/design/pcb-assembly-and-prototyping.md
           - Open-Source Board Designs: docs/design/open-board-designs.md
+          - Breadboard Prototype: docs/design/breadboard-prototype.md
           - Motion & Location Detection: docs/design/motion-location-detection.md
       - Software:
           - Project Structure: docs/software/project-structure.md
