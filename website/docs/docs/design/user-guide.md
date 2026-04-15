@@ -6,112 +6,122 @@
 
 ## Table of Contents
 
-**I. Introduction**
-1. [What Is Dilder?](#1-what-is-dilder)
-2. [The Origin Story — Meet Jamal](#2-the-origin-story--meet-jamal)
-3. [Your First Hatch](#3-your-first-hatch)
+### I. Introduction
 
-**II. Getting to Know Your Octopus**
-4. [The 16 Emotional States](#4-the-16-emotional-states)
-   - 4.1 [Normal / Sassy](#41-normal--sassy)
-   - 4.2 [Hungry](#42-hungry)
-   - 4.3 [Tired](#43-tired)
-   - 4.4 [Sad](#44-sad)
-   - 4.5 [Angry](#45-angry)
-   - 4.6 [Excited](#46-excited)
-   - 4.7 [Chill](#47-chill)
-   - 4.8 [Lazy](#48-lazy)
-   - 4.9 [Fat](#49-fat)
-   - 4.10 [Chaotic](#410-chaotic)
-   - 4.11 [Weird](#411-weird)
-   - 4.12 [Unhinged](#412-unhinged)
-   - 4.13 [Slap Happy](#413-slap-happy)
-   - 4.14 [Horny](#414-horny)
-   - 4.15 [Nostalgic](#415-nostalgic)
-   - 4.16 [Homesick](#416-homesick)
-5. [Reading the Display](#5-reading-the-display)
+- [1. What Is Dilder?](#1-what-is-dilder)
+- [2. The Origin Story — Meet Jamal](#2-the-origin-story--meet-jamal)
+- [3. Your First Hatch](#3-your-first-hatch)
 
-**III. Caring for Dilder**
-6. [The Stat System](#6-the-stat-system)
-   - 6.1 [Primary Stats](#61-primary-stats)
-   - 6.2 [Secondary Stats](#62-secondary-stats)
-   - 6.3 [Hidden Stats](#63-hidden-stats)
-   - 6.4 [Stat Decay & Modifiers](#64-stat-decay--modifiers)
-7. [Care Actions](#7-care-actions)
-   - 7.1 [Feeding](#71-feeding)
-   - 7.2 [Cleaning](#72-cleaning)
-   - 7.3 [Playing](#73-playing)
-   - 7.4 [Petting](#74-petting)
-   - 7.5 [Medicine](#75-medicine)
-   - 7.6 [Scolding & Discipline](#76-scolding--discipline)
-   - 7.7 [Sleep](#77-sleep)
-8. [The Daily Rhythm](#8-the-daily-rhythm)
+### II. Getting to Know Your Octopus
 
-**IV. The Physical World**
-9. [Sensor Interactions](#9-sensor-interactions)
-   - 9.1 [Touch Zones](#91-touch-zones)
-   - 9.2 [Voice & Sound](#92-voice--sound)
-   - 9.3 [Light & Darkness](#93-light--darkness)
-   - 9.4 [Temperature & Humidity](#94-temperature--humidity)
-   - 9.5 [Motion & Movement](#95-motion--movement)
-10. [Step Tracking & Activity](#10-step-tracking--activity)
-    - 10.1 [Daily Step Targets](#101-daily-step-targets)
-    - 10.2 [Weekly Targets](#102-weekly-targets)
-    - 10.3 [Monthly Targets](#103-monthly-targets)
-    - 10.4 [The Streak System](#104-the-streak-system)
-11. [Location & Exploration](#11-location--exploration)
+- [4. The 16 Emotional States](#4-the-16-emotional-states)
+    - [4.1 Normal / Sassy](#41-normal--sassy)
+    - [4.2 Hungry](#42-hungry)
+    - [4.3 Tired](#43-tired)
+    - [4.4 Sad](#44-sad)
+    - [4.5 Angry](#45-angry)
+    - [4.6 Excited](#46-excited)
+    - [4.7 Chill](#47-chill)
+    - [4.8 Lazy](#48-lazy)
+    - [4.9 Fat](#49-fat)
+    - [4.10 Chaotic](#410-chaotic)
+    - [4.11 Weird](#411-weird)
+    - [4.12 Unhinged](#412-unhinged)
+    - [4.13 Slap Happy](#413-slap-happy)
+    - [4.14 Horny](#414-horny)
+    - [4.15 Nostalgic](#415-nostalgic)
+    - [4.16 Homesick](#416-homesick)
+- [5. Reading the Display](#5-reading-the-display)
 
-**V. Growing Up**
-12. [Life Stages](#12-life-stages)
-    - 12.1 [Egg](#121-egg)
-    - 12.2 [Hatchling](#122-hatchling)
-    - 12.3 [Juvenile](#123-juvenile)
-    - 12.4 [Adolescent](#124-adolescent)
-    - 12.5 [Adult](#125-adult)
-    - 12.6 [Elder](#126-elder)
-13. [Evolution — The Six Adult Forms](#13-evolution--the-six-adult-forms)
-    - 13.1 [Deep-Sea Scholar](#131-deep-sea-scholar)
-    - 13.2 [Reef Guardian](#132-reef-guardian)
-    - 13.3 [Tidal Trickster](#133-tidal-trickster)
-    - 13.4 [Abyssal Hermit](#134-abyssal-hermit)
-    - 13.5 [Coral Dancer](#135-coral-dancer)
-    - 13.6 [Storm Kraken](#136-storm-kraken)
-14. [Rebirth & Legacy](#14-rebirth--legacy)
+### III. Caring for Dilder
 
-**VI. Progression & Collection**
-15. [Bond Levels](#15-bond-levels)
-16. [The Dialogue System](#16-the-dialogue-system)
-17. [Decor & Cosmetics](#17-decor--cosmetics)
-    - 17.1 [Hats & Headwear](#171-hats--headwear)
-    - 17.2 [Backgrounds & Environments](#172-backgrounds--environments)
-    - 17.3 [Accessories](#173-accessories)
-    - 17.4 [Animation Styles](#174-animation-styles)
-18. [Treasure Hunts](#18-treasure-hunts)
+- [6. The Stat System](#6-the-stat-system)
+    - [6.1 Primary Stats](#61-primary-stats)
+    - [6.2 Secondary Stats](#62-secondary-stats)
+    - [6.3 Hidden Stats](#63-hidden-stats)
+    - [6.4 Stat Decay & Modifiers](#64-stat-decay--modifiers)
+- [7. Care Actions](#7-care-actions)
+    - [7.1 Feeding](#71-feeding)
+    - [7.2 Cleaning](#72-cleaning)
+    - [7.3 Playing](#73-playing)
+    - [7.4 Petting](#74-petting)
+    - [7.5 Medicine](#75-medicine)
+    - [7.6 Scolding & Discipline](#76-scolding--discipline)
+    - [7.7 Sleep](#77-sleep)
+- [8. The Daily Rhythm](#8-the-daily-rhythm)
 
-**VII. Achievements**
-19. [Achievement System Overview](#19-achievement-system-overview)
-20. [Care Achievements](#20-care-achievements)
-21. [Exploration Achievements](#21-exploration-achievements)
-22. [Social Achievements](#22-social-achievements)
-23. [Environmental Achievements](#23-environmental-achievements)
-24. [Mastery Achievements](#24-mastery-achievements)
-25. [Step Achievements](#25-step-achievements)
-26. [Secret Achievements](#26-secret-achievements)
+### IV. The Physical World
 
-**VIII. Environments & Scenes**
-27. [The 22 Environments](#27-the-22-environments)
-28. [Outfits & Decor Props](#28-outfits--decor-props)
-29. [Aura & Particle Effects](#29-aura--particle-effects)
+- [9. Sensor Interactions](#9-sensor-interactions)
+    - [9.1 Touch Zones](#91-touch-zones)
+    - [9.2 Voice & Sound](#92-voice--sound)
+    - [9.3 Light & Darkness](#93-light--darkness)
+    - [9.4 Temperature & Humidity](#94-temperature--humidity)
+    - [9.5 Motion & Movement](#95-motion--movement)
+- [10. Step Tracking & Activity](#10-step-tracking--activity)
+    - [10.1 Daily Step Targets](#101-daily-step-targets)
+    - [10.2 Weekly Targets](#102-weekly-targets)
+    - [10.3 Monthly Targets](#103-monthly-targets)
+    - [10.4 The Streak System](#104-the-streak-system)
+- [11. Location & Exploration](#11-location--exploration)
 
-**IX. Controls & Navigation**
-30. [Button Layout](#30-button-layout)
-31. [Menu System](#31-menu-system)
-32. [Quick Actions](#32-quick-actions)
+### V. Growing Up
 
-**X. Tips & Secrets**
-33. [Beginner Tips](#33-beginner-tips)
-34. [Advanced Strategies](#34-advanced-strategies)
-35. [Easter Eggs & Hidden Features](#35-easter-eggs--hidden-features)
+- [12. Life Stages](#12-life-stages)
+    - [12.1 Egg](#121-egg)
+    - [12.2 Hatchling](#122-hatchling)
+    - [12.3 Juvenile](#123-juvenile)
+    - [12.4 Adolescent](#124-adolescent)
+    - [12.5 Adult](#125-adult)
+    - [12.6 Elder](#126-elder)
+- [13. Evolution — The Six Adult Forms](#13-evolution--the-six-adult-forms)
+    - [13.1 Deep-Sea Scholar](#131-deep-sea-scholar)
+    - [13.2 Reef Guardian](#132-reef-guardian)
+    - [13.3 Tidal Trickster](#133-tidal-trickster)
+    - [13.4 Abyssal Hermit](#134-abyssal-hermit)
+    - [13.5 Coral Dancer](#135-coral-dancer)
+    - [13.6 Storm Kraken](#136-storm-kraken)
+- [14. Rebirth & Legacy](#14-rebirth--legacy)
+
+### VI. Progression & Collection
+
+- [15. Bond Levels](#15-bond-levels)
+- [16. The Dialogue System](#16-the-dialogue-system)
+- [17. Decor & Cosmetics](#17-decor--cosmetics)
+    - [17.1 Hats & Headwear](#171-hats--headwear)
+    - [17.2 Backgrounds & Environments](#172-backgrounds--environments)
+    - [17.3 Accessories](#173-accessories)
+    - [17.4 Animation Styles](#174-animation-styles)
+- [18. Treasure Hunts](#18-treasure-hunts)
+
+### VII. Achievements
+
+- [19. Achievement System Overview](#19-achievement-system-overview)
+- [20. Care Achievements](#20-care-achievements)
+- [21. Exploration Achievements](#21-exploration-achievements)
+- [22. Social Achievements](#22-social-achievements)
+- [23. Environmental Achievements](#23-environmental-achievements)
+- [24. Mastery Achievements](#24-mastery-achievements)
+- [25. Step Achievements](#25-step-achievements)
+- [26. Secret Achievements](#26-secret-achievements)
+
+### VIII. Environments & Scenes
+
+- [27. The 22 Environments](#27-the-22-environments)
+- [28. Outfits & Decor Props](#28-outfits--decor-props)
+- [29. Aura & Particle Effects](#29-aura--particle-effects)
+
+### IX. Controls & Navigation
+
+- [30. Button Layout](#30-button-layout)
+- [31. Menu System](#31-menu-system)
+- [32. Quick Actions](#32-quick-actions)
+
+### X. Tips & Secrets
+
+- [33. Beginner Tips](#33-beginner-tips)
+- [34. Advanced Strategies](#34-advanced-strategies)
+- [35. Easter Eggs & Hidden Features](#35-easter-eggs--hidden-features)
 
 ---
 
