@@ -28,7 +28,7 @@ _UNIQUE_POSES = [
     ("melted_puddle",   "lazy",      (0, 30),  "Body completely flattened, dome barely raised, tentacles pooled"),
     ("belly_rub",       "fat",       (0, -2),  "2 tentacles on belly, body leaned back satisfied"),
     ("wall_lean",       "chill",     (-5, 2),  "Body at angle against invisible wall, tentacles crossed in front"),
-    ("peacock_strut",   "horny",     (0, -1),  "Body puffed out, tentacles in walking motion, exaggerated posture"),
+    ("peacock_strut",   "creepy",     (0, -1),  "Body puffed out, tentacles in walking motion, exaggerated posture"),
     ("victory_jump",    "excited",   (0, -8),  "Body 5px above ground, all tentacles raised up and spread wide"),
     ("photo_gaze",      "nostalgic", (2, 0),   "1 tentacle holding tiny rectangle photo, body slightly turned"),
     ("globe_hold",      "homesick",  (0, 3),   "2 tentacles cradling small circle globe, body hunched protectively"),

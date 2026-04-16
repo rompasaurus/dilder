@@ -36,7 +36,7 @@ class EmotionConfig:
 EMOTION_NAMES = [
     "normal", "weird", "unhinged", "angry", "sad", "chaotic",
     "hungry", "tired", "slaphappy", "lazy", "fat", "chill",
-    "horny", "excited", "nostalgic", "homesick",
+    "creepy", "excited", "nostalgic", "homesick",
 ]
 
 # REGISTRY is populated by faces.py on import

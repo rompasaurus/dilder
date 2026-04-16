@@ -26,7 +26,7 @@
    - 4.11 [Weird](#411-weird)
    - 4.12 [Unhinged](#412-unhinged)
    - 4.13 [Slap Happy](#413-slap-happy)
-   - 4.14 [Horny](#414-horny)
+   - 4.14 [Creepy](#414-creepy)
    - 4.15 [Nostalgic](#415-nostalgic)
    - 4.16 [Homesick](#416-homesick)
 5. [Reading the Display](#5-reading-the-display)
@@ -312,9 +312,9 @@ One eye squinted shut (thin slit), one eye with an oversized manic pupil, a wide
 
 **Triggered by:** Happiness > 90 after recently being < 30. The relief of recovery expressed as manic joy.
 
-### 4.14 Horny
+### 4.14 Creepy
 
-![Horny emotion](../assets/emotion-previews/horny.png)
+![Creepy emotion](../assets/emotion-previews/creepy.png)
 
 Heart-shaped diamond pupils, a wide smile with tongue out, and a rhythmic throbbing pulse (body expands and contracts 2 pixels). Dilder is... feeling things.
 
@@ -1070,7 +1070,7 @@ Each emotion has a unique aura — particle effects that emanate from the octopu
 - **Chill:** Slow drifting waves
 - **Chaotic:** Random scattered debris
 - **Hungry:** Rising food particles
-- **Horny:** Floating hearts
+- **Creepy:** Floating hearts
 - **Homesick:** Swirling fog wisps
 
 ---

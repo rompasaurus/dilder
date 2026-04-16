@@ -30,7 +30,7 @@ Each emotion has 3-5 small pixel clusters (2-4px each) that float around the cha
 | Lazy       | Slow drifting ellipsis dots (...)                      |
 | Fat        | Tiny satisfied sparkles (food crumb dots)              |
 | Chill      | Wavy tilde lines drifting sideways (~)                 |
-| Horny      | Pulsing heart-shaped pixel clusters                    |
+| Creepy      | Pulsing heart-shaped pixel clusters                    |
 | Excited    | Star bursts (+ shaped, rotating outward)               |
 | Nostalgic  | Floating clock/hourglass dots (slow upward drift)      |
 | Homesick   | Tiny house silhouette pixels dissolving outward        |
@@ -81,7 +81,7 @@ The environment subtly reacts to the current emotion. This layer is supplementar
 | Lazy       | Melted Puddle      | Body completely flattened, dome barely raised, tentacles pooled outward  |
 | Fat        | Belly Rub          | 2 tentacles on belly, body leaned back, satisfied posture                |
 | Chill      | Wall Lean          | Body at angle against invisible wall, tentacles crossed in front         |
-| Horny      | Peacock Strut      | Body puffed out, tentacles in walking motion, exaggerated posture        |
+| Creepy      | Peacock Strut      | Body puffed out, tentacles in walking motion, exaggerated posture        |
 | Excited    | Victory Jump       | Body 5px above ground line, all tentacles raised up and spread           |
 | Nostalgic  | Photo Gaze         | 1 tentacle holding tiny rectangle (photo), body slightly turned          |
 | Homesick   | Globe Hold         | 2 tentacles cradling small circle (globe/house), body hunched protectively |

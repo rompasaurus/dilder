@@ -123,12 +123,12 @@ services:
       - ./hello-world/lib:/project/lib
     working_dir: /project
 
-  build-horny-octopus:
+  build-creepy-octopus:
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./horny-octopus:/project
+      - ./creepy-octopus:/project
       - ./hello-world/lib:/project/lib
     working_dir: /project
 

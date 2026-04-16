@@ -17,7 +17,7 @@ dev-setup/slaphappy-octopus/build/
 dev-setup/lazy-octopus/build/
 dev-setup/fat-octopus/build/
 dev-setup/chill-octopus/build/
-dev-setup/horny-octopus/build/
+dev-setup/creepy-octopus/build/
 dev-setup/excited-octopus/build/
 dev-setup/nostalgic-octopus/build/
 dev-setup/homesick-octopus/build/
@@ -57,8 +57,8 @@ dev-setup/fat-octopus/lib/
 dev-setup/fat-octopus/pico_sdk_import.cmake
 dev-setup/chill-octopus/lib/
 dev-setup/chill-octopus/pico_sdk_import.cmake
-dev-setup/horny-octopus/lib/
-dev-setup/horny-octopus/pico_sdk_import.cmake
+dev-setup/creepy-octopus/lib/
+dev-setup/creepy-octopus/pico_sdk_import.cmake
 dev-setup/excited-octopus/lib/
 dev-setup/excited-octopus/pico_sdk_import.cmake
 dev-setup/nostalgic-octopus/lib/

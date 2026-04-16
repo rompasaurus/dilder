@@ -147,7 +147,7 @@ static const char *QUOTES_SLAPHAPPY[] = {
     "*laughs uncontrollably*",
 };
 
-static const char *QUOTES_HORNY[] = {
+static const char *QUOTES_CREEPY[] = {
     "Hey there...",
     "*wiggles tentacles suggestively*",
     "Is it hot in here or is it just me?",
@@ -222,7 +222,7 @@ static const quote_set_t QUOTE_SETS[EMOTION_COUNT] = {
     [EMOTION_WEIRD]      = QSET(QUOTES_WEIRD),
     [EMOTION_UNHINGED]   = QSET(QUOTES_UNHINGED),
     [EMOTION_SLAP_HAPPY] = QSET(QUOTES_SLAPHAPPY),
-    [EMOTION_HORNY]      = QSET(QUOTES_HORNY),
+    [EMOTION_CREEPY]      = QSET(QUOTES_CREEPY),
     [EMOTION_NOSTALGIC]  = QSET(QUOTES_NOSTALGIC),
     [EMOTION_HOMESICK]   = QSET(QUOTES_HOMESICK),
 };

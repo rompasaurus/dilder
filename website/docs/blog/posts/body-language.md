@@ -42,7 +42,7 @@ static inline void px_set_off(int x, int y) {
 | Tired | 0 | +2 | -1 | none | Sagging, melting |
 | Slap Happy | sin | 0 | 0 | 2 amp | Drunk sway |
 | Excited | 0 | 3*sin | 0 | none | Bouncing up and down |
-| Horny | 0 | 0 | 2*sin | none | Rhythmic expand/contract |
+| Creepy | 0 | 0 | 2*sin | none | Rhythmic expand/contract |
 | Homesick | 0 | +1 | -2 | none | Curled inward, smaller |
 
 The `f` value is `frame_idx * PI / 2`, so each frame steps the sine by 90 degrees. Over 4 frames you get one full oscillation.

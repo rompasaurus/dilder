@@ -278,10 +278,10 @@ static float eval_slap_happy(const stats_t *s, const sensor_context_t *ctx,
 }
 
 /*
- * eval_horny -- Only triggers for adolescent/adult creatures with high
+ * eval_creepy -- Only triggers for adolescent/adult creatures with high
  * happiness and strong bond with the user. Fires randomly and rarely.
  */
-static float eval_horny(const stats_t *s, const sensor_context_t *ctx,
+static float eval_creepy(const stats_t *s, const sensor_context_t *ctx,
                         const life_state_t *life) {
     if ((life->stage == LIFE_STAGE_ADOLESCENT || life->stage == LIFE_STAGE_ADULT) &&
         s->primary.happiness > 70 && s->secondary.bond_xp > 4000) {
@@ -382,7 +382,7 @@ static const emotion_trigger_t TRIGGERS[] = {
     { EMOTION_NOSTALGIC,  eval_nostalgic,   4.5f, 30000 },
     { EMOTION_FAT,        eval_fat,         4.0f, 30000 },
     { EMOTION_LAZY,       eval_lazy,        3.5f, 30000 },
-    { EMOTION_HORNY,      eval_horny,       3.0f, 20000 },
+    { EMOTION_CREEPY,      eval_creepy,       3.0f, 20000 },
     { EMOTION_WEIRD,      eval_weird,       2.5f, 20000 },
     { EMOTION_CHILL,      eval_chill,       2.0f, 30000 },
     { EMOTION_NORMAL,     eval_normal,      1.0f, 30000 },
@@ -494,8 +494,8 @@ void emotion_resolve(emotion_state_t *state, const stats_t *stats,
             }
         }
     } else if (life->stage == LIFE_STAGE_JUVENILE) {
-        /* Juveniles can't feel horny, nostalgic, or unhinged */
-        state->weights[EMOTION_HORNY] = 0.0f;
+        /* Juveniles can't feel creepy, nostalgic, or unhinged */
+        state->weights[EMOTION_CREEPY] = 0.0f;
         state->weights[EMOTION_NOSTALGIC] = 0.0f;
         state->weights[EMOTION_UNHINGED] = 0.0f;
     }

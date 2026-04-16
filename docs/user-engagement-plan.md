@@ -170,7 +170,7 @@ EMOTION = f(hunger, happiness, energy, hygiene, health,
 | **Weird** | Random trigger (5% chance per tick if bored) | Low interaction + moderate stats |
 | **Unhinged** | Health < 20, multiple stats critical | Extreme neglect |
 | **Slap Happy** | Happiness > 90 after being < 30 | Major recovery event |
-| **Horny** | Specific life stage + happiness > 70 | Bond level > threshold |
+| **Creepy** | Specific life stage + happiness > 70 | Bond level > threshold |
 | **Nostalgic** | Age milestone reached, returning to known location | — |
 | **Homesick** | Away from "home" WiFi for extended period | First time at new location |
 

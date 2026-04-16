@@ -184,9 +184,9 @@ def aura_chill(cx, cy, frame_idx):
             _px(bx + dx, by + dy)
 
 
-# ── Horny: pulsing heart-shaped clusters ──
-@register("horny")
-def aura_horny(cx, cy, frame_idx):
+# ── Creepy: pulsing heart-shaped clusters ──
+@register("creepy")
+def aura_creepy(cx, cy, frame_idx):
     f = frame_idx * math.pi / 2.0
     for i in range(2):
         angle = math.pi / 4.0 + i * math.pi / 2.0 + f * 0.5

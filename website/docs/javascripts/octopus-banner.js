@@ -812,7 +812,7 @@
     "NAMASTE IN THE WATER FOREVER."
   ];
 
-  var HORNY = [
+  var CREEPY = [
     "I HAVE 8 ARMS AND THEY ALL WANT TO HOLD YOU.",
     "IS IT HOT IN HERE OR IS THAT JUST THE HYDROTHERMAL VENT.",
     "MY LOVE IS DEEPER THAN THE MARIANA TRENCH.",
@@ -929,7 +929,7 @@
       [LAZY, "lazy"],
       [FAT, "fat"],
       [CHILL, "chill"],
-      [HORNY, "horny"],
+      [CREEPY, "creepy"],
       [EXCITED, "excited"],
       [NOSTALGIC, "nostalgic"],
       [HOMESICK, "homesick"]
@@ -991,7 +991,7 @@
         lazy:            "~ LAZY OCTOPUS ~",
         fat:             "~ FAT OCTOPUS ~",
         chill:           "~ CHILL OCTOPUS ~",
-        horny:           "~ HORNY OCTOPUS ~",
+        creepy:           "~ CREEPY OCTOPUS ~",
         excited:         "~ EXCITED OCTOPUS ~",
         nostalgic:       "~ NOSTALGIC OCTOPUS ~",
         homesick:        "~ HOMESICK OCTOPUS ~"

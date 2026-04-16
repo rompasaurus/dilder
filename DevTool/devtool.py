@@ -2528,7 +2528,7 @@ MOUTH_SLAPHAPPY = "slaphappy"   # wide wobbly grin
 MOUTH_LAZY = "lazy"             # flat horizontal line (minimal effort)
 MOUTH_FAT = "fat"               # satisfied closed smile with cheek puffs
 MOUTH_CHILL = "chill"           # slight asymmetric half-smile
-MOUTH_HORNY = "horny"           # wide open smile with tongue out
+MOUTH_CREEPY = "creepy"           # wide open smile with tongue out
 MOUTH_EXCITED = "excited"       # wide open smile (bigger than normal)
 MOUTH_NOSTALGIC = "nostalgic"   # gentle closed half-smile (wistful)
 MOUTH_HOMESICK = "homesick"     # wobbly trying-not-to-cry line
@@ -2546,7 +2546,7 @@ MOUTH_CYCLE_SLAPHAPPY = [MOUTH_SLAPHAPPY, MOUTH_OPEN, MOUTH_SLAPHAPPY, MOUTH_SMI
 MOUTH_CYCLE_LAZY = [MOUTH_LAZY, MOUTH_LAZY, MOUTH_LAZY, MOUTH_OPEN]
 MOUTH_CYCLE_FAT = [MOUTH_FAT, MOUTH_OPEN, MOUTH_FAT, MOUTH_SMILE]
 MOUTH_CYCLE_CHILL = [MOUTH_CHILL, MOUTH_OPEN, MOUTH_CHILL, MOUTH_SMILE]
-MOUTH_CYCLE_HORNY = [MOUTH_HORNY, MOUTH_OPEN, MOUTH_HORNY, MOUTH_SMILE]
+MOUTH_CYCLE_CREEPY = [MOUTH_CREEPY, MOUTH_OPEN, MOUTH_CREEPY, MOUTH_SMILE]
 MOUTH_CYCLE_EXCITED = [MOUTH_EXCITED, MOUTH_OPEN, MOUTH_EXCITED, MOUTH_SMILE]
 MOUTH_CYCLE_NOSTALGIC = [MOUTH_NOSTALGIC, MOUTH_OPEN, MOUTH_NOSTALGIC, MOUTH_SMILE]
 MOUTH_CYCLE_HOMESICK = [MOUTH_HOMESICK, MOUTH_OPEN, MOUTH_HOMESICK, MOUTH_HOMESICK]
@@ -2993,7 +2993,7 @@ def _octo_chill_mouth():
     return mouth
 
 
-def _octo_horny_pupils():
+def _octo_creepy_pupils():
     """Heart-shaped pupils — small diamond/V shapes in each eye socket."""
     pupils = []
     for ecx in [22, 48]:
@@ -3012,7 +3012,7 @@ def _octo_horny_pupils():
     return pupils
 
 
-def _octo_horny_mouth():
+def _octo_creepy_mouth():
     """Wide open smile with tongue hanging out.
 
     Returns list of (op, x, y) tuples — 'set' for border, 'clr' for interior.
@@ -3175,8 +3175,8 @@ def _mood_cycle(mood):
         return MOUTH_CYCLE_FAT
     if mood == "chill":
         return MOUTH_CYCLE_CHILL
-    if mood == "horny":
-        return MOUTH_CYCLE_HORNY
+    if mood == "creepy":
+        return MOUTH_CYCLE_CREEPY
     if mood == "excited":
         return MOUTH_CYCLE_EXCITED
     if mood == "nostalgic":
@@ -4124,7 +4124,7 @@ CHILL_QUOTES = [
     "NAMASTE IN THE WATER FOREVER.",
 ]
 
-HORNY_QUOTES = [
+CREEPY_QUOTES = [
     # ── Flirty octopus energy ──
     "I HAVE 8 ARMS AND THEY ALL WANT TO HOLD YOU.",
     "IS IT HOT IN HERE OR IS THAT JUST THE HYDROTHERMAL VENT.",
@@ -4319,7 +4319,7 @@ def _body_transform(mood, frame_count):
     elif mood == "chill":
         # Slight lean back, very subtle
         return (int(sin(f * 0.4)), 1, 0, no_wobble)
-    elif mood == "horny":
+    elif mood == "creepy":
         # Rhythmic pulse (expand/contract)
         pulse = int(2 * sin(f * 2.0))
         return (0, 0, pulse, no_wobble)
@@ -4397,7 +4397,7 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
         "lazy": _octo_lazy_pupils,
         "fat": _octo_fat_pupils,
         "chill": _octo_chill_pupils,
-        "horny": _octo_horny_pupils,
+        "creepy": _octo_creepy_pupils,
         "excited": _octo_excited_pupils,
         "nostalgic": _octo_nostalgic_pupils,
         "homesick": _octo_homesick_pupils,
@@ -4499,8 +4499,8 @@ def _generate_octopus_frame(mouth_expr, quote, tagline="~ SASSY OCTOPUS ~",
     elif mouth_expr == MOUTH_CHILL:
         for mx, my in _octo_chill_mouth():
             _set(mx, my, 1)
-    elif mouth_expr == MOUTH_HORNY:
-        for item in _octo_horny_mouth():
+    elif mouth_expr == MOUTH_CREEPY:
+        for item in _octo_creepy_mouth():
             op, mx, my = item
             if op == "set":
                 _set(mx, my, 1)
@@ -4606,8 +4606,8 @@ class ProgramsTab(ttk.Frame):
             "desc": "Side-glancing cool pupils, relaxed half-smile. Unbothered\n"
                     "zen vibes, stoner philosopher energy, going with the flow.",
         },
-        "horny_octopus": {
-            "name": "Horny Octopus",
+        "creepy_octopus": {
+            "name": "Creepy Octopus",
             "desc": "Heart-shaped pupils, wide smile with tongue out. Flirty\n"
                     "tentacle energy, ocean romance, and goofy innuendo.",
         },
@@ -4667,7 +4667,7 @@ class ProgramsTab(ttk.Frame):
             ("Playful", [
                 "slaphappy_octopus",
                 "excited_octopus",
-                "horny_octopus",
+                "creepy_octopus",
             ]),
             ("Relaxed", [
                 "chill_octopus",
@@ -4926,7 +4926,7 @@ class ProgramsTab(ttk.Frame):
         "lazy_octopus":           (LAZY_QUOTES,           "~ LAZY OCTOPUS ~",           "lazy"),
         "fat_octopus":            (FAT_QUOTES,            "~ FAT OCTOPUS ~",            "fat"),
         "chill_octopus":          (CHILL_QUOTES,          "~ CHILL OCTOPUS ~",          "chill"),
-        "horny_octopus":          (HORNY_QUOTES,          "~ HORNY OCTOPUS ~",          "horny"),
+        "creepy_octopus":          (CREEPY_QUOTES,          "~ CREEPY OCTOPUS ~",          "creepy"),
         "excited_octopus":        (EXCITED_QUOTES,        "~ EXCITED OCTOPUS ~",        "excited"),
         "nostalgic_octopus":      (NOSTALGIC_QUOTES,      "~ NOSTALGIC OCTOPUS ~",      "nostalgic"),
         "homesick_octopus":       (HOMESICK_QUOTES,       "~ HOMESICK OCTOPUS ~",       "homesick"),
@@ -4934,14 +4934,14 @@ class ProgramsTab(ttk.Frame):
                                    CONSPIRATORIAL_QUOTES + SAD_QUOTES + CHAOTIC_QUOTES +
                                    HUNGRY_QUOTES + TIRED_QUOTES + SLAPHAPPY_QUOTES +
                                    LAZY_QUOTES + FAT_QUOTES + CHILL_QUOTES +
-                                   HORNY_QUOTES + EXCITED_QUOTES + NOSTALGIC_QUOTES +
+                                   CREEPY_QUOTES + EXCITED_QUOTES + NOSTALGIC_QUOTES +
                                    HOMESICK_QUOTES,
                                    "~ MOOD SELECTOR ~", None),
         "joystick_mood_selector": (SASSY_QUOTES + SUPPORTIVE_QUOTES + ANGRY_QUOTES +
                                    CONSPIRATORIAL_QUOTES + SAD_QUOTES + CHAOTIC_QUOTES +
                                    HUNGRY_QUOTES + TIRED_QUOTES + SLAPHAPPY_QUOTES +
                                    LAZY_QUOTES + FAT_QUOTES + CHILL_QUOTES +
-                                   HORNY_QUOTES + EXCITED_QUOTES + NOSTALGIC_QUOTES +
+                                   CREEPY_QUOTES + EXCITED_QUOTES + NOSTALGIC_QUOTES +
                                    HOMESICK_QUOTES,
                                    "~ JOYSTICK MOOD ~", None),
     }
@@ -5290,7 +5290,7 @@ class ProgramsTab(ttk.Frame):
         "lazy_octopus":           "lazy-octopus",
         "fat_octopus":            "fat-octopus",
         "chill_octopus":          "chill-octopus",
-        "horny_octopus":          "horny-octopus",
+        "creepy_octopus":          "creepy-octopus",
         "excited_octopus":        "excited-octopus",
         "nostalgic_octopus":      "nostalgic-octopus",
         "homesick_octopus":       "homesick-octopus",
@@ -5318,7 +5318,7 @@ class ProgramsTab(ttk.Frame):
         mood_map = {None: 0, "weird": 1, "unhinged": 2,
                     "angry": 3, "sad": 4, "chaotic": 5,
                     "hungry": 6, "tired": 7, "slaphappy": 8,
-                    "lazy": 9, "fat": 10, "chill": 11, "horny": 12,
+                    "lazy": 9, "fat": 10, "chill": 11, "creepy": 12,
                     "excited": 13, "nostalgic": 14, "homesick": 15}
 
         with open(header_path, "w") as f:

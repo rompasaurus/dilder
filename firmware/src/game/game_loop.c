@@ -111,7 +111,7 @@ static sensor_context_t prev_sensor_ctx;
 static const char *EMOTION_NAMES[] = {
     "Normal", "Hungry", "Tired", "Sad", "Angry",
     "Excited", "Chill", "Lazy", "Fat", "Chaotic",
-    "Weird", "Unhinged", "SlapHappy", "Horny",
+    "Weird", "Unhinged", "SlapHappy", "Creepy",
     "Nostalgic", "Homesick"
 };
 

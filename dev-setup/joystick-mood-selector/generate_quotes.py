@@ -26,7 +26,7 @@ quote_vars = [
     'CONSPIRATORIAL_QUOTES', 'SAD_QUOTES', 'CHAOTIC_QUOTES',
     'HUNGRY_QUOTES', 'TIRED_QUOTES', 'SLAPHAPPY_QUOTES',
     'LAZY_QUOTES', 'FAT_QUOTES', 'CHILL_QUOTES',
-    'HORNY_QUOTES', 'EXCITED_QUOTES', 'NOSTALGIC_QUOTES',
+    'CREEPY_QUOTES', 'EXCITED_QUOTES', 'NOSTALGIC_QUOTES',
     'HOMESICK_QUOTES',
 ]
 
@@ -57,7 +57,7 @@ for var in quote_vars:
 mood_map = {
     None: 0, "weird": 1, "unhinged": 2, "angry": 3, "sad": 4,
     "chaotic": 5, "hungry": 6, "tired": 7, "slaphappy": 8,
-    "lazy": 9, "fat": 10, "chill": 11, "horny": 12,
+    "lazy": 9, "fat": 10, "chill": 11, "creepy": 12,
     "excited": 13, "nostalgic": 14, "homesick": 15,
 }
 
@@ -75,7 +75,7 @@ configs = [
     ('LAZY_QUOTES',           'lazy'),
     ('FAT_QUOTES',            'fat'),
     ('CHILL_QUOTES',          'chill'),
-    ('HORNY_QUOTES',          'horny'),
+    ('CREEPY_QUOTES',          'creepy'),
     ('EXCITED_QUOTES',        'excited'),
     ('NOSTALGIC_QUOTES',      'nostalgic'),
     ('HOMESICK_QUOTES',       'homesick'),

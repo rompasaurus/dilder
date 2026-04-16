@@ -93,7 +93,7 @@ def draw_pupils_chill():
                 if dx * dx + dy * dy <= 4:
                     canvas.px_set_off(ecx + dx, ecy + dy)
 
-def draw_pupils_horny():
+def draw_pupils_creepy():
     for ecx in [22, 48]:
         for dx, dy in [(-2, -1), (-1, -2), (0, -1), (1, -2), (2, -1)]:
             canvas.px_set_off(ecx + dx, 25 + dy)
@@ -346,7 +346,7 @@ def draw_mouth_chill():
         canvas.px_set_off(x, y)
         canvas.px_set_off(x, y + 1)
 
-def draw_mouth_horny():
+def draw_mouth_creepy():
     cx, cy, rx, ry = 35, 39, 8, 5
     for dy in range(0, ry + 1):
         for dx in range(-rx, rx + 1):
@@ -440,7 +440,7 @@ _CONFIGS = {
     "lazy":      {"body_key": "lazy",     "pupils": draw_pupils_lazy,      "mouth": draw_mouth_lazy,     "lids": draw_lids_lazy, "belly": draw_belly_tentacle_lazy, "unique_pose": "melted_puddle"},
     "fat":       {"body_key": "fat",      "pupils": draw_pupils_fat,       "mouth": draw_mouth_fat,      "unique_pose": "belly_rub"},
     "chill":     {"body_key": "standard", "pupils": draw_pupils_chill,     "mouth": draw_mouth_chill,    "unique_pose": "wall_lean"},
-    "horny":     {"body_key": "standard", "pupils": draw_pupils_horny,     "mouth": draw_mouth_horny,    "unique_pose": "peacock_strut"},
+    "creepy":     {"body_key": "standard", "pupils": draw_pupils_creepy,     "mouth": draw_mouth_creepy,    "unique_pose": "peacock_strut"},
     "excited":   {"body_key": "standard", "pupils": draw_pupils_excited,   "mouth": draw_mouth_excited,  "unique_pose": "victory_jump"},
     "nostalgic": {"body_key": "standard", "pupils": draw_pupils_nostalgic, "mouth": draw_mouth_nostalgic, "unique_pose": "photo_gaze"},
     "homesick":  {"body_key": "standard", "pupils": draw_pupils_homesick,  "mouth": draw_mouth_homesick, "tears": draw_tears_homesick, "unique_pose": "globe_hold"},

@@ -89,7 +89,7 @@ def transform_chill(frame_idx):
     canvas.set_body_transform(dx=int(math.sin(f * 0.4)), dy=1)
 
 
-def transform_horny(frame_idx):
+def transform_creepy(frame_idx):
     f = frame_idx * math.pi / 2.0
     canvas.set_body_transform(x_expand=int(2 * math.sin(f * 2.0)))
 
@@ -125,7 +125,7 @@ REGISTRY = {
     "lazy": transform_lazy,
     "fat": transform_fat,
     "chill": transform_chill,
-    "horny": transform_horny,
+    "creepy": transform_creepy,
     "excited": transform_excited,
     "nostalgic": transform_nostalgic,
     "homesick": transform_homesick,

@@ -123,7 +123,7 @@ Main loop (modified):
 | `l` | Lazy | 9 |
 | `f` | Fat | 10 |
 | `k` | Chill | 11 |
-| `y` | Horny | 12 |
+| `y` | Creepy | 12 |
 
 ### Mood Cycling
 
@@ -292,7 +292,7 @@ The DevTool Python app could add a keyboard listener panel:
 │  [n]ormal [w]eird [u]nhinged       │
 │  [a]ngry  [s]ad   [c]haotic        │
 │  [h]ungry [t]ired [p]slaphappy     │
-│  [l]azy   [f]at   [k]chill [y]horny│
+│  [l]azy   [f]at   [k]chill [y]creepy│
 │                                     │
 │  [space] pause  [.] step  [r]andom │
 │  [[] prev  []] next  [?] help      │

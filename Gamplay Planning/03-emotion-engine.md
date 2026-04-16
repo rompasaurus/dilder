@@ -32,7 +32,7 @@ typedef enum {
     EMOTION_WEIRD,        // 10 — Random trigger when bored
     EMOTION_UNHINGED,     // 11 — Health < 20, multiple stats critical
     EMOTION_SLAP_HAPPY,   // 12 — Happiness > 90 after being < 30
-    EMOTION_HORNY,        // 13 — Specific stage + happiness > 70
+    EMOTION_CREEPY,        // 13 — Specific stage + happiness > 70
     EMOTION_NOSTALGIC,    // 14 — Age milestone, familiar location
     EMOTION_HOMESICK,     // 15 — Away from home WiFi for extended period
     EMOTION_COUNT
@@ -238,7 +238,7 @@ float eval_slap_happy(const stats_t *s, const sensor_context_t *ctx,
     return 0.0f;
 }
 
-float eval_horny(const stats_t *s, const sensor_context_t *ctx,
+float eval_creepy(const stats_t *s, const sensor_context_t *ctx,
                  const event_record_t *ev, const life_state_t *life) {
     // Only adolescent or adult, happiness > 70, bond > threshold
     if ((life->stage == LIFE_STAGE_ADOLESCENT || life->stage == LIFE_STAGE_ADULT) &&
@@ -290,7 +290,7 @@ static const emotion_trigger_t TRIGGERS[] = {
     { EMOTION_NOSTALGIC,  eval_nostalgic,    4.5f,    30000 },
     { EMOTION_FAT,        eval_fat,          4.0f,    30000 },
     { EMOTION_LAZY,       eval_lazy,         3.5f,    30000 },
-    { EMOTION_HORNY,      eval_horny,        3.0f,    20000 },
+    { EMOTION_CREEPY,      eval_creepy,        3.0f,    20000 },
     { EMOTION_WEIRD,      eval_weird,        2.5f,    20000 },
     { EMOTION_CHILL,      eval_chill,        2.0f,    30000 },
     { EMOTION_NORMAL,     eval_normal,       1.0f,    30000 },  // Lowest priority
@@ -333,7 +333,7 @@ void emotion_resolve(emotion_state_t *state, const stats_t *stats,
     }
     // Juveniles add: chill, lazy, angry, weird
     else if (life->stage == LIFE_STAGE_JUVENILE) {
-        state->weights[EMOTION_HORNY] = 0.0f;
+        state->weights[EMOTION_CREEPY] = 0.0f;
         state->weights[EMOTION_NOSTALGIC] = 0.0f;
         state->weights[EMOTION_UNHINGED] = 0.0f;
     }

@@ -445,7 +445,7 @@ Events are also logged to a **ring buffer** (circular array of 16 entries). The 
 
 2. GATE — Remove emotions the pet is too young for:
    Hatchlings only get: normal, hungry, tired, sad, excited
-   Juveniles lose: horny, nostalgic, unhinged
+   Juveniles lose: creepy, nostalgic, unhinged
 
 3. SELECT — Pick the highest weight:
    hungry wins at 0.8

@@ -62,7 +62,7 @@ Mood          Diff pixels  Status
 normal              0      MATCH
 lazy                0      MATCH
 fat                 0      MATCH
-horny               0      MATCH
+creepy               0      MATCH
 excited             0      MATCH
 nostalgic           0      MATCH
 angry             256      DIFF (wobble edge)

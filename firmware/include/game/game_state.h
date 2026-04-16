@@ -118,7 +118,7 @@ typedef enum {
     EMOTION_WEIRD,        /* unusual sensor conditions */
     EMOTION_UNHINGED,     /* extreme neglect or very strange inputs */
     EMOTION_SLAP_HAPPY,   /* over-tired but somehow giddy */
-    EMOTION_HORNY,        /* ... it's a pet with personality */
+    EMOTION_CREEPY,        /* ... it's a pet with personality */
     EMOTION_NOSTALGIC,    /* triggered by certain time/age conditions */
     EMOTION_HOMESICK,     /* away from home too long (wifi context) */
     EMOTION_COUNT         /* NOT a real emotion -- equals the total count (16) */

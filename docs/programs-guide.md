@@ -29,7 +29,7 @@ A comprehensive reference for every firmware program in the Dilder project. Each
   - [Lazy Octopus](#lazy-octopus)
   - [Fat Octopus](#fat-octopus)
   - [Chill Octopus](#chill-octopus)
-  - [Horny Octopus](#horny-octopus)
+  - [Creepy Octopus](#creepy-octopus)
   - [Excited Octopus](#excited-octopus)
   - [Nostalgic Octopus](#nostalgic-octopus)
   - [Homesick Octopus](#homesick-octopus)
@@ -326,11 +326,11 @@ Side-glancing cool pupils shifted right, relaxed asymmetric half-smile. Unbother
 | Body | Gentle 1px sway, lowered 1px |
 | Quotes | Stoner philosopher energy, going with the flow |
 
-### Horny Octopus
+### Creepy Octopus
 
-**Directory:** `dev-setup/horny-octopus/` | **Quotes:** 30 | **Default Mood:** Horny
+**Directory:** `dev-setup/creepy-octopus/` | **Quotes:** 30 | **Default Mood:** Creepy
 
-![Horny](../assets/emotion-previews/horny.png)
+![Creepy](../assets/emotion-previews/creepy.png)
 
 Heart-shaped pupils in each eye socket, wide open smile with a tongue hanging out (filled oval + tongue bump below). Flirty tentacle energy.
 
@@ -430,7 +430,7 @@ Connect to the Pico's USB serial port at 115200 baud. All commands are single ke
 | `h` | Hungry | `t` | Tired |
 | `p` | Slap Happy | `l` | Lazy |
 | `f` | Fat | `k` | Chill |
-| `y` | Horny | `e` | Excited |
+| `y` | Creepy | `e` | Excited |
 | `o` | Nostalgic | `m` | Homesick |
 
 #### Other Commands
@@ -509,7 +509,7 @@ minicom -D /dev/ttyACM0 -b 115200
 | Lazy | 30 | Custom (side-sit) | Barely-open slits | Flat line | Sagged, tentacles right |
 | Fat | 30 | Custom (wide) | Wide happy | Cheek-puff smile | Width pulse |
 | Chill | 30 | Standard | Side-glance | Half-smile | Gentle 1px sway |
-| Horny | 30 | Standard | Heart-shaped | Tongue out | Width pulse +/-2px |
+| Creepy | 30 | Standard | Heart-shaped | Tongue out | Width pulse +/-2px |
 | Excited | 30 | Standard | Star sparkle | Wide open grin | Bounce +/-3px |
 | Nostalgic | 30 | Standard | Up-right gaze | Small half-smile | Slow 2px sway |
 | Homesick | 30 | Standard | Tears below | Wobbly line | Drooped, -2px narrow |

@@ -93,7 +93,7 @@
 #define MOOD_LAZY      9
 #define MOOD_FAT       10
 #define MOOD_CHILL     11
-#define MOOD_HORNY     12
+#define MOOD_CREEPY     12
 #define MOOD_EXCITED   13
 #define MOOD_NOSTALGIC 14
 #define MOOD_HOMESICK  15
@@ -124,7 +124,7 @@
 #define EXPR_LAZY      11
 #define EXPR_FAT       12
 #define EXPR_CHILL     13
-#define EXPR_HORNY     14
+#define EXPR_CREEPY     14
 #define EXPR_EXCITED   15
 #define EXPR_NOSTALGIC 16
 #define EXPR_HOMESICK  17
@@ -134,7 +134,7 @@ static const char *mood_names[MOOD_COUNT] = {
     "SASSY",    "WEIRD",    "UNHINGED",   "ANGRY",
     "SAD",      "CHAOTIC",  "HUNGRY",     "TIRED",
     "SLAPHAPPY","LAZY",     "FAT",        "CHILL",
-    "HORNY",    "EXCITED",  "NOSTALGIC",  "HOMESICK",
+    "CREEPY",    "EXCITED",  "NOSTALGIC",  "HOMESICK",
 };
 
 /* Landscape frame buffer (1 = black pixel, packed MSB-first) */
@@ -474,7 +474,7 @@ static void draw_pupils_chill(void) {
                     px_set_off(centers[e][0]+dx, centers[e][1]+dy);
 }
 
-static void draw_pupils_horny(void) {
+static void draw_pupils_creepy(void) {
     for (int e = 0; e < 2; e++) {
         int ecx = e ? 48 : 22;
         static const int8_t top[][2] = {{-2,-1},{-1,-2},{0,-1},{1,-2},{2,-1}};
@@ -716,7 +716,7 @@ static void draw_mouth_chill(void) {
     }
 }
 
-static void draw_mouth_horny(void) {
+static void draw_mouth_creepy(void) {
     int cx = 35, cy = 39, rx = 8, ry = 5;
     for (int dy = 0; dy <= ry; dy++)
         for (int dx = -rx; dx <= rx; dx++) {
@@ -917,7 +917,7 @@ static void setup_body_transform(uint8_t mood, uint32_t f) {
         case MOOD_CHILL:
             body_dx = (int)sinf(f * 0.4f); body_dy = 1;
             break;
-        case MOOD_HORNY:
+        case MOOD_CREEPY:
             body_x_expand = (int)(2 * sinf(f * 2.0f));
             break;
         case MOOD_EXCITED:
@@ -995,7 +995,7 @@ static void render_frame(const Quote *q, int expr, uint32_t frame_idx, uint8_t c
         case MOOD_LAZY:      draw_pupils_lazy();      break;
         case MOOD_FAT:       draw_pupils_fat();       break;
         case MOOD_CHILL:     draw_pupils_chill();     break;
-        case MOOD_HORNY:     draw_pupils_horny();     break;
+        case MOOD_CREEPY:     draw_pupils_creepy();     break;
         case MOOD_EXCITED:   draw_pupils_excited();   break;
         case MOOD_NOSTALGIC: draw_pupils_nostalgic(); break;
         case MOOD_HOMESICK:  draw_pupils_homesick();  break;
@@ -1025,7 +1025,7 @@ static void render_frame(const Quote *q, int expr, uint32_t frame_idx, uint8_t c
         case EXPR_LAZY:      draw_mouth_lazy();      break;
         case EXPR_FAT:       draw_mouth_fat();       break;
         case EXPR_CHILL:     draw_mouth_chill();     break;
-        case EXPR_HORNY:     draw_mouth_horny();     break;
+        case EXPR_CREEPY:     draw_mouth_creepy();     break;
         case EXPR_EXCITED:   draw_mouth_excited();   break;
         case EXPR_NOSTALGIC: draw_mouth_nostalgic(); break;
         case EXPR_HOMESICK:  draw_mouth_homesick();  break;
@@ -1099,7 +1099,7 @@ static const uint8_t cycle_slaphappy[]= {EXPR_SLAPHAPPY, EXPR_OPEN, EXPR_SLAPHAP
 static const uint8_t cycle_lazy[]     = {EXPR_LAZY, EXPR_LAZY, EXPR_LAZY, EXPR_OPEN};
 static const uint8_t cycle_fat[]      = {EXPR_FAT, EXPR_OPEN, EXPR_FAT, EXPR_SMILE};
 static const uint8_t cycle_chill[]    = {EXPR_CHILL, EXPR_OPEN, EXPR_CHILL, EXPR_SMILE};
-static const uint8_t cycle_horny[]    = {EXPR_HORNY, EXPR_OPEN, EXPR_HORNY, EXPR_SMILE};
+static const uint8_t cycle_creepy[]    = {EXPR_CREEPY, EXPR_OPEN, EXPR_CREEPY, EXPR_SMILE};
 static const uint8_t cycle_excited[]  = {EXPR_EXCITED, EXPR_OPEN, EXPR_EXCITED, EXPR_SMILE};
 static const uint8_t cycle_nostalgic[]= {EXPR_NOSTALGIC, EXPR_OPEN, EXPR_NOSTALGIC, EXPR_SMILE};
 static const uint8_t cycle_homesick[] = {EXPR_HOMESICK, EXPR_OPEN, EXPR_HOMESICK, EXPR_HOMESICK};
@@ -1117,7 +1117,7 @@ static const uint8_t *mood_cycle(uint8_t mood) {
         case MOOD_LAZY:      return cycle_lazy;
         case MOOD_FAT:       return cycle_fat;
         case MOOD_CHILL:     return cycle_chill;
-        case MOOD_HORNY:     return cycle_horny;
+        case MOOD_CREEPY:     return cycle_creepy;
         case MOOD_EXCITED:   return cycle_excited;
         case MOOD_NOSTALGIC: return cycle_nostalgic;
         case MOOD_HOMESICK:  return cycle_homesick;
@@ -1203,7 +1203,7 @@ static void print_help(void) {
     printf("    h = Hungry     t = Tired\n");
     printf("    p = SlapHappy  l = Lazy\n");
     printf("    f = Fat        k = Chill\n");
-    printf("    y = Horny      e = Excited\n");
+    printf("    y = Creepy      e = Excited\n");
     printf("    o = Nostalgic  m = Homesick\n");
     printf("\n");
     printf("  OTHER:\n");
@@ -1368,7 +1368,7 @@ int main(void) {
                     case 'l': case 'L': current_mood = MOOD_LAZY;      snprintf(last_input, sizeof(last_input), "SER:L"); break;
                     case 'f': case 'F': current_mood = MOOD_FAT;       snprintf(last_input, sizeof(last_input), "SER:F"); break;
                     case 'k': case 'K': current_mood = MOOD_CHILL;     snprintf(last_input, sizeof(last_input), "SER:K"); break;
-                    case 'y': case 'Y': current_mood = MOOD_HORNY;     snprintf(last_input, sizeof(last_input), "SER:Y"); break;
+                    case 'y': case 'Y': current_mood = MOOD_CREEPY;     snprintf(last_input, sizeof(last_input), "SER:Y"); break;
                     case 'e': case 'E': current_mood = MOOD_EXCITED;   snprintf(last_input, sizeof(last_input), "SER:E"); break;
                     case 'o': case 'O': current_mood = MOOD_NOSTALGIC; snprintf(last_input, sizeof(last_input), "SER:O"); break;
                     case 'm': case 'M': current_mood = MOOD_HOMESICK;  snprintf(last_input, sizeof(last_input), "SER:M"); break;

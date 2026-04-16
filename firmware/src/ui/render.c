@@ -954,7 +954,7 @@ static void draw_eyes(int cx, int cy, emotion_id_t emotion) {
         fb_line(rx - 3, ey + 3, rx + 3, ey - 3);  /* right eye: / diagonal */
         break;
 
-    case EMOTION_HORNY:
+    case EMOTION_CREEPY:
         /* Heart-shaped eyes: two overlapping filled circles per eye,
          * positioned side by side and slightly above center.
          * The overlap creates a rough heart shape. */

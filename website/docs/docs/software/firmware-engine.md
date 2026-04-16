@@ -85,7 +85,7 @@ Every 5 seconds, 16 emotion triggers are evaluated. Each returns a weight (0.0â€
 - **Stat-driven**: Hungry, Tired, Sad, Unhinged (critical stats)
 - **Event-driven**: Angry (scolded), Excited (fed, milestone)
 - **Sensor-driven**: Chill (comfortable temp), Homesick (away from home WiFi)
-- **Random**: Weird (5% chance when bored), Horny (2% chance when happy + old enough)
+- **Random**: Weird (5% chance when bored), Creepy (2% chance when happy + old enough)
 
 The highest-weight emotion wins, with hysteresis preventing rapid flickering.
 

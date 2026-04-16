@@ -186,12 +186,12 @@ All 16 octopus emotional states with facial features, body animations, and rende
 
 ---
 
-## Horny
+## Creepy
 
-![Horny](emotion-previews/horny.png)
+![Creepy](emotion-previews/creepy.png)
 
 **Animation strip:**
-![Horny animation](emotion-previews/horny-anim.png)
+![Creepy animation](emotion-previews/creepy-anim.png)
 
 | Feature | Description |
 |---------|-------------|

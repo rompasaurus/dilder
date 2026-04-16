@@ -87,7 +87,7 @@
 #define MOOD_LAZY      9
 #define MOOD_FAT       10
 #define MOOD_CHILL     11
-#define MOOD_HORNY     12
+#define MOOD_CREEPY     12
 #define MOOD_EXCITED   13
 #define MOOD_NOSTALGIC 14
 #define MOOD_HOMESICK  15
@@ -107,7 +107,7 @@
 #define EXPR_LAZY      11
 #define EXPR_FAT       12
 #define EXPR_CHILL     13
-#define EXPR_HORNY     14
+#define EXPR_CREEPY     14
 #define EXPR_EXCITED   15
 #define EXPR_NOSTALGIC 16
 #define EXPR_HOMESICK  17
@@ -728,9 +728,9 @@ static void draw_mouth_chill(void) {
     }
 }
 
-/* ─── Horny: heart-shaped pupils, tongue-out mouth ─── */
+/* ─── Creepy: heart-shaped pupils, tongue-out mouth ─── */
 
-static void draw_pupils_horny(void) {
+static void draw_pupils_creepy(void) {
     /* Heart-shaped pupils in each eye socket */
     for (int e = 0; e < 2; e++) {
         int ecx = e ? 48 : 22;
@@ -749,7 +749,7 @@ static void draw_pupils_horny(void) {
     }
 }
 
-static void draw_mouth_horny(void) {
+static void draw_mouth_creepy(void) {
     /* Wide open smile with tongue hanging out */
     int cx = 35, cy = 39, rx = 8, ry = 5;
     for (int dy = 0; dy <= ry; dy++)
@@ -1022,7 +1022,7 @@ static void setup_body_transform(uint8_t mood, uint32_t f) {
         case MOOD_CHILL:
             body_dx = (int)sinf(f * 0.4f); body_dy = 1;
             break;
-        case MOOD_HORNY:
+        case MOOD_CREEPY:
             body_x_expand = (int)(2 * sinf(f * 2.0f));
             break;
         case MOOD_EXCITED:
@@ -1069,7 +1069,7 @@ static void render_frame(const Quote *q, int expr, uint32_t frame_idx) {
         case MOOD_LAZY:     draw_pupils_lazy();     break;
         case MOOD_FAT:      draw_pupils_fat();      break;
         case MOOD_CHILL:    draw_pupils_chill();    break;
-        case MOOD_HORNY:    draw_pupils_horny();    break;
+        case MOOD_CREEPY:    draw_pupils_creepy();    break;
         case MOOD_EXCITED:  draw_pupils_excited();  break;
         case MOOD_NOSTALGIC: draw_pupils_nostalgic(); break;
         case MOOD_HOMESICK: draw_pupils_homesick(); break;
@@ -1099,7 +1099,7 @@ static void render_frame(const Quote *q, int expr, uint32_t frame_idx) {
         case EXPR_LAZY:      draw_mouth_lazy();      break;
         case EXPR_FAT:       draw_mouth_fat();       break;
         case EXPR_CHILL:     draw_mouth_chill();     break;
-        case EXPR_HORNY:     draw_mouth_horny();     break;
+        case EXPR_CREEPY:     draw_mouth_creepy();     break;
         case EXPR_EXCITED:   draw_mouth_excited();   break;
         case EXPR_NOSTALGIC: draw_mouth_nostalgic(); break;
         case EXPR_HOMESICK:  draw_mouth_homesick();  break;
@@ -1175,7 +1175,7 @@ static const uint8_t cycle_slaphappy[] = {EXPR_SLAPHAPPY, EXPR_OPEN, EXPR_SLAPHA
 static const uint8_t cycle_lazy[]      = {EXPR_LAZY, EXPR_LAZY, EXPR_LAZY, EXPR_OPEN};
 static const uint8_t cycle_fat[]       = {EXPR_FAT, EXPR_OPEN, EXPR_FAT, EXPR_SMILE};
 static const uint8_t cycle_chill[]     = {EXPR_CHILL, EXPR_OPEN, EXPR_CHILL, EXPR_SMILE};
-static const uint8_t cycle_horny[]     = {EXPR_HORNY, EXPR_OPEN, EXPR_HORNY, EXPR_SMILE};
+static const uint8_t cycle_creepy[]     = {EXPR_CREEPY, EXPR_OPEN, EXPR_CREEPY, EXPR_SMILE};
 static const uint8_t cycle_excited[]   = {EXPR_EXCITED, EXPR_OPEN, EXPR_EXCITED, EXPR_SMILE};
 static const uint8_t cycle_nostalgic[] = {EXPR_NOSTALGIC, EXPR_OPEN, EXPR_NOSTALGIC, EXPR_SMILE};
 static const uint8_t cycle_homesick[]  = {EXPR_HOMESICK, EXPR_OPEN, EXPR_HOMESICK, EXPR_HOMESICK};
@@ -1193,7 +1193,7 @@ static const uint8_t *mood_cycle(uint8_t mood) {
         case MOOD_LAZY:      return cycle_lazy;
         case MOOD_FAT:       return cycle_fat;
         case MOOD_CHILL:     return cycle_chill;
-        case MOOD_HORNY:     return cycle_horny;
+        case MOOD_CREEPY:     return cycle_creepy;
         case MOOD_EXCITED:   return cycle_excited;
         case MOOD_NOSTALGIC: return cycle_nostalgic;
         case MOOD_HOMESICK:  return cycle_homesick;

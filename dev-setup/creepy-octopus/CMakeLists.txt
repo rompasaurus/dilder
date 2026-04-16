@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 
 include(pico_sdk_import.cmake)
 
-project(horny_octopus C CXX ASM)
+project(creepy_octopus C CXX ASM)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
@@ -33,23 +33,23 @@ else()
     message(STATUS "Display variant: V3 (standard)")
 endif()
 
-add_executable(horny_octopus
+add_executable(creepy_octopus
     main.c
     lib/Config/DEV_Config.c
     ${EPD_SOURCE}
 )
 
 if(EPD_DEFINE)
-    target_compile_definitions(horny_octopus PRIVATE ${EPD_DEFINE}=1)
+    target_compile_definitions(creepy_octopus PRIVATE ${EPD_DEFINE}=1)
 endif()
 
-target_include_directories(horny_octopus PRIVATE
+target_include_directories(creepy_octopus PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/Config
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/e-Paper
 )
 
-target_link_libraries(horny_octopus
+target_link_libraries(creepy_octopus
     pico_stdlib
     hardware_spi
     hardware_gpio
@@ -58,7 +58,7 @@ target_link_libraries(horny_octopus
     m
 )
 
-pico_enable_stdio_usb(horny_octopus 1)
-pico_enable_stdio_uart(horny_octopus 0)
+pico_enable_stdio_usb(creepy_octopus 1)
+pico_enable_stdio_uart(creepy_octopus 0)
 
-pico_add_extra_outputs(horny_octopus)
+pico_add_extra_outputs(creepy_octopus)

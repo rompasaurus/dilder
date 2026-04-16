@@ -34,7 +34,7 @@ dilder/
 │   ├── lazy-octopus/            # Lazy personality (30 quotes, custom body)
 │   ├── fat-octopus/             # Fat personality (30 quotes, custom body)
 │   ├── chill-octopus/           # Chill personality (30 quotes)
-│   ├── horny-octopus/           # Horny personality (30 quotes)
+│   ├── creepy-octopus/           # Creepy personality (30 quotes)
 │   ├── excited-octopus/         # Excited personality (30 quotes)
 │   ├── nostalgic-octopus/       # Nostalgic personality (30 quotes)
 │   ├── homesick-octopus/        # Homesick personality (30 quotes)

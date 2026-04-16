@@ -10,7 +10,7 @@ slug: sixteen-emotions
 
 # 16 Emotions — Building the Octopus Personality System
 
-One octopus personality isn't a pet. It's a novelty. Today the octopus learned to feel — angry eyebrows, sad droopy eyes, chaotic spiral pupils, heart-shaped horny eyes, and 12 more distinct emotional states. Each one changes how the octopus looks, moves, and talks.
+One octopus personality isn't a pet. It's a novelty. Today the octopus learned to feel — angry eyebrows, sad droopy eyes, chaotic spiral pupils, heart-shaped creepy eyes, and 12 more distinct emotional states. Each one changes how the octopus looks, moves, and talks.
 
 <!-- more -->
 
@@ -23,7 +23,7 @@ Every emotional state is a combination of independently drawn components:
 - **Eyelids** — partial circle fills covering the top of the eye socket (tired, lazy)
 - **Mouth** — distinct mathematical curve per emotion (parabola, sine wave, zigzag, ellipse with drool)
 - **Body transform** — per-frame animation (breathing bob, jitter, sway, puff, droop)
-- **Special effects** — tear drops (homesick), tongue (horny), cheek puffs (fat)
+- **Special effects** — tear drops (homesick), tongue (creepy), cheek puffs (fat)
 
 The system is composable. Adding a new emotion means writing 2-3 small draw functions and a 4-element animation cycle. No bitmaps to create, no sprites to manage.
 
@@ -45,7 +45,7 @@ The octopus went from 1 personality to 16 in a few sessions:
 | Lazy | Nearly shut slits | Flat line | Tentacles draped right | Proudly doing nothing |
 | Fat | Wide happy | Smile + cheek puffs | Wide dome, thick tentacles | Food-positive king |
 | Chill | Side-glancing | Half-smile | Subtle lean | Stoner philosopher |
-| Horny | Heart-shaped | Tongue out | Rhythmic pulse | Tentacle romance |
+| Creepy | Heart-shaped | Tongue out | Rhythmic pulse | Tentacle romance |
 | Excited | Star sparkles | Wide grin | Bouncing | CAPS LOCK ENERGY |
 | Nostalgic | Looking up-right | Wistful smile | Gentle sway | Back in my day |
 | Homesick | Teary + drops | Wobbly line | Curled inward | Missing the deep |
@@ -64,7 +64,7 @@ New quotes are selected on `EXPR_OPEN` frames. So the angry octopus mostly frown
 
 ## Each Emotion is a Standalone Firmware
 
-Every emotional state has its own firmware directory under `dev-setup/` — `angry-octopus/`, `sad-octopus/`, `horny-octopus/`, etc. Each has its own `main.c` (identical rendering code) and `quotes.h` (30-196 themed quotes generated to match the personality).
+Every emotional state has its own firmware directory under `dev-setup/` — `angry-octopus/`, `sad-octopus/`, `creepy-octopus/`, etc. Each has its own `main.c` (identical rendering code) and `quotes.h` (30-196 themed quotes generated to match the personality).
 
 Pick a mood, flash it, and your desk octopus becomes that emotion permanently until you flash a different one. Or use the Mood Selector firmware that contains all 823 quotes across all 16 moods and lets you browse with serial commands.
 
@@ -76,7 +76,7 @@ Each personality has a curated quote list. The quotes are short (fits in a 170x7
 
 **Tired:** "MY BRAIN HAS 47 TABS OPEN AND THEY'RE ALL LOADING."
 
-**Horny:** "ARE YOU A CORAL REEF? BECAUSE I WANT TO EXPLORE YOU."
+**Creepy:** "ARE YOU A CORAL REEF? BECAUSE I WANT TO EXPLORE YOU."
 
 **Homesick:** "THE DEEP OCEAN NEVER JUDGED ME FOR BEING SQUISHY."
 

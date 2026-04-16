@@ -110,7 +110,7 @@ def setup_body_transform(mood, frame_idx):
     elif mood == "chill":
         body_dx = int(math.sin(f * 0.4))
         body_dy = 1
-    elif mood == "horny":
+    elif mood == "creepy":
         body_x_expand = int(2 * math.sin(f * 2.0))
     elif mood == "excited":
         body_dy = int(3 * math.sin(f * 3.0))
@@ -373,7 +373,7 @@ def draw_pupils_chill():
                     px_set_off(ecx + dx, ecy + dy)
 
 
-def draw_pupils_horny():
+def draw_pupils_creepy():
     for ecx in [22, 48]:
         top = [(-2, -1), (-1, -2), (0, -1), (1, -2), (2, -1)]
         for dx, dy in top:
@@ -653,7 +653,7 @@ def draw_mouth_chill():
         px_set_off(x, y + 1)
 
 
-def draw_mouth_horny():
+def draw_mouth_creepy():
     cx, cy, rx, ry = 35, 39, 8, 5
     for dy in range(0, ry + 1):
         for dx in range(-rx, rx + 1):
@@ -798,7 +798,7 @@ MOOD_CONFIG = {
                      "brows": None, "lids": None, "special_eyes": None, "tears": None, "belly": None},
     "chill":        {"body": BODY_RLE_STANDARD, "pupils": draw_pupils_chill, "mouth": draw_mouth_chill,
                      "brows": None, "lids": None, "special_eyes": None, "tears": None, "belly": None},
-    "horny":        {"body": BODY_RLE_STANDARD, "pupils": draw_pupils_horny, "mouth": draw_mouth_horny,
+    "creepy":        {"body": BODY_RLE_STANDARD, "pupils": draw_pupils_creepy, "mouth": draw_mouth_creepy,
                      "brows": None, "lids": None, "special_eyes": None, "tears": None, "belly": None},
     "excited":      {"body": BODY_RLE_STANDARD, "pupils": draw_pupils_excited, "mouth": draw_mouth_excited,
                      "brows": None, "lids": None, "special_eyes": None, "tears": None, "belly": None},
