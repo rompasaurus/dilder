@@ -5,6 +5,14 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# ── Target board selection ──────────────────────────────────────
+# Set via: cmake -DTARGET_BOARD=PICO_W ..  (or ESP32S3, DESKTOP)
+# Defaults to DESKTOP for the shared library / CLI build.
+if(NOT DEFINED TARGET_BOARD)
+    set(TARGET_BOARD "DESKTOP")
+endif()
+add_compile_definitions(BOARD_${TARGET_BOARD})
+
 # ── Compiler Warnings ───────────────────────────────────────────
 add_compile_options(-Wall -Wextra -Wno-unused-parameter)
 

@@ -17,34 +17,37 @@ A complete, step-by-step walkthrough for setting up the Raspberry Pi Pico W deve
     Before following the manual steps below, try the automated setup script. It walks you through the entire process with explanations, automates installs and builds, and lets you skip/quit/resume at any point.
 
 ```bash
-python3 setup.py              # full interactive walkthrough
+python3 setup.py              # interactive board selection menu (Pico W / ESP32-S3 / Both)
+python3 setup.py --board pico # run setup for Pico W only
+python3 setup.py --board esp32 # run setup for ESP32-S3 only
 python3 setup.py --status     # see what's installed and what's missing
-python3 setup.py --list       # list all 15 steps
+python3 setup.py --list       # list all 16 steps
 python3 setup.py --step 7     # jump to a specific step
 python3 setup.py --test-setup # install testing dependencies
 ```
 
 ![Setup CLI step list](../../assets/images/setup-cli/setup_cli_list_rendered.png)
 
-The script handles 15 steps across three checkpoints:
+The script handles 16 steps across three checkpoints:
 
-| Step | Name | Description |
-|------|------|-------------|
-| 1 | Check Prerequisites | Detects distro, verifies git/cmake/Python/Tkinter/pyserial |
-| 2 | Install ARM Toolchain | Runs the correct package manager command |
-| 3 | Clone Pico SDK | Clones `pico-sdk` with submodules |
-| 4 | Set PICO_SDK_PATH | Adds export to your shell profile |
-| 5 | Serial Port Permissions | Adds user to `uucp` (Arch) or `dialout` (Debian) |
-| 6 | Install VSCode Extensions | Installs C/C++ (or clangd for Code OSS), CMake Tools, Cortex-Debug |
-| 7 | Build Hello Serial | CMake + Ninja build of serial-only test |
-| 8 | Flash Hello Serial | Guides BOOTSEL, auto-detects mount, copies UF2 |
-| 9 | Verify Serial Output | Confirms serial and LED work (Checkpoint 1) |
-| 10 | Connect the Display | Guides HAT-on-header assembly |
-| 11 | Get Waveshare Library | Clones and copies C driver files |
-| 12 | Build Hello Display | Builds the e-ink display test |
-| 13 | Flash Hello Display | Flash display firmware |
-| 14 | Verify Display Output | Confirms text on display (Checkpoint 2) |
-| 15 | Docker Build Toolchain | Installs Docker and pre-builds the ARM container (Checkpoint 3) |
+| Step | Name | Board | Description |
+|------|------|-------|-------------|
+| 1 | Check Prerequisites | [Both] | Detects distro, verifies git/cmake/Python/Tkinter/pyserial |
+| 2 | Install ARM Toolchain | [Pico W] | Runs the correct package manager command |
+| 3 | Clone Pico SDK | [Pico W] | Clones `pico-sdk` with submodules |
+| 4 | Set PICO_SDK_PATH | [Pico W] | Adds export to your shell profile |
+| 5 | Serial Port Permissions | [Both] | Adds user to `uucp` (Arch) or `dialout` (Debian) |
+| 6 | Install VSCode Extensions | [Both] | Installs C/C++ (or clangd for Code OSS), CMake Tools, Cortex-Debug |
+| 7 | Build Hello Serial | [Pico W] | CMake + Ninja build of serial-only test |
+| 8 | Flash Hello Serial | [Pico W] | Guides BOOTSEL, auto-detects mount, copies UF2 |
+| 9 | Verify Serial Output | [Pico W] | Confirms serial and LED work (Checkpoint 1) |
+| 10 | Connect the Display | [Pico W] | Guides HAT-on-header assembly |
+| 11 | Get Waveshare Library | [Pico W] | Clones and copies C driver files |
+| 12 | Build Hello Display | [Pico W] | Builds the e-ink display test |
+| 13 | Flash Hello Display | [Pico W] | Flash display firmware |
+| 14 | Verify Display Output | [Pico W] | Confirms text on display (Checkpoint 2) |
+| 15 | Docker Build Toolchain | [Both] | Installs Docker and pre-builds the ARM container (Checkpoint 3) |
+| 16 | ESP32-S3 Toolchain (PlatformIO) | [ESP32-S3] | Set up PlatformIO and ESP-IDF for the Olimex ESP32-S3 |
 
 Use `--status` to check your current environment at a glance:
 

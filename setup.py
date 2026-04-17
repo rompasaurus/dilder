@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """
-Dilder — Pico W & Display First-Time Setup
+Dilder — Multi-Board First-Time Setup
 
 Interactive step-by-step CLI that walks you through the entire process:
 installing the C/C++ SDK toolchain, configuring VSCode, building and
-flashing the hello world programs, and connecting the e-ink display.
+flashing the hello world programs, connecting the e-ink display, and
+setting up the ESP32-S3 (Olimex) PlatformIO toolchain.
 
 Usage:
-  python3 setup.py              # interactive step-by-step walkthrough
-  python3 setup.py --status     # show current setup state
-  python3 setup.py --step N     # jump to step N
-  python3 setup.py --list       # list all steps
+  python3 setup.py                   # interactive walkthrough (all boards)
+  python3 setup.py --board pico      # only Pico W steps
+  python3 setup.py --board esp32     # only ESP32-S3 steps
+  python3 setup.py --status          # show current setup state
+  python3 setup.py --step N          # jump to step N (1-16)
+  python3 setup.py --list            # list all steps
 """
 
 import argparse
@@ -170,8 +173,73 @@ PROJECT_ROOT = Path(__file__).parent.resolve()
 DEV_SETUP    = PROJECT_ROOT / "dev-setup"
 HELLO_SERIAL = DEV_SETUP / "hello-world-serial"
 HELLO_DISPLAY = DEV_SETUP / "hello-world"
+ESP32_PROJECT = PROJECT_ROOT / "ESP Protyping" / "dilder-esp32"
 
 DEFAULT_SDK_PATH = Path.home() / "pico" / "pico-sdk"
+
+
+def _pip_is_externally_managed() -> bool:
+    """Return True if pip refuses --user installs (PEP 668 / Arch)."""
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "install", "--user", "--dry-run", "pip"],
+        capture_output=True, text=True,
+    )
+    return "externally-managed-environment" in (result.stderr or "").lower()
+
+
+def _install_python_app(package: str, binaries: "list[str]") -> bool:
+    """Install a Python CLI application, choosing the right method for the OS.
+
+    On Arch/CachyOS (PEP 668), uses pipx.
+    On other distros, falls back to pip install --user.
+    Returns True on success.
+    """
+    distro = detect_distro()
+    use_pipx = (distro == "arch" or _pip_is_externally_managed())
+
+    if use_pipx:
+        pipx = shutil.which("pipx")
+        if not pipx:
+            log_warn("pipx not found — required on Arch/CachyOS (PEP 668).")
+            log_step("Installing pipx via pacman...")
+            pac = subprocess.run(["sudo", "pacman", "-S", "--needed", "--noconfirm",
+                                  "python-pipx"], capture_output=False)
+            if pac.returncode != 0:
+                log_error("Failed to install pipx.")
+                log_info(f"Install manually: sudo pacman -S python-pipx && pipx install {package}")
+                return False
+            # pipx needs PATH setup — ensure it
+            subprocess.run(["pipx", "ensurepath"], capture_output=True)
+            pipx = shutil.which("pipx") or "pipx"
+
+        log_step(f"Installing {package} via pipx...")
+        result = subprocess.run([pipx, "install", package],
+                                capture_output=False)
+        if result.returncode != 0:
+            # pipx may fail if already installed but outdated — try upgrade
+            result = subprocess.run([pipx, "upgrade", package],
+                                    capture_output=False)
+        return result.returncode == 0
+    else:
+        log_step(f"Installing {package} via pip...")
+        result = run_cmd([sys.executable, "-m", "pip", "install", "--user", package],
+                         check=False, capture=False)
+        return result.returncode == 0
+
+
+# ── Board identifiers for step filtering ─────────────────────────────────────
+BOARD_PICO  = "pico"
+BOARD_ESP32 = "esp32"
+BOARD_BOTH  = "both"
+
+BOARD_LABELS_CLI = {
+    BOARD_PICO:  "Pico W",
+    BOARD_ESP32: "ESP32-S3",
+    BOARD_BOTH:  "Both",
+}
+
+# Currently selected board filter (set by --board flag, None = all steps)
+_board_filter = None
 
 
 def detect_serial_group() -> str:
@@ -306,18 +374,33 @@ def prompt_yes_no(msg: str, default: bool = True) -> bool:
 STEPS = []
 
 
-def step(number: int, title: str, desc: str):
-    """Decorator to register a setup step."""
+def step(number: int, title: str, desc: str, board: str = BOARD_BOTH):
+    """Decorator to register a setup step.
+
+    Args:
+        board: Which board this step applies to — BOARD_PICO, BOARD_ESP32,
+               or BOARD_BOTH. Used by --board flag to filter steps.
+    """
     def decorator(fn):
         STEPS.append({
             "number": number,
             "title": title,
             "desc": desc,
+            "board": board,
             "fn": fn,
         })
         STEPS.sort(key=lambda s: s["number"])
         return fn
     return decorator
+
+
+def step_matches_board(s: dict) -> bool:
+    """Return True if step ``s`` should run under the current board filter."""
+    if _board_filter is None:
+        return True
+    if s["board"] == BOARD_BOTH:
+        return True
+    return s["board"] == _board_filter
 
 
 # ── Step 1: Prerequisites ────────────────────────────────────────────────────
@@ -414,7 +497,7 @@ def step_prerequisites():
 
 # ── Step 2: ARM Toolchain ────────────────────────────────────────────────────
 
-@step(2, "Install ARM Toolchain", "Install the cross-compiler, CMake, and Ninja for Pico W builds")
+@step(2, "Install ARM Toolchain", "Install the cross-compiler, CMake, and Ninja for Pico W builds", board=BOARD_PICO)
 def step_toolchain():
     log_header("Step 2 — Install ARM Cross-Compilation Toolchain")
 
@@ -497,7 +580,7 @@ def step_toolchain():
 
 # ── Step 3: Pico SDK ─────────────────────────────────────────────────────────
 
-@step(3, "Clone Pico SDK", "Download the official Raspberry Pi Pico C/C++ SDK")
+@step(3, "Clone Pico SDK", "Download the official Raspberry Pi Pico C/C++ SDK", board=BOARD_PICO)
 def step_pico_sdk():
     log_header("Step 3 — Clone the Pico SDK")
 
@@ -554,7 +637,7 @@ def step_pico_sdk():
 
 # ── Step 4: Environment Variable ─────────────────────────────────────────────
 
-@step(4, "Set PICO_SDK_PATH", "Configure your shell to find the Pico SDK")
+@step(4, "Set PICO_SDK_PATH", "Configure your shell to find the Pico SDK", board=BOARD_PICO)
 def step_env_var():
     log_header("Step 4 — Set PICO_SDK_PATH Environment Variable")
 
@@ -780,7 +863,7 @@ def step_vscode():
 
 # ── Step 7: Build Hello Serial ────────────────────────────────────────────────
 
-@step(7, "Build Hello World (Serial)", "Compile the serial-only test — no display wiring needed")
+@step(7, "Build Hello World (Serial)", "Compile the serial-only test — no display wiring needed", board=BOARD_PICO)
 def step_build_serial():
     log_header("Step 7 — Checkpoint 1: Build Hello World (Serial Only)")
 
@@ -879,7 +962,7 @@ def step_build_serial():
 
 # ── Step 8: Flash Hello Serial ────────────────────────────────────────────────
 
-@step(8, "Flash Hello World (Serial)", "Put the Pico W in BOOTSEL mode and flash the firmware")
+@step(8, "Flash Hello World (Serial)", "Put the Pico W in BOOTSEL mode and flash the firmware", board=BOARD_PICO)
 def step_flash_serial():
     log_header("Step 8 — Flash Hello World (Serial) to the Pico W")
 
@@ -944,7 +1027,7 @@ The Pico W should now appear as a USB drive called "RPI-RP2".""")
 
 # ── Step 9: Verify Serial Output ─────────────────────────────────────────────
 
-@step(9, "Verify Serial Output", "Open a serial monitor and confirm the Pico W is alive")
+@step(9, "Verify Serial Output", "Open a serial monitor and confirm the Pico W is alive", board=BOARD_PICO)
 def step_verify_serial():
     log_header("Step 9 — Verify Serial Output")
 
@@ -1024,7 +1107,7 @@ CHECK: Serial output shows "Hello, Dilder!" and heartbeat lines.""")
 
 # ── Step 10: Connect Display ──────────────────────────────────────────────────
 
-@step(10, "Connect the Display", "Slide the Waveshare HAT onto the Pico W headers")
+@step(10, "Connect the Display", "Slide the Waveshare HAT onto the Pico W headers", board=BOARD_PICO)
 def step_connect_display():
     log_header("Step 10 — Connect the Waveshare e-Ink Display")
 
@@ -1081,7 +1164,7 @@ def step_connect_display():
 
 # ── Step 11: Get Waveshare Library ────────────────────────────────────────────
 
-@step(11, "Get Waveshare Library", "Download the C display driver and drawing library")
+@step(11, "Get Waveshare Library", "Download the C display driver and drawing library", board=BOARD_PICO)
 def step_waveshare_lib():
     log_header("Step 11 — Download the Waveshare C Library")
 
@@ -1171,7 +1254,7 @@ def step_waveshare_lib():
 
 # ── Step 12: Build Hello Display ──────────────────────────────────────────────
 
-@step(12, "Build Hello World (Display)", "Compile the e-ink display test program")
+@step(12, "Build Hello World (Display)", "Compile the e-ink display test program", board=BOARD_PICO)
 def step_build_display():
     log_header("Step 12 — Checkpoint 2: Build Hello World (e-Ink Display)")
 
@@ -1251,7 +1334,7 @@ def step_build_display():
 
 # ── Step 13: Flash Hello Display ──────────────────────────────────────────────
 
-@step(13, "Flash Hello World (Display)", "Flash the display firmware to the Pico W")
+@step(13, "Flash Hello World (Display)", "Flash the display firmware to the Pico W", board=BOARD_PICO)
 def step_flash_display():
     log_header("Step 13 — Flash Hello World (Display)")
 
@@ -1307,7 +1390,7 @@ The RPI-RP2 USB drive should appear.""")
 
 # ── Step 14: Verify Display ──────────────────────────────────────────────────
 
-@step(14, "Verify Display Output", "Confirm text appears on the e-ink display")
+@step(14, "Verify Display Output", "Confirm text appears on the e-ink display", board=BOARD_PICO)
 def step_verify_display():
     log_header("Step 14 — Verify Display Output")
 
@@ -1584,6 +1667,227 @@ def step_docker():
     return True
 
 
+# ── Step 16: ESP32-S3 / PlatformIO Toolchain ────────────────────────────────
+
+@step(16, "ESP32-S3 Toolchain (PlatformIO)", "Set up PlatformIO and ESP-IDF for the Olimex ESP32-S3 board", board=BOARD_ESP32)
+def step_esp32():
+    log_header("Step 16 — ESP32-S3 / PlatformIO Toolchain")
+
+    log_explain("""
+        The Dilder project supports two target boards:
+          - Pico W (RP2040) — set up in Steps 1-15
+          - ESP32-S3 (Olimex DevKit-Lipo) — this step
+
+        This step installs PlatformIO CLI, the ESP-IDF/Arduino toolchain,
+        esptool (for flashing), and verifies the ESP32 PlatformIO project
+        is ready to build.
+
+        PlatformIO handles downloading the Xtensa cross-compiler,
+        ESP-IDF framework, and all board support packages automatically.
+    """)
+
+    # ── 1. Check Python package installer ────────────────────────────────
+
+    distro = detect_distro()
+    use_pipx = (distro == "arch" or _pip_is_externally_managed())
+
+    if use_pipx:
+        log_info("Arch/CachyOS detected — will use pipx (PEP 668)")
+        pipx = shutil.which("pipx")
+        if pipx:
+            log_ok(f"pipx: {pipx}")
+        else:
+            log_info("pipx not yet installed — will install via pacman when needed")
+    else:
+        log_step("Checking pip availability...")
+        pip_check = run_cmd([sys.executable, "-m", "pip", "--version"], check=False)
+        if pip_check.returncode != 0:
+            log_error("pip is not available.")
+            if distro == "debian":
+                log_info("Install with: sudo apt install python3-pip")
+            elif distro == "fedora":
+                log_info("Install with: sudo dnf install python3-pip")
+            else:
+                log_info("Install pip for your distribution, then re-run.")
+            return False
+        log_ok("pip available")
+
+    # ── 2. Install PlatformIO CLI ─────────────────────────────────────────
+
+    pio = shutil.which("pio") or shutil.which("platformio")
+    if pio:
+        result = run_cmd([pio, "--version"], check=False)
+        version = result.stdout.strip() if result.returncode == 0 else "installed"
+        log_ok(f"PlatformIO CLI: {version}")
+    else:
+        log_warn("PlatformIO CLI not found.")
+        log_explain("""
+            PlatformIO is the build system for the ESP32-S3 firmware.
+            It downloads and manages the Xtensa compiler, ESP-IDF,
+            Arduino framework, and all library dependencies automatically.
+        """)
+
+        install_hint = "pipx install platformio" if use_pipx else "pip install --user platformio"
+        if not prompt_yes_no(f"Install PlatformIO CLI now? ({install_hint})"):
+            log_info(f"Skipped. Install manually with: {install_hint}")
+            return True
+
+        if not _install_python_app("platformio", ["pio", "platformio"]):
+            log_error("PlatformIO installation failed.")
+            log_info(f"Try manually: {install_hint}")
+            return False
+
+        # Refresh PATH for newly installed binary
+        pio = shutil.which("pio") or shutil.which("platformio")
+        if not pio:
+            # pipx/pip may put it somewhere not yet on PATH
+            for candidate in [
+                Path.home() / ".local" / "bin" / "pio",
+                Path.home() / ".local" / "bin" / "platformio",
+            ]:
+                if candidate.exists():
+                    pio = str(candidate)
+                    break
+
+        if pio:
+            log_ok("PlatformIO installed successfully.")
+        else:
+            log_warn("PlatformIO installed but 'pio' not in PATH.")
+            log_info("Add ~/.local/bin to your PATH:")
+            log_code_block('export PATH="$HOME/.local/bin:$PATH"')
+            log_info("Then add that line to your ~/.bashrc or ~/.zshrc")
+            return True
+
+    # ── 3. Install esptool (for direct flashing from DevTool) ─────────────
+
+    esptool = shutil.which("esptool.py") or shutil.which("esptool")
+    if esptool:
+        log_ok(f"esptool: {esptool}")
+    else:
+        log_step("Installing esptool (ESP32 flash utility)...")
+        if _install_python_app("esptool", ["esptool.py", "esptool"]):
+            log_ok("esptool installed.")
+        else:
+            log_warn("esptool install failed — PlatformIO includes its own copy.")
+
+    # ── 4. Install USB serial driver dependencies ─────────────────────────
+
+    log_step("Checking USB serial driver (CH340X)...")
+
+    distro = detect_distro()
+    # CH340 driver is built into the kernel on most modern distros
+    ch340_check = run_cmd(["modprobe", "-n", "ch341"], check=False)
+    if ch340_check.returncode == 0:
+        log_ok("CH341/CH340X kernel module available")
+    else:
+        log_warn("CH340X kernel module not found")
+        if distro == "arch":
+            log_info("Usually built-in. Check: lsmod | grep ch341")
+        elif distro == "debian":
+            log_info("Install with: sudo apt install linux-modules-extra-$(uname -r)")
+
+    # Check serial group membership (needed for /dev/ttyUSB* access)
+    serial_group = detect_serial_group()
+    if user_in_serial_group():
+        log_ok(f"User in '{serial_group}' group (serial port access)")
+    else:
+        user = os.environ.get("USER", "your_user")
+        log_warn(f"User not in '{serial_group}' group — ESP32 serial access may fail")
+        log_code_block(f"sudo usermod -aG {serial_group} {user}\n# Then log out and back in")
+
+    # ── 5. Verify PlatformIO project exists ───────────────────────────────
+
+    log_step("Checking ESP32 project structure...")
+    pio_ini = ESP32_PROJECT / "platformio.ini"
+    main_cpp = ESP32_PROJECT / "src" / "main.cpp"
+
+    if pio_ini.exists():
+        log_ok(f"platformio.ini: {pio_ini}")
+    else:
+        log_error(f"Missing: {pio_ini}")
+        log_info("The ESP32 project should be at: ESP Protyping/dilder-esp32/")
+        return False
+
+    if main_cpp.exists():
+        log_ok(f"main.cpp: {main_cpp}")
+    else:
+        log_error(f"Missing: {main_cpp}")
+        return False
+
+    # ── 6. Pre-download ESP32-S3 platform and libraries ───────────────────
+
+    log_explain("""
+        PlatformIO needs to download the ESP32-S3 platform tools the first
+        time you build. This includes the Xtensa cross-compiler, ESP-IDF,
+        Arduino core, and the display library (GxEPD2).
+
+        Downloading now means the first build in DevTool will be fast.
+        This downloads ~500 MB.
+    """)
+
+    if not prompt_yes_no("Pre-download ESP32-S3 platform and libraries now?"):
+        log_info("Skipped. They will download on first build.")
+        return True
+
+    # Refresh the pio path in case it was just installed
+    pio = shutil.which("pio") or shutil.which("platformio")
+    if not pio:
+        log_error("PlatformIO CLI not found in PATH.")
+        return False
+
+    log_step("Downloading ESP32-S3 platform (this may take a few minutes)...")
+    print()
+
+    # Run pio run which triggers the full download + compile
+    build_proc = subprocess.Popen(
+        [pio, "run", "-d", str(ESP32_PROJECT)],
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True,
+    )
+
+    for line in build_proc.stdout:
+        line = line.rstrip()
+        if line:
+            lower = line.lower()
+            if any(kw in lower for kw in [
+                "platform", "framework", "download", "install",
+                "compil", "link", "success", "error", "warning",
+                "library", "depend",
+            ]):
+                print(c(f"    {line[:78]}", FG_GREY))
+
+    build_proc.wait(timeout=600)
+
+    if build_proc.returncode != 0:
+        log_error("ESP32-S3 build failed. Check the output above.")
+        log_info(f"You can retry manually: pio run -d \"{ESP32_PROJECT}\"")
+        return False
+
+    # Check for the firmware binary
+    fw_bin = ESP32_PROJECT / ".pio" / "build" / "olimex-esp32s3-devkit-lipo" / "firmware.bin"
+    if fw_bin.exists():
+        size = fw_bin.stat().st_size / 1024
+        log_ok(f"ESP32 firmware built: firmware.bin ({size:.0f} KB)")
+    else:
+        log_warn("Build completed but firmware.bin not found at expected path.")
+
+    print()
+    print(c("  ┌────────────────────────────────────────────────────────────┐", FG_GREEN, BOLD))
+    print(c("  │                                                            │", FG_GREEN, BOLD))
+    print(c("  │    ESP32-S3 TOOLCHAIN READY                                │", FG_GREEN, BOLD))
+    print(c("  │                                                            │", FG_GREEN, BOLD))
+    print(c("  │    Board: Olimex ESP32-S3-DevKit-Lipo                      │", FG_GREEN, BOLD))
+    print(c("  │    Build: pio run -d 'ESP Protyping/dilder-esp32'          │", FG_GREEN, BOLD))
+    print(c("  │    Flash: pio run -t upload                                │", FG_GREEN, BOLD))
+    print(c("  │                                                            │", FG_GREEN, BOLD))
+    print(c("  │    Or use DevTool → select 'ESP32-S3 (Olimex)' board       │", FG_GREEN, BOLD))
+    print(c("  │                                                            │", FG_GREEN, BOLD))
+    print(c("  └────────────────────────────────────────────────────────────┘", FG_GREEN, BOLD))
+    print()
+
+    return True
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Status command
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1733,6 +2037,39 @@ def show_status():
     else:
         log_error("Dockerfile: MISSING")
 
+    # ESP32-S3 Toolchain
+    print()
+    print(c("  ESP32-S3 Toolchain", FG_WHITE, BOLD))
+    print(c("  " + "\u2500" * 50, FG_GREY))
+
+    pio = shutil.which("pio") or shutil.which("platformio")
+    if pio:
+        pio_ver = run_cmd([pio, "--version"], check=False)
+        log_ok(f"PlatformIO: {pio_ver.stdout.strip()}" if pio_ver.returncode == 0 else "PlatformIO: installed")
+    else:
+        log_warn("PlatformIO: not installed")
+        log_info("  Run: python3 setup.py --step 16")
+
+    esptool = shutil.which("esptool.py") or shutil.which("esptool")
+    if esptool:
+        log_ok(f"esptool: {esptool}")
+    else:
+        log_info("esptool: not installed (optional, PlatformIO includes its own)")
+
+    pio_ini = ESP32_PROJECT / "platformio.ini"
+    if pio_ini.exists():
+        log_ok(f"ESP32 project: {ESP32_PROJECT}")
+    else:
+        log_warn("ESP32 project: not found")
+        log_info(f"  Expected at: {ESP32_PROJECT}")
+
+    esp_fw = ESP32_PROJECT / ".pio" / "build" / "olimex-esp32s3-devkit-lipo" / "firmware.bin"
+    if esp_fw.exists():
+        size = esp_fw.stat().st_size / 1024
+        log_ok(f"ESP32 firmware.bin: {size:.0f} KB")
+    else:
+        log_info("ESP32 firmware: not built")
+
     # Hardware
     print()
     print(c("  Hardware", FG_WHITE, BOLD))
@@ -1742,6 +2079,14 @@ def show_status():
         log_ok("Pico W detected on /dev/ttyACM0")
     else:
         log_info("Pico W not connected (or in BOOTSEL mode)")
+
+    # Check for ESP32 on ttyUSB*
+    esp_detected = False
+    for tty in sorted(Path("/dev").glob("ttyUSB*")):
+        log_ok(f"ESP32-S3 (CH340X) candidate: {tty}")
+        esp_detected = True
+    if not esp_detected:
+        log_info("ESP32-S3 not connected (no /dev/ttyUSB* found)")
 
     # Testing
     print()
@@ -2026,11 +2371,27 @@ def list_steps():
     """Print all steps with their status."""
     log_header("Setup Steps")
 
+    if _board_filter:
+        label = BOARD_LABELS_CLI.get(_board_filter, _board_filter)
+        print(c(f"  Showing steps for: {label}", FG_YELLOW))
+        print(c(f"  (use --board to change, omit for all)\n", FG_GREY))
+
+    board_tag_colors = {
+        BOARD_PICO:  FG_MAGENTA,
+        BOARD_ESP32: FG_YELLOW,
+        BOARD_BOTH:  FG_GREY,
+    }
+
     for s in STEPS:
+        if not step_matches_board(s):
+            continue
         num = s["number"]
         title = s["title"]
         desc = s["desc"]
-        print(f"  {c(f'Step {num:2d}', FG_CYAN, BOLD)}  {c(title, FG_WHITE)}")
+        board = s["board"]
+        tag = f"[{BOARD_LABELS_CLI.get(board, board)}]"
+        tag_color = board_tag_colors.get(board, FG_GREY)
+        print(f"  {c(f'Step {num:2d}', FG_CYAN, BOLD)}  {c(title, FG_WHITE)}  {c(tag, tag_color)}")
         print(c(f"           {desc}", FG_GREY))
         print()
 
@@ -2042,20 +2403,25 @@ def list_steps():
 def run_walkthrough(start_step: int = 1):
     """Run the interactive step-by-step setup."""
 
-    for s in STEPS:
+    filtered = [s for s in STEPS if step_matches_board(s)]
+    total = len(filtered)
+
+    for idx, s in enumerate(filtered):
         if s["number"] < start_step:
             continue
 
         num = s["number"]
         title = s["title"]
-        total = len(STEPS)
+        board = s["board"]
+        tag = f"[{BOARD_LABELS_CLI.get(board, board)}]"
 
         # Step banner
         print()
         bar = "\u2500" * 58
         print(c(f"  {bar}", FG_GREY))
-        progress = f"Step {num}/{total}"
-        print(c(f"  {progress:>10}  ", FG_CYAN, BOLD) + c(title, FG_WHITE, BOLD))
+        progress = f"Step {num}/{STEPS[-1]['number']}"
+        print(c(f"  {progress:>10}  ", FG_CYAN, BOLD) + c(title, FG_WHITE, BOLD)
+              + c(f"  {tag}", FG_GREY))
         print(c(f"  {bar}", FG_GREY))
 
         result = s["fn"]()
@@ -2070,16 +2436,15 @@ def run_walkthrough(start_step: int = 1):
             continue
 
         # Ask before continuing to next step
-        if s["number"] < total:
-            next_step = STEPS[STEPS.index(s) + 1] if STEPS.index(s) + 1 < len(STEPS) else None
-            if next_step:
+        next_step = filtered[idx + 1] if idx + 1 < total else None
+        if next_step and next_step["number"] >= start_step:
+            print()
+            print(c(f"  Next: Step {next_step['number']} — {next_step['title']}", FG_GREY))
+            action = prompt_continue("Press Enter to continue (or 'q' to quit)")
+            if action == "quit":
                 print()
-                print(c(f"  Next: Step {next_step['number']} — {next_step['title']}", FG_GREY))
-                action = prompt_continue("Press Enter to continue (or 'q' to quit)")
-                if action == "quit":
-                    print()
-                    log_info(f"Resume later with: python3 setup.py --step {next_step['number']}")
-                    return
+                log_info(f"Resume later with: python3 setup.py --step {next_step['number']}")
+                return
 
     # All done
     print()
@@ -2101,17 +2466,21 @@ BANNER = """\
 def main():
     parser = argparse.ArgumentParser(
         prog="setup.py",
-        description="Dilder — Pico W & Display First-Time Setup CLI",
+        description="Dilder — Multi-Board First-Time Setup CLI (Pico W + ESP32-S3)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""\
 examples:
-  python3 setup.py              # full interactive walkthrough
-  python3 setup.py --status     # check what's installed
-  python3 setup.py --step 7     # jump to step 7 (build serial hello world)
-  python3 setup.py --list       # show all steps
-  python3 setup.py --test-setup # install testing dependencies (tk, pytest, Playwright)
+  python3 setup.py                    # full interactive walkthrough (all boards)
+  python3 setup.py --board pico       # only Pico W steps
+  python3 setup.py --board esp32      # only ESP32-S3 steps
+  python3 setup.py --status           # check what's installed
+  python3 setup.py --step 7           # jump to step 7
+  python3 setup.py --board esp32 --list  # list ESP32 steps only
+  python3 setup.py --test-setup       # install testing dependencies
 """,
     )
+    parser.add_argument("--board", choices=["pico", "esp32"],
+                        help="Filter steps for a specific board (pico or esp32)")
     parser.add_argument("--status", action="store_true",
                         help="Show current setup state")
     parser.add_argument("--step", type=int, metavar="N",
@@ -2123,16 +2492,21 @@ examples:
 
     args = parser.parse_args()
 
+    # Apply board filter globally
+    global _board_filter
+    _board_filter = args.board  # None, "pico", or "esp32"
+
     # Banner
+    board_hint = f" ({BOARD_LABELS_CLI[args.board]} only)" if args.board else ""
     if not NO_COLOUR:
         print()
         for i, line in enumerate(BANNER.splitlines()):
             color = FG_CYAN if i % 2 == 0 else FG_BLUE
             print(c(line, color, BOLD))
-        print(c("  Pico W & Display — First-Time Setup", FG_GREY))
+        print(c(f"  Pico W & ESP32-S3 — First-Time Setup{board_hint}", FG_GREY))
         print(c(f"  Project: {PROJECT_ROOT}", FG_GREY, DIM))
     else:
-        print("\nDILDER — Pico W & Display First-Time Setup\n")
+        print(f"\nDILDER — Pico W & ESP32-S3 First-Time Setup{board_hint}\n")
 
     if args.test_setup:
         setup_testing()
@@ -2146,25 +2520,82 @@ examples:
         list_steps()
         return
 
+    # ── Interactive board selection when --board not given ────────────────
+    if _board_filter is None and not args.step:
+        print()
+        print(c("  Which board are you setting up?", FG_WHITE, BOLD))
+        print()
+        print(c("    1) ", FG_CYAN, BOLD) + c("Pico W (RP2040)", FG_WHITE)
+              + c("          — ARM GCC, CMake, UF2 flash", FG_GREY))
+        print(c("    2) ", FG_CYAN, BOLD) + c("ESP32-S3 (Olimex)", FG_WHITE)
+              + c("        — PlatformIO, esptool flash", FG_GREY))
+        print(c("    3) ", FG_CYAN, BOLD) + c("Both", FG_WHITE)
+              + c("                     — full walkthrough for both boards", FG_GREY))
+        print()
+        try:
+            choice = input(c("  → Enter 1, 2, or 3 [3]: ", FG_CYAN)).strip()
+        except (KeyboardInterrupt, EOFError):
+            print()
+            return
+        if choice == "1":
+            _board_filter = BOARD_PICO
+        elif choice == "2":
+            _board_filter = BOARD_ESP32
+        # else: keep None (all steps)
+        if _board_filter:
+            label = BOARD_LABELS_CLI[_board_filter]
+            print(c(f"\n  {icon('ok')} Selected: {label}\n", FG_GREEN))
+
     start = args.step if args.step else 1
 
-    if start < 1 or start > len(STEPS):
-        log_error(f"Invalid step number. Valid range: 1-{len(STEPS)}")
+    max_step = STEPS[-1]["number"] if STEPS else 16
+    if start < 1 or start > max_step:
+        log_error(f"Invalid step number. Valid range: 1-{max_step}")
         sys.exit(1)
 
-    log_explain(f"""
-        This script walks you through the complete first-time setup for
-        Pico W development with the Waveshare e-ink display, using C and
-        the official Pico SDK.
+    filtered_count = len([s for s in STEPS if step_matches_board(s) and s["number"] >= start])
+    if filtered_count == 0:
+        board_label = BOARD_LABELS_CLI.get(args.board, args.board) if args.board else "selected board"
+        log_warn(f"No steps match from step {start}.")
+        log_info("Run with --list to see available steps.")
+        return
 
-        It will:
-          1. Install the ARM cross-compilation toolchain
+    if _board_filter == BOARD_PICO:
+        overview = """\
+        Setting up for Pico W (RP2040) development:
+
+          - Install the ARM cross-compilation toolchain
+          - Clone the Pico SDK and configure your shell
+          - Set up VSCode with the right extensions
+          - Build and flash a serial "Hello World" (Checkpoint 1)
+          - Connect the display and build a display "Hello World" (Checkpoint 2)
+          - Set up Docker for DevTool firmware builds (Checkpoint 3)"""
+    elif _board_filter == BOARD_ESP32:
+        overview = """\
+        Setting up for ESP32-S3 (Olimex) development:
+
+          - Check prerequisites and serial permissions
+          - Set up VSCode extensions
+          - Install PlatformIO + ESP-IDF toolchain
+          - Set up Docker for DevTool firmware builds"""
+    else:
+        overview = """\
+        Setting up for both target boards (Pico W and ESP32-S3):
+
+          1. Install the ARM cross-compilation toolchain (Pico W)
           2. Clone the Pico SDK
           3. Configure your shell and permissions
           4. Set up VSCode with the right extensions
           5. Build and flash a serial "Hello World" (Checkpoint 1)
           6. Connect the display and build a display "Hello World" (Checkpoint 2)
           7. Set up Docker for DevTool firmware builds (Checkpoint 3)
+          8. Install PlatformIO + ESP-IDF for ESP32-S3 (Step 16)
+
+        Tip: Use --board pico or --board esp32 to run only the steps
+        for a specific board."""
+
+    log_explain(f"""
+        {overview}
 
         At each step, you'll see an explanation of what's happening and why.
         You can skip any step, quit at any time, and resume later with:

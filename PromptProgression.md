@@ -2282,3 +2282,67 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
 - **Output Tokens (est):** ~8,000
 - **Files Created/Modified:**
   - `PromptProgression.md` (modified — added Prompts #168-170, spelling/grammar cleanup)
+
+---
+
+## Prompt #171 — 2026-04-17
+- **Prompt:** "OK the setup needs to have options in each step if needed to differentiate and choose the ESP board, as well update the CLI."
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~45,000
+- **Files Created/Modified:**
+  - `setup.py` (modified — added `--board {pico,esp32}` flag, board tags on all 16 steps, interactive board selection menu at startup, `step_matches_board()` filtering, `_install_python_app()` helper using pipx on Arch/CachyOS for PEP 668 compliance, board-aware walkthrough overview text)
+  - `ESP Protyping/dev setup guide.md` (modified — renamed to multi-board guide, added "Choosing Your Board" section, every deployment step (1-6) now has Pico W and ESP32-S3 subsections, troubleshooting organized by board, automated section documents `--board` flag, Arch pipx instructions added)
+
+---
+
+## Prompt #172 — 2026-04-17
+- **Prompt:** "PlatformIO install fails with externally-managed-environment error (PEP 668 on Arch/CachyOS)."
+- **Input Tokens (est):** ~100 (error log)
+- **Output Tokens (est):** ~8,000
+- **Files Created/Modified:**
+  - `setup.py` (modified — added `_pip_is_externally_managed()` check, `_install_python_app()` that uses pipx on Arch via pacman, replaced raw pip calls in step 16 with the new helper)
+  - `ESP Protyping/dev setup guide.md` (modified — added pipx instructions for Arch, added PEP 668 troubleshooting entry)
+
+---
+
+## Prompt #173 — 2026-04-17
+- **Prompt:** "Add a selection option to select the setup option depending on the board intended to be used to the setup, make a CLI interface to do this."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~5,000
+- **Files Created/Modified:**
+  - `setup.py` (modified — added interactive board selection menu: "1) Pico W, 2) ESP32-S3, 3) Both" prompt at walkthrough start, skipped when `--board` is passed or `--step` is used)
+
+---
+
+## Prompt #174 — 2026-04-17
+- **Prompt:** "PlatformIO build fails: board_config.h not found, then HAL linker errors, then hal_init symbol collision."
+- **Input Tokens (est):** ~200 (build logs)
+- **Output Tokens (est):** ~12,000
+- **Files Created/Modified:**
+  - `ESP Protyping/dilder-esp32/platformio.ini` (modified — added `-I../../firmware/include` to build_flags, fixed build_src_filter paths from `../../` to `../../../`, removed invalid `build_src_extra` option)
+  - `ESP Protyping/dilder-esp32/include/platform/board_config.h` (deleted — removed shadowing local copy with PIN_JOY_* names)
+  - `firmware/src/platform/esp32s3/esp32s3_hal.c` (renamed to `.cpp` — C++ needed for Arduino SPI classes, added `extern "C"` linkage block)
+  - `firmware/include/platform/hal.h` (modified — renamed `hal_init` to `dilder_hal_init` to avoid ESP-IDF collision)
+  - `ESP Protyping/dilder-esp32/src/main.cpp` (modified — updated `hal_init()` call to `dilder_hal_init()`)
+
+---
+
+## Prompt #175 — 2026-04-17
+- **Prompt:** "OK the DevTool Programs tab needs a board selection dropdown above the display model to select either the ESP or Pico, then allows me to deploy standalone or flash to the specified board. Make sure each program can deploy to the ESP."
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~25,000
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — ProgramsTab: added Target Board dropdown with serial detection status, ESP32 flash via PlatformIO `_build_and_flash_esp32()`, ESP32 standalone deploy `_deploy_standalone_esp32()` generating quotes.h + PlatformIO build + flash, board-aware flash hints, board-agnostic serial status messages; DilderDevTool: `target_board` property now handles label/key reverse-lookup, `_on_board_changed` syncs Programs tab combo, `_update_flash_hint` early-return guard)
+
+---
+
+## Prompt #176 — 2026-04-17
+- **Prompt:** "Update the Connect tab when the target board is changed, I need separate steps for the ESP board. Also I need steps based on my ESP board on how to put it in download mode. Once done, update all the docs and website and add new blog and docs, commit then pull the prompts and update the prompts doc and update the website prompt blog."
+- **Input Tokens (est):** ~60
+- **Output Tokens (est):** ~50,000
+- **Files Created/Modified:**
+  - `DevTool/devtool.py` (modified — ConnectionUtility: added `refresh_for_board()`, `_build_usb_panel_esp32()` with 5 ESP32-specific steps including CH340X detection, /dev/ttyUSB* check, download mode button sequence diagram, `_build_wifi_panel_esp32()` with Arduino WiFi setup, `_check_usb_esp32()` and `_check_serial_esp32()` detection methods; board indicator label in mode selector; DilderDevTool._on_board_changed now refreshes conn_tab)
+  - `website/docs/docs/setup/first-time-setup.md` (modified — added `--board` CLI examples, Step 16 to table, board tags column)
+  - `website/docs/blog/posts/esp32-board-support.md` (created — blog post about multi-board architecture going live)
+  - `PromptProgression.md` (modified — added Prompts #171-176)
+  - `website/docs/prompts/index.md` (modified — synced with PromptProgression.md)

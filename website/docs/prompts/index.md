@@ -1381,3 +1381,28 @@ This is part of the transparency experiment — showing AI-assisted development 
 - **Input Tokens (est):** ~60
 - **Output Tokens (est):** ~5,000
 - **Files:** Website content commit: 3 blog posts (breadboard prototype guide, motion/location detection, PCB routing complete), 2 docs pages (board design v0.4, breadboard prototype), octopus SVG icon, mkdocs nav/logo updates. Fixed broken link in breadboard blog post. Updated `PromptProgression.md` with Prompts #154-156.
+
+---
+
+## Prompts #157-167 — 2026-04-15 to 2026-04-16
+
+**Summary:** PCB fabrication pricing research (JLCPCB/PCBWay/Aisler quotes), ESP32-S3 schematic wiring (power chain, USB-C, ESD, crystal), peer-to-peer discovery research (BLE/mDNS/UDP), engagement plan gamification design, asset rendering pipeline, body language system with 16 emotion states. Created corresponding blog posts and documentation for each topic.
+
+---
+
+## Prompts #168-170 — 2026-04-15
+
+**Summary:** Firmware game engine implementation. Built the complete C engine: game loop, event system, emotion/stat/life modules, sensor layer, UI renderer with bitmap font, and DevTool emulator tab with ctypes bridge. Added comprehensive beginner-friendly code comments and FIRMWARE.md architecture guide. All 14 source files documented.
+
+---
+
+## Prompts #171-176 — 2026-04-17
+
+**Summary:** ESP32-S3 multi-board architecture. Major session covering:
+
+- **setup.py CLI** — Added `--board {pico,esp32}` flag with interactive board selection menu. All 16 steps tagged [Pico W], [ESP32-S3], or [Both]. PEP 668 fix using pipx on Arch/CachyOS.
+- **Dev setup guide** — Restructured as multi-board guide. Every deployment step has Pico W and ESP32-S3 subsections. Troubleshooting organized by board.
+- **PlatformIO build fixes** — Fixed include paths (`-I../../firmware/include`), `build_src_filter` relative paths, removed shadowing local `board_config.h`, renamed HAL to `.cpp` for C++ SPI, added `extern "C"` linkage, renamed `hal_init` to `dilder_hal_init` to avoid ESP-IDF collision. Firmware builds at 293KB.
+- **DevTool Programs tab** — Added Target Board dropdown, ESP32 Flash via PlatformIO, ESP32 Deploy Standalone with quotes.h generation + PlatformIO build.
+- **DevTool Connect tab** — Board-aware USB steps: ESP32 shows CH340X detection, /dev/ttyUSB* check, download mode button sequence (BOOT + RST), Wi-Fi panel for ESP32-S3.
+- **Website** — Updated first-time-setup docs with `--board` flag and Step 16. New blog post: "ESP32-S3 Board Support — Multi-Board Architecture Goes Live". Prompt log synced through #176.

@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-Dilder DevTool — Pico W Development Companion
+Dilder DevTool — Multi-Board Development Companion
 
-Tkinter GUI for developing on the Pico W + Waveshare 2.13" e-ink display.
+Tkinter GUI for developing on the Pico W and ESP32-S3 (Olimex DevKit-Lipo)
+with the Waveshare 2.13" e-ink display.
 
 Features:
+  - Board selector (Pico W / ESP32-S3) with auto-detection
   - E-ink display emulator (250x122, 1-bit) with drawing and text tools
-  - Serial monitor for live printf output from the Pico W
-  - Firmware flash utility (BOOTSEL detection + UF2 copy)
+  - Serial monitor for live printf output
+  - Firmware flash utility (Pico BOOTSEL + ESP32 esptool)
   - Asset manager (save/load/preview 1-bit bitmaps)
-  - GPIO pin state viewer
+  - GPIO pin reference for both boards
 
 Usage:
   python3 DevTool/devtool.py
@@ -126,7 +128,19 @@ from tkinter import ttk, filedialog, messagebox, colorchooser, simpledialog, fon
 # ─────────────────────────────────────────────────────────────────────────────
 
 APP_NAME = "Dilder DevTool"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.1.0"
+
+# ── Target boards ──────────────────────────────────────────────────────────
+BOARD_PICO_W = "pico_w"
+BOARD_ESP32S3 = "esp32s3"
+
+BOARD_LABELS = {
+    BOARD_PICO_W:  "Pico W (RP2040)",
+    BOARD_ESP32S3: "ESP32-S3 (Olimex)",
+}
+
+# ESP32-S3 flash size (Olimex DevKit-Lipo N8R8)
+ESP32_FLASH_KB = 8192  # 8 MB
 
 # Display dimensions (Waveshare 2.13" V3)
 DISPLAY_W = 250
@@ -181,6 +195,33 @@ def find_pico_serial():
         if "ttyACM" in port.device or "usbmodem" in port.device:
             return port.device
     return None
+
+
+def find_esp32_serial():
+    """Find the ESP32-S3 serial port (Olimex DevKit-Lipo via CH340X).
+
+    The Olimex board's USB-UART port uses a CH340X chip which shows up as
+    /dev/ttyUSB* on Linux. The CH340 VID is 0x1A86, PID 0x55D4 (CH340X)
+    or 0x7523 (CH340G/CH340C).
+    """
+    CH340_VID = 0x1A86
+    CH340X_PIDS = {0x55D4, 0x7523}  # CH340X, CH340G/C
+    # First pass: match by CH340 VID + PID
+    for port in serial.tools.list_ports.comports():
+        if port.vid == CH340_VID and port.pid in CH340X_PIDS:
+            return port.device
+    # Second pass: match by ttyUSB pattern (broader)
+    for port in serial.tools.list_ports.comports():
+        if "ttyUSB" in port.device:
+            return port.device
+    return None
+
+
+def find_serial_for_board(board):
+    """Find the serial port for the given target board."""
+    if board == BOARD_ESP32S3:
+        return find_esp32_serial()
+    return find_pico_serial()
 
 
 def find_rpi_rp2_mount():
@@ -911,76 +952,9 @@ class SerialMonitor(ttk.Frame):
 # ─────────────────────────────────────────────────��───────────────────────────
 
 class FlashUtility(ttk.Frame):
-    """Flash .uf2 firmware to the Pico W via BOOTSEL mode."""
+    """Flash firmware to the target board (Pico W via BOOTSEL, ESP32-S3 via esptool)."""
 
-    def __init__(self, parent, app):
-        super().__init__(parent)
-        self.app = app
-        self._build_ui()
-
-    def _build_ui(self):
-        # ── UF2 file selection ──
-        file_frame = ttk.LabelFrame(self, text="Firmware File", padding=10)
-        file_frame.pack(fill=tk.X, padx=10, pady=10)
-
-        self.uf2_var = tk.StringVar()
-        ttk.Entry(file_frame, textvariable=self.uf2_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
-        ttk.Button(file_frame, text="Browse", command=self._browse_uf2).pack(side=tk.LEFT, padx=2)
-
-        # Quick picks
-        quick_frame = ttk.LabelFrame(self, text="Quick Flash", padding=10)
-        quick_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
-
-        serial_uf2 = DEV_SETUP / "hello-world-serial" / "build" / "hello_serial.uf2"
-        display_uf2 = DEV_SETUP / "hello-world" / "build" / "hello_dilder.uf2"
-
-        for label, path in [
-            ("Hello Serial", serial_uf2),
-            ("Hello Display", display_uf2),
-        ]:
-            exists = path.exists()
-            btn = ttk.Button(
-                quick_frame, text=f"{label} {'(' + self._size_str(path) + ')' if exists else '(not built)'}",
-                command=lambda p=path: self._set_uf2(p),
-                state=tk.NORMAL if exists else tk.DISABLED,
-            )
-            btn.pack(side=tk.LEFT, padx=5)
-
-        # ── Flash control ──
-        flash_frame = ttk.LabelFrame(self, text="Flash to Pico W", padding=10)
-        flash_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
-
-        self.mount_label = ttk.Label(flash_frame, text="RPI-RP2: not detected")
-        self.mount_label.pack(anchor=tk.W)
-
-        btn_row = ttk.Frame(flash_frame)
-        btn_row.pack(fill=tk.X, pady=(8, 0))
-
-        ttk.Button(btn_row, text="Detect RPI-RP2", command=self._detect_mount).pack(side=tk.LEFT, padx=5)
-        ttk.Button(btn_row, text="Flash", command=self._flash).pack(side=tk.LEFT, padx=5)
-
-        # ── Build ──
-        build_frame = ttk.LabelFrame(self, text="Build Projects", padding=10)
-        build_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
-
-        for label, proj_dir in [
-            ("Build Hello Serial", DEV_SETUP / "hello-world-serial"),
-            ("Build Hello Display", DEV_SETUP / "hello-world"),
-        ]:
-            ttk.Button(
-                build_frame, text=label,
-                command=lambda d=proj_dir: self._build_project(d)
-            ).pack(side=tk.LEFT, padx=5)
-
-        # ── Instructions ──
-        inst_frame = ttk.LabelFrame(self, text="Instructions", padding=10)
-        inst_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
-
-        instructions = tk.Text(inst_frame, height=8, wrap=tk.WORD, bg=BG_DARK, fg=FG_TEXT,
-                               font=("JetBrains Mono", 10), state=tk.DISABLED)
-        instructions.pack(fill=tk.BOTH, expand=True)
-        instructions.configure(state=tk.NORMAL)
-        instructions.insert(tk.END, """\
+    _PICO_INSTRUCTIONS = """\
 To flash the Pico W:
 
 1. Unplug the Pico W from USB
@@ -991,9 +965,146 @@ To flash the Pico W:
 6. Click "Flash" to copy the firmware
 
 The Pico W will reboot automatically after flashing.
-The RPI-RP2 drive will disappear — this is normal.\
-""")
-        instructions.configure(state=tk.DISABLED)
+The RPI-RP2 drive will disappear — this is normal."""
+
+    _ESP32_INSTRUCTIONS = """\
+To flash the ESP32-S3 (Olimex DevKit-Lipo):
+
+1. Connect the USB-UART port (near the buttons, CH340X)
+2. Click "Detect ESP32" to find the serial port
+3. Select a .bin firmware or use PlatformIO to build
+4. Click "Flash" to upload via esptool
+
+Auto-reset: The CH340X handles bootloader entry automatically.
+No need to hold BOOT — just click Flash.
+
+If auto-reset fails:
+  1. Hold the BOOT button
+  2. Press and release RST
+  3. Release BOOT
+  4. Click Flash again"""
+
+    def __init__(self, parent, app):
+        super().__init__(parent)
+        self.app = app
+        self._current_board = BOARD_PICO_W
+        self._build_ui()
+
+    def _build_ui(self):
+        # ── Firmware file selection ──
+        file_frame = ttk.LabelFrame(self, text="Firmware File", padding=10)
+        file_frame.pack(fill=tk.X, padx=10, pady=10)
+
+        self.fw_var = tk.StringVar()
+        ttk.Entry(file_frame, textvariable=self.fw_var).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
+        ttk.Button(file_frame, text="Browse", command=self._browse_fw).pack(side=tk.LEFT, padx=2)
+
+        # Quick picks (Pico W)
+        self.quick_frame = ttk.LabelFrame(self, text="Quick Flash", padding=10)
+        self.quick_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        self._populate_quick_picks()
+
+        # ── Flash control ──
+        self.flash_frame = ttk.LabelFrame(self, text="Flash to Pico W", padding=10)
+        self.flash_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+
+        self.mount_label = ttk.Label(self.flash_frame, text="RPI-RP2: not detected")
+        self.mount_label.pack(anchor=tk.W)
+
+        btn_row = ttk.Frame(self.flash_frame)
+        btn_row.pack(fill=tk.X, pady=(8, 0))
+
+        self.detect_btn = ttk.Button(btn_row, text="Detect RPI-RP2", command=self._detect_mount)
+        self.detect_btn.pack(side=tk.LEFT, padx=5)
+        self.flash_btn_main = ttk.Button(btn_row, text="Flash", command=self._flash)
+        self.flash_btn_main.pack(side=tk.LEFT, padx=5)
+
+        # ── Build ──
+        self.build_frame = ttk.LabelFrame(self, text="Build Projects", padding=10)
+        self.build_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        self._populate_build_buttons()
+
+        # ── Instructions ──
+        inst_frame = ttk.LabelFrame(self, text="Instructions", padding=10)
+        inst_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
+
+        self.instructions = tk.Text(inst_frame, height=8, wrap=tk.WORD, bg=BG_DARK, fg=FG_TEXT,
+                                    font=("JetBrains Mono", 10), state=tk.DISABLED)
+        self.instructions.pack(fill=tk.BOTH, expand=True)
+        self._set_instructions(self._PICO_INSTRUCTIONS)
+
+    def _set_instructions(self, text):
+        self.instructions.configure(state=tk.NORMAL)
+        self.instructions.delete("1.0", tk.END)
+        self.instructions.insert(tk.END, text)
+        self.instructions.configure(state=tk.DISABLED)
+
+    def _populate_quick_picks(self):
+        for w in self.quick_frame.winfo_children():
+            w.destroy()
+
+        if self._current_board == BOARD_ESP32S3:
+            esp_proj = PROJECT_ROOT / "ESP Protyping" / "dilder-esp32"
+            bin_path = esp_proj / ".pio" / "build" / "olimex-esp32s3-devkit-lipo" / "firmware.bin"
+            exists = bin_path.exists()
+            ttk.Button(
+                self.quick_frame,
+                text=f"ESP32 Firmware {'(' + self._size_str(bin_path) + ')' if exists else '(not built)'}",
+                command=lambda: self._set_fw(bin_path),
+                state=tk.NORMAL if exists else tk.DISABLED,
+            ).pack(side=tk.LEFT, padx=5)
+        else:
+            serial_uf2 = DEV_SETUP / "hello-world-serial" / "build" / "hello_serial.uf2"
+            display_uf2 = DEV_SETUP / "hello-world" / "build" / "hello_dilder.uf2"
+            for label, path in [
+                ("Hello Serial", serial_uf2),
+                ("Hello Display", display_uf2),
+            ]:
+                exists = path.exists()
+                ttk.Button(
+                    self.quick_frame,
+                    text=f"{label} {'(' + self._size_str(path) + ')' if exists else '(not built)'}",
+                    command=lambda p=path: self._set_fw(p),
+                    state=tk.NORMAL if exists else tk.DISABLED,
+                ).pack(side=tk.LEFT, padx=5)
+
+    def _populate_build_buttons(self):
+        for w in self.build_frame.winfo_children():
+            w.destroy()
+
+        if self._current_board == BOARD_ESP32S3:
+            ttk.Button(
+                self.build_frame, text="Build ESP32 (PlatformIO)",
+                command=self._build_esp32_project
+            ).pack(side=tk.LEFT, padx=5)
+        else:
+            for label, proj_dir in [
+                ("Build Hello Serial", DEV_SETUP / "hello-world-serial"),
+                ("Build Hello Display", DEV_SETUP / "hello-world"),
+            ]:
+                ttk.Button(
+                    self.build_frame, text=label,
+                    command=lambda d=proj_dir: self._build_project(d)
+                ).pack(side=tk.LEFT, padx=5)
+
+    def refresh_for_board(self, board):
+        """Rebuild the flash UI for the selected target board."""
+        self._current_board = board
+        self._populate_quick_picks()
+        self._populate_build_buttons()
+
+        if board == BOARD_ESP32S3:
+            self.flash_frame.config(text="Flash to ESP32-S3")
+            self.detect_btn.config(text="Detect ESP32", command=self._detect_esp32)
+            self.flash_btn_main.config(command=self._flash_esp32)
+            self.mount_label.config(text="ESP32: not detected")
+            self._set_instructions(self._ESP32_INSTRUCTIONS)
+        else:
+            self.flash_frame.config(text="Flash to Pico W")
+            self.detect_btn.config(text="Detect RPI-RP2", command=self._detect_mount)
+            self.flash_btn_main.config(command=self._flash)
+            self.mount_label.config(text="RPI-RP2: not detected")
+            self._set_instructions(self._PICO_INSTRUCTIONS)
 
     def _size_str(self, path):
         try:
@@ -1001,17 +1112,22 @@ The RPI-RP2 drive will disappear — this is normal.\
         except (FileNotFoundError, OSError):
             return "?"
 
-    def _browse_uf2(self):
+    def _browse_fw(self):
+        if self._current_board == BOARD_ESP32S3:
+            filetypes = [("BIN files", "*.bin"), ("All files", "*.*")]
+            title = "Select ESP32 Firmware (.bin)"
+        else:
+            filetypes = [("UF2 files", "*.uf2"), ("All files", "*.*")]
+            title = "Select UF2 Firmware"
         path = filedialog.askopenfilename(
-            title="Select UF2 Firmware",
-            initialdir=str(DEV_SETUP),
-            filetypes=[("UF2 files", "*.uf2"), ("All files", "*.*")]
-        )
+            title=title, initialdir=str(DEV_SETUP), filetypes=filetypes)
         if path:
-            self.uf2_var.set(path)
+            self.fw_var.set(path)
 
-    def _set_uf2(self, path):
-        self.uf2_var.set(str(path))
+    def _set_fw(self, path):
+        self.fw_var.set(str(path))
+
+    # ── Pico W flash methods ──
 
     def _detect_mount(self):
         mount = find_rpi_rp2_mount()
@@ -1023,8 +1139,8 @@ The RPI-RP2 drive will disappear — this is normal.\
                                     foreground=FG_RED)
 
     def _flash(self):
-        uf2 = self.uf2_var.get()
-        if not uf2 or not Path(uf2).exists():
+        fw = self.fw_var.get()
+        if not fw or not Path(fw).exists():
             messagebox.showwarning("No File", "Select a .uf2 file first.")
             return
 
@@ -1034,9 +1150,9 @@ The RPI-RP2 drive will disappear — this is normal.\
             return
 
         try:
-            shutil.copy2(uf2, mount / Path(uf2).name)
-            self.app.log(f"Flashed: {Path(uf2).name} -> {mount}")
-            messagebox.showinfo("Success", f"Firmware flashed!\n\n{Path(uf2).name}")
+            shutil.copy2(fw, mount / Path(fw).name)
+            self.app.log(f"Flashed: {Path(fw).name} -> {mount}")
+            messagebox.showinfo("Success", f"Firmware flashed!\n\n{Path(fw).name}")
         except Exception as e:
             messagebox.showerror("Flash Failed", str(e))
 
@@ -1057,7 +1173,6 @@ The RPI-RP2 drive will disappear — this is normal.\
 
         def _run():
             try:
-                # Configure
                 result = subprocess.run(
                     ["cmake", "-G", "Ninja", f"-DPICO_SDK_PATH={sdk}", "-DPICO_BOARD=pico_w", ".."],
                     cwd=build_dir, capture_output=True, text=True
@@ -1065,8 +1180,6 @@ The RPI-RP2 drive will disappear — this is normal.\
                 if result.returncode != 0:
                     self.app.log(f"CMake failed: {result.stderr[-500:]}")
                     return
-
-                # Build
                 result = subprocess.run(
                     ["ninja"], cwd=build_dir, capture_output=True, text=True
                 )
@@ -1074,10 +1187,115 @@ The RPI-RP2 drive will disappear — this is normal.\
                     output = (result.stderr or "") + (result.stdout or "")
                     self.app.log(f"Build failed: {output[-500:]}")
                     return
-
                 self.app.log(f"Build complete: {proj_dir.name}")
             except Exception as e:
                 self.app.log(f"Build error: {e}")
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    # ── ESP32-S3 flash methods ──
+
+    def _detect_esp32(self):
+        port = find_esp32_serial()
+        if port:
+            self.mount_label.config(text=f"ESP32-S3: {port}", foreground=FG_GREEN)
+            self.app.log(f"ESP32-S3 found on {port}")
+        else:
+            self.mount_label.config(
+                text="ESP32-S3: not detected — plug in USB-UART port (CH340X)",
+                foreground=FG_RED)
+
+    def _flash_esp32(self):
+        fw = self.fw_var.get()
+        if not fw or not Path(fw).exists():
+            messagebox.showwarning("No File", "Select a .bin firmware file first.")
+            return
+
+        port = find_esp32_serial()
+        if not port:
+            messagebox.showwarning("No ESP32",
+                                   "ESP32-S3 not detected.\n\n"
+                                   "Plug in the USB-UART port (near the buttons).")
+            return
+
+        self.app.log(f"Flashing {Path(fw).name} to ESP32-S3 on {port}...")
+
+        def _run():
+            try:
+                # Try esptool.py first (installed with PlatformIO or standalone)
+                esptool = shutil.which("esptool.py") or shutil.which("esptool")
+                if not esptool:
+                    # Try PlatformIO's bundled esptool
+                    pio_esptool = Path.home() / ".platformio" / "packages" / "tool-esptoolpy" / "esptool.py"
+                    if pio_esptool.exists():
+                        esptool = str(pio_esptool)
+
+                if not esptool:
+                    self.after(0, lambda: messagebox.showerror(
+                        "esptool Not Found",
+                        "esptool is required to flash ESP32-S3.\n\n"
+                        "Install with: pip install esptool\n"
+                        "Or install PlatformIO (includes esptool)."))
+                    return
+
+                result = subprocess.run(
+                    [esptool, "--chip", "esp32s3", "--port", port,
+                     "--baud", "460800", "write_flash", "0x0", fw],
+                    capture_output=True, text=True, timeout=120
+                )
+                if result.returncode == 0:
+                    self.after(0, lambda: self.app.log(f"Flashed: {Path(fw).name} -> {port}"))
+                    self.after(0, lambda: messagebox.showinfo(
+                        "Success", f"ESP32-S3 firmware flashed!\n\n{Path(fw).name}"))
+                else:
+                    output = (result.stderr or "") + (result.stdout or "")
+                    self.after(0, lambda: self.app.log(f"Flash failed: {output[-500:]}"))
+                    self.after(0, lambda: messagebox.showerror(
+                        "Flash Failed", f"esptool error:\n{output[-300:]}"))
+            except subprocess.TimeoutExpired:
+                self.after(0, lambda: self.app.log("Flash timed out (2 min)."))
+            except Exception as e:
+                self.after(0, lambda: messagebox.showerror("Flash Failed", str(e)))
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    def _build_esp32_project(self):
+        """Build ESP32-S3 firmware using PlatformIO CLI."""
+        esp_proj = PROJECT_ROOT / "ESP Protyping" / "dilder-esp32"
+        if not (esp_proj / "platformio.ini").exists():
+            messagebox.showwarning(
+                "No Project",
+                f"PlatformIO project not found at:\n{esp_proj}\n\n"
+                "Run setup.py step 16 to initialize the ESP32 project.")
+            return
+
+        self.app.log(f"Building ESP32-S3 firmware via PlatformIO...")
+
+        def _run():
+            try:
+                pio = shutil.which("pio") or shutil.which("platformio")
+                if not pio:
+                    self.after(0, lambda: messagebox.showerror(
+                        "PlatformIO Not Found",
+                        "PlatformIO CLI not found.\n\n"
+                        "Install with: pip install platformio\n"
+                        "Or run: python3 setup.py --step 16"))
+                    return
+
+                result = subprocess.run(
+                    [pio, "run", "-d", str(esp_proj)],
+                    capture_output=True, text=True, timeout=300
+                )
+                if result.returncode == 0:
+                    self.after(0, lambda: self.app.log("[build] ESP32 build complete."))
+                    self.after(0, lambda: self._populate_quick_picks())
+                else:
+                    output = (result.stderr or "") + (result.stdout or "")
+                    self.after(0, lambda: self.app.log(f"[build] ESP32 build failed: {output[-500:]}"))
+            except subprocess.TimeoutExpired:
+                self.after(0, lambda: self.app.log("[build] ESP32 build timed out (5 min)."))
+            except Exception as e:
+                self.after(0, lambda: self.app.log(f"[build] Error: {e}"))
 
         threading.Thread(target=_run, daemon=True).start()
 
@@ -1212,22 +1430,9 @@ class AssetManager(ttk.Frame):
 # ─────────────────────────────────────────────────────────────────────────────
 
 class PinViewer(ttk.Frame):
-    """Visual GPIO pin assignment reference."""
+    """Visual GPIO pin assignment reference — switches between Pico W and ESP32-S3."""
 
-    def __init__(self, parent, app):
-        super().__init__(parent)
-        self.app = app
-        self._build_ui()
-
-    def _build_ui(self):
-        # Pin map
-        pin_text = tk.Text(self, wrap=tk.NONE, bg=BG_DARK, fg=FG_TEXT,
-                           font=("JetBrains Mono", 11), state=tk.DISABLED,
-                           height=30, width=70)
-        pin_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-
-        pin_text.configure(state=tk.NORMAL)
-        pin_text.insert(tk.END, """\
+    _PICO_W_PINOUT = """\
 Pico W GPIO Pin Assignments — Dilder Project
 ══════════════════════════════════════════════
 
@@ -1275,8 +1480,100 @@ Mode:        Mode 0 (CPOL=0, CPHA=0)
 Clock:       4 MHz
 CS:          Active LOW
 Bit order:   MSB first
-""")
-        pin_text.configure(state=tk.DISABLED)
+"""
+
+    _ESP32S3_PINOUT = """\
+Olimex ESP32-S3-DevKit-Lipo GPIO Assignments — Dilder Project
+══════════════════════════════════════════════════════════════
+
+         ┌──[USB-OTG]──┐   ┌──[USB-UART]──┐
+         │  (native)    │   │  (CH340X)    │
+         └──────────────┘   └──────────────┘
+         [RST]  [BOOT]   (o) LED (GPIO38)
+
+   EXT1 (Left)                    EXT2 (Right)
+  ┌───────────┐                  ┌───────────┐
+  │ 3V3  [ 1] │  ◄── VCC        │ GND  [ 1] │
+  │ 3V3  [ 2] │                  │ GP43 [ 2] │  UART0 TX
+  │ EN   [ 3] │                  │ GP44 [ 3] │  UART0 RX
+▶ │ GP4  [ 4] │  JOY UP         │ GP1  [ 4] │ ▶ JOY LEFT
+  │ GP5  [ 5] │  PWR sense      │ GP2  [ 5] │ ▶ JOY RIGHT
+  │ GP6  [ 6] │  BAT sense      │ GP42 [ 6] │
+▶ │ GP7  [ 7] │  JOY DOWN       │ GP41 [ 7] │
+▶ │ GP15 [ 8] │  JOY CENTER     │ GP40 [ 8] │
+  │ GP16 [ 9] │                  │ GP39 [ 9] │
+  │ GP17 [10] │                  │ GP38 [10] │ ▶ LED
+  │ GP18 [11] │                  │ GP37 [11] │  ✕ PSRAM
+▶ │ GP8  [12] │  BUSY            │ GP36 [12] │  ✕ PSRAM
+  │ GP3  [13] │ ▶ RST            │ GP35 [13] │  ✕ PSRAM
+  │ GP46 [14] │                  │ GP0  [14] │  BOOT btn
+▶ │ GP9  [15] │  DC              │ GP45 [15] │
+▶ │ GP10 [16] │  CS              │ GP48 [16] │  I2C SDA
+▶ │ GP11 [17] │  DIN (MOSI)      │ GP47 [17] │  I2C SCL
+▶ │ GP12 [18] │  CLK (SCLK)      │ GP21 [18] │
+  │ GP13 [19] │                  │ GP20 [19] │  USB D+
+  │ GP14 [20] │                  │ GP19 [20] │  USB D-
+  │ +5V  [21] │                  │ GND  [21] │
+  │ GND  [22] │  ◄── GND        │ GND  [22] │
+  └───────────┘                  └───────────┘
+
+▶ = used by Dilder   ✕ = reserved (PSRAM)
+
+═══════════════════════════════════════════════════════
+e-Paper Display (FSPI)          Joystick (5-way)
+═══════════════════════════════════════════════════════
+VCC  → 3.3V   EXT1-1           UP     → GPIO4  EXT1-4
+GND  → GND    EXT1-22          DOWN   → GPIO7  EXT1-7
+DIN  → GPIO11 EXT1-17          LEFT   → GPIO1  EXT2-4
+CLK  → GPIO12 EXT1-18          RIGHT  → GPIO2  EXT2-5
+CS   → GPIO10 EXT1-16          CENTER → GPIO15 EXT1-8
+DC   → GPIO9  EXT1-15
+RST  → GPIO3  EXT1-13
+BUSY → GPIO8  EXT1-12
+
+═══════════════════════════════════════════════════════
+Board Peripherals
+═══════════════════════════════════════════════════════
+Green LED → GPIO38 (active LOW)   EXT2-10
+BOOT btn  → GPIO0  (user btn)    EXT2-14
+BAT sense → GPIO6  (ADC ×4.133)  EXT1-6
+PWR sense → GPIO5  (ADC ×1.468)  EXT1-5
+
+═══════════════════════════════════════════════════════
+SPI Configuration (FSPI / SPI3)
+═══════════════════════════════════════════════════════
+Controller:  FSPI (SPI3, hardware)
+Mode:        Mode 0 (CPOL=0, CPHA=0)
+Clock:       4 MHz
+CS:          Active LOW (10k pull-up on board)
+Bit order:   MSB first
+"""
+
+    def __init__(self, parent, app):
+        super().__init__(parent)
+        self.app = app
+        self._build_ui()
+
+    def _build_ui(self):
+        # Pin map
+        self.pin_text = tk.Text(self, wrap=tk.NONE, bg=BG_DARK, fg=FG_TEXT,
+                                font=("JetBrains Mono", 11), state=tk.DISABLED,
+                                height=30, width=70)
+        self.pin_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self._show_pinout(self._PICO_W_PINOUT)
+
+    def _show_pinout(self, text):
+        self.pin_text.configure(state=tk.NORMAL)
+        self.pin_text.delete("1.0", tk.END)
+        self.pin_text.insert(tk.END, text)
+        self.pin_text.configure(state=tk.DISABLED)
+
+    def refresh_for_board(self, board):
+        """Switch the displayed pinout for the selected board."""
+        if board == BOARD_ESP32S3:
+            self._show_pinout(self._ESP32S3_PINOUT)
+        else:
+            self._show_pinout(self._PICO_W_PINOUT)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1285,13 +1582,14 @@ Bit order:   MSB first
 
 class ConnectionUtility(ttk.Frame):
     """
-    Step-by-step walkthrough for connecting the Pico W via USB serial
-    and over Wi-Fi. Includes live status checks at each step.
+    Step-by-step walkthrough for connecting the target board via USB serial
+    and over Wi-Fi. Adapts steps based on the selected board (Pico W or ESP32-S3).
     """
 
     def __init__(self, parent, app):
         super().__init__(parent)
         self.app = app
+        self._last_board = None
         self._build_ui()
 
     def _build_ui(self):
@@ -1307,19 +1605,37 @@ class ConnectionUtility(ttk.Frame):
                         variable=self.mode_var, value="wifi",
                         command=self._show_mode).pack(side=tk.LEFT)
 
+        # Board indicator
+        self.board_label = ttk.Label(mode_frame, text="", font=("JetBrains Mono", 10),
+                                      foreground=FG_ACCENT)
+        self.board_label.pack(side=tk.RIGHT, padx=10)
+
         # ── Content area ──
         self.content = ttk.Frame(self)
         self.content.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         self._show_mode()
 
+    def refresh_for_board(self, board_key=None):
+        """Rebuild the panel when the target board changes."""
+        self._show_mode()
+
     def _show_mode(self):
         for w in self.content.winfo_children():
             w.destroy()
+        board = self.app.target_board
+        board_label = BOARD_LABELS.get(board, "Board")
+        self.board_label.config(text=f"Board: {board_label}")
         if self.mode_var.get() == "usb":
-            self._build_usb_panel()
+            if board == BOARD_ESP32S3:
+                self._build_usb_panel_esp32()
+            else:
+                self._build_usb_panel()
         else:
-            self._build_wifi_panel()
+            if board == BOARD_ESP32S3:
+                self._build_wifi_panel_esp32()
+            else:
+                self._build_wifi_panel()
 
     # ── USB Panel ────────────────────────────────────────────────────────────
 
@@ -1723,6 +2039,242 @@ port below to test the connection.""")
             f"Open a terminal manually and run:\n\n  {cmd}\n\n"
             f"Then log out and back in."
         )
+
+    # ── ESP32-S3 USB Panel ────────────────────────────────────────────────────
+
+    def _build_usb_panel_esp32(self):
+        canvas = tk.Canvas(self.content, bg=BG_PANEL, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.content, orient=tk.VERTICAL, command=canvas.yview)
+        scroll_frame = ttk.Frame(canvas)
+
+        scroll_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=scroll_frame, anchor=tk.NW)
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        canvas.bind_all("<Button-4>", lambda e: canvas.yview_scroll(-3, "units"))
+        canvas.bind_all("<Button-5>", lambda e: canvas.yview_scroll(3, "units"))
+
+        f = scroll_frame
+
+        # Step 1
+        self._step_header(f, "Step 1", "Plug in via USB-UART (not USB-OTG)")
+        self._step_body(f, """\
+The Olimex ESP32-S3-DevKit-Lipo has TWO USB-C ports:
+
+  USB-UART  (near RST/BOOT buttons)  CH340X chip
+     Upload firmware, serial monitor, auto-reset
+
+  USB-OTG   (near the antenna)        Native USB
+     JTAG debugging only (advanced)
+
+Plug your USB-C data cable into the USB-UART port.
+This is the port closer to the RST and BOOT buttons.""")
+
+        self._step_check_btn(f, "Check: Is the ESP32-S3 detected on USB?", self._check_usb_esp32)
+        self.esp_step1_label = ttk.Label(f, text="")
+        self.esp_step1_label.pack(anchor=tk.W, padx=20)
+
+        # Step 2
+        self._step_header(f, "Step 2", "Verify serial port (/dev/ttyUSB*)")
+        self._step_body(f, """\
+The CH340X USB-to-serial chip shows up as /dev/ttyUSB0.
+The ch341 kernel module is built into most Linux kernels.
+
+If no /dev/ttyUSB* appears:
+  - Make sure you used the USB-UART port (not USB-OTG)
+  - Try a different USB cable (must be data, not charge-only)
+  - Check: dmesg | tail  (should show "ch341-uart converter")""")
+
+        self._step_check_btn(f, "Check: Is /dev/ttyUSB* present?", self._check_serial_esp32)
+        self.esp_step2_label = ttk.Label(f, text="")
+        self.esp_step2_label.pack(anchor=tk.W, padx=20)
+
+        # Step 3
+        self._step_header(f, "Step 3", "Verify serial port permissions")
+        self._step_body(f, """\
+Same as the Pico W — your user must be in the serial group:
+
+  Arch / CachyOS / Manjaro:  uucp
+  Ubuntu / Debian:            dialout
+
+If you already set this up for the Pico W, you are good.
+Otherwise run:
+  sudo usermod -aG uucp $USER    (Arch)
+  sudo usermod -aG dialout $USER (Debian)
+
+Then log out and back in.""")
+
+        self._step_check_btn(f, "Check: Do I have serial permissions?", self._check_serial_perms)
+        self.usb_step3_label = ttk.Label(f, text="")
+        self.usb_step3_label.pack(anchor=tk.W, padx=20)
+
+        self.fix_perms_btn = ttk.Button(f, text="Fix: Add me to serial group (requires sudo password)",
+                                        command=self._fix_serial_perms)
+        self.fix_perms_btn.pack(anchor=tk.W, padx=20, pady=(3, 0))
+
+        # Step 4
+        self._step_header(f, "Step 4", "Download Mode (manual bootloader entry)")
+        self._step_body(f, """\
+Normally you do NOT need download mode — the CH340X auto-resets
+the board into bootloader mode when PlatformIO or esptool flash.
+
+If auto-reset fails (flash hangs or times out), enter download
+mode manually:
+
+  1. Hold the BOOT button (do not release)
+  2. Press and release the RST button (while still holding BOOT)
+  3. Release the BOOT button
+  4. The board is now in download mode for 5 seconds
+  5. Run the flash command immediately
+
+  Button locations on the Olimex board:
+  ┌──────────────────────────────────────┐
+  │  [USB-OTG]         [USB-UART]        │
+  │                                      │
+  │  [RST]  [BOOT]   (o) Green LED      │
+  │                   (o) Yellow LED     │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   │
+  │  ▓  ESP32-S3-WROOM-1-N8R8      ▓   │
+  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   │
+  └──────────────────────────────────────┘
+
+After flashing, press RST once to reboot into normal mode.""")
+
+        # Step 5
+        self._step_header(f, "Step 5", "Open the Serial Monitor")
+        self._step_body(f, """\
+Everything looks good — switch to the Serial Monitor tab.
+
+  1. Go to the "Serial Monitor" tab
+  2. Port should show /dev/ttyUSB0
+  3. Baud rate: 115200
+  4. Click "Connect"
+
+Expected output after flashing Dilder firmware:
+  === Dilder ESP32-S3 Firmware ===
+  Board: ESP32-S3 (Olimex)
+  PSRAM: 8388608 bytes""")
+
+        ttk.Button(f, text="Go to Serial Monitor",
+                   command=lambda: self.app.notebook.select(self.app.serial_tab)).pack(
+                       anchor=tk.W, padx=20, pady=(5, 20))
+
+    def _check_usb_esp32(self):
+        try:
+            result = subprocess.run(["lsusb"], capture_output=True, text=True, timeout=5)
+            ch340_lines = [l for l in result.stdout.splitlines()
+                           if "1a86" in l.lower() or "ch340" in l.lower() or "qinheng" in l.lower()]
+            if ch340_lines:
+                self.esp_step1_label.config(
+                    text=f"  ✓ CH340X detected: {ch340_lines[0].strip()}",
+                    foreground=FG_GREEN)
+                self.app.log("USB check: CH340X (ESP32-S3) detected")
+            else:
+                self.esp_step1_label.config(
+                    text="  ✗ No CH340X found. Is the USB-UART port plugged in?",
+                    foreground=FG_RED)
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            self.esp_step1_label.config(
+                text="  ? lsusb not available — check manually: dmesg | tail",
+                foreground=FG_YELLOW)
+
+    def _check_serial_esp32(self):
+        port = find_esp32_serial()
+        if port:
+            self.esp_step2_label.config(
+                text=f"  ✓ {port} detected — ESP32-S3 serial ready",
+                foreground=FG_GREEN)
+            self.app.log(f"Serial port check: {port} found (ESP32)")
+        else:
+            import glob as _glob
+            others = _glob.glob("/dev/ttyUSB*")
+            if others:
+                self.esp_step2_label.config(
+                    text=f"  ~ ESP32 not auto-detected, but found: {', '.join(others)}",
+                    foreground=FG_YELLOW)
+            else:
+                self.esp_step2_label.config(
+                    text="  ✗ No /dev/ttyUSB* found. Check USB-UART cable.",
+                    foreground=FG_RED)
+
+    # ── ESP32-S3 Wi-Fi Panel ────────────────────────────────────────────────
+
+    def _build_wifi_panel_esp32(self):
+        canvas = tk.Canvas(self.content, bg=BG_PANEL, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.content, orient=tk.VERTICAL, command=canvas.yview)
+        scroll_frame = ttk.Frame(canvas)
+
+        scroll_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=scroll_frame, anchor=tk.NW)
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        canvas.bind_all("<Button-4>", lambda e: canvas.yview_scroll(-3, "units"))
+        canvas.bind_all("<Button-5>", lambda e: canvas.yview_scroll(3, "units"))
+
+        f = scroll_frame
+
+        self._step_header(f, "Overview", "ESP32-S3 Wi-Fi Connection")
+        self._step_body(f, """\
+The ESP32-S3 has built-in 802.11 b/g/n Wi-Fi (2.4 GHz)
+and Bluetooth 5.0 LE — no external chip needed.
+
+Wi-Fi is configured through the Arduino framework or
+ESP-IDF. The PlatformIO project already includes the
+WiFi library.
+
+This is not yet used in the Dilder prototype firmware.
+Below are the steps to add Wi-Fi when ready.""")
+
+        self._step_header(f, "Step 1", "Add Wi-Fi to your ESP32-S3 firmware")
+        self._step_body(f, """\
+In your main.cpp or a separate wifi_setup.cpp:
+
+  #include <WiFi.h>
+
+  void setup() {
+      WiFi.begin("YOUR_SSID", "YOUR_PASSWORD");
+      while (WiFi.status() != WL_CONNECTED) {
+          delay(500);
+          Serial.print(".");
+      }
+      Serial.print("IP: ");
+      Serial.println(WiFi.localIP());
+  }
+
+The Arduino WiFi library handles all the ESP-IDF
+networking stack underneath.""")
+
+        self._step_header(f, "Step 2", "Test the connection")
+        self._step_body(f, """\
+After flashing, open the Serial Monitor to see the IP address.
+Then test from your computer:
+
+  ping <IP_ADDRESS>
+
+The ESP32-S3 supports mDNS (WiFi.setHostname("dilder"))
+and TCP/HTTP servers just like the Pico W.""")
+
+        conn_frame = ttk.Frame(f)
+        conn_frame.pack(fill=tk.X, padx=20, pady=(0, 10))
+
+        ttk.Label(conn_frame, text="IP:").pack(side=tk.LEFT)
+        self.wifi_ip_var = tk.StringVar(value="192.168.1.")
+        ttk.Entry(conn_frame, textvariable=self.wifi_ip_var, width=16).pack(side=tk.LEFT, padx=(3, 10))
+
+        ttk.Label(conn_frame, text="Port:").pack(side=tk.LEFT)
+        self.wifi_port_var = tk.StringVar(value="4242")
+        ttk.Entry(conn_frame, textvariable=self.wifi_port_var, width=6).pack(side=tk.LEFT, padx=(3, 10))
+
+        ttk.Button(conn_frame, text="Test Connection", command=self._test_wifi_conn).pack(side=tk.LEFT)
+
+        self.wifi_conn_label = ttk.Label(f, text="")
+        self.wifi_conn_label.pack(anchor=tk.W, padx=20, pady=(0, 20))
 
     # ── Wi-Fi Checks ─────────────────────────────────────────────────────────
 
@@ -4770,11 +5322,29 @@ class ProgramsTab(ttk.Frame):
         self.preview_btn = ttk.Button(btn_frame, text="Preview", command=self._preview_program)
         self.preview_btn.pack(side=tk.LEFT, padx=2)
 
-        self.deploy_btn = ttk.Button(btn_frame, text="Deploy to Pico", command=self._deploy_to_pico)
+        self.deploy_btn = ttk.Button(btn_frame, text="Deploy to Board", command=self._deploy_to_board)
         self.deploy_btn.pack(side=tk.LEFT, padx=2)
 
         self.stop_btn = ttk.Button(btn_frame, text="Stop", command=self._stop_program, state=tk.DISABLED)
         self.stop_btn.pack(side=tk.LEFT, padx=2)
+
+        # Board selector (synced with main toolbar)
+        board_frame = ttk.LabelFrame(list_frame, text="Target Board", padding=4)
+        board_frame.pack(fill=tk.X, pady=(8, 0))
+
+        self.board_combo = ttk.Combobox(
+            board_frame,
+            values=list(BOARD_LABELS.values()),
+            state="readonly", font=("JetBrains Mono", 9),
+        )
+        self.board_combo.set(BOARD_LABELS[BOARD_PICO_W])
+        self.board_combo.pack(fill=tk.X)
+        self.board_combo.bind("<<ComboboxSelected>>", self._on_programs_board_changed)
+
+        self._board_status_label = ttk.Label(
+            board_frame, text="", font=("JetBrains Mono", 8))
+        self._board_status_label.pack(fill=tk.X, pady=(2, 0))
+        self._update_board_status()
 
         # Display variant selector
         display_frame = ttk.LabelFrame(list_frame, text="Display Model", padding=4)
@@ -4790,7 +5360,7 @@ class ProgramsTab(ttk.Frame):
         self.display_combo.bind("<<ComboboxSelected>>", self._on_display_changed)
 
         # Firmware flash section
-        flash_frame = ttk.LabelFrame(list_frame, text="Pico Firmware", padding=4)
+        flash_frame = ttk.LabelFrame(list_frame, text="Board Firmware", padding=4)
         flash_frame.pack(fill=tk.X, pady=(8, 0))
 
         self.flash_btn = ttk.Button(flash_frame, text="Flash IMG Receiver",
@@ -4803,11 +5373,10 @@ class ProgramsTab(ttk.Frame):
                                           command=self._deploy_standalone)
         self.standalone_btn.pack(fill=tk.X, pady=2)
 
-        self.flash_status = ttk.Label(flash_frame, text="IMG Receiver: stream from PC\n"
-                                       "Standalone: runs without PC\n"
-                                       "Put Pico in BOOTSEL mode first.",
+        self.flash_status = ttk.Label(flash_frame, text="",
                                        wraplength=200, foreground=FG_DIM,
                                        font=("JetBrains Mono", 8))
+        self._update_flash_hint()
         self.flash_status.pack(fill=tk.X)
 
         # ── Preview area (right) ──
@@ -4845,14 +5414,76 @@ class ProgramsTab(ttk.Frame):
             return self.DISPLAY_VARIANTS[idx][0]
         return "V3"
 
+    def _on_programs_board_changed(self, event=None):
+        """Handle board change from the Programs tab dropdown."""
+        selected_label = self.board_combo.get()
+        board_key = BOARD_PICO_W
+        for key, label in BOARD_LABELS.items():
+            if label == selected_label:
+                board_key = key
+                break
+        # Update the main app's StringVar and toolbar combo
+        self.app._target_board.set(board_key)
+        if hasattr(self.app, 'board_combo'):
+            self.app.board_combo.set(BOARD_LABELS[board_key])
+        # Update the main toolbar status
+        port = find_serial_for_board(board_key)
+        if hasattr(self.app, 'board_status'):
+            if port:
+                self.app.board_status.config(text=f"Serial: {port}", foreground=FG_GREEN)
+            else:
+                hint = "/dev/ttyUSB*" if board_key == BOARD_ESP32S3 else "/dev/ttyACM*"
+                self.app.board_status.config(text=f"Not detected ({hint})", foreground=FG_YELLOW)
+        self._update_board_status()
+        self.app.log(f"[programs] Target board: {BOARD_LABELS[board_key]}")
+        # Re-trigger the selection display to update flash size info
+        self._on_select()
+
+    def _update_board_status(self):
+        """Update the board status label with serial detection info."""
+        board = self.app.target_board
+        port = find_serial_for_board(board)
+        if port:
+            self._board_status_label.config(
+                text=f"Serial: {port}", foreground=FG_GREEN)
+        else:
+            hint = "/dev/ttyUSB*" if board == BOARD_ESP32S3 else "/dev/ttyACM*"
+            self._board_status_label.config(
+                text=f"Not detected ({hint})", foreground=FG_RED)
+        self._update_flash_hint()
+
+    def _update_flash_hint(self):
+        """Update the flash status hint based on selected board."""
+        if not hasattr(self, 'flash_status'):
+            return  # called before flash_status widget is created
+        board = self.app.target_board
+        if board == BOARD_ESP32S3:
+            port = find_esp32_serial()
+            port_str = port if port else "(not detected)"
+            self.flash_status.config(
+                text=f"ESP32-S3 (Olimex) — {port_str}\n"
+                     "1) Plug USB-UART cable (near buttons)\n"
+                     "2) Click Flash or Deploy Standalone\n"
+                     "   PlatformIO builds + flashes automatically\n"
+                     "   No BOOTSEL needed — auto-resets via DTR",
+                foreground=FG_DIM)
+        else:
+            self.flash_status.config(
+                text="Pico W (RP2040)\n"
+                     "Flash IMG Receiver: stream frames from PC\n"
+                     "  1) Hold BOOTSEL, plug USB, release\n"
+                     "  2) Click Flash → copies .uf2\n"
+                     "Deploy Standalone: runs without PC\n"
+                     "  Same BOOTSEL steps, bakes quotes in",
+                foreground=FG_DIM)
+
     def _on_display_changed(self, event=None):
         variant = self._get_display_variant()
         self.app.log(f"[programs] Display variant set to: {variant}")
 
-    # Pico W flash: 2MB total, but the UF2 bootloader + SDK runtime take ~28KB.
-    # Rendering code (drawing functions, font, body RLE) is ~15KB.
-    # Each quote is a C string + mood byte in the quotes.h header.
-    PICO_FLASH_KB = 2048  # 2MB total flash
+    # Flash sizes by board
+    PICO_FLASH_KB = 2048   # 2 MB total flash
+    ESP32_FLASH_KB = 8192  # 8 MB total flash
 
     # Base firmware size in KB (SDK runtime + SPI driver + display driver +
     # rendering code + font + body RLE). Measured from compiled .uf2 files:
@@ -4887,8 +5518,11 @@ class ProgramsTab(ttk.Frame):
 
         # Estimate firmware size
         est_kb = self._estimate_firmware_kb(key)
-        free_kb = self.PICO_FLASH_KB - est_kb
-        pct_used = (est_kb / self.PICO_FLASH_KB) * 100
+        board = self.app.target_board
+        flash_kb = self.ESP32_FLASH_KB if board == BOARD_ESP32S3 else self.PICO_FLASH_KB
+        board_label = BOARD_LABELS.get(board, "Board")
+        free_kb = flash_kb - est_kb
+        pct_used = (est_kb / flash_kb) * 100
 
         # Get quote count
         if key in self._OCTOPUS_CONFIGS:
@@ -4900,7 +5534,7 @@ class ProgramsTab(ttk.Frame):
         size_info = (
             f"\n\n"
             f"Firmware: ~{est_kb} KB  |  "
-            f"Pico flash: {self.PICO_FLASH_KB} KB  |  "
+            f"{board_label} flash: {flash_kb} KB  |  "
             f"Free after deploy: {free_kb} KB ({100 - pct_used:.1f}% free)\n"
             f"Quotes: {num_quotes}  |  "
             f"Flash used: {pct_used:.1f}%"
@@ -4986,24 +5620,26 @@ class ProgramsTab(ttk.Frame):
             t = threading.Thread(target=self._run_octopus, args=(key, False), daemon=True)
             t.start()
 
-    def _deploy_to_pico(self):
-        """Run the selected program, sending each frame to the Pico display."""
+    def _deploy_to_board(self):
+        """Run the selected program, sending each frame to the target board's display."""
         key = self._get_selected_key()
         if not key:
             messagebox.showinfo("Select Program", "Select a program from the list first.")
             return
 
-        port = find_pico_serial()
+        board = self.app.target_board
+        port = find_serial_for_board(board)
+        board_label = BOARD_LABELS.get(board, "board")
         if not port:
-            messagebox.showwarning("No Pico", "No Pico W detected on USB serial.")
+            messagebox.showwarning("No Board", f"No {board_label} detected on USB serial.")
             return
 
         self._stop_event.clear()
         self.preview_btn.config(state=tk.DISABLED)
         self.deploy_btn.config(state=tk.DISABLED)
         self.stop_btn.config(state=tk.NORMAL)
-        self.status_label.config(text=f"Deploying to {port}...")
-        self.app.log(f"Deploying {self.PROGRAMS[key]['name']} to Pico on {port}")
+        self.status_label.config(text=f"Deploying to {port} ({board_label})...")
+        self.app.log(f"Deploying {self.PROGRAMS[key]['name']} to {board_label} on {port}")
 
         if key in self._OCTOPUS_CONFIGS:
             t = threading.Thread(target=self._run_octopus, args=(key, True), daemon=True)
@@ -5019,7 +5655,7 @@ class ProgramsTab(ttk.Frame):
         quotes, tagline, default_mood = self._OCTOPUS_CONFIGS[prog_key]
         ser = None
         if deploy_to_pico:
-            port = find_pico_serial()
+            port = find_serial_for_board(self.app.target_board)
             if port:
                 try:
                     ser = serial.Serial(port, DEFAULT_BAUD, timeout=2,
@@ -5059,20 +5695,23 @@ class ProgramsTab(ttk.Frame):
                         ser.write(struct.pack("<HH", DISPLAY_W, DISPLAY_H))
                         ser.write(data)
                         ser.flush()
-                        self.after(0, lambda fc=frame_count: self.status_label.config(
-                            text=f"Frame {fc} sent to Pico", foreground=FG_GREEN))
+                        board_label = BOARD_LABELS.get(self.app.target_board, "board")
+                        self.after(0, lambda fc=frame_count, bl=board_label:
+                            self.status_label.config(
+                                text=f"Frame {fc} sent to {bl}", foreground=FG_GREEN))
                     except (serial.SerialException, serial.SerialTimeoutException):
-                        self.after(0, lambda: self.status_label.config(
-                            text="Pico write failed — needs IMG-receiver firmware.\n"
-                                 "Use 'Build & Flash to Pico' below the program list\n"
-                                 "(put Pico in BOOTSEL mode first, then retry deploy).",
+                        board_label = BOARD_LABELS.get(self.app.target_board, "board")
+                        self.after(0, lambda bl=board_label: self.status_label.config(
+                            text=f"{bl} write failed — needs receiver firmware.\n"
+                                 "Use 'Flash IMG Receiver' below the program list.",
                             foreground=FG_RED))
                         # Don't kill ser — try again next frame
                 elif deploy_to_pico and ser is None:
-                    # Pico wasn't found, just preview locally
+                    # Board wasn't found, just preview locally
                     if frame_count == 0:
-                        self.after(0, lambda: self.status_label.config(
-                            text="No Pico — previewing locally", foreground=FG_YELLOW))
+                        board_label = BOARD_LABELS.get(self.app.target_board, "board")
+                        self.after(0, lambda bl=board_label: self.status_label.config(
+                            text=f"No {bl} — previewing locally", foreground=FG_YELLOW))
 
                 frame_count += 1
                 # Wait 3 seconds between frames (e-ink refresh is slow)
@@ -5086,8 +5725,14 @@ class ProgramsTab(ttk.Frame):
             self._finish_program()
 
     def _build_and_flash(self):
-        """Build the img-receiver firmware via Docker and flash to Pico in BOOTSEL mode."""
-        # Check for BOOTSEL mount first
+        """Build and flash firmware — routes to Pico (Docker+UF2) or ESP32 (PlatformIO)."""
+        board = self.app.target_board
+
+        if board == BOARD_ESP32S3:
+            self._build_and_flash_esp32()
+            return
+
+        # Pico path: check for BOOTSEL mount first
         mount = find_rpi_rp2_mount()
         if not mount:
             self.flash_status.config(
@@ -5105,6 +5750,81 @@ class ProgramsTab(ttk.Frame):
 
         t = threading.Thread(target=self._do_build_and_flash, args=(mount,), daemon=True)
         t.start()
+
+    def _build_and_flash_esp32(self):
+        """Build ESP32-S3 firmware via PlatformIO and flash via USB-UART."""
+        pio = shutil.which("pio") or shutil.which("platformio")
+        if not pio:
+            self.flash_status.config(
+                text="PlatformIO not found.\n"
+                     "Run: python3 setup.py --board esp32",
+                foreground=FG_RED)
+            return
+
+        port = find_esp32_serial()
+        if not port:
+            self.flash_status.config(
+                text="ESP32-S3 not detected.\n"
+                     "Plug in the USB-UART cable\n"
+                     "(near the RST/BOOT buttons).",
+                foreground=FG_YELLOW)
+            return
+
+        self.flash_btn.config(state=tk.DISABLED)
+        self.flash_status.config(text="Building ESP32 firmware...", foreground=FG_ACCENT)
+
+        t = threading.Thread(target=self._do_build_and_flash_esp32,
+                             args=(pio, port), daemon=True)
+        t.start()
+
+    def _do_build_and_flash_esp32(self, pio, port):
+        """Background thread: PlatformIO build + upload for ESP32-S3."""
+        esp_project = PROJECT_ROOT / "ESP Protyping" / "dilder-esp32"
+        try:
+            self._log_build("Building ESP32-S3 firmware (PlatformIO)...")
+            proc = subprocess.Popen(
+                [pio, "run", "-t", "upload",
+                 "--upload-port", port,
+                 "-d", str(esp_project)],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+            )
+            last_lines = []
+            for line in proc.stdout:
+                line = line.rstrip()
+                if line:
+                    last_lines.append(line)
+                    last_lines = last_lines[-10:]
+                    self.after(0, lambda l=line: self.app.log(f"[pio] {l}"))
+                    short = line[:70]
+                    self.after(0, lambda s=short: self.flash_status.config(
+                        text=f"PlatformIO...\n{s}"))
+            proc.wait(timeout=300)
+
+            if proc.returncode != 0:
+                err = "\n".join(last_lines[-3:])
+                self.after(0, lambda: self.flash_status.config(
+                    text=f"ESP32 build/flash failed:\n{err[:200]}",
+                    foreground=FG_RED))
+                return
+
+            self.after(0, lambda: self.flash_status.config(
+                text=f"ESP32-S3 firmware flashed!\n"
+                     f"Board will reboot on {port}.\n"
+                     f"Wait 3 seconds, then Deploy.",
+                foreground=FG_GREEN))
+            self.after(0, lambda: self.app.log("[pio] ESP32-S3 firmware flashed successfully."))
+
+        except subprocess.TimeoutExpired:
+            self.after(0, lambda: self.flash_status.config(
+                text="PlatformIO build timed out (5 min).", foreground=FG_RED))
+        except FileNotFoundError:
+            self.after(0, lambda: self.flash_status.config(
+                text="PlatformIO not found.", foreground=FG_RED))
+        except Exception as e:
+            self.after(0, lambda: self.flash_status.config(
+                text=f"Error: {str(e)[:150]}", foreground=FG_RED))
+        finally:
+            self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
 
     def _log_build(self, msg):
         """Log a build message to both the flash status and the app log."""
@@ -5248,12 +5968,24 @@ class ProgramsTab(ttk.Frame):
             self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
 
     def _deploy_standalone(self):
-        """Build standalone firmware with baked-in frames and flash to Pico."""
+        """Build standalone firmware with baked-in quotes — routes by board."""
         key = self._get_selected_key()
         if not key:
             messagebox.showinfo("Select Program", "Select a program from the list first.")
             return
 
+        if key not in self._OCTOPUS_CONFIGS:
+            messagebox.showinfo("Not Supported",
+                                "Standalone deploy is only available for octopus programs.")
+            return
+
+        board = self.app.target_board
+
+        if board == BOARD_ESP32S3:
+            self._deploy_standalone_esp32(key)
+            return
+
+        # Pico path
         mount = find_rpi_rp2_mount()
         if not mount:
             self.flash_status.config(
@@ -5275,6 +6007,117 @@ class ProgramsTab(ttk.Frame):
         t = threading.Thread(target=self._do_deploy_standalone,
                              args=(key, mount, variant), daemon=True)
         t.start()
+
+    def _deploy_standalone_esp32(self, prog_key):
+        """Build standalone ESP32-S3 firmware with baked quotes via PlatformIO."""
+        pio = shutil.which("pio") or shutil.which("platformio")
+        if not pio:
+            self.flash_status.config(
+                text="PlatformIO not found.\n"
+                     "Run: python3 setup.py --board esp32",
+                foreground=FG_RED)
+            return
+
+        port = find_esp32_serial()
+        if not port:
+            self.flash_status.config(
+                text="ESP32-S3 not detected.\n"
+                     "Plug in the USB-UART cable.",
+                foreground=FG_YELLOW)
+            return
+
+        self.standalone_btn.config(state=tk.DISABLED)
+        self.flash_btn.config(state=tk.DISABLED)
+        self.flash_status.config(text="Generating quotes for ESP32...", foreground=FG_ACCENT)
+
+        t = threading.Thread(target=self._do_deploy_standalone_esp32,
+                             args=(prog_key, pio, port), daemon=True)
+        t.start()
+
+    def _do_deploy_standalone_esp32(self, prog_key, pio, port):
+        """Background thread: generate quotes.h → PlatformIO build → flash ESP32."""
+        esp_project = PROJECT_ROOT / "ESP Protyping" / "dilder-esp32"
+        quotes_dest = esp_project / "src" / "quotes.h"
+
+        try:
+            # Step 1: Generate quotes.h directly into the ESP32 project
+            quotes, tagline, default_mood = self._OCTOPUS_CONFIGS[prog_key]
+            prog_name = self.PROGRAMS.get(prog_key, {}).get("name", prog_key)
+            self._log_build(f"Generating quotes.h for {prog_name} ({len(quotes)} quotes)...")
+
+            mood_map = {None: 0, "weird": 1, "unhinged": 2,
+                        "angry": 3, "sad": 4, "chaotic": 5,
+                        "hungry": 6, "tired": 7, "slaphappy": 8,
+                        "lazy": 9, "fat": 10, "chill": 11, "creepy": 12,
+                        "excited": 13, "nostalgic": 14, "homesick": 15}
+
+            with open(quotes_dest, "w") as f:
+                f.write("/* Auto-generated by Dilder DevTool — do not edit */\n")
+                f.write("#ifndef QUOTES_H\n#define QUOTES_H\n\n")
+                f.write("#include <stdint.h>\n\n")
+                f.write(f'#define TAGLINE "{tagline}"\n')
+                f.write(f"#define QUOTE_COUNT {len(quotes)}\n")
+                f.write(f"#define HAS_STANDALONE_QUOTES 1\n\n")
+                f.write("typedef struct { const char *text; uint8_t mood; } Quote;\n\n")
+                f.write(f"static const Quote quotes[QUOTE_COUNT] = {{\n")
+                for raw in quotes:
+                    text, mood = _parse_quote(raw)
+                    mood = mood or default_mood
+                    escaped = text.replace('\\', '\\\\').replace('"', '\\"')
+                    f.write(f'    {{"{escaped}", {mood_map.get(mood, 0)}}},\n')
+                f.write("};\n\n#endif /* QUOTES_H */\n")
+
+            size_kb = quotes_dest.stat().st_size / 1024
+            self._log_build(f"Wrote quotes.h ({size_kb:.1f} KB)")
+
+            # Step 2: Build + flash via PlatformIO
+            self._log_build("Building ESP32-S3 standalone firmware...")
+            proc = subprocess.Popen(
+                [pio, "run", "-t", "upload",
+                 "--upload-port", port,
+                 "-d", str(esp_project)],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+            )
+
+            last_lines = []
+            for line in proc.stdout:
+                line = line.rstrip()
+                if line:
+                    last_lines.append(line)
+                    last_lines = last_lines[-10:]
+                    self.after(0, lambda l=line: self.app.log(f"[pio] {l}"))
+                    short = line[:70]
+                    self.after(0, lambda s=short: self.flash_status.config(
+                        text=f"Building standalone...\n{s}"))
+            proc.wait(timeout=300)
+
+            if proc.returncode != 0:
+                err = "\n".join(last_lines[-3:])
+                self.after(0, lambda: self.flash_status.config(
+                    text=f"ESP32 build failed:\n{err[:200]}", foreground=FG_RED))
+                return
+
+            self.after(0, lambda pn=prog_name: self.flash_status.config(
+                text=f"Standalone flashed to ESP32!\n"
+                     f"Board will reboot and run\n"
+                     f"{pn} on its own.",
+                foreground=FG_GREEN))
+            self.after(0, lambda: self.app.log(
+                f"[pio] Standalone {prog_name} flashed to ESP32-S3."))
+
+        except subprocess.TimeoutExpired:
+            self.after(0, lambda: self.flash_status.config(
+                text="PlatformIO build timed out.", foreground=FG_RED))
+        except Exception as e:
+            self.after(0, lambda: self.flash_status.config(
+                text=f"Error: {str(e)[:150]}", foreground=FG_RED))
+            self.after(0, lambda: self.app.log(f"[build] Error: {e}"))
+        finally:
+            # Clean up quotes.h so it doesn't persist
+            if quotes_dest.exists():
+                quotes_dest.unlink()
+            self.after(0, lambda: self.standalone_btn.config(state=tk.NORMAL))
+            self.after(0, lambda: self.flash_btn.config(state=tk.NORMAL))
 
     # Maps program keys to their firmware directory name
     _FIRMWARE_DIRS = {
@@ -5974,6 +6817,9 @@ class DilderDevTool(tk.Tk):
         self.geometry("1100x750")
         self.minsize(900, 600)
 
+        # Target board state
+        self._target_board = tk.StringVar(value=BOARD_PICO_W)
+
         # Style
         style = ttk.Style()
         style.theme_use("clam")
@@ -6014,7 +6860,41 @@ class DilderDevTool(tk.Tk):
         # Run Docker health check after UI is ready
         self.after(500, self._check_docker_toolchain)
 
+    @property
+    def target_board(self):
+        """Return the current target board key (BOARD_PICO_W or BOARD_ESP32S3)."""
+        val = self._target_board.get()
+        # The combobox may write the display label into the StringVar;
+        # reverse-lookup to always return the key.
+        if val in BOARD_LABELS:
+            return val  # already a key
+        for key, label in BOARD_LABELS.items():
+            if label == val:
+                return key
+        return BOARD_PICO_W  # safe default
+
     def _build_ui(self):
+        # ── Board selector toolbar ──
+        toolbar = ttk.Frame(self)
+        toolbar.pack(fill=tk.X, padx=5, pady=(5, 0))
+
+        ttk.Label(toolbar, text="Target Board:",
+                  font=("JetBrains Mono", 10, "bold")).pack(side=tk.LEFT, padx=(4, 8))
+
+        self.board_combo = ttk.Combobox(
+            toolbar, textvariable=self._target_board,
+            values=list(BOARD_LABELS.values()),
+            state="readonly", font=("JetBrains Mono", 10), width=22,
+        )
+        # Set the display value to the label for the default board
+        self.board_combo.set(BOARD_LABELS[BOARD_PICO_W])
+        self.board_combo.pack(side=tk.LEFT, padx=2)
+        self.board_combo.bind("<<ComboboxSelected>>", self._on_board_changed)
+
+        self.board_status = ttk.Label(toolbar, text="", foreground=FG_DIM,
+                                       font=("JetBrains Mono", 9))
+        self.board_status.pack(side=tk.LEFT, padx=(12, 0))
+
         # ── Vertical PanedWindow (notebook on top, log on bottom, resizable) ──
         paned = tk.PanedWindow(
             self, orient=tk.VERTICAL, sashwidth=6, sashrelief=tk.RAISED,
@@ -6164,6 +7044,44 @@ class DilderDevTool(tk.Tk):
         self.log_text.configure(state=tk.NORMAL)
         self.log_text.delete("1.0", tk.END)
         self.log_text.configure(state=tk.DISABLED)
+
+    def _on_board_changed(self, event=None):
+        """Handle board selector change."""
+        # Reverse-lookup the key from the display label
+        selected_label = self.board_combo.get()
+        board_key = BOARD_PICO_W  # default
+        for key, label in BOARD_LABELS.items():
+            if label == selected_label:
+                board_key = key
+                break
+        self._target_board.set(board_key)
+
+        self.log(f"[board] Target board changed to: {BOARD_LABELS[board_key]}")
+
+        # Detect serial for the new board
+        port = find_serial_for_board(board_key)
+        if port:
+            self.board_status.config(text=f"Serial: {port}", foreground=FG_GREEN)
+        else:
+            hint = "/dev/ttyUSB*" if board_key == BOARD_ESP32S3 else "/dev/ttyACM*"
+            self.board_status.config(text=f"Not detected ({hint})", foreground=FG_YELLOW)
+
+        # Sync Programs tab board combo
+        if hasattr(self, "programs_tab"):
+            self.programs_tab.board_combo.set(BOARD_LABELS[board_key])
+            self.programs_tab._update_board_status()
+
+        # Refresh the pin viewer if it exists
+        if hasattr(self, "pin_tab"):
+            self.pin_tab.refresh_for_board(board_key)
+
+        # Refresh flash utility
+        if hasattr(self, "flash_tab"):
+            self.flash_tab.refresh_for_board(board_key)
+
+        # Refresh connect tab
+        if hasattr(self, "conn_tab"):
+            self.conn_tab.refresh_for_board(board_key)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

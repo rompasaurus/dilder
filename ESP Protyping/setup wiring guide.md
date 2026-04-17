@@ -196,64 +196,111 @@ Battery Voltage = ADC_reading × (3.3 / 4095) × 4.133
 
 #### Compatible LiPo Battery Options
 
+> **How to read LiPo model numbers:** The model encodes dimensions as XXYYZZ where XX = thickness (×0.1mm), YY = width (mm), ZZ = length (mm). Example: **102050** = 10mm thick × 20mm wide × 50mm long. The Olimex board is 28mm wide, so batteries under 24mm wide fit within the board footprint.
+
 **Tier 1 — Guaranteed Compatible (Olimex direct)**
 
-These are Olimex's own batteries — same connector, correct polarity, confirmed compatible. Buy from [olimex.com](https://www.olimex.com/Products/Power-Supply/Lipo-battery/).
+Olimex's own batteries — same connector, correct polarity, no risk. Buy from [olimex.com](https://www.olimex.com/Products/Power-Supply/Lipo-battery/).
 
-| Battery | Capacity | Price | Dimensions | Notes |
-|---------|----------|-------|------------|-------|
-| **BATTERY-LIPO250mAh** | 250 mAh | €3.55 | 27 × 21 × 5 mm | Tiny. Good for compact builds. |
-| **BATTERY-LIPO800mAh** | 800 mAh | €4.55 | 50 × 30 × 5 mm | Check stock — sometimes unavailable. |
-| **BATTERY-LIPO1400mAh** | 1400 mAh | €5.95 | 50 × 34 × 8 mm | **Best mid-range pick.** In stock. |
-| **BATTERY-LIPO3000mAh** | 3000 mAh | €7.95 | 135 × 45 × 5 mm | Large/flat — good for prototyping. |
-| **BATTERY-LIPO4400mAh** | 4400 mAh | €8.95 | 68 × 37 × 18 mm | Highest capacity. Thick form factor. |
+| Battery | Capacity | Dimensions (W × L × T) | Width | Price | Notes |
+|---------|----------|------------------------|-------|-------|-------|
+| **BATTERY-LIPO250mAh** | 250 mAh | 21 × 27 × 5 mm | 21 mm | €3.55 | Fits under board width (< 24mm). |
+| **BATTERY-LIPO800mAh** | 800 mAh | 30 × 50 × 5 mm | 30 mm | €4.55 | Check stock — sometimes unavailable. |
+| **BATTERY-LIPO1400mAh** | 1400 mAh | 34 × 50 × 8 mm | 34 mm | €5.95 | **Best mid-range.** Same footprint as board. |
+| **BATTERY-LIPO3000mAh** | 3000 mAh | 45 × 135 × 5 mm | 45 mm | €7.95 | Very long. Good for prototyping. |
+| **BATTERY-LIPO4400mAh** | 4400 mAh | 37 × 68 × 18 mm | 37 mm | €8.95 | Highest capacity. Thick. |
 
-All include overcharge + short-circuit protection. Ships from Plovdiv, Bulgaria (3-7 days to Germany). You're already ordering from Olimex, so bundle a battery with your next order to save on shipping.
+All include overcharge + short-circuit protection. Ships from Plovdiv, Bulgaria (3-7 days to Germany).
 
 **Tier 2 — Confirmed Compatible (Adafruit / SparkFun / Pimoroni)**
 
-These brands use the same JST PH 2.0mm polarity convention as Olimex. Available through European resellers.
+Same JST PH 2.0mm polarity convention as Olimex. Available through European resellers.
 
-| Battery | Capacity | Price | Connector | Source |
-|---------|----------|-------|-----------|--------|
-| **Pimoroni LiPo Pack (BAT0002)** | 150 mAh | ~€3.75 | JST-PH 2.0mm | shop.pimoroni.com |
-| **Pimoroni LiPo Pack (BAT0003)** | 500 mAh | ~€6.75 | JST-PH 2.0mm | shop.pimoroni.com |
-| **Pimoroni LiPo Pack (BAT0004)** | 1200 mAh | ~€9.70 | JST-PH 2.0mm | shop.pimoroni.com |
-| **Adafruit LiPo 1578** | 500 mAh | ~€7.20 | JST-PH 2.0mm | adafruit.com / exp-tech.de |
-| **Adafruit LiPo 328** | 2500 mAh | ~€13.50 | JST-PH 2.0mm | adafruit.com / exp-tech.de |
-| **SparkFun PRT-13851** | 400 mAh | ~€7.20 | JST-PH 2.0mm | sparkfun.com (no intl. battery shipping) |
-| **SparkFun PRT-13854** | 850 mAh | ~€12.30 | JST-PH 2.0mm | sparkfun.com (no intl. battery shipping) |
+| Battery | Capacity | Dimensions (W × L × T) | Width | Price | Source |
+|---------|----------|------------------------|-------|-------|--------|
+| **Pimoroni BAT0002** | 150 mAh | 20.5 × 27 × 4.3 mm | 20.5 mm | ~€3.75 | shop.pimoroni.com |
+| **SparkFun PRT-13851** | 400 mAh | 25 × 37 × 5 mm | 25 mm | ~€7.20 | sparkfun.com (no intl. shipping) |
+| **Pimoroni BAT0003** | 500 mAh | 30.5 × 37 × 5.3 mm | 30.5 mm | ~€6.75 | shop.pimoroni.com |
+| **Adafruit LiPo 1578** | 500 mAh | 26 × 35 × 5 mm | 26 mm | ~€7.20 | adafruit.com / exp-tech.de |
+| **SparkFun PRT-13854** | 850 mAh | 35 × 45 × 5 mm | 35 mm | ~€12.30 | sparkfun.com (no intl. shipping) |
+| **Pimoroni BAT0004** | 1200 mAh | 35.5 × 64 × 5.3 mm | 35.5 mm | ~€9.70 | shop.pimoroni.com |
+| **Adafruit LiPo 328** | 2500 mAh | 50 × 60 × 7.3 mm | 50 mm | ~€13.50 | adafruit.com / exp-tech.de |
 
 **Note:** SparkFun and Adafruit do not ship lithium batteries internationally. Use European resellers like exp-tech.de, The Pi Hut, or Pimoroni for delivery to Germany.
 
 **Tier 3 — Compatible, Verify Polarity (German retailers)**
 
-These use JST PH 2.0mm connectors but polarity is not always documented. **Test with a multimeter before plugging in.**
+JST PH 2.0mm connectors but polarity not always documented. **Test with a multimeter before plugging in.**
 
-| Battery | Capacity | Price | Source |
-|---------|----------|-------|--------|
-| **BerryBase LP-785060** | 2500 mAh | €7.70 | berrybase.de |
-| **BerryBase LP-503562** | 1200 mAh | €5.50 | berrybase.de |
-| **BerryBase LP-503035** | 500 mAh | €5.10 | berrybase.de |
-| **Eckstein-Shop LP503562** | 1200 mAh | €6.97 | eckstein-shop.de |
-| **Eckstein-Shop LP503035** | 500 mAh | €5.19 | eckstein-shop.de |
+| Battery | Capacity | Dimensions (W × L × T) | Width | Price | Source |
+|---------|----------|------------------------|-------|-------|--------|
+| **BerryBase LP-503035** | 500 mAh | 30 × 35.5 × 5 mm | 30 mm | €5.10 | berrybase.de |
+| **Eckstein-Shop LP503035** | 500 mAh | 30 × 35.5 × 5 mm | 30 mm | €5.19 | eckstein-shop.de |
+| **BerryBase LP-503562** | 1200 mAh | 36 × 62.5 × 5 mm | 36 mm | €5.50 | berrybase.de |
+| **Eckstein-Shop LP503562** | 1200 mAh | 36 × 62.5 × 5 mm | 36 mm | €6.97 | eckstein-shop.de |
+| **BerryBase LP-785060** | 2500 mAh | 50 × 60.5 × 7.8 mm | 50 mm | €7.70 | berrybase.de |
 
-**Tier 4 — HIGH RISK (Amazon / AliExpress)**
+**Tier 4 — Narrow Cells (< 24mm wide, fits under the board)**
 
-Many unbranded Amazon.de and AliExpress LiPo batteries have **reversed JST PH polarity**. Only buy these if you are comfortable verifying and potentially swapping the connector pins.
+These are the only 1000+ mAh batteries that fit within the Olimex board's 28mm width. The **102050** cell format is the sweet spot. Most ship with JST PH 2.0mm but **always verify polarity with a multimeter** — Amazon/generic sellers have ~50% chance of reversed wiring.
 
-| Battery | Capacity | Price | Risk |
-|---------|----------|-------|------|
-| Generic "3.7V LiPo JST PH" | 1000-3000 mAh | €5-12 | **Polarity reversal ~50% chance** |
+| Battery | Capacity | Dimensions (W × L × T) | Width | Price | Connector | Source |
+|---------|----------|------------------------|-------|-------|-----------|--------|
+| **102050 (YDL)** | 1000 mAh | 20 × 50 × 10 mm | **20 mm** | ~$2.80 | JST-PH 2.0mm | ydlbattery.com |
+| **102050 (AKZYTUE)** | 1000 mAh | 20 × 50 × 10 mm | **20 mm** | ~€8-10 | JST-PH 2.0mm | Amazon (B0GHR4GJK8) |
+| **102050 (MakerHawk)** | 1000 mAh | 20 × 50 × 10 mm | **20 mm** | ~€8-12 | JST-PH 2.0mm | Amazon (B0D9K7HQHT) |
+| **102050 (Ampul.eu)** | 1000 mAh | 20 × 50 × 10 mm | **20 mm** | €7.18 | Verify before buying | ampul.eu |
+| **102060** | 1300 mAh | 20 × 60 × 10 mm | **20 mm** | ~€4-8 | Varies — check listing | eBay (115955049826) |
+| **LP102250** | 1200 mAh | 22 × 50 × 10 mm | **22 mm** | ~€5-8 | 3-pin JST (needs swap) | li-polymer-battery.com |
+
+> **Warning — Amazon generics:** Many listings say "Micro JST 2.0" but some ship with **Micro JST 1.25mm** (different connector — does NOT fit). Read each listing description carefully. The YDL and AKZYTUE listings explicitly confirm 2.0mm pitch.
+
+**Tier 5 — HIGH RISK (unbranded Amazon / AliExpress)**
+
+| Battery | Capacity | Dimensions (W × L × T) | Width | Price | Risk |
+|---------|----------|------------------------|-------|-------|------|
+| Generic "3.7V LiPo JST PH" | 1000-3000 mAh | Varies wildly | 20-60 mm | €5-12 | **~50% polarity reversal, dimensions often wrong** |
 
 To swap reversed JST PH pins: use a fine needle to lift the locking tab on each pin inside the housing, pull the wire out, and reinsert in the correct order.
 
+#### All Batteries — Master Size Comparison
+
+Sorted by width (narrowest first). **Bold** = fits under the board (< 24mm wide).
+
+| Battery | mAh | Width | Length | Thick | Fits < 24mm? | Price | Polarity |
+|---------|-----|-------|--------|-------|--------------|-------|----------|
+| **102050 (any brand)** | **1000** | **20 mm** | **50 mm** | **10 mm** | **YES** | **€3-10** | **Verify** |
+| **102060** | **1300** | **20 mm** | **60 mm** | **10 mm** | **YES** | **€4-8** | **Verify** |
+| Pimoroni BAT0002 | 150 | 20.5 mm | 27 mm | 4.3 mm | **YES** | ~€3.75 | Confirmed |
+| Olimex 250mAh | 250 | 21 mm | 27 mm | 5 mm | **YES** | €3.55 | Guaranteed |
+| **LP102250** | **1200** | **22 mm** | **50 mm** | **10 mm** | **YES** | **€5-8** | **Verify** |
+| SparkFun PRT-13851 | 400 | 25 mm | 37 mm | 5 mm | No | ~€7.20 | Confirmed |
+| Adafruit LiPo 1578 | 500 | 26 mm | 35 mm | 5 mm | No | ~€7.20 | Confirmed |
+| Olimex 800mAh | 800 | 30 mm | 50 mm | 5 mm | No | €4.55 | Guaranteed |
+| BerryBase LP-503035 | 500 | 30 mm | 35.5 mm | 5 mm | No | €5.10 | Verify |
+| Pimoroni BAT0003 | 500 | 30.5 mm | 37 mm | 5.3 mm | No | ~€6.75 | Confirmed |
+| Olimex 1400mAh | 1400 | 34 mm | 50 mm | 8 mm | No | €5.95 | Guaranteed |
+| SparkFun PRT-13854 | 850 | 35 mm | 45 mm | 5 mm | No | ~€12.30 | Confirmed |
+| Pimoroni BAT0004 | 1200 | 35.5 mm | 64 mm | 5.3 mm | No | ~€9.70 | Confirmed |
+| BerryBase LP-503562 | 1200 | 36 mm | 62.5 mm | 5 mm | No | €5.50 | Verify |
+| Eckstein LP503562 | 1200 | 36 mm | 62.5 mm | 5 mm | No | €6.97 | Verify |
+| Olimex 4400mAh | 4400 | 37 mm | 68 mm | 18 mm | No | €8.95 | Guaranteed |
+| Olimex 3000mAh | 3000 | 45 mm | 135 mm | 5 mm | No | €7.95 | Guaranteed |
+| BerryBase LP-785060 | 2500 | 50 mm | 60.5 mm | 7.8 mm | No | €7.70 | Verify |
+| Adafruit LiPo 328 | 2500 | 50 mm | 60 mm | 7.3 mm | No | ~€13.50 | Confirmed |
+
 #### Recommended Battery for Dilder Prototyping
 
-**Best pick: Olimex BATTERY-LIPO1400mAh (€5.95)**
-- Guaranteed compatible — no polarity risk
-- 1400 mAh = ~14+ hours of Dilder runtime (display + joystick, no WiFi)
-- Compact (50 × 34 × 8 mm) — fits under a breadboard or in a prototype enclosure
+**Best narrow fit (< 24mm wide): 102050 cell — 1000 mAh (20 × 50 × 10 mm)**
+- Fits under the Olimex board with 4mm clearance per side
+- 1000 mAh = ~10+ hours of Dilder runtime (display + joystick, no WiFi)
+- JST PH 2.0mm connector on most listings — plugs straight in
+- Buy from YDL Battery ($2.80 direct) or Amazon (€8-10 with Prime)
+- **Always verify polarity with a multimeter before connecting**
+
+**Best guaranteed-safe pick: Olimex BATTERY-LIPO1400mAh (€5.95)**
+- No polarity risk — guaranteed compatible
+- 1400 mAh, 34 × 50 × 8 mm (wider than the board but fine for breadboard prototyping)
 - Ships from the same company that makes the board
 - At 100 mA charge rate, full charge takes ~14 hours (upgrade R4 to 2k for ~500 mA / 3-hour charge)
 
