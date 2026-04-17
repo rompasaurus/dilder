@@ -158,6 +158,12 @@ DEV_SETUP = PROJECT_ROOT / "dev-setup"
 DEFAULT_BAUD = 115200
 SERIAL_TIMEOUT = 0.1
 
+# Ensure ~/.local/bin is in PATH (pipx installs PlatformIO/esptool there,
+# but Python may not inherit it from the shell profile).
+_local_bin = str(Path.home() / ".local" / "bin")
+if _local_bin not in os.environ.get("PATH", ""):
+    os.environ["PATH"] = _local_bin + os.pathsep + os.environ.get("PATH", "")
+
 # Colours for the UI
 BG_DARK = "#1e1e2e"
 BG_PANEL = "#282840"

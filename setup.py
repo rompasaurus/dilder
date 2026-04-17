@@ -1714,6 +1714,12 @@ def step_esp32():
 
     # ── 2. Install PlatformIO CLI ─────────────────────────────────────────
 
+    # Ensure ~/.local/bin is in PATH — pipx installs binaries there, but
+    # Python may not inherit it from the shell profile (e.g. .zshrc).
+    local_bin = str(Path.home() / ".local" / "bin")
+    if local_bin not in os.environ.get("PATH", ""):
+        os.environ["PATH"] = local_bin + os.pathsep + os.environ.get("PATH", "")
+
     pio = shutil.which("pio") or shutil.which("platformio")
     if pio:
         result = run_cmd([pio, "--version"], check=False)
@@ -1829,10 +1835,26 @@ def step_esp32():
         log_info("Skipped. They will download on first build.")
         return True
 
-    # Refresh the pio path in case it was just installed
+    # Refresh the pio path in case it was just installed.
+    # pipx installs to ~/.local/bin which may not be in PATH yet for this
+    # shell session. We check there explicitly as a fallback.
     pio = shutil.which("pio") or shutil.which("platformio")
     if not pio:
+        for candidate in [
+            Path.home() / ".local" / "bin" / "pio",
+            Path.home() / ".local" / "bin" / "platformio",
+        ]:
+            if candidate.exists():
+                pio = str(candidate)
+                # Also add to PATH for any child processes in this session
+                local_bin = str(Path.home() / ".local" / "bin")
+                if local_bin not in os.environ.get("PATH", ""):
+                    os.environ["PATH"] = local_bin + os.pathsep + os.environ.get("PATH", "")
+                break
+    if not pio:
         log_error("PlatformIO CLI not found in PATH.")
+        log_info('Fix: run "pipx install platformio" then add ~/.local/bin to your PATH:')
+        log_code_block('export PATH="$HOME/.local/bin:$PATH"')
         return False
 
     log_step("Downloading ESP32-S3 platform (this may take a few minutes)...")
@@ -2043,6 +2065,13 @@ def show_status():
     print(c("  " + "\u2500" * 50, FG_GREY))
 
     pio = shutil.which("pio") or shutil.which("platformio")
+    if not pio:
+        # Check pipx install path as fallback
+        for _c in [Path.home() / ".local" / "bin" / "pio",
+                    Path.home() / ".local" / "bin" / "platformio"]:
+            if _c.exists():
+                pio = str(_c)
+                break
     if pio:
         pio_ver = run_cmd([pio, "--version"], check=False)
         log_ok(f"PlatformIO: {pio_ver.stdout.strip()}" if pio_ver.returncode == 0 else "PlatformIO: installed")

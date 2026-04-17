@@ -135,6 +135,7 @@ nav:
       - Software:
           - Project Structure: docs/software/project-structure.md
           - Firmware Game Engine: docs/software/firmware-engine.md
+          - ESP32-S3 Firmware: docs/software/esp32-firmware.md
           - Emotion States: docs/software/emotion-states.md
       - Tools:
           - DevTool (GUI): docs/tools/devtool.md
