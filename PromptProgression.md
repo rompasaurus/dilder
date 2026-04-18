@@ -2346,3 +2346,92 @@ Spelling and grammar are lightly cleaned for readability while preserving the or
   - `website/docs/blog/posts/esp32-board-support.md` (created — blog post about multi-board architecture going live)
   - `PromptProgression.md` (modified — added Prompts #171-176)
   - `website/docs/prompts/index.md` (modified — synced with PromptProgression.md)
+
+---
+
+## Prompt #177 — 2026-04-17
+- **Prompt:** "OK we are going to build out the dev tools to emulate this device, have it actually compile and run the C code that will be running on the device, and allow for joystick input and emulation of the sensor systems — pedometer, temp, light sensor, humidity, etc. So let's do this: let's add a robust Dilder tab to give emulation, to load up this game and run and debug it. So step one is to implement the C code for this. Make an entirely new directory folder to handle all the C development and implementation. Plan out the project structure and architecture, then code this out so that it can be run via the dev tool."
+- **Input Tokens (est):** ~130
+- **Output Tokens (est):** ~120,000
+- **Commit:** `d3388a3` — Add firmware game engine, DevTool Dilder emulator tab, and documentation
+- **Files Created/Modified:**
+  - `firmware/` (created — entire directory: 35 source files implementing complete game engine)
+  - `DevTool/devtool.py` (modified — added DilderEmulatorTab with display canvas, joystick, sensor sliders, game state panel)
+
+---
+
+## Prompt #178 — 2026-04-17
+- **Prompt:** "OK I need you to make comments through the firmware files as if I don't know C code that well. Explain in depth what every function is doing and any complex line of code, and also the memory management in the code. Be detailed — this is to help in learning. Then we also need an MD doc in the firmware folder to outline the project structure, architecture, and guides to reading the code and debugging. Also update the software documentation and add this to the list of software on the website with the documentation as well."
+- **Input Tokens (est):** ~100
+- **Output Tokens (est):** ~150,000
+- **Files Created/Modified:**
+  - All 14 `.c` source files and 2 key `.h` headers rewritten with comprehensive beginner-friendly comments
+  - `firmware/FIRMWARE.md` (created — 633-line architecture guide with 5-level reading order, debugging guide, C patterns glossary)
+  - `website/docs/docs/software/firmware-engine.md` (created — website docs with Mermaid architecture diagram)
+  - `website/mkdocs.yml` (modified — added Firmware Game Engine to nav)
+  - `website/docs/docs/software/project-structure.md` (modified — updated firmware section)
+
+---
+
+## Prompt #179 — 2026-04-17
+- **Prompt:** "Add the MSK-12C02 power switch to the board design — add it, pull in the specs datasheet, and add an MD file with documentation on it."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~40,000
+- **Files Created/Modified:**
+  - `hardware-design/parts-sheets/msk-12c02.md` (created — 294-line parts sheet: SPDT slide switch mechanics, contact materials, power path design, enclosure slot notes)
+  - `hardware-design/BOM.md` (modified — added SW2, updated to v0.4, 32 components)
+  - `hardware-design/board-design-v04.md` (modified — added SW2 to Zone C, BOM table, ASCII layout, renumbered BOOT/RESET to SW3/SW4)
+  - `hardware-design/parts-sheets/README.md` (modified — added MSK-12C02 entry, updated count to 32)
+  - `hardware-design/parts-sheets/manufacturer-datasheets/DOWNLOAD-GUIDE.md` (modified — added datasheet link)
+  - `website/docs/docs/hardware/materials-list.md` (modified — added SW2 row, component gallery with 12 photos)
+  - `website/docs/docs/design/board-design.md` (modified — added SW2 to BOM, Zone C, ASCII layout)
+  - `website/docs/docs/design/kicad-schematic-pcb-guide.md` (modified — added section 2.5b Power Switch with wiring steps)
+
+---
+
+## Prompt #180 — 2026-04-17
+- **Prompt:** "Get me a full parts list for the planned new board with the power switch. Get me a BOM file and JLCPCB KiCad parts list. I don't want any extended parts — well, limit them as much as possible."
+- **Input Tokens (est):** ~40
+- **Output Tokens (est):** ~30,000
+- **Files Created/Modified:**
+  - `hardware-design/jlcpcb-kicad-parts.md` (created — optimized BOM with basic/extended tier for each part, 3 parts swapped to basic saving ~$9/order, LCSC quick-copy list, KiCad footprint notes)
+  - `hardware-design/BOM.md` (modified — filled in missing LCSC codes: J3→C160407, R8/R9→C25905)
+
+---
+
+## Prompt #181 — 2026-04-17
+- **Prompt:** "Draw me up a schematic image with all these parts connected up together, make a nice JPEG file I can see. Also provide description labels of what the bigger components do."
+- **Input Tokens (est):** ~30
+- **Output Tokens (est):** ~25,000
+- **Files Created/Modified:**
+  - `hardware-design/generate_schematic_image.py` (created — Pillow script generating full-board schematic overview)
+  - `hardware-design/dilder-pcb-schematic-overview.jpg` (created — 3200x2000 schematic showing power path, ESP32, I2C sensors, SPI display, joystick, BOM summary, JLCPCB cost breakdown)
+
+---
+
+## Prompt #182 — 2026-04-17
+- **Prompt:** "The programs don't work as expected, the joystick mood selector for example just shows a Dilder splash screen and not the octopus and quotes and selection like the Pico was doing. We need to fix the programs so they work identically."
+- **Input Tokens (est):** ~50
+- **Output Tokens (est):** ~80,000
+- **Files Created/Modified:**
+  - `ESP Protyping/dilder-esp32/src/main.cpp` (rewritten — full port of Pico mood-selector: RLE body, 16 eye variants, 17 mouths, body animations, 823 quotes, joystick + serial input, GxEPD2 display push)
+  - `ESP Protyping/dilder-esp32/src/quotes.h` (copied from dev-setup/mood-selector/)
+
+---
+
+## Prompt #183 — 2026-04-17
+- **Prompt:** "OK let's update the implementation docs for the code we set up in C for the programs. I need you to outline the project structure and code layout and design principles along with a deep explanation of each file. Let's also comment the code thoroughly to explain it to a person new to C. Then commit and push the changes and update the website docs and commit and push that. Then update the prompts with the session data from today on this computer."
+- **Input Tokens (est):** ~60
+- **Output Tokens (est):** ~60,000
+- **Commit:** `76f3079` — Port mood-selector to ESP32-S3, add implementation docs and code comments
+- **Files Created/Modified:**
+  - `ESP Protyping/dilder-esp32/src/main.cpp` (modified — comprehensive beginner-friendly comments: rendering pipeline, GxEPD2 pattern, bit math, RLE encoding, font encoding, edge detection, Arduino execution model)
+  - `firmware/include/platform/hal.h` (modified — HAL pattern explanation, function declarations vs definitions, extern "C" block)
+  - `firmware/include/platform/board_config.h` (modified — preprocessor chain explanation, SPI bus selection, pin mapping per board)
+  - `firmware/src/platform/esp32s3/esp32s3_hal.cpp` (modified — Arduino API explanation, INPUT_PULLUP/active-LOW logic, ADC voltage divider math, SPI init, extern "C")
+  - `ESP Protyping/dilder-esp32/README.md` (created — 374-line implementation guide: architecture diagram, code layout map, rendering pipeline, display comparison, input handling, design principles, debugging)
+  - `website/docs/docs/software/esp32-firmware.md` (created — website docs with Mermaid flow, controls table, pin mapping, memory usage)
+  - `website/mkdocs.yml` (modified — added ESP32-S3 Firmware to Software nav)
+  - `DevTool/devtool.py` (modified — PATH fix for pipx-installed PlatformIO)
+  - `setup.py` (modified — PATH fix for pipx-installed PlatformIO in step 16 + status report)
+  - `PromptProgression.md` (modified — added Prompts #177-183)
