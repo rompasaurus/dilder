@@ -55,6 +55,7 @@ target_link_libraries(dilder_hub
     hardware_gpio
     hardware_adc
     hardware_pwm
+    hardware_i2c
     pico_cyw43_arch_lwip_poll
     m
 )

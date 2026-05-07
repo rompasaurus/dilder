@@ -22,6 +22,7 @@
 #include "pico/cyw43_arch.h"
 #include "hardware/pwm.h"
 #include "hardware/adc.h"
+#include "hardware/i2c.h"
 #include "lwip/dns.h"
 #include "lwip/pbuf.h"
 #include "lwip/udp.h"
@@ -37,35 +38,54 @@
 #define JOY_RIGHT  5
 #define JOY_CENTER 6
 
-/* ─── Speaker (push-pull for 2x volume) ─── */
-/* GP14 (pin 19) and GP15 (pin 20) share PWM slice 7, channels A and B.
- * By driving them in opposite phase, the piezo sees ~6.6Vpp instead of 3.3V.
- * Wire: piezo + → pin 20 (GP15), piezo - → pin 19 (GP14). No resistor needed. */
-#define SPEAKER_A  14  /* GP14 = pin 19 (PWM7A) — inverted phase */
-#define SPEAKER_B  15  /* GP15 = pin 20 (PWM7B) — normal phase */
-static uint speaker_slice;
+/* ─── Speaker (active buzzer on GP14) ─── */
+/* Wire: buzzer (+) → pin 19 (GP14), buzzer (-) → GND (pin 18). */
+#define BUZZER_PIN 14  /* GP14 = pin 19 — active buzzer (+) */
+
+static bool sound_enabled = true;
+static uint8_t sound_vol = 2;  /* 0=short, 1=med, 2=long beep duration */
+static const uint16_t vol_durations[] = {20, 50, 100};  /* ms per level */
 
 static void speaker_init(void) {
-    gpio_set_function(SPEAKER_A, GPIO_FUNC_PWM);
-    gpio_set_function(SPEAKER_B, GPIO_FUNC_PWM);
-    speaker_slice = pwm_gpio_to_slice_num(SPEAKER_A);  /* same slice for both */
-    pwm_set_enabled(speaker_slice, false);
-
-    /* Invert channel A so it's opposite phase from channel B */
-    pwm_set_output_polarity(speaker_slice, true, false);
+    gpio_init(BUZZER_PIN);
+    gpio_set_dir(BUZZER_PIN, GPIO_OUT);
+    gpio_put(BUZZER_PIN, 0);
 }
 
 static void speaker_tone(uint16_t freq_hz, uint16_t duration_ms) {
-    if (freq_hz == 0) { pwm_set_enabled(speaker_slice, false); sleep_ms(duration_ms); return; }
-    uint32_t wrap = 125000000 / freq_hz;
-    if (wrap > 65535) wrap = 65535;
-    pwm_set_wrap(speaker_slice, (uint16_t)wrap);
-    /* Both channels at 50% duty — but A is inverted, so piezo sees full swing */
-    pwm_set_chan_level(speaker_slice, PWM_CHAN_A, (uint16_t)(wrap / 2));
-    pwm_set_chan_level(speaker_slice, PWM_CHAN_B, (uint16_t)(wrap / 2));
-    pwm_set_enabled(speaker_slice, true);
-    sleep_ms(duration_ms);
-    pwm_set_enabled(speaker_slice, false);
+    if (!sound_enabled || freq_hz == 0) { sleep_ms(duration_ms); return; }
+    uint16_t actual = duration_ms < vol_durations[sound_vol] ? duration_ms : vol_durations[sound_vol];
+    gpio_put(BUZZER_PIN, 1);
+    sleep_ms(actual);
+    gpio_put(BUZZER_PIN, 0);
+    if (duration_ms > actual) sleep_ms(duration_ms - actual);
+}
+
+/* ─── Sound patterns (on_ms, off_ms pairs; 0 terminates) ─── */
+static const uint16_t pat_beep[]     = {150, 0};
+static const uint16_t pat_chirp[]    = {30,30, 30,30, 30,30, 30,30, 30, 0};
+static const uint16_t pat_sos[]      = {60,60, 60,60, 60,180, 180,60, 180,60, 180,180, 60,60, 60,60, 60, 0};
+static const uint16_t pat_doorbell[] = {200, 100, 300, 0};
+static const uint16_t pat_alert[]    = {300,200, 300,200, 300, 0};
+static const uint16_t pat_happy[]    = {40,60, 40,60, 40,60, 200,100, 50,50, 50,50, 300, 0};
+
+#define SOUND_PATTERN_COUNT 6
+static const char *pattern_names[] = {"BEEP", "CHIRP", "SOS", "DOORBELL", "ALERT", "HAPPY"};
+static const uint16_t *patterns[]  = {pat_beep, pat_chirp, pat_sos, pat_doorbell, pat_alert, pat_happy};
+static int current_pattern = 0;
+
+static void play_sound_pattern(int idx) {
+    if (!sound_enabled || idx < 0 || idx >= SOUND_PATTERN_COUNT) return;
+    const uint16_t *p = patterns[idx];
+    while (*p) {
+        uint16_t on_ms = *p++;
+        uint16_t actual = on_ms < vol_durations[sound_vol] ? on_ms : vol_durations[sound_vol];
+        gpio_put(BUZZER_PIN, 1);
+        sleep_ms(actual);
+        gpio_put(BUZZER_PIN, 0);
+        if (on_ms > actual) sleep_ms(on_ms - actual);
+        if (*p) { sleep_ms(*p); p++; }
+    }
 }
 
 /* ─── Joystick init ─── */
@@ -101,7 +121,11 @@ static uint8_t read_joystick(void) {
 #define STATE_SOUND       2   /* sound test sub-screen */
 #define STATE_INFO        3   /* device info sub-screen */
 #define STATE_MOOD_SELECT 4   /* mood picker */
-#define STATE_NETWORK     5   /* WiFi status + toggle */
+#define STATE_NETWORK     5   /* WiFi status (read-only) */
+#define STATE_NET_MENU    6   /* Network submenu */
+#define STATE_NET_SCAN    7   /* Scan results list */
+#define STATE_NET_KEYBOARD 8  /* On-screen keyboard for WiFi password */
+#define STATE_MOTION       9  /* Accelerometer / pedometer menu */
 
 /* ─── WiFi state ─── */
 static bool wifi_enabled = false;
@@ -110,6 +134,182 @@ static bool ntp_synced = false;
 static int32_t wifi_rssi = 0;
 static char wifi_ssid_display[33] = "---";
 static char wifi_ip_str[20] = "---";
+
+/* ─── WiFi scan state ─── */
+#define MAX_SCAN_RESULTS 16
+typedef struct { char ssid[33]; int8_t rssi; uint8_t auth_mode; } scan_entry_t;
+static scan_entry_t scan_results[MAX_SCAN_RESULTS];
+static int  scan_count = 0;
+static int  scan_sel = 0;
+static bool scan_in_progress = false;
+static bool scan_complete = false;
+
+/* ─── On-screen keyboard state ─── */
+#define PW_MAX_LEN 63
+static char pw_buf[PW_MAX_LEN + 1];
+static int  pw_len = 0;
+static int  kb_row = 0;
+static int  kb_col = 0;
+static bool kb_shift = true;   /* start in CAPS mode */
+static int  selected_network = -1;
+
+static const char kb_grid[4][10] = {
+    {'Q','W','E','R','T','Y','U','I','O','P'},
+    {'A','S','D','F','G','H','J','K','L','.'},
+    {'Z','X','C','V','B','N','M','-','!','?'},
+    {'0','1','2','3','4','5','6','7','8','9'},
+};
+#define KB_CHAR_ROWS 4
+#define KB_SPECIAL_ROW 4
+#define KB_SP_SHIFT  0
+#define KB_SP_SPACE  1
+#define KB_SP_DEL    2
+#define KB_SP_DONE   3
+#define KB_SP_CANCEL 4
+#define KB_SP_COUNT  5
+
+static char kb_char_at(int row, int col, bool shift) {
+    if (row >= KB_CHAR_ROWS) return '\0';
+    char c = kb_grid[row][col];
+    if (!shift && c >= 'A' && c <= 'Z') return c + 32;
+    return c;
+}
+
+/* ─── MPU-6050 accelerometer/gyro (I2C0 on GP0/GP1) ─── */
+#define MPU_I2C    i2c0
+static uint8_t mpu_addr = 0x68;  /* auto-detected in mpu_init */
+#define MPU_SDA    0   /* GP0 = pin 1 */
+#define MPU_SCL    1   /* GP1 = pin 2 */
+
+/* Registers */
+#define MPU_PWR_MGMT_1   0x6B
+#define MPU_WHO_AM_I     0x75
+#define MPU_ACCEL_XOUT_H 0x3B
+#define MPU_GYRO_XOUT_H  0x43
+#define MPU_TEMP_OUT_H   0x41
+#define MPU_ACCEL_CONFIG  0x1C
+#define MPU_GYRO_CONFIG   0x1B
+
+static bool mpu_ok = false;
+
+/* Raw sensor data */
+static int16_t accel_x, accel_y, accel_z;
+static int16_t gyro_x, gyro_y, gyro_z;
+static float   mpu_temp_c;
+
+/* Pedometer state */
+static uint32_t step_count = 0;
+static float    step_threshold = 1.3f;  /* g — adjustable */
+static bool     step_above = false;     /* debounce: was last sample above threshold? */
+
+static bool mpu_write_reg(uint8_t reg, uint8_t val) {
+    uint8_t buf[2] = {reg, val};
+    return i2c_write_blocking(MPU_I2C, mpu_addr, buf, 2, false) == 2;
+}
+
+static int mpu_read_reg(uint8_t reg) {
+    uint8_t val;
+    if (i2c_write_blocking(MPU_I2C, mpu_addr, &reg, 1, true) < 0) return -1;
+    if (i2c_read_blocking(MPU_I2C, mpu_addr, &val, 1, false) < 0) return -1;
+    return val;
+}
+
+static bool mpu_read_burst(uint8_t reg, uint8_t *dst, uint8_t len) {
+    if (i2c_write_blocking(MPU_I2C, mpu_addr, &reg, 1, true) < 0) return false;
+    return i2c_read_blocking(MPU_I2C, mpu_addr, dst, len, false) == len;
+}
+
+static void mpu_init(void) {
+    i2c_init(MPU_I2C, 400 * 1000);  /* 400 kHz */
+    gpio_set_function(MPU_SDA, GPIO_FUNC_I2C);
+    gpio_set_function(MPU_SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(MPU_SDA);
+    gpio_pull_up(MPU_SCL);
+    sleep_ms(100);  /* Let MPU boot */
+
+    /* Try both possible addresses */
+    uint8_t try_addrs[] = {0x68, 0x69};
+    bool found = false;
+    for (int a = 0; a < 2; a++) {
+        uint8_t addr = try_addrs[a];
+        uint8_t reg = MPU_WHO_AM_I;
+        uint8_t who = 0;
+        int w = i2c_write_blocking(MPU_I2C, addr, &reg, 1, true);
+        int r = i2c_read_blocking(MPU_I2C, addr, &who, 1, false);
+        printf("[MPU] Probe 0x%02X: w=%d r=%d who=0x%02X\n", addr, w, r, who);
+        if (w >= 0 && r >= 0) {
+            mpu_addr = addr;
+            found = true;
+            printf("[MPU] Using address 0x%02X\n", addr);
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("[MPU] NOT DETECTED on I2C0\n");
+        mpu_ok = false;
+        return;
+    }
+
+    mpu_write_reg(MPU_PWR_MGMT_1, 0x00);  /* Wake up (clear sleep bit) */
+    sleep_ms(100);
+    mpu_write_reg(MPU_ACCEL_CONFIG, 0x00); /* +/- 2g */
+    mpu_write_reg(MPU_GYRO_CONFIG, 0x00);  /* +/- 250 deg/s */
+    mpu_ok = true;
+    printf("[MPU] MPU-6050 initialized OK at 0x%02X\n", mpu_addr);
+}
+
+static void mpu_read_all(void) {
+    if (!mpu_ok) return;
+
+    /* Burst read accel (6 bytes) + temp (2 bytes) + gyro (6 bytes) = 14 bytes from 0x3B */
+    uint8_t buf[14];
+    mpu_read_burst(MPU_ACCEL_XOUT_H, buf, 14);
+
+    accel_x = (int16_t)((buf[0] << 8) | buf[1]);
+    accel_y = (int16_t)((buf[2] << 8) | buf[3]);
+    accel_z = (int16_t)((buf[4] << 8) | buf[5]);
+
+    int16_t temp_raw = (int16_t)((buf[6] << 8) | buf[7]);
+    mpu_temp_c = temp_raw / 340.0f + 36.53f;
+
+    gyro_x = (int16_t)((buf[8]  << 8) | buf[9]);
+    gyro_y = (int16_t)((buf[10] << 8) | buf[11]);
+    gyro_z = (int16_t)((buf[12] << 8) | buf[13]);
+}
+
+/* Convert raw accel to g (at +/-2g range, 16384 LSB/g) */
+static float accel_g(int16_t raw) { return raw / 16384.0f; }
+
+/* Convert raw gyro to deg/s (at +/-250, 131 LSB/(deg/s)) */
+static float gyro_dps(int16_t raw) { return raw / 131.0f; }
+
+/* Magnitude of acceleration vector in g */
+static float accel_magnitude(void) {
+    float ax = accel_g(accel_x);
+    float ay = accel_g(accel_y);
+    float az = accel_g(accel_z);
+    return sqrtf(ax * ax + ay * ay + az * az);
+}
+
+/* Tilt angles in degrees */
+static float tilt_x_deg(void) {
+    return atan2f(accel_g(accel_x), sqrtf(accel_g(accel_y) * accel_g(accel_y) + accel_g(accel_z) * accel_g(accel_z))) * 57.2958f;
+}
+static float tilt_y_deg(void) {
+    return atan2f(accel_g(accel_y), sqrtf(accel_g(accel_x) * accel_g(accel_x) + accel_g(accel_z) * accel_g(accel_z))) * 57.2958f;
+}
+
+/* Simple pedometer: detect step when magnitude crosses threshold going up then back down */
+static void pedometer_update(void) {
+    float mag = accel_magnitude();
+    if (!step_above && mag > step_threshold) {
+        step_above = true;
+        step_count++;
+    } else if (step_above && mag < (step_threshold - 0.3f)) {
+        step_above = false;
+    }
+}
 
 /* ─── NTP ─── */
 #define NTP_PORT 123
@@ -1329,23 +1529,25 @@ static void battery_init(void) {
 
 static float read_vsys_volts(void) {
     if (!battery_adc_ready) battery_init();
-    adc_select_input(3);        /* ADC3 = GP29 = VSYS/3 */
+
+    /* GPIO 29 is shared with CYW43 SPI — lock it out while we read */
+    cyw43_thread_enter();
+
+    adc_gpio_init(29);              /* reclaim pin as ADC input */
+    adc_select_input(3);            /* ADC3 = GP29 = VSYS/3 */
     uint32_t acc = 0;
     const int N = 32;
     for (int i = 0; i < N; i++) acc += adc_read();
+
+    cyw43_thread_exit();
+
     float raw = (float)acc / (float)N;
     return raw * 3.3f / 4095.0f * 3.0f;   /* 3:1 divider */
 }
 
 static bool is_usb_powered(void) {
-    if (wifi_enabled) {
-        /* CYW43 is initialized — VBUS sense is reliable */
-        bool vbus = false;
-        cyw43_arch_gpio_get(CYW43_WL_GPIO_VBUS_PIN, &vbus);
-        return vbus;
-    }
-    /* Fallback: VSYS rises above battery voltage when USB is attached */
-    return read_vsys_volts() > 4.5f;
+    /* CYW43 is always initialised at boot — VBUS sense is reliable */
+    return cyw43_arch_gpio_get(CYW43_WL_GPIO_VBUS_PIN);
 }
 
 /* Returns 0..100 from VSYS, or -1 if running on USB. */
@@ -1422,11 +1624,12 @@ static void draw_wifi_icon(int x0, int y0, bool connected) {
 static const char *menu_items[] = {
     "MOOD SELECT",
     "NETWORK",
-    "SOUND TEST",
+    "SOUND",
+    "MOTION",
     "DEVICE INFO",
     "BACK",
 };
-#define MENU_COUNT 5
+#define MENU_COUNT 6
 
 /* ─── Helper: draw inverted text (white on black bar) ─── */
 static void draw_inverted_line(int y, const char *text) {
@@ -1461,50 +1664,66 @@ static void render_menu(int selected) {
     for (int x = 5; x < 245; x++) px_set(x, 73);
     draw_text(8, 75, "MENU", IMG_W);
 
-    /* 5 items at 8px spacing starting at y=84 → 84,92,100,108,116 — all fit */
-    for (int i = 0; i < MENU_COUNT; i++) {
+    /* 6 items — scroll if needed */
+    int m_vis = 5;
+    int m_start = 0;
+    if (selected > m_vis - 2) m_start = selected - (m_vis - 2);
+    if (m_start + m_vis > MENU_COUNT) m_start = MENU_COUNT - m_vis;
+    if (m_start < 0) m_start = 0;
+    for (int i = 0; i < m_vis && (m_start + i) < MENU_COUNT; i++) {
+        int idx = m_start + i;
         int y = 84 + i * 8;
         char line[40];
-        if (i == selected) {
-            snprintf(line, sizeof(line), "> %s", menu_items[i]);
+        if (idx == selected) {
+            snprintf(line, sizeof(line), "> %s", menu_items[idx]);
             draw_inverted_line(y, line);
         } else {
-            snprintf(line, sizeof(line), "  %s", menu_items[i]);
+            snprintf(line, sizeof(line), "  %s", menu_items[idx]);
             draw_text(10, y, line, IMG_W);
         }
     }
 }
 
-/* ─── Draw sound test screen ─── */
-static void render_sound_screen(const char *last_dir, uint16_t freq, int presses) {
+/* ─── Draw sound submenu ─── */
+#define SND_ITEM_PATTERN 0
+#define SND_ITEM_ONOFF   1
+#define SND_ITEM_VOL     2
+#define SND_ITEM_BACK    3
+#define SND_MENU_COUNT   4
+
+static const char *vol_labels[] = {"LOW", "MED", "HIGH"};
+
+static void render_sound_menu(int sel) {
     memset(frame, 0, sizeof(frame));
-    draw_text(30, 3, "SOUND TEST", IMG_W);
+    draw_text(30, 3, "SOUND", IMG_W);
     for (int x = 10; x < 240; x++) px_set(x, 14);
 
     char buf[40];
-    snprintf(buf, sizeof(buf), "DIRECTION: %s", last_dir);
-    draw_text(10, 22, buf, IMG_W);
-    snprintf(buf, sizeof(buf), freq > 0 ? "TONE: %d HZ" : "TONE: ---", freq);
-    draw_text(10, 35, buf, IMG_W);
-    snprintf(buf, sizeof(buf), "PRESSES: %d", presses);
-    draw_text(10, 48, buf, IMG_W);
+    const char *items[SND_MENU_COUNT];
+    static char pattern_buf[30];
+    snprintf(pattern_buf, sizeof(pattern_buf), "TONE: %s", pattern_names[current_pattern]);
+    items[SND_ITEM_PATTERN] = pattern_buf;
+    static char onoff_buf[20];
+    snprintf(onoff_buf, sizeof(onoff_buf), "SOUND: %s", sound_enabled ? "ON" : "OFF");
+    items[SND_ITEM_ONOFF] = onoff_buf;
+    static char vol_buf[20];
+    snprintf(vol_buf, sizeof(vol_buf), "VOLUME: %s", vol_labels[sound_vol]);
+    items[SND_ITEM_VOL] = vol_buf;
+    items[SND_ITEM_BACK] = "BACK";
 
-    const char *labels[] = {"L", "D", "U", "R", "C"};
-    const int pins[] = {JOY_LEFT, JOY_DOWN, JOY_UP, JOY_RIGHT, JOY_CENTER};
-    for (int i = 0; i < 5; i++) {
-        int bx = 10 + i * 46;
-        int pressed = !gpio_get(pins[i]);
-        draw_text(bx + 8, 68, labels[i], IMG_W);
-        if (pressed) {
-            for (int hy = 78; hy < 88; hy++)
-                for (int hx = bx; hx < bx + 40; hx++) px_set(hx, hy);
+    for (int i = 0; i < SND_MENU_COUNT; i++) {
+        int y = 22 + i * 12;
+        if (i == sel) {
+            snprintf(buf, sizeof(buf), "> %s", items[i]);
+            draw_inverted_line(y, buf);
         } else {
-            for (int x = bx; x < bx + 40; x++) { px_set(x, 78); px_set(x, 87); }
-            for (int y = 78; y < 88; y++) { px_set(bx, y); px_set(bx + 39, y); }
+            snprintf(buf, sizeof(buf), "  %s", items[i]);
+            draw_text(10, y, buf, IMG_W);
         }
     }
-    draw_text(10, 108, "SPEAKER: GP14-GP15", IMG_W);
-    draw_text(175, 108, "LEFT:BACK", IMG_W);
+
+    draw_text(10, 96, "C:PLAY  L/R:CHANGE TONE", IMG_W);
+    draw_text(155, 108, "LEFT:BACK", IMG_W);
 }
 
 /* ─── Draw device info screen ─── */
@@ -1586,37 +1805,361 @@ static void render_mood_select(int selected) {
     draw_text(175, 110, "LEFT:BACK", IMG_W);
 }
 
-/* ─── Draw network screen ─── */
+/* ─── Draw network status screen (read-only) ─── */
 static void render_network_screen(void) {
     memset(frame, 0, sizeof(frame));
-    draw_text(30, 3, "NETWORK", IMG_W);
+    draw_text(30, 3, "WIFI STATUS", IMG_W);
     for (int x = 10; x < 240; x++) px_set(x, 14);
     char buf[48];
 
     snprintf(buf, sizeof(buf), "WIFI: %s", wifi_enabled ? "ON" : "OFF");
     draw_text(10, 22, buf, IMG_W);
-    draw_text(160, 22, "CENTER:TOGGLE", IMG_W);
 
     snprintf(buf, sizeof(buf), "SSID: %s", wifi_ssid_display);
-    draw_text(10, 38, buf, IMG_W);
+    draw_text(10, 35, buf, IMG_W);
 
     snprintf(buf, sizeof(buf), "STATUS: %s",
              !wifi_enabled ? "DISABLED" :
-             wifi_connected ? "CONNECTED" : "CONNECTING...");
-    draw_text(10, 51, buf, IMG_W);
+             wifi_connected ? "CONNECTED" : "DISCONNECTED");
+    draw_text(10, 48, buf, IMG_W);
 
     snprintf(buf, sizeof(buf), "IP: %s", wifi_connected ? wifi_ip_str : "---");
-    draw_text(10, 64, buf, IMG_W);
+    draw_text(10, 61, buf, IMG_W);
 
     if (wifi_connected) {
         snprintf(buf, sizeof(buf), "SIGNAL: %d DBM", (int)wifi_rssi);
-        draw_text(10, 77, buf, IMG_W);
+        draw_text(10, 74, buf, IMG_W);
     }
 
     snprintf(buf, sizeof(buf), "NTP: %s", ntp_synced ? "SYNCED" : "NOT SYNCED");
-    draw_text(10, 90, buf, IMG_W);
+    draw_text(10, 87, buf, IMG_W);
 
     draw_text(175, 110, "LEFT:BACK", IMG_W);
+}
+
+/* ─── Draw network submenu ─── */
+#define NET_ITEM_ONOFF      0
+#define NET_ITEM_SCAN       1
+#define NET_ITEM_STATUS     2
+#define NET_ITEM_BACK       3
+#define NET_MENU_COUNT      4
+
+static void render_net_menu(int sel) {
+    memset(frame, 0, sizeof(frame));
+    draw_text(30, 3, "NETWORK", IMG_W);
+    for (int x = 10; x < 240; x++) px_set(x, 14);
+
+    char buf[40];
+    const char *items[NET_MENU_COUNT];
+    static char onoff_buf[20];
+    snprintf(onoff_buf, sizeof(onoff_buf), "WIFI: %s", wifi_enabled ? "ON" : "OFF");
+    items[NET_ITEM_ONOFF] = onoff_buf;
+    items[NET_ITEM_SCAN] = "SCAN NETWORKS";
+    items[NET_ITEM_STATUS] = "STATUS";
+    items[NET_ITEM_BACK] = "BACK";
+
+    for (int i = 0; i < NET_MENU_COUNT; i++) {
+        int y = 22 + i * 12;
+        if (i == sel) {
+            snprintf(buf, sizeof(buf), "> %s", items[i]);
+            draw_inverted_line(y, buf);
+        } else {
+            snprintf(buf, sizeof(buf), "  %s", items[i]);
+            draw_text(10, y, buf, IMG_W);
+        }
+    }
+
+    snprintf(buf, sizeof(buf), "%s", wifi_connected ? "CONNECTED" : "DISCONNECTED");
+    draw_text(10, 100, buf, IMG_W);
+    draw_text(175, 110, "LEFT:BACK", IMG_W);
+}
+
+/* ─── Draw scan results ─── */
+static void render_scan_results(void) {
+    memset(frame, 0, sizeof(frame));
+    draw_text(30, 3, "WIFI NETWORKS", IMG_W);
+    for (int x = 10; x < 240; x++) px_set(x, 14);
+
+    if (scan_in_progress) {
+        draw_text(60, 50, "SCANNING...", IMG_W);
+        char buf[20];
+        snprintf(buf, sizeof(buf), "FOUND: %d", scan_count);
+        draw_text(80, 65, buf, IMG_W);
+        draw_text(175, 110, "LEFT:CANCEL", IMG_W);
+        return;
+    }
+
+    if (scan_count == 0) {
+        draw_text(50, 55, "NO NETWORKS FOUND", IMG_W);
+        draw_text(175, 110, "LEFT:BACK", IMG_W);
+        return;
+    }
+
+    /* Scrolling list — 7 items visible */
+    int start = 0;
+    if (scan_sel > 5) start = scan_sel - 5;
+    if (start + 7 > scan_count) start = scan_count - 7;
+    if (start < 0) start = 0;
+
+    char buf[42];
+    for (int i = 0; i < 7 && (start + i) < scan_count; i++) {
+        int idx = start + i;
+        int y = 20 + i * 12;
+        char lock = (scan_results[idx].auth_mode != 0) ? '~' : ' ';
+        if (idx == scan_sel) {
+            snprintf(buf, sizeof(buf), "> %c%s", lock, scan_results[idx].ssid);
+            draw_inverted_line(y, buf);
+        } else {
+            snprintf(buf, sizeof(buf), "  %c%s", lock, scan_results[idx].ssid);
+            draw_text(10, y, buf, IMG_W);
+        }
+    }
+
+    snprintf(buf, sizeof(buf), "%d FOUND  C:CONNECT", scan_count);
+    draw_text(10, 110, buf, IMG_W);
+    draw_text(175, 110, "LEFT:BACK", IMG_W);
+}
+
+/* ─── Draw on-screen keyboard ─── */
+static void render_keyboard(void) {
+    memset(frame, 0, sizeof(frame));
+
+    /* Header: SSID */
+    char hdr[42];
+    snprintf(hdr, sizeof(hdr), "CONNECT: %s",
+             selected_network >= 0 ? scan_results[selected_network].ssid : "?");
+    draw_text(5, 0, hdr, IMG_W);
+
+    /* Password field + shift indicator */
+    char pw_show[35];
+    int vis_start = pw_len > 28 ? pw_len - 28 : 0;
+    for (int i = 0; i < pw_len - vis_start; i++) {
+        char c = pw_buf[vis_start + i];
+        pw_show[i] = (c >= 'a' && c <= 'z') ? c - 32 : c;
+    }
+    pw_show[pw_len - vis_start] = '\0';
+    char pw_line[42];
+    snprintf(pw_line, sizeof(pw_line), "PW:%s %s", pw_show, kb_shift ? "(CAPS)" : "(LOW)");
+    draw_text(5, 10, pw_line, IMG_W);
+
+    /* Separator */
+    for (int x = 5; x < 245; x++) px_set(x, 20);
+
+    /* Character grid: 4 rows x 10 cols, cells 24px wide x 12px tall */
+    for (int r = 0; r < KB_CHAR_ROWS; r++) {
+        for (int c = 0; c < 10; c++) {
+            int cx = 5 + c * 24;
+            int cy = 24 + r * 12;
+            char ch = kb_grid[r][c];
+
+            if (kb_row == r && kb_col == c) {
+                /* Selected: inverted cell */
+                for (int iy = cy; iy < cy + 10; iy++)
+                    for (int ix = cx; ix < cx + 22; ix++)
+                        px_set(ix, iy);
+                /* Draw character white-on-black */
+                const char *pos = strchr(font_chars, ch);
+                if (pos) {
+                    int fi = (int)(pos - font_chars);
+                    for (int row2 = 0; row2 < 7; row2++) {
+                        uint8_t bits = font5x7[fi][row2];
+                        for (int col2 = 0; col2 < 5; col2++)
+                            if (bits & (0x10 >> col2))
+                                px_clr(cx + 8 + col2, cy + 1 + row2);
+                    }
+                }
+            } else {
+                /* Normal cell */
+                const char *pos = strchr(font_chars, ch);
+                if (pos) draw_char(cx + 8, cy + 1, (int)(pos - font_chars));
+            }
+        }
+    }
+
+    /* Special keys row at y=76 */
+    static const char *sp_labels[] = {"SHIFT", "SPC", "DEL", "DONE", "CANCEL"};
+    int sp_x[] = {5, 50, 90, 135, 190};
+    int sp_w[] = {40, 35, 40, 50, 55};
+    for (int i = 0; i < KB_SP_COUNT; i++) {
+        int sx = sp_x[i];
+        int sy = 76;
+        if (kb_row == KB_SPECIAL_ROW && kb_col == i) {
+            for (int iy = sy; iy < sy + 10; iy++)
+                for (int ix = sx; ix < sx + sp_w[i]; ix++)
+                    px_set(ix, iy);
+            /* Draw label white-on-black */
+            int tx = sx + 3;
+            for (const char *cp = sp_labels[i]; *cp; cp++) {
+                char up = *cp;
+                const char *pos = strchr(font_chars, up);
+                if (pos) {
+                    int fi = (int)(pos - font_chars);
+                    for (int row2 = 0; row2 < 7; row2++) {
+                        uint8_t bits = font5x7[fi][row2];
+                        for (int col2 = 0; col2 < 5; col2++)
+                            if (bits & (0x10 >> col2))
+                                px_clr(tx + col2, sy + 1 + row2);
+                    }
+                }
+                tx += 6;
+            }
+        } else {
+            draw_text(sx + 3, sy + 1, sp_labels[i], sp_w[i]);
+        }
+    }
+
+    /* Help text */
+    draw_text(5, 108, "U/D/L/R:MOVE  C:SELECT", IMG_W);
+}
+
+/* ─── Draw motion / accelerometer menu ─── */
+#define MOT_ITEM_LIVE      0
+#define MOT_ITEM_PEDOMETER 1
+#define MOT_ITEM_TILT      2
+#define MOT_ITEM_RESET     3
+#define MOT_ITEM_THRESH    4
+#define MOT_ITEM_I2CSCAN   5
+#define MOT_ITEM_BACK      6
+#define MOT_MENU_COUNT     7
+
+static void render_motion_menu(int sel) {
+    /* Poll sensor fresh data */
+    mpu_read_all();
+    pedometer_update();
+
+    memset(frame, 0, sizeof(frame));
+    draw_text(30, 3, "MOTION", IMG_W);
+    for (int x = 10; x < 240; x++) px_set(x, 14);
+
+    char buf[42];
+    const char *items[MOT_MENU_COUNT];
+
+    static char live_buf[42];
+    snprintf(live_buf, sizeof(live_buf), "ACCEL: %.1f  %.1f  %.1fG",
+             (double)accel_g(accel_x), (double)accel_g(accel_y), (double)accel_g(accel_z));
+    items[MOT_ITEM_LIVE] = live_buf;
+
+    static char ped_buf[25];
+    snprintf(ped_buf, sizeof(ped_buf), "STEPS: %lu", (unsigned long)step_count);
+    items[MOT_ITEM_PEDOMETER] = ped_buf;
+
+    static char tilt_buf[30];
+    snprintf(tilt_buf, sizeof(tilt_buf), "TILT: X%.0f  Y%.0f  %.1fC",
+             (double)tilt_x_deg(), (double)tilt_y_deg(), (double)mpu_temp_c);
+    items[MOT_ITEM_TILT] = tilt_buf;
+
+    items[MOT_ITEM_RESET] = "RESET PEDOMETER";
+
+    static char thresh_buf[25];
+    snprintf(thresh_buf, sizeof(thresh_buf), "THRESHOLD: %.1fG", (double)step_threshold);
+    items[MOT_ITEM_THRESH] = thresh_buf;
+
+    items[MOT_ITEM_I2CSCAN] = "I2C BUS SCAN";
+    items[MOT_ITEM_BACK] = "BACK";
+
+    /* Scrolling window — 5 items visible */
+    int vis = 5;
+    int start = 0;
+    if (sel > vis - 2) start = sel - (vis - 2);
+    if (start + vis > MOT_MENU_COUNT) start = MOT_MENU_COUNT - vis;
+    if (start < 0) start = 0;
+
+    for (int i = 0; i < vis && (start + i) < MOT_MENU_COUNT; i++) {
+        int idx = start + i;
+        int y = 18 + i * 11;
+        if (idx == sel) {
+            snprintf(buf, sizeof(buf), "> %s", items[idx]);
+            draw_inverted_line(y, buf);
+        } else {
+            snprintf(buf, sizeof(buf), "  %s", items[idx]);
+            draw_text(10, y, buf, IMG_W);
+        }
+    }
+
+    /* Scroll indicators */
+    if (start > 0) draw_text(235, 18, "/", IMG_W);
+    if (start + vis < MOT_MENU_COUNT) draw_text(235, 18 + (vis - 1) * 11, "/", IMG_W);
+
+    /* Gyro readout at bottom */
+    static char gyro_buf[42];
+    snprintf(gyro_buf, sizeof(gyro_buf), "GYRO: %.0f  %.0f  %.0f D/S",
+             (double)gyro_dps(gyro_x), (double)gyro_dps(gyro_y), (double)gyro_dps(gyro_z));
+    draw_text(10, 86, gyro_buf, IMG_W);
+
+    /* Magnitude bar */
+    float mag = accel_magnitude();
+    snprintf(buf, sizeof(buf), "MAG: %.2fG", (double)mag);
+    draw_text(10, 98, buf, IMG_W);
+
+    if (!mpu_ok) draw_text(130, 98, "MPU:NO", IMG_W);
+    else draw_text(130, 98, "MPU:OK", IMG_W);
+    draw_text(175, 110, "LEFT:BACK", IMG_W);
+}
+
+/* ─── I2C bus scan screen ─── */
+static void render_i2c_scan(void) {
+    memset(frame, 0, sizeof(frame));
+    draw_text(30, 3, "I2C BUS SCAN", IMG_W);
+    for (int x = 10; x < 240; x++) px_set(x, 14);
+
+    draw_text(10, 20, "SCANNING I2C0 (GP0/GP1)...", IMG_W);
+    transpose_to_display();
+    EPD_Partial(display_buf);
+
+    /* Scan all valid 7-bit addresses */
+    uint8_t found[16];
+    int found_count = 0;
+    printf("[I2C] Scanning I2C0 bus...\n");
+
+    for (int addr = 0x08; addr < 0x78; addr++) {
+        uint8_t dummy;
+        int ret = i2c_read_blocking(MPU_I2C, addr, &dummy, 1, false);
+        if (ret >= 0 && found_count < 16) {
+            found[found_count++] = (uint8_t)addr;
+            printf("[I2C]   Device at 0x%02X\n", addr);
+        }
+    }
+    printf("[I2C] Scan complete: %d device(s)\n", found_count);
+
+    /* Show results */
+    memset(frame, 0, sizeof(frame));
+    draw_text(30, 3, "I2C BUS SCAN", IMG_W);
+    for (int x = 10; x < 240; x++) px_set(x, 14);
+
+    char buf[42];
+    snprintf(buf, sizeof(buf), "FOUND %d DEVICE(S):", found_count);
+    draw_text(10, 20, buf, IMG_W);
+
+    for (int i = 0; i < found_count && i < 8; i++) {
+        const char *desc = "";
+        if (found[i] == 0x68) desc = " (MPU-6050)";
+        else if (found[i] == 0x69) desc = " (MPU-6050 AD0:H)";
+        else if (found[i] == 0x76) desc = " (BME280/BMP280)";
+        else if (found[i] == 0x77) desc = " (BME280/BMP280)";
+        else if (found[i] == 0x3C) desc = " (SSD1306 OLED)";
+        else if (found[i] == 0x50) desc = " (EEPROM)";
+        snprintf(buf, sizeof(buf), "  0X%02X%s", found[i], desc);
+        draw_text(10, 32 + i * 10, buf, IMG_W);
+    }
+
+    if (found_count == 0) {
+        draw_text(10, 40, "NO DEVICES FOUND", IMG_W);
+        draw_text(10, 55, "CHECK WIRING:", IMG_W);
+        draw_text(10, 66, "SDA:GP0(PIN1) SCL:GP1(PIN2)", IMG_W);
+        draw_text(10, 77, "VCC:3V3 GND:GND AD0:GND", IMG_W);
+    }
+
+    draw_text(155, 110, "C:BACK", IMG_W);
+}
+
+/* ─── Show connecting screen (blocks during wifi_connect_to) ─── */
+static void show_connecting_screen(const char *ssid) {
+    memset(frame, 0, sizeof(frame));
+    draw_text(40, 40, "CONNECTING TO", IMG_W);
+    draw_text(40, 55, ssid, IMG_W);
+    draw_text(40, 75, "PLEASE WAIT...", IMG_W);
+    transpose_to_display();
+    EPD_Partial(display_buf);
 }
 
 /* ─── WiFi / NTP functions ─── */
@@ -1671,20 +2214,54 @@ static void ntp_request(void) {
     dns_gethostbyname(NTP_SERVER, &ntp_server_addr, ntp_dns_cb, NULL);
 }
 
-static void wifi_connect(void) {
-    printf("[WiFi] Connecting to \"%s\"...\n", WIFI_SSID);
-    strncpy(wifi_ssid_display, WIFI_SSID, sizeof(wifi_ssid_display) - 1);
+/* ─── WiFi scan ─── */
+static int wifi_scan_callback(void *env, const cyw43_ev_scan_result_t *result) {
+    (void)env;
+    if (!result || scan_count >= MAX_SCAN_RESULTS) return 0;
+    if (result->ssid_len == 0) return 0;  /* skip hidden networks */
+
+    /* Deduplicate — keep the one with better RSSI */
+    for (int i = 0; i < scan_count; i++) {
+        if (strncmp(scan_results[i].ssid, (const char *)result->ssid, result->ssid_len) == 0
+            && strlen(scan_results[i].ssid) == result->ssid_len) {
+            if (result->rssi > scan_results[i].rssi) {
+                scan_results[i].rssi = (int8_t)result->rssi;
+                scan_results[i].auth_mode = result->auth_mode;
+            }
+            return 0;
+        }
+    }
+
+    memcpy(scan_results[scan_count].ssid, result->ssid, result->ssid_len);
+    scan_results[scan_count].ssid[result->ssid_len] = '\0';
+    scan_results[scan_count].rssi = (int8_t)result->rssi;
+    scan_results[scan_count].auth_mode = result->auth_mode;
+    scan_count++;
+    return 0;
+}
+
+static void wifi_start_scan(void) {
+    scan_count = 0;
+    scan_sel = 0;
+    scan_in_progress = true;
+    scan_complete = false;
+    cyw43_arch_enable_sta_mode();
+    cyw43_wifi_scan_options_t opts = {0};
+    cyw43_wifi_scan(&cyw43_state, &opts, NULL, wifi_scan_callback);
+    printf("[WiFi] Scan started\n");
+}
+
+/* ─── WiFi connect (accepts arbitrary SSID/password) ─── */
+static void wifi_connect_to(const char *ssid, const char *password) {
+    printf("[WiFi] Connecting to \"%s\"...\n", ssid);
+    strncpy(wifi_ssid_display, ssid, sizeof(wifi_ssid_display) - 1);
+    wifi_ssid_display[sizeof(wifi_ssid_display) - 1] = '\0';
     wifi_enabled = true;
 
-    if (cyw43_arch_init()) {
-        printf("[WiFi] CYW43 init failed\n");
-        wifi_connected = false;
-        return;
-    }
     cyw43_arch_enable_sta_mode();
 
-    int err = cyw43_arch_wifi_connect_timeout_ms(
-        WIFI_SSID, WIFI_PASS, CYW43_AUTH_WPA2_AES_PSK, 15000);
+    uint32_t auth = (password[0] != '\0') ? CYW43_AUTH_WPA2_AES_PSK : 0;
+    int err = cyw43_arch_wifi_connect_timeout_ms(ssid, password, auth, 15000);
     if (err) {
         printf("[WiFi] Connection failed (err=%d)\n", err);
         wifi_connected = false;
@@ -1697,13 +2274,17 @@ static void wifi_connect(void) {
     cyw43_wifi_get_rssi(&cyw43_state, &wifi_rssi);
     printf("[WiFi] Connected: %s  RSSI: %d\n", wifi_ip_str, (int)wifi_rssi);
 
-    /* Sync time via NTP */
     ntp_request();
+}
+
+static void wifi_connect(void) {
+    wifi_connect_to(WIFI_SSID, WIFI_PASS);
 }
 
 static void wifi_disconnect(void) {
     printf("[WiFi] Disconnecting...\n");
-    cyw43_arch_deinit();
+    cyw43_wifi_leave(&cyw43_state, CYW43_ITF_STA);
+    /* Keep CYW43 initialised — battery VSYS sense needs it on GPIO 29 */
     wifi_connected = false;
     wifi_enabled = false;
     ntp_synced = false;
@@ -1727,13 +2308,6 @@ static int pick_quote(void) {
         return rng_next() % QUOTE_COUNT;  /* fallback */
     return matches[rng_next() % count];
 }
-
-/* ─── Tone frequencies for sound test ─── */
-#define TONE_UP     1047
-#define TONE_DOWN    784
-#define TONE_LEFT    880
-#define TONE_RIGHT   988
-#define TONE_CENTER 1319
 
 /* ─── Main ─── */
 int main(void) {
@@ -1760,7 +2334,15 @@ int main(void) {
     EPD_Init();
     EPD_Clear();
     rng_seed();
+
+    /* Init CYW43 early — even without WiFi, the chip's SPI CS shares
+       GPIO 29 (ADC3/VSYS sense) and will hold it low if uninitialised. */
+    if (cyw43_arch_init()) {
+        printf("WARNING: CYW43 init failed — battery reads may be 0\n");
+    }
+
     battery_init();
+    mpu_init();
 
     /* ─── State machine ─── */
     uint8_t state = STATE_OCTOPUS;
@@ -1769,18 +2351,16 @@ int main(void) {
     int menu_sel = 0;
     int mood_sel = 0;  /* 0 = ALL, 1-16 = specific mood */
 
-    const char *snd_dir = "NONE";
-    uint16_t snd_freq = 0;
-    int snd_presses = 0;
+    int snd_sel = 0;
 
     uint32_t last_input_ms = 0;
-    #define INPUT_DEBOUNCE 200
+    #define INPUT_DEBOUNCE 5
 
     /* Helper macro for polling input in sub-screens */
     #define POLL_INPUT(ms) \
-        for (int _pi = 0; _pi < ((ms)/20); _pi++) { \
-            sleep_ms(20); \
-            if (wifi_enabled) cyw43_arch_poll(); \
+        for (int _pi = 0; _pi < ((ms)/5); _pi++) { \
+            sleep_ms(5); \
+            if (wifi_enabled || scan_in_progress) cyw43_arch_poll(); \
             if (to_ms_since_boot(get_absolute_time()) - last_input_ms < INPUT_DEBOUNCE) continue; \
             uint8_t inp = read_joystick(); \
             if (inp == INPUT_NONE) continue; \
@@ -1791,8 +2371,8 @@ int main(void) {
     while (true) {
         uint32_t now = to_ms_since_boot(get_absolute_time());
 
-        /* Poll WiFi if connected */
-        if (wifi_enabled) cyw43_arch_poll();
+        /* Poll WiFi / scan */
+        if (wifi_enabled || scan_in_progress) cyw43_arch_poll();
 
         switch (state) {
 
@@ -1816,9 +2396,9 @@ int main(void) {
             frame_idx++;
 
             /* Poll 3 seconds for joystick */
-            for (int i = 0; i < 150 && state == STATE_OCTOPUS; i++) {
-                sleep_ms(20);
-                if (wifi_enabled) cyw43_arch_poll();
+            for (int i = 0; i < 600 && state == STATE_OCTOPUS; i++) {
+                sleep_ms(5);
+                if (wifi_enabled || scan_in_progress) cyw43_arch_poll();
                 if (to_ms_since_boot(get_absolute_time()) - last_input_ms < INPUT_DEBOUNCE) continue;
                 uint8_t inp = read_joystick();
                 if (inp == INPUT_DOWN) {
@@ -1853,9 +2433,10 @@ int main(void) {
                     
                     switch (menu_sel) {
                         case 0: state = STATE_MOOD_SELECT; mood_sel = current_mood + 1; break;
-                        case 1: state = STATE_NETWORK; break;
-                        case 2: state = STATE_SOUND; snd_dir="NONE"; snd_freq=0; snd_presses=0; break;
-                        case 3: state = STATE_INFO; break;
+                        case 1: state = STATE_NET_MENU; break;
+                        case 2: state = STATE_SOUND; snd_sel = 0; break;
+                        case 3: state = STATE_MOTION; break;
+                        case 4: state = STATE_INFO; break;
                         default: state = STATE_OCTOPUS; break;
                     }
                     break;
@@ -1897,43 +2478,70 @@ int main(void) {
             break;
         }
 
-        /* ════════ NETWORK ════════ */
+        /* ════════ NETWORK STATUS (read-only) ════════ */
         case STATE_NETWORK: {
             render_network_screen();
             transpose_to_display();
             EPD_Partial(display_buf);
 
             POLL_INPUT(4000)
-                if (inp == INPUT_CENTER) {
-                    speaker_tone(1000, 50);
-                    if (wifi_enabled) wifi_disconnect();
-                    else wifi_connect();
-                    
-                    break;
-                } else if (inp == INPUT_LEFT) {
-                    state = STATE_MENU; 
+                if (inp == INPUT_LEFT || inp == INPUT_CENTER) {
+                    state = STATE_NET_MENU;
                     speaker_tone(500, 50); break;
                 }
             POLL_END
             break;
         }
 
-        /* ════════ SOUND TEST ════════ */
+        /* ════════ SOUND SUBMENU ════════ */
         case STATE_SOUND: {
-            render_sound_screen(snd_dir, snd_freq, snd_presses);
+            render_sound_menu(snd_sel);
             transpose_to_display();
             EPD_Partial(display_buf);
 
-            POLL_INPUT(2000)
+            POLL_INPUT(4000)
+                if (inp == INPUT_UP) {
+                    snd_sel = (snd_sel - 1 + SND_MENU_COUNT) % SND_MENU_COUNT;
+                    speaker_tone(800, 50); break;
+                }
+                if (inp == INPUT_DOWN) {
+                    snd_sel = (snd_sel + 1) % SND_MENU_COUNT;
+                    speaker_tone(800, 50); break;
+                }
                 if (inp == INPUT_LEFT) {
-                    state = STATE_MENU; 
+                    if (snd_sel == SND_ITEM_PATTERN) {
+                        current_pattern = (current_pattern - 1 + SOUND_PATTERN_COUNT) % SOUND_PATTERN_COUNT;
+                        speaker_tone(800, 30); break;
+                    }
+                    state = STATE_MENU;
                     speaker_tone(500, 50); break;
                 }
-                snd_presses++;
-                if (inp == INPUT_UP)     { snd_dir="UP";     snd_freq=TONE_UP;     speaker_tone(TONE_UP, 150); }
-                if (inp == INPUT_DOWN)   { snd_dir="DOWN";   snd_freq=TONE_DOWN;   speaker_tone(TONE_DOWN, 150); }
-                if (inp == INPUT_RIGHT)  { snd_dir="RIGHT";  snd_freq=TONE_RIGHT;  speaker_tone(TONE_RIGHT, 150); }
-                if (inp == INPUT_CENTER) { snd_dir="CENTER"; snd_freq=TONE_CENTER; speaker_tone(TONE_CENTER, 200); }
+                if (inp == INPUT_RIGHT) {
+                    if (snd_sel == SND_ITEM_PATTERN) {
+                        current_pattern = (current_pattern + 1) % SOUND_PATTERN_COUNT;
+                        speaker_tone(800, 30); break;
+                    }
+                }
+                if (inp == INPUT_CENTER) {
+                    switch (snd_sel) {
+                        case SND_ITEM_PATTERN:
+                            play_sound_pattern(current_pattern);
+                            break;
+                        case SND_ITEM_ONOFF:
+                            sound_enabled = !sound_enabled;
+                            if (sound_enabled) speaker_tone(1000, 50);
+                            break;
+                        case SND_ITEM_VOL:
+                            sound_vol = (sound_vol + 1) % 3;
+                            speaker_tone(1000, 100);
+                            break;
+                        case SND_ITEM_BACK:
+                            state = STATE_MENU;
+                            speaker_tone(500, 50);
+                            break;
+                    }
+                    break;
+                }
             POLL_END
             break;
         }
@@ -1948,6 +2556,231 @@ int main(void) {
                 if (inp == INPUT_LEFT || inp == INPUT_CENTER) {
                     state = STATE_MENU; 
                     speaker_tone(500, 50); break;
+                }
+            POLL_END
+            break;
+        }
+
+        /* ════════ NETWORK SUBMENU ════════ */
+        case STATE_NET_MENU: {
+            static int net_menu_sel = 0;
+            render_net_menu(net_menu_sel);
+            transpose_to_display();
+            EPD_Partial(display_buf);
+
+            POLL_INPUT(4000)
+                if (inp == INPUT_UP) {
+                    net_menu_sel = (net_menu_sel - 1 + NET_MENU_COUNT) % NET_MENU_COUNT;
+                    speaker_tone(600, 30); break;
+                }
+                if (inp == INPUT_DOWN) {
+                    net_menu_sel = (net_menu_sel + 1) % NET_MENU_COUNT;
+                    speaker_tone(600, 30); break;
+                }
+                if (inp == INPUT_LEFT) {
+                    state = STATE_MENU;
+                    speaker_tone(500, 50); break;
+                }
+                if (inp == INPUT_CENTER) {
+                    speaker_tone(1000, 50);
+                    switch (net_menu_sel) {
+                        case NET_ITEM_ONOFF:
+                            if (wifi_enabled) wifi_disconnect();
+                            else wifi_connect();
+                            break;
+                        case NET_ITEM_SCAN:
+                            wifi_start_scan();
+                            state = STATE_NET_SCAN; break;
+                        case NET_ITEM_STATUS:
+                            state = STATE_NETWORK; break;
+                        case NET_ITEM_BACK:
+                            state = STATE_MENU; break;
+                    }
+                    break;
+                }
+            POLL_END
+            break;
+        }
+
+        /* ════════ SCAN RESULTS ════════ */
+        case STATE_NET_SCAN: {
+            /* Check if scan finished */
+            if (scan_in_progress && !cyw43_wifi_scan_active(&cyw43_state)) {
+                scan_in_progress = false;
+                scan_complete = true;
+                printf("[WiFi] Scan complete: %d networks\n", scan_count);
+            }
+
+            render_scan_results();
+            transpose_to_display();
+            EPD_Partial(display_buf);
+
+            POLL_INPUT(scan_in_progress ? 500 : 4000)
+                if (inp == INPUT_LEFT) {
+                    scan_in_progress = false;
+                    state = STATE_NET_MENU;
+                    speaker_tone(500, 50); break;
+                }
+                if (scan_complete && scan_count > 0) {
+                    if (inp == INPUT_UP) {
+                        scan_sel = (scan_sel - 1 + scan_count) % scan_count;
+                        speaker_tone(600, 30); break;
+                    }
+                    if (inp == INPUT_DOWN) {
+                        scan_sel = (scan_sel + 1) % scan_count;
+                        speaker_tone(600, 30); break;
+                    }
+                    if (inp == INPUT_CENTER) {
+                        speaker_tone(1000, 50);
+                        selected_network = scan_sel;
+                        if (scan_results[scan_sel].auth_mode == 0) {
+                            /* Open network — connect directly */
+                            show_connecting_screen(scan_results[scan_sel].ssid);
+                            wifi_connect_to(scan_results[scan_sel].ssid, "");
+                            state = STATE_NETWORK;
+                        } else {
+                            /* Needs password — keyboard */
+                            pw_len = 0;
+                            pw_buf[0] = '\0';
+                            kb_row = 0; kb_col = 0; kb_shift = true;
+                            state = STATE_NET_KEYBOARD;
+                        }
+                        break;
+                    }
+                }
+            POLL_END
+            break;
+        }
+
+        /* ════════ ON-SCREEN KEYBOARD ════════ */
+        case STATE_NET_KEYBOARD: {
+            render_keyboard();
+            transpose_to_display();
+            EPD_Partial(display_buf);
+
+            POLL_INPUT(4000)
+                if (inp == INPUT_UP) {
+                    if (kb_row > 0) kb_row--;
+                    if (kb_row < KB_SPECIAL_ROW && kb_col >= 10) kb_col = 9;
+                    speaker_tone(600, 20); break;
+                }
+                if (inp == INPUT_DOWN) {
+                    if (kb_row < KB_SPECIAL_ROW) kb_row++;
+                    if (kb_row == KB_SPECIAL_ROW && kb_col >= KB_SP_COUNT) kb_col = KB_SP_COUNT - 1;
+                    speaker_tone(600, 20); break;
+                }
+                if (inp == INPUT_LEFT) {
+                    if (kb_row < KB_SPECIAL_ROW)
+                        kb_col = (kb_col - 1 + 10) % 10;
+                    else
+                        kb_col = (kb_col - 1 + KB_SP_COUNT) % KB_SP_COUNT;
+                    speaker_tone(600, 20); break;
+                }
+                if (inp == INPUT_RIGHT) {
+                    if (kb_row < KB_SPECIAL_ROW)
+                        kb_col = (kb_col + 1) % 10;
+                    else
+                        kb_col = (kb_col + 1) % KB_SP_COUNT;
+                    speaker_tone(600, 20); break;
+                }
+                if (inp == INPUT_CENTER) {
+                    if (kb_row < KB_SPECIAL_ROW) {
+                        /* Insert character */
+                        if (pw_len < PW_MAX_LEN) {
+                            pw_buf[pw_len++] = kb_char_at(kb_row, kb_col, kb_shift);
+                            pw_buf[pw_len] = '\0';
+                            speaker_tone(1000, 30);
+                        }
+                    } else {
+                        /* Special key */
+                        switch (kb_col) {
+                            case KB_SP_SHIFT:
+                                kb_shift = !kb_shift;
+                                speaker_tone(800, 30);
+                                break;
+                            case KB_SP_SPACE:
+                                if (pw_len < PW_MAX_LEN) {
+                                    pw_buf[pw_len++] = ' ';
+                                    pw_buf[pw_len] = '\0';
+                                }
+                                speaker_tone(1000, 30);
+                                break;
+                            case KB_SP_DEL:
+                                if (pw_len > 0) pw_buf[--pw_len] = '\0';
+                                speaker_tone(500, 30);
+                                break;
+                            case KB_SP_DONE:
+                                speaker_tone(1200, 80);
+                                show_connecting_screen(scan_results[selected_network].ssid);
+                                wifi_connect_to(scan_results[selected_network].ssid, pw_buf);
+                                state = STATE_NETWORK;
+                                break;
+                            case KB_SP_CANCEL:
+                                speaker_tone(500, 50);
+                                state = STATE_NET_SCAN;
+                                break;
+                        }
+                    }
+                    break;
+                }
+            POLL_END
+            break;
+        }
+
+        /* ════════ MOTION / ACCELEROMETER ════════ */
+        case STATE_MOTION: {
+            static int mot_sel = 0;
+            render_motion_menu(mot_sel);
+            transpose_to_display();
+            EPD_Partial(display_buf);
+
+            POLL_INPUT(500)  /* fast refresh for live data */
+                if (inp == INPUT_UP) {
+                    mot_sel = (mot_sel - 1 + MOT_MENU_COUNT) % MOT_MENU_COUNT;
+                    speaker_tone(600, 20); break;
+                }
+                if (inp == INPUT_DOWN) {
+                    mot_sel = (mot_sel + 1) % MOT_MENU_COUNT;
+                    speaker_tone(600, 20); break;
+                }
+                if (inp == INPUT_LEFT) {
+                    state = STATE_MENU;
+                    speaker_tone(500, 50); break;
+                }
+                if (inp == INPUT_CENTER) {
+                    switch (mot_sel) {
+                        case MOT_ITEM_RESET:
+                            step_count = 0;
+                            speaker_tone(1000, 50);
+                            break;
+                        case MOT_ITEM_THRESH:
+                            step_threshold += 0.1f;
+                            if (step_threshold > 2.5f) step_threshold = 0.8f;
+                            speaker_tone(800, 30);
+                            break;
+                        case MOT_ITEM_I2CSCAN:
+                            speaker_tone(1000, 50);
+                            render_i2c_scan();
+                            transpose_to_display();
+                            EPD_Partial(display_buf);
+                            /* Wait for any button to go back */
+                            POLL_INPUT(30000)
+                                speaker_tone(500, 30);
+                            POLL_END
+                            break;
+                        case MOT_ITEM_BACK:
+                            state = STATE_MENU;
+                            speaker_tone(500, 50);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                if (inp == INPUT_RIGHT && mot_sel == MOT_ITEM_THRESH) {
+                    step_threshold += 0.1f;
+                    if (step_threshold > 2.5f) step_threshold = 0.8f;
+                    speaker_tone(800, 30); break;
                 }
             POLL_END
             break;
