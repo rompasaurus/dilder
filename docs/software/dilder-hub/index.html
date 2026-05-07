@@ -2526,10 +2526,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#network-state_network" class="md-nav__link">
+  <a href="#network-menu-state_net_menu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Network (STATE_NETWORK)
+        Network Menu (STATE_NET_MENU)
       
     </span>
   </a>
@@ -2537,10 +2537,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sound-test-state_sound" class="md-nav__link">
+  <a href="#wifi-scan-state_net_scan" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sound Test (STATE_SOUND)
+        WiFi Scan (STATE_NET_SCAN)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on-screen-keyboard-state_net_keyboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On-Screen Keyboard (STATE_NET_KEYBOARD)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sound-menu-state_sound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sound Menu (STATE_SOUND)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#motion-menu-state_motion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motion Menu (STATE_MOTION)
       
     </span>
   </a>
@@ -2576,10 +2609,32 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#speaker-push-pull-drive" class="md-nav__link">
+  <a href="#active-buzzer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Speaker: Push-Pull Drive
+        Active Buzzer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mpu-6050-i2c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MPU-6050 (I2C)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#battery-sensing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Battery Sensing
       
     </span>
   </a>
@@ -3506,10 +3561,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#network-state_network" class="md-nav__link">
+  <a href="#network-menu-state_net_menu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Network (STATE_NETWORK)
+        Network Menu (STATE_NET_MENU)
       
     </span>
   </a>
@@ -3517,10 +3572,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sound-test-state_sound" class="md-nav__link">
+  <a href="#wifi-scan-state_net_scan" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sound Test (STATE_SOUND)
+        WiFi Scan (STATE_NET_SCAN)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on-screen-keyboard-state_net_keyboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On-Screen Keyboard (STATE_NET_KEYBOARD)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sound-menu-state_sound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sound Menu (STATE_SOUND)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#motion-menu-state_motion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motion Menu (STATE_MOTION)
       
     </span>
   </a>
@@ -3556,10 +3644,32 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#speaker-push-pull-drive" class="md-nav__link">
+  <a href="#active-buzzer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Speaker: Push-Pull Drive
+        Active Buzzer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mpu-6050-i2c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MPU-6050 (I2C)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#battery-sensing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Battery Sensing
       
     </span>
   </a>
@@ -3653,7 +3763,7 @@
 
 
 <h1 id="dilder-hub-all-in-one-firmware">Dilder Hub — All-In-One Firmware<a class="headerlink" href="#dilder-hub-all-in-one-firmware" title="Permanent link">&para;</a></h1>
-<p>The combined firmware that brings together all Dilder features: animated octopus with 16 moods, joystick menu navigation, WiFi with NTP time sync, piezo speaker, battery monitoring, and a network status screen.</p>
+<p>The combined firmware that brings together all Dilder features: animated octopus with 16 moods, joystick menu navigation, WiFi scanning with on-screen keyboard, active buzzer with sound patterns, MPU-6050 accelerometer/gyroscope with pedometer, battery monitoring, and 10 navigable screens.</p>
 <hr />
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
 <table>
@@ -3674,19 +3784,23 @@
 </tr>
 <tr>
 <td><strong>WiFi</strong></td>
-<td>CYW43 STA mode, auto-connect to configured network</td>
+<td>CYW43 STA mode, network scanning, on-screen keyboard for password entry</td>
 </tr>
 <tr>
 <td><strong>NTP Time Sync</strong></td>
 <td>Syncs RTC to pool.ntp.org on WiFi connect (UTC+2 CEST)</td>
 </tr>
 <tr>
-<td><strong>Network Screen</strong></td>
-<td>Live WiFi status, SSID, IP, RSSI, NTP sync, on/off toggle</td>
+<td><strong>Network Menu</strong></td>
+<td>WiFi on/off, scan networks, connect to any network, live status display</td>
 </tr>
 <tr>
-<td><strong>Sound Test</strong></td>
-<td>Each joystick direction plays a different tone</td>
+<td><strong>Sound</strong></td>
+<td>Active buzzer with 6 patterns (beep, chirp, SOS, doorbell, alert, happy), volume control, on/off toggle</td>
+</tr>
+<tr>
+<td><strong>Motion</strong></td>
+<td>MPU-6050 accelerometer/gyroscope — live values, pedometer, tilt angles, temperature, I2C bus scanner</td>
 </tr>
 <tr>
 <td><strong>Device Info</strong></td>
@@ -3694,7 +3808,7 @@
 </tr>
 <tr>
 <td><strong>Battery Monitor</strong></td>
-<td>ADC reads VSYS — shows percentage or USB-powered status</td>
+<td>ADC3 reads VSYS/3 via CYW43 SPI lock — shows percentage or USB-powered status</td>
 </tr>
 <tr>
 <td><strong>Status Icons</strong></td>
@@ -3711,8 +3825,9 @@
 <p>Press joystick DOWN on the main screen. Overlay on the bottom half showing:</p>
 <ol>
 <li><strong>MOOD SELECT</strong> — pick a personality</li>
-<li><strong>NETWORK</strong> — WiFi settings</li>
-<li><strong>SOUND TEST</strong> — test the piezo speaker</li>
+<li><strong>NETWORK</strong> — WiFi on/off, scan, connect, status</li>
+<li><strong>SOUND</strong> — test patterns, volume, on/off</li>
+<li><strong>MOTION</strong> — accelerometer, pedometer, tilt, I2C scan</li>
 <li><strong>DEVICE INFO</strong> — system information</li>
 <li><strong>BACK</strong> — return to octopus</li>
 </ol>
@@ -3810,54 +3925,44 @@
 </tr>
 </tbody>
 </table>
-<h3 id="network-state_network">Network (STATE_NETWORK)<a class="headerlink" href="#network-state_network" title="Permanent link">&para;</a></h3>
-<p>Shows:
-- <strong>WIFI:</strong> ON / OFF (CENTER to toggle)
-- <strong>SSID:</strong> configured network name
-- <strong>STATUS:</strong> DISABLED / CONNECTING... / CONNECTED
-- <strong>IP:</strong> assigned IP address
-- <strong>SIGNAL:</strong> RSSI in dBm
-- <strong>NTP:</strong> SYNCED / NOT SYNCED</p>
-<p>When WiFi is toggled ON, the firmware connects to the configured SSID and immediately requests NTP time sync. The clock on the main screen updates to real network time.</p>
-<h3 id="sound-test-state_sound">Sound Test (STATE_SOUND)<a class="headerlink" href="#sound-test-state_sound" title="Permanent link">&para;</a></h3>
-<p>Each joystick direction plays a tone through the push-pull piezo:</p>
-<table>
-<thead>
-<tr>
-<th>Direction</th>
-<th>Note</th>
-<th>Frequency</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>UP</td>
-<td>C5</td>
-<td>1047 Hz</td>
-</tr>
-<tr>
-<td>DOWN</td>
-<td>G4</td>
-<td>784 Hz</td>
-</tr>
-<tr>
-<td>LEFT</td>
-<td>A4</td>
-<td>880 Hz</td>
-</tr>
-<tr>
-<td>RIGHT</td>
-<td>B4</td>
-<td>988 Hz</td>
-</tr>
-<tr>
-<td>CENTER</td>
-<td>E5</td>
-<td>1319 Hz</td>
-</tr>
-</tbody>
-</table>
-<p>Shows direction, frequency, press count, and live GPIO status indicators.</p>
+<h3 id="network-menu-state_net_menu">Network Menu (STATE_NET_MENU)<a class="headerlink" href="#network-menu-state_net_menu" title="Permanent link">&para;</a></h3>
+<p>A submenu with four options:</p>
+<ul>
+<li><strong>WIFI: ON/OFF</strong> — toggle WiFi connection (connects to hardcoded SSID or last scanned network)</li>
+<li><strong>SCAN NETWORKS</strong> — async CYW43 scan, shows scrollable list of discovered SSIDs with lock icon (~) for encrypted networks</li>
+<li><strong>STATUS</strong> — read-only display of WiFi state, SSID, IP, RSSI, NTP sync</li>
+<li><strong>BACK</strong> — return to main menu</li>
+</ul>
+<h3 id="wifi-scan-state_net_scan">WiFi Scan (STATE_NET_SCAN)<a class="headerlink" href="#wifi-scan-state_net_scan" title="Permanent link">&para;</a></h3>
+<p>Shows "SCANNING... FOUND: N" during the async scan (refreshes every 500ms). When complete, displays a scrollable list of up to 16 networks. Selecting an open network connects immediately. Selecting an encrypted network opens the on-screen keyboard.</p>
+<h3 id="on-screen-keyboard-state_net_keyboard">On-Screen Keyboard (STATE_NET_KEYBOARD)<a class="headerlink" href="#on-screen-keyboard-state_net_keyboard" title="Permanent link">&para;</a></h3>
+<p>Full keyboard for WiFi password entry:</p>
+<ul>
+<li>4 rows of 10 characters (QWERTY layout + numbers + punctuation)</li>
+<li>5 special keys: SHIFT (toggle CAPS/lowercase), SPC, DEL, DONE, CANCEL</li>
+<li>CAPS/LOW indicator next to password field</li>
+<li>Navigate with joystick, CENTER to select</li>
+</ul>
+<h3 id="sound-menu-state_sound">Sound Menu (STATE_SOUND)<a class="headerlink" href="#sound-menu-state_sound" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TONE: [pattern name]</strong> — LEFT/RIGHT cycles through 6 patterns, CENTER plays</li>
+<li><strong>SOUND: ON/OFF</strong> — global toggle</li>
+<li><strong>VOLUME: LOW/MED/HIGH</strong> — controls beep duration (20/50/100ms)</li>
+<li><strong>BACK</strong> — return to main menu</li>
+</ul>
+<p>Sound patterns: BEEP, CHIRP, SOS, DOORBELL, ALERT, HAPPY. All are rhythmic on/off sequences (active buzzer has fixed pitch).</p>
+<h3 id="motion-menu-state_motion">Motion Menu (STATE_MOTION)<a class="headerlink" href="#motion-menu-state_motion" title="Permanent link">&para;</a></h3>
+<p>Scrolling menu with live sensor data from the MPU-6050:</p>
+<ul>
+<li><strong>ACCEL: X Y Z (g)</strong> — live accelerometer values</li>
+<li><strong>STEPS: N</strong> — pedometer count</li>
+<li><strong>TILT: X Y (deg) + temperature</strong> — tilt angles and chip temperature</li>
+<li><strong>RESET PEDOMETER</strong> — zero the step counter</li>
+<li><strong>THRESHOLD: N.Ng</strong> — adjustable step detection threshold (0.8g-2.5g)</li>
+<li><strong>I2C BUS SCAN</strong> — scans all I2C addresses, identifies known devices</li>
+<li><strong>BACK</strong> — return to main menu</li>
+</ul>
+<p>Gyro readout and acceleration magnitude displayed at the bottom. Refreshes every 500ms for live data.</p>
 <h3 id="device-info-state_info">Device Info (STATE_INFO)<a class="headerlink" href="#device-info-state_info" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Firmware version and display variant</li>
@@ -3947,27 +4052,67 @@
 <td>Center/push</td>
 </tr>
 <tr>
-<td>Speaker +</td>
-<td>20</td>
-<td>GP15</td>
-<td>PWM7B</td>
-</tr>
-<tr>
-<td>Speaker -</td>
+<td>Buzzer +</td>
 <td>19</td>
 <td>GP14</td>
-<td>PWM7A (inverted)</td>
+<td>GPIO out (active buzzer)</td>
+</tr>
+<tr>
+<td>Buzzer -</td>
+<td>18</td>
+<td>GND</td>
+<td>Ground</td>
+</tr>
+<tr>
+<td>MPU-6050 SDA</td>
+<td>1</td>
+<td>GP0</td>
+<td>I2C0 data</td>
+</tr>
+<tr>
+<td>MPU-6050 SCL</td>
+<td>2</td>
+<td>GP1</td>
+<td>I2C0 clock</td>
+</tr>
+<tr>
+<td>MPU-6050 VCC</td>
+<td>36</td>
+<td>3V3(OUT)</td>
+<td>Shared with display</td>
+</tr>
+<tr>
+<td>MPU-6050 GND</td>
+<td>33</td>
+<td>GND</td>
+<td>Ground</td>
 </tr>
 <tr>
 <td>Battery sense</td>
 <td>—</td>
 <td>GP29</td>
-<td>ADC3 (VSYS/3)</td>
+<td>ADC3 (VSYS/3, CYW43 shared)</td>
+</tr>
+<tr>
+<td>TP4056 OUT+</td>
+<td>39</td>
+<td>VSYS</td>
+<td>Battery/charger power input</td>
+</tr>
+<tr>
+<td>TP4056 OUT-</td>
+<td>38</td>
+<td>GND</td>
+<td>Ground</td>
 </tr>
 </tbody>
 </table>
-<h3 id="speaker-push-pull-drive">Speaker: Push-Pull Drive<a class="headerlink" href="#speaker-push-pull-drive" title="Permanent link">&para;</a></h3>
-<p>Both GP14 and GP15 share PWM slice 7. Channel A (GP14) is inverted so the piezo sees opposite-phase signals — 6.6Vpp instead of 3.3V from a single pin. Direct connection, no resistor needed.</p>
+<h3 id="active-buzzer">Active Buzzer<a class="headerlink" href="#active-buzzer" title="Permanent link">&para;</a></h3>
+<p>Single GPIO pin drive — GP14 HIGH to buzz, LOW to silence. No PWM needed. Volume is controlled by adjusting beep duration (20/50/100ms). The old push-pull piezo driver was replaced because active buzzers have a built-in oscillator.</p>
+<h3 id="mpu-6050-i2c">MPU-6050 (I2C)<a class="headerlink" href="#mpu-6050-i2c" title="Permanent link">&para;</a></h3>
+<p>I2C0 at 400kHz. The GY-521 module has onboard pull-ups. Firmware auto-detects the device at 0x68 or 0x69 (depending on AD0 pin state). See <a href="../../../docs/mpu6050-wiring-guide.md">MPU-6050 wiring guide</a> for full details.</p>
+<h3 id="battery-sensing">Battery Sensing<a class="headerlink" href="#battery-sensing" title="Permanent link">&para;</a></h3>
+<p>GPIO 29 (ADC3) reads VSYS/3 through an onboard voltage divider. On the Pico W/2 W, GPIO 29 is shared with the CYW43 WiFi chip's SPI bus. The firmware locks the CYW43 driver (<code>cyw43_thread_enter/exit</code>) during ADC reads. CYW43 must be initialized at boot even without WiFi for this to work.</p>
 <hr />
 <h2 id="wifi-configuration">WiFi Configuration<a class="headerlink" href="#wifi-configuration" title="Permanent link">&para;</a></h2>
 <p>Edit <code>dev-setup/dilder-hub/wifi_config.h</code>:</p>
