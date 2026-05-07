@@ -1,0 +1,2200 @@
+"""
+Dilder Rev 2 Mk2 — NO SOLAR + ACTIVE BUZZER variant
+==============================================================
+3 Bodies: BasePlate, AAACradle, TopCover
+Each built from constrained sketches + Pad/Pocket/Fillet/AdditivePrimitive chains.
+
+Variant: Based on the no-solar build. Adds a 12 mm × 9.5 mm (12095)
+active buzzer on the -X short wall (display side), nestled just below
+the FPC ribbon-cable bridge in the cover. The buzzer drops through a
+full through-hole in the cradle and rests on a flange ring in the base
+plate. Sound exits through a 10 mm port in the floor; wires route
+through the same hole.
+
+Presets baked:
+  Base plate:  no solar, thinner back  (bp_h=4.0, floor=0.6, no solar pit/holes)
+               + buzzer flange ring + sound port
+  AAA cradle:  04-27 shortened + open window  (cell_len = 39.5, clip_win_z_ext = 4)
+               + buzzer mount shelf + 12 mm through-hole
+  Top cover:   4-26-final-face-for-now  (fp_z = 1.0, edge_curve_r = 2.2)
+
+All values live in the Parameters spreadsheet — change any cell, Ctrl+Shift+R.
+Save path (auto):  hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer.FCStd
+
+Usage:
+  FreeCAD ≥ 0.21 > Macro > Run Macro > select this file
+"""
+
+import math, os
+import FreeCAD as App
+import Part
+import Sketcher
+
+V = App.Vector
+ROT0 = App.Rotation()
+
+# =====================================================================
+# EDGE FINDERS
+# =====================================================================
+
+def find_edges(feature, axis=None):
+    """Return edge name list by orientation."""
+    results = []
+    for i, e in enumerate(feature.Shape.Edges):
+        verts = e.Vertexes
+        if len(verts) != 2:
+            continue
+        p1, p2 = verts[0].Point, verts[1].Point
+        tag = f"Edge{i + 1}"
+        if axis == "vertical":
+            if abs(p1.x - p2.x) < 0.01 and abs(p1.y - p2.y) < 0.01 and abs(p1.z - p2.z) > 0.5:
+                results.append(tag)
+        elif axis == "horizontal_bottom":
+            if abs(p1.z - p2.z) < 0.01 and abs(p1.z) < 0.5 and abs(p2.z) < 0.5:
+                results.append(tag)
+        elif axis == "horizontal_top":
+            if abs(p1.z - p2.z) < 0.01 and p1.z > 5:
+                results.append(tag)
+    return results
+
+
+def edges_at_z(feature, z_target, tol=0.1):
+    """Return edge names at a specific Z height."""
+    results = []
+    for i, e in enumerate(feature.Shape.Edges):
+        verts = e.Vertexes
+        if len(verts) != 2:
+            continue
+        p1, p2 = verts[0].Point, verts[1].Point
+        if abs(p1.z - p2.z) < 0.01 and abs(p1.z - z_target) < tol:
+            results.append(f"Edge{i + 1}")
+    return results
+
+
+# =====================================================================
+# CONSTRAINED SKETCH HELPERS
+# =====================================================================
+
+def make_rect_sketch(body, name, z_offset, x0, y0, x1, y1):
+    """
+    Full constrained rectangle sketch at z_offset on XY plane.
+    Returns (sketch, constraint_indices) for expression binding.
+    """
+    doc = body.Document
+    sk = body.newObject("Sketcher::SketchObject", name)
+    sk.AttachmentSupport = [(body.Origin.OriginFeatures[3], "")]
+    sk.MapMode = "FlatFace"
+    sk.AttachmentOffset = App.Placement(V(0, 0, z_offset), ROT0)
+
+    w, h = x1 - x0, y1 - y0
+    sk.addGeometry(Part.LineSegment(V(x0, y0, 0), V(x1, y0, 0)), False)  # 0: bottom
+    sk.addGeometry(Part.LineSegment(V(x1, y0, 0), V(x1, y1, 0)), False)  # 1: right
+    sk.addGeometry(Part.LineSegment(V(x1, y1, 0), V(x0, y1, 0)), False)  # 2: top
+    sk.addGeometry(Part.LineSegment(V(x0, y1, 0), V(x0, y0, 0)), False)  # 3: left
+    # Close + orient
+    sk.addConstraint(Sketcher.Constraint("Coincident", 0, 2, 1, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 1, 2, 2, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 2, 2, 3, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 3, 2, 0, 1))
+    sk.addConstraint(Sketcher.Constraint("Horizontal", 0))
+    sk.addConstraint(Sketcher.Constraint("Horizontal", 2))
+    sk.addConstraint(Sketcher.Constraint("Vertical", 1))
+    sk.addConstraint(Sketcher.Constraint("Vertical", 3))
+    # Position + size
+    c_ox = sk.addConstraint(Sketcher.Constraint("DistanceX", -1, 1, 0, 1, x0))
+    c_oy = sk.addConstraint(Sketcher.Constraint("DistanceY", -1, 1, 0, 1, y0))
+    c_w  = sk.addConstraint(Sketcher.Constraint("DistanceX", 0, 1, 0, 2, w))
+    c_h  = sk.addConstraint(Sketcher.Constraint("DistanceY", 1, 1, 1, 2, h))
+    doc.recompute()
+    return sk, (c_ox, c_oy, c_w, c_h)
+
+
+def make_circle_sketch(body, name, z_offset, cx, cy, r):
+    """Circle sketch at z_offset."""
+    doc = body.Document
+    sk = body.newObject("Sketcher::SketchObject", name)
+    sk.AttachmentSupport = [(body.Origin.OriginFeatures[3], "")]
+    sk.MapMode = "FlatFace"
+    sk.AttachmentOffset = App.Placement(V(0, 0, z_offset), ROT0)
+    sk.addGeometry(Part.Circle(V(cx, cy, 0), V(0, 0, 1), r), False)
+    c_x = sk.addConstraint(Sketcher.Constraint("DistanceX", -1, 1, 0, 3, cx))
+    c_y = sk.addConstraint(Sketcher.Constraint("DistanceY", -1, 1, 0, 3, cy))
+    c_r = sk.addConstraint(Sketcher.Constraint("Radius", 0, r))
+    doc.recompute()
+    return sk, (c_x, c_y, c_r)
+
+
+def SP(alias):
+    """Spreadsheet expression string."""
+    return f"Parameters.{alias}"
+
+
+# =====================================================================
+# PARAMETER SPREADSHEET
+# =====================================================================
+
+PARAMS = [
+    # (alias, value, description)
+    # ─── Enclosure ───
+    ("enc_x",         98.9,  "Enclosure width X (+2mm extension at X=64 slice plane, 05-01-2026)"),
+    ("enc_y",         46.0,  "Enclosure depth Y"),
+    ("wall_mx",        5.0,  "-X wall thickness (+2mm for buzzer clearance)"),
+    ("wall_px",        1.2,  "+X wall thickness"),
+    ("wall_y",         2.0,  "Side wall thickness Y"),
+    ("corner_r",       4.0,  "Corner radius"),
+    ("pillar",         5.0,  "Corner pillar side"),
+    # ─── Base plate ───
+    # SCAD builds at 8mm then shaves 2mm band (Z=4..6), effective height = 6
+    ("bp_h",           4.0,  "Base plate height Z (no solar: 6 - 2)"),
+    ("bp_fillet",      2.0,  "Bottom fillet radius"),
+    ("bp_floor",       0.6,  "Pocket floor thickness (no solar: 2.6 - 2.0)"),
+    ("cpx0",           5.1,  "Pocket X start (+2mm with wall_mx)"),
+    ("cpx1",          97.6,  "Pocket X end (+2mm enc_x)"),
+    ("cpy0",           2.1,  "Pocket Y start"),
+    ("cpy1",          43.9,  "Pocket Y end"),
+    ("peg_d",          3.0,  "Peg diameter"),
+    ("peg_h",          5.0,  "Peg height above plate (no-solar: +2mm)"),
+    ("peg_cham",       0.4,  "Peg tip chamfer"),
+    ("ext_x",         30.0,  "Pillar extension X (thick floo preset)"),
+    ("ext_y",          0.0,  "Pillar extension Y (was 4.0; reduced wing Y from 9→5mm to free middle of base 05-01-2026)"),
+    ("ext_z",         -1.5,  "Extension Z above plate"),
+    ("bay_d",         11.1,  "AAA bay diameter"),
+    ("bay_yM",         7.85, "Bay -Y center"),
+    ("bay_yP",        38.15, "Bay +Y center"),
+    ("bay_xs",        34.0,  "Trough X start"),
+    ("bay_xl",        41.0,  "Trough X length (+2mm to fill X=64 slice gap)"),
+    ("rail_lift",      5.0,  "Rail Z lift"),
+    ("rail_hred",      2.5,  "Rail height reduce"),
+    ("rail_dred",      6.0,  "Rail depth reduce per side (was 2.0; reduced rail support Y by 4mm 05-01-2026)"),
+    ("usb_w",          9.2,  "USB-C cutout width (9+0.2 tol)"),
+    ("usb_h",          4.45, "USB-C cutout height (4.25+0.2 tol)"),
+    ("usb_zd",         0.5,  "USB-C Z drop"),
+    ("usb_r",          1.0,  "USB-C corner radius"),
+    ("sol_x",         62.4,  "Solar pit width"),
+    ("sol_y",         36.4,  "Solar pit depth"),
+    ("sol_z",          2.0,  "Solar pit Z depth"),
+    ("sol_hd",         3.1,  "Solar hole diameter"),
+    ("sol_h1x",        2.5,  "Hole 1 X in pit"),
+    ("sol_h1y",        2.0,  "Hole 1 Y in pit"),
+    ("sol_h2x",       60.0,  "Hole 2 X in pit"),
+    ("sol_h2y",        2.4,  "Hole 2 Y in pit"),
+    ("ublk_xs",        5.0,  "USB block X size"),
+    ("ublk_yw",       15.0,  "USB block Y width"),
+    ("ublk_gap",       5.0,  "USB block X gap"),
+    ("ublk_inset",     5.0,  "USB block inset from +X wall"),
+    ("pblk_inset",    18.0,  "Pico block inset from -X wall"),
+    ("pblk_xs",        5.0,  "Pico block X size"),
+    ("pblk_yw",       15.0,  "Pico block Y width"),
+    ("pblk_zh",        2.0,  "Pico block Z height"),
+    # ─── AAA Cradle ───
+    ("plug_slop",      0.3,  "Plug wall slop"),
+    ("aaa_d",         10.5,  "AAA cell diameter"),
+    ("aaa_rslop",      0.3,  "AAA radial slop"),
+    ("aaa_bwall",      0.5,  "Bay wall above/below"),
+    ("aaa_len",       41.5,  "AAA cell length (+2mm rail extension at X=64 slice 05-01-2026; was 39.5)"),
+    ("aaa_aslop",      1.0,  "AAA axial slop"),
+    ("aaa_cspace",     2.0,  "Contact space per end"),
+    ("pil_cslop",      0.4,  "Pillar cutout slop"),
+    ("fpc_gap",        3.0,  "FPC gap width"),
+    ("pico_by",       21.0,  "Pico board width Y"),
+    ("pico_bx",       80.0,  "Pico nest length X (+2mm with enclosure extension)"),
+    ("fit_tol",        0.4,  "Print fit tolerance"),
+    ("conn_xl",       29.0,  "Connecting block X length"),
+    ("tp_xl",         28.0,  "TP4056 board X"),
+    ("tp_yw",         17.0,  "TP4056 board Y"),
+    ("tp_iz",          1.0,  "TP4056 indent depth"),
+    ("tp_slop",        0.3,  "TP4056 slop"),
+    ("disp_cz",        3.0,  "Display cutout depth Z"),
+    ("clip_sz",        7.0,  "Clip plate size"),
+    ("clip_tk",        0.5,  "Clip plate thickness"),
+    ("clip_slop",      0.2,  "Clip slot slop"),
+    ("clip_ret",       1.0,  "Retainer thickness"),
+    ("clip_win",       5.0,  "Retainer window size YZ"),
+    ("clip_wze",       4.0,  "Retainer window Z extend up (04-27)"),
+    ("bay_gap_pil",    3.0,  "Bay gap from pillar cutout"),
+    ("bay_shift_mx",  20.0,  "Bay shift toward -X"),
+    # ─── Top Cover ───
+    ("tc_bull",        4.0,  "Bullnose radius"),
+    ("tc_edge_r",      2.2,  "Face plate edge curve radius (4-26-final)"),
+    ("tc_fp_z",        1.0,  "Face plate thickness (4-26-final)"),
+    ("tc_wext",        5.0,  "Wall ext below mating"),
+    ("disp_xl",       65.2,  "Display length X (+0.2 on +X for display fit)"),
+    ("disp_yd",       30.0,  "Display depth Y"),
+    ("disp_z",         7.0,  "Display thickness Z"),
+    ("inlay_z",        3.0,  "Screen inlay depth"),
+    ("inlay_slop",     0.3,  "Inlay XY slop"),
+    ("inlay_yslop",    0.35, "Inlay Y slop"),
+    ("win_xl",        50.0,  "Window length X"),
+    ("win_yd",        25.0,  "Window depth Y"),
+    ("win_shift",      2.8,  "Window shift toward +X"),
+    ("joy_d",         12.0,  "Joystick hole diameter"),
+    ("joy_cx",        81.35, "Joystick center X (+2mm with enclosure extension at X=64 slice)"),
+    ("joy_pcb_y_offset", 0.67, "SW1 Y offset from PCB bbox center (production-PCB constant — KiCad places the K1-1506SN-01 +0.67 mm in Y from board geometric center; cover's joystick hole + pocket are shifted by this amount so SW1's stick aligns with the through-hole)"),
+    ("joy_body_size", 10.6, "Square joystick body cutout size (K1-1506SN-01 body is 10.2 mm + 0.4 mm clearance; replaces the round joy_d hole — square corners of the body would otherwise foul the 12 mm circular cut)"),
+    ("joy_pit_depth", 8.45, "Depth of the joystick PCB pit cut UP into the AAA cradle so the K1-1506SN-01 body's 10 mm height fits between the cradle pit floor and the cover dome top. Drops PCB top Z from 19.5 to 11.05 globally, putting the body top at Z=21.05 (flush with the cover JoyPCBPocket top edge / Edge106 plane)"),
+    ("m3_d",           3.2,  "M3 bore diameter"),
+    ("joy_px",        20.0,  "Joystick PCB pocket X (cover pocket)"),
+    ("joy_py",        20.0,  "Joystick PCB pocket Y (cover pocket)"),
+    ("joy_pit_xy",    20.0,  "Joystick PCB pit XY in cradle (board 19.6 + 0.2 mm/side clearance)"),
+    ("fpc_dy",        13.0,  "FPC divet width Y"),
+    ("fpc_dw",         1.0,  "FPC divet wall remaining"),
+    ("fpc_dze",        2.0,  "FPC divet Z extend below inlay"),
+    ("pil_inner_r",    1.0,  "Pillar inner facing corner radius"),
+    # ─── Thumbpiece (snap cap nested in cover's 12 mm joystick hole) ───
+    # Single disc: OD = joy_d - 1.0 → 0.5 mm radial clearance all around
+    # (1 mm total) for joystick directional travel inside the hole. Snap
+    # socket on the underside fits over the K1-1506SN-01 actuator peg/stick.
+    ("thumb_od",      10.0,  "Thumbpiece OD = joy_d - 2.0 → 1.0 mm radial clearance in the 12 mm cover hole (2 mm total → joystick directional travel)"),
+    ("thumb_h",        4.5,  "Thumbpiece total height"),
+    ("thumb_top_clr",  0.1,  "Z clearance between thumbpiece top and cover top face (Z=23 globally)"),
+    ("thumb_dish_r",  12.0,  "Concave thumb dish spherical radius"),
+    ("thumb_dish_d",   0.6,  "Concave thumb dish depth at center (must be < thumb_h - thumb_top_clr - thumb_sock_d so the dish doesn't break into the socket cavity above the peg)"),
+    ("thumb_sock_x",   3.3,  "Snap socket X size (actuator stick is 3.2 mm; +0.1 mm fit clearance)"),
+    ("thumb_sock_y",   3.3,  "Snap socket Y size"),
+    ("thumb_sock_d",   3.5,  "Snap socket depth (cuts up from disc bottom)"),
+    ("thumb_stick_cy", 23.68, "Actuator stick Y center (PCB bbox-centered at enc_y/2=23.0, stick offset +0.68 from bbox center; now aligned with cover hole at 23.67)"),
+    # ─── Solar panel (AK 62×36, sits in base plate's bottom solar pit) ───
+    ("sol_panel_x",   62.0,  "Solar panel X (= sol_x - 0.4 slop → AK 62×36 nominal)"),
+    ("sol_panel_y",   36.0,  "Solar panel Y (= sol_y - 0.4 slop)"),
+    ("sol_panel_z",    2.0,  "Solar panel total Z (matches sol_z so the panel fills the pit)"),
+    ("sol_cell_inset", 1.5,  "Inset of the dark-blue cell layer from the panel frame edges"),
+    ("sol_cell_z",     0.25, "Thickness of the cell layer (lower band on the panel — visible side)"),
+    ("sol_wire_d",     1.0,  "Solar lead wire OD (red = +, black = -)"),
+    # ─── Active buzzer (12095 form factor, 85dB wired) ───
+    ("buzz_d",        12.0,  "Active buzzer body diameter (12095)"),
+    ("buzz_h",         9.5,  "Active buzzer body height"),
+    ("buzz_port_d",    2.0,  "Sound hole / channel diameter (base plate + cradle floor)"),
+]
+
+
+def setup_spreadsheet(doc):
+    """Create or update the Parameters spreadsheet."""
+    if hasattr(doc, "Parameters"):
+        sheet = doc.Parameters
+    else:
+        sheet = doc.addObject("Spreadsheet::Sheet", "Parameters")
+    sheet.set("A1", "Parameter")
+    sheet.set("B1", "Value")
+    sheet.set("C1", "Description")
+    for i, (alias, val, desc) in enumerate(PARAMS, start=2):
+        cell = f"B{i}"
+        sheet.set(f"A{i}", alias)
+        sheet.set(cell, str(val))
+        sheet.set(f"C{i}", desc)
+        try:
+            sheet.setAlias(cell, alias)
+        except Exception:
+            pass
+    doc.recompute()
+    return sheet
+
+
+# =====================================================================
+# BASE PLATE  (preset: extended_inset-pillar-blocks)
+# =====================================================================
+
+def build_base_plate(doc):
+    print("  Building Base Plate...")
+    body = doc.addObject("PartDesign::Body", "BasePlate")
+
+    W, H = 98.9, 46.0
+    Z = 4.0           # no-solar: 6mm - 2mm (solar pit depth removed)
+    Z_preshave = 6.0   # adjusted pre-shave height (for USB-C Z calculation)
+    floor_z = 0.6      # no-solar: 2.6 - 2.0 (keeps same pocket depth)
+
+    # ── 1. Outer profile sketch (constrained rectangle at origin) ──
+    # Manual sketch — avoids over-constraining when pinned to origin
+    sk = body.newObject("Sketcher::SketchObject", "Sk_BP_Outline")
+    sk.AttachmentSupport = [(body.Origin.OriginFeatures[3], "")]
+    sk.MapMode = "FlatFace"
+    sk.addGeometry(Part.LineSegment(V(0, 0, 0), V(W, 0, 0)), False)
+    sk.addGeometry(Part.LineSegment(V(W, 0, 0), V(W, H, 0)), False)
+    sk.addGeometry(Part.LineSegment(V(W, H, 0), V(0, H, 0)), False)
+    sk.addGeometry(Part.LineSegment(V(0, H, 0), V(0, 0, 0)), False)
+    sk.addConstraint(Sketcher.Constraint("Coincident", 0, 2, 1, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 1, 2, 2, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 2, 2, 3, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 3, 2, 0, 1))
+    sk.addConstraint(Sketcher.Constraint("Horizontal", 0))
+    sk.addConstraint(Sketcher.Constraint("Horizontal", 2))
+    sk.addConstraint(Sketcher.Constraint("Vertical", 1))
+    sk.addConstraint(Sketcher.Constraint("Vertical", 3))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 0, 1, -1, 1))  # pin to origin
+    c_w = sk.addConstraint(Sketcher.Constraint("DistanceX", 0, 1, 0, 2, W))
+    c_h = sk.addConstraint(Sketcher.Constraint("DistanceY", 1, 1, 1, 2, H))
+    sk.setExpression(f"Constraints[{c_w}]", SP("enc_x"))
+    sk.setExpression(f"Constraints[{c_h}]", SP("enc_y"))
+    doc.recompute()
+
+    # ── 2. Pad outer shell ──
+    pad = body.newObject("PartDesign::Pad", "Pad_Shell")
+    pad.Profile = sk
+    pad.Length = Z
+    pad.setExpression("Length", SP("bp_h"))
+    doc.recompute()
+
+    # ── 3. Fillet vertical edges (corner rounding) ──
+    vert = find_edges(pad, "vertical")
+    if vert:
+        fil_c = body.newObject("PartDesign::Fillet", "Fillet_Corners")
+        fil_c.Base = (pad, vert)
+        fil_c.Radius = 4.0
+        fil_c.setExpression("Radius", SP("corner_r"))
+        doc.recompute()
+        last = fil_c
+    else:
+        last = pad
+
+    # ── 4. Fillet bottom edges ──
+    bot = find_edges(last, "horizontal_bottom")
+    if bot:
+        fil_b = body.newObject("PartDesign::Fillet", "Fillet_BottomEdge")
+        fil_b.Base = (last, bot)
+        fil_b.Radius = 2.0
+        fil_b.setExpression("Radius", SP("bp_fillet"))
+        doc.recompute()
+
+    # ── 5. Cradle pocket ── SubtractiveBox from top
+    cpx0, cpy0, cpx1, cpy1 = 5.1, 2.1, 97.6, 43.9
+    pocket_depth = Z - floor_z  # 5.5
+    pock = body.newObject("PartDesign::SubtractiveBox", "Pocket_Cradle")
+    pock.Length = cpx1 - cpx0
+    pock.Width = cpy1 - cpy0
+    pock.Height = pocket_depth
+    pock.Placement = App.Placement(V(cpx0, cpy0, Z - pocket_depth), ROT0)
+    pock.setExpression("Length", SP("cpx1") + " - " + SP("cpx0"))
+    pock.setExpression("Width", SP("cpy1") + " - " + SP("cpy0"))
+    pock.setExpression("Height", SP("bp_h") + " - " + SP("bp_floor"))
+    doc.recompute()
+
+    # ── 6. Solar pit REMOVED (no-solar variant) ──
+    # Solar pit, wire holes, and solar panel model all removed.
+    # Base plate is 2mm thinner (4mm instead of 6mm) since the pit
+    # no longer needs floor material above it.
+
+    # ── 7. USB-C cutout (3 subtractive primitives for rounded opening) ──
+    # USB-C Z position uses the PRE-SHAVE height (8mm) because the cutout
+    # bottom (3.05) is below the shave band (Z=4). The shave doesn't move it.
+    uw = 9.2
+    ur = 1.0
+    usb_z_bot = Z_preshave - 4.45 - 0.5   # no-solar: 6 - 4.95 = 1.05
+    uc_y = H / 2
+    wall_depth = 3.0   # cuts well through the 1.2mm +X wall
+
+    usb_main = body.newObject("PartDesign::SubtractiveBox", "USB_Main")
+    usb_main.Length = wall_depth
+    usb_main.Width = uw
+    usb_main.Height = Z - usb_z_bot - ur + 1.0   # top-open
+    usb_main.Placement = App.Placement(
+        V(W - wall_depth/2 - 0.5, uc_y - uw/2, usb_z_bot + ur), ROT0)
+    doc.recompute()
+
+    usb_bot = body.newObject("PartDesign::SubtractiveBox", "USB_BottomStrip")
+    usb_bot.Length = wall_depth
+    usb_bot.Width = uw - 2 * ur
+    usb_bot.Height = ur
+    usb_bot.Placement = App.Placement(
+        V(W - wall_depth/2 - 0.5, uc_y - (uw - 2*ur)/2, usb_z_bot), ROT0)
+    doc.recompute()
+
+    for side, y_off in [("L", uc_y - uw/2 + ur), ("R", uc_y + uw/2 - ur)]:
+        cyl = body.newObject("PartDesign::SubtractiveCylinder", f"USB_Arc_{side}")
+        cyl.Radius = ur
+        cyl.Height = wall_depth
+        cyl.Placement = App.Placement(
+            V(W - wall_depth/2 - 0.5, y_off, usb_z_bot + ur),
+            App.Rotation(V(0, 1, 0), 90))
+        doc.recompute()
+
+    # ── 9. Corner pillars (4) with extended wings ──
+    ps = 5.0
+    center_x, center_y = W/2, H/2
+    peg_positions = [
+        (5.0 + ps/2,        2.0 + ps/2),         # -X-Y
+        (W - 1.2 - ps/2,    2.0 + ps/2),         # +X-Y
+        (5.0 + ps/2,        H - 2.0 - ps/2),     # -X+Y
+        (W - 1.2 - ps/2,    H - 2.0 - ps/2),     # +X+Y
+    ]
+    ext_x, ext_y = 30.0, 0.0   # ext_y reduced to 0 (was 4.0) to shrink wing Y from 9→5mm 05-01-2026
+
+    for i, (px, py) in enumerate(peg_positions):
+        is_mx = px < center_x
+        is_my = py < center_y
+
+        # 5×5 pillar pad
+        pil = body.newObject("PartDesign::AdditiveBox", f"Pillar_{i+1}")
+        pil.Length = ps
+        pil.Width = ps
+        pil.Height = Z - floor_z
+        pil.Placement = App.Placement(V(px - ps/2, py - ps/2, floor_z), ROT0)
+        pil.setExpression("Length", SP("pillar"))
+        pil.setExpression("Width", SP("pillar"))
+        pil.setExpression("Height", SP("bp_h") + " - " + SP("bp_floor"))
+        doc.recompute()
+
+        # Extension wing
+        wx = (px - ps/2) if is_mx else (px - ps/2 - ext_x)
+        wy = (py - ps/2) if is_my else (py - ps/2 - ext_y)
+        wh = Z + (-1.5) - floor_z   # = 4.0
+        if wh > 0:
+            wing = body.newObject("PartDesign::AdditiveBox", f"PillarWing_{i+1}")
+            wing.Length = ps + ext_x
+            wing.Width = ps + ext_y
+            wing.Height = wh
+            wing.Placement = App.Placement(V(wx, wy, floor_z), ROT0)
+            wing.setExpression("Length", SP("pillar") + " + " + SP("ext_x"))
+            wing.setExpression("Width", SP("pillar") + " + " + SP("ext_y"))
+            wing.setExpression("Height", SP("bp_h") + " + " + SP("ext_z") + " - " + SP("bp_floor"))
+            doc.recompute()
+
+        # Peg cylinder
+        peg = body.newObject("PartDesign::AdditiveCylinder", f"Peg_{i+1}")
+        peg.Radius = 1.5
+        peg.Height = 5.0
+        peg.Placement = App.Placement(V(px, py, Z), ROT0)
+        peg.setExpression("Radius", SP("peg_d") + " / 2")
+        peg.setExpression("Height", SP("peg_h"))
+        doc.recompute()
+
+        # Peg tip chamfer
+        peg_top_z = Z + 5.0
+        ch_edges = edges_at_z(peg, peg_top_z)
+        if ch_edges:
+            cham = body.newObject("PartDesign::Chamfer", f"PegChamfer_{i+1}")
+            cham.Base = (peg, ch_edges[:1])
+            cham.Size = 0.4
+            cham.setExpression("Size", SP("peg_cham"))
+            doc.recompute()
+
+    # ── 10. Battery rail troughs (±Y) ──
+    bay_r = 11.1 / 2
+    bay_cz_glob = Z + 0.95   # 8.95
+    lift = 5.0
+
+    for idx, (bay_y, is_plus) in enumerate([(7.85, False), (38.15, True)]):
+        if is_plus:
+            fy0 = bay_y - bay_r - 0.1 + 6.0   # rail_dred (was 2.0; -4mm rail support Y)
+            fy1 = H - 2.0
+        else:
+            fy0 = 2.0
+            fy1 = bay_y + bay_r + 0.1 - 6.0   # rail_dred (was 2.0; -4mm rail support Y)
+
+        rz_bot = floor_z + lift    # 7.5
+        fz_top = Z - 2.5 + lift    # 10.5
+
+        # Support block below rail
+        sup = body.newObject("PartDesign::AdditiveBox", f"RailSupport_{idx+1}")
+        sup.Length = 41.0
+        sup.Width = fy1 - fy0
+        sup.Height = lift + 0.1
+        sup.Placement = App.Placement(V(34.0, fy0, floor_z), ROT0)
+        sup.setExpression("Length", SP("bay_xl"))
+        sup.setExpression("Height", SP("rail_lift") + " + 0.1")
+        doc.recompute()
+
+        # Rail body
+        rail = body.newObject("PartDesign::AdditiveBox", f"RailBody_{idx+1}")
+        rail.Length = 41.0
+        rail.Width = fy1 - fy0
+        rail.Height = fz_top - rz_bot + 0.1
+        rail.Placement = App.Placement(V(34.0, fy0, rz_bot), ROT0)
+        rail.setExpression("Length", SP("bay_xl"))
+        doc.recompute()
+
+        # Battery cylinder subtraction (axis along X)
+        cyl_cz = bay_cz_glob + lift   # 13.95
+        cyl = body.newObject("PartDesign::SubtractiveCylinder", f"BattCylCut_{idx+1}")
+        cyl.Radius = bay_r
+        cyl.Height = 41.2
+        cyl.Placement = App.Placement(
+            V(34.0 - 0.1, bay_y, cyl_cz),
+            App.Rotation(V(0, 1, 0), 90))
+        cyl.setExpression("Radius", SP("bay_d") + " / 2")
+        cyl.setExpression("Height", SP("bay_xl") + " + 0.2")
+        doc.recompute()
+
+    # ── 11. USB support blocks (2) ──
+    bx0 = W - 5.0 - 2 * 5.0
+    by0 = H/2 - 15.0/2
+    bz_h = usb_z_bot - floor_z   # height from floor to USB bottom (= 3.05 - 2.6 = 0.45)
+
+    for j, offset in enumerate([0, -(5.0 + 5.0)]):
+        blk = body.newObject("PartDesign::AdditiveBox", f"USBBlock_{j+1}")
+        blk.Length = 5.0
+        blk.Width = 15.0
+        blk.Height = max(0.1, bz_h)
+        blk.Placement = App.Placement(V(bx0 + offset, by0, floor_z), ROT0)
+        blk.setExpression("Length", SP("ublk_xs"))
+        blk.setExpression("Width", SP("ublk_yw"))
+        doc.recompute()
+
+    # (PicoRetentionBlock removed — overlapped with IMU pocket)
+
+    # ── 12. Piezo speaker ring REMOVED (using active buzzer instead) ──
+
+    # ── 14. MPU-6050 accelerometer pocket (centered between battery rails) ──
+    # GY-521 module: 21 × 16 × 1.0 mm PCB + ~2.3 mm components on top.
+    # Centered on the base plate (enc_x/2, enc_y/2).
+    # Retaining wall around a recessed pocket (module drops in flush).
+    imu_xl = 21.0    # GY-521 PCB X length
+    imu_yw = 16.0    # GY-521 PCB Y width
+    imu_pcb_t = 1.0  # PCB thickness
+    imu_slop = 0.2   # clearance per side
+    imu_wall = 1.0   # retaining wall thickness
+    imu_wall_h = 1.5 # wall height above pocket floor
+
+    # Center: middle of the base plate
+    imu_cx = W / 2   # 48.45
+    imu_cy = H / 2   # 23.0
+
+    # Pocket dimensions (inner cavity)
+    ipx = imu_xl + 2 * imu_slop    # 21.4
+    ipy = imu_yw + 2 * imu_slop    # 16.4
+    # Outer wall dimensions
+    opx = ipx + 2 * imu_wall       # 23.4
+    opy = ipy + 2 * imu_wall       # 18.4
+
+    # Outer retaining wall
+    imu_wall_box = body.newObject("PartDesign::AdditiveBox", "IMU_Wall")
+    imu_wall_box.Length = opx
+    imu_wall_box.Width = opy
+    imu_wall_box.Height = imu_wall_h
+    imu_wall_box.Placement = App.Placement(
+        V(imu_cx - opx / 2, imu_cy - opy / 2, floor_z), ROT0)
+    doc.recompute()
+
+    # Inner pocket (module drops in)
+    imu_pocket = body.newObject("PartDesign::SubtractiveBox", "IMU_Pocket")
+    imu_pocket.Length = ipx
+    imu_pocket.Width = ipy
+    imu_pocket.Height = imu_wall_h + 0.2
+    imu_pocket.Placement = App.Placement(
+        V(imu_cx - ipx / 2, imu_cy - ipy / 2, floor_z - 0.1), ROT0)
+    doc.recompute()
+
+    # ── 15. Solar wire holes REMOVED (no-solar variant) ──
+
+    # ── 16. USB reinforcement block ──
+    # Solid block under the USB-C cutout, from the base plate floor up to
+    # the bottom of the USB opening. Supports the USB-C port and prevents
+    # flex in the thinner (4mm) base plate wall.
+    usb_reinf_x = 5.0    # length along X (toward port)
+    usb_reinf_y = 10.0   # width along Y (centered on USB cutout)
+    usb_reinf_z = usb_z_bot - floor_z  # floor to USB bottom
+    if usb_reinf_z > 0.1:
+        reinf = body.newObject("PartDesign::AdditiveBox", "USB_Reinforcement")
+        reinf.Length = usb_reinf_x
+        reinf.Width = usb_reinf_y
+        reinf.Height = usb_reinf_z
+        reinf.Placement = App.Placement(
+            V(W - 1.2 - usb_reinf_x, H/2 - usb_reinf_y/2, floor_z), ROT0)
+        doc.recompute()
+
+    # ── 17. Buzzer sound hole (-X end, 2 mm through floor) ──
+    # The active buzzer lays flat on the pocket floor.  A small 2 mm hole
+    # dead-center lets sound exit through the base plate bottom.
+    # Global X = 100.7 - cradle_local_cx;  pushed as close to X=0 as
+    # possible (center at X=6.5 so the 12 mm body clears the outer wall).
+    buzz_hole_cx = 8.5
+    buzz_hole_cy = H / 2   # 23.0
+    buzz_hole_r = 1.0       # 2 mm diameter
+
+    port = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerSoundPort")
+    port.Radius = buzz_hole_r
+    port.Height = floor_z + 0.2
+    port.Placement = App.Placement(V(buzz_hole_cx, buzz_hole_cy, -0.1), ROT0)
+    port.setExpression("Radius", SP("buzz_port_d") + " / 2")
+    port.setExpression("Height", SP("bp_floor") + " + 0.2")
+    doc.recompute()
+
+    # ── 18. Buzzer nest indentation (-X wall) ──
+    # The 12 mm buzzer at X=6.5 extends past the pocket edge (X=3.1)
+    # into the -X wall.  Cut a circular indent so the buzzer nestles in.
+    buzz_nest_r = (12.0 + 0.2) / 2   # 6.1 — matches cradle bore
+    buzz_nest = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerNest")
+    buzz_nest.Radius = buzz_nest_r
+    buzz_nest.Height = Z - floor_z + 0.1   # pocket depth (3.5 mm)
+    buzz_nest.Placement = App.Placement(
+        V(buzz_hole_cx, buzz_hole_cy, floor_z - 0.05), ROT0)
+    buzz_nest.setExpression("Radius", "(" + SP("buzz_d") + " + 0.2) / 2")
+    buzz_nest.setExpression("Height", SP("bp_h") + " - " + SP("bp_floor") + " + 0.1")
+    doc.recompute()
+
+    feats = [o.Name for o in body.Group if "Origin" not in o.Name]
+    print(f"    BasePlate: {len(feats)} features")
+    return body
+
+
+# =====================================================================
+# AAA CRADLE  (preset: shortened + open clip window 04-27)
+# =====================================================================
+
+def build_cradle(doc):
+    print("  Building AAA Cradle...")
+    body = doc.addObject("PartDesign::Body", "AAACradle")
+
+    # Derived constants (matching SCAD exactly)
+    bay_d = 10.5 + 2 * 0.3            # 11.1
+    plug_thick = bay_d + 2 * 0.5      # 12.1
+    plug_top = 7.0
+    plug_bot = plug_top - plug_thick   # -5.1
+    plug_x0, plug_x1 = 3.3, 95.4
+    plug_y0, plug_y1 = 2.3, 43.7
+    bay_cz = (plug_top + plug_bot) / 2  # 0.95
+
+    # AAA bay X range — PRESET values
+    aaa_len = 41.5   # PRESET: shortened from 44.5; +2mm rail extension at X=64 slice (05-01-2026)
+    bay_len = aaa_len + 2*2.0 + 1.0   # = 46.5
+    px_pillar_cut_mx = 98.9 - 1.2 - 5.0 - 0.4   # 90.3 (enc_x +2mm)
+    bay_px_end = px_pillar_cut_mx - 3.0 - 20.0   # 67.3 (was 65.3 → +2mm in cradle local; -X global side stays put)
+    bay_mx_start = bay_px_end - bay_len           # 20.8 (unchanged: bay grows +2mm, anchored to -X global / +X cradle-local)
+
+    ps = 5.0
+    slop = 0.4
+
+    # ── 1. Main plug body (sketch + pad) ──
+    sk_plug, (c_ox, c_oy, c_pw, c_ph) = make_rect_sketch(
+        body, "Sk_CR_PlugBody", plug_bot,
+        plug_x0, plug_y0, plug_x1, plug_y1)
+    doc.recompute()
+
+    pad = body.newObject("PartDesign::Pad", "Pad_PlugBody")
+    pad.Profile = sk_plug
+    pad.Length = plug_thick
+    doc.recompute()
+
+    # ── 2. Corner pillar cutouts (4) ──
+    cs = ps + 2 * slop
+    pillar_origins = [
+        (3.0, 2.0), (90.7, 2.0),
+        (3.0, 46.0 - 2.0 - ps), (90.7, 46.0 - 2.0 - ps),
+    ]
+    for i, (ox, oy) in enumerate(pillar_origins):
+        cut = body.newObject("PartDesign::SubtractiveBox", f"PillarCut_{i+1}")
+        cut.Length = cs
+        cut.Width = cs
+        cut.Height = plug_thick + 0.4
+        cut.Placement = App.Placement(V(ox - slop, oy - slop, plug_bot - 0.1), ROT0)
+        doc.recompute()
+
+    # ── 3. FPC gap ──
+    fpc = body.newObject("PartDesign::SubtractiveBox", "FPC_Gap")
+    fpc.Length = 3.1
+    fpc.Width = plug_y1 - plug_y0 + 0.2
+    fpc.Height = plug_thick + 0.2
+    fpc.Placement = App.Placement(V(plug_x0 - 0.1, plug_y0 - 0.1, plug_bot - 0.1), ROT0)
+    fpc.setExpression("Length", SP("fpc_gap") + " + 0.1")
+    doc.recompute()
+
+    # ── 4. AAA bays (2 × cylinder + top-open slot) ──
+    for j, bay_y in enumerate([7.85, 38.15]):
+        cyl = body.newObject("PartDesign::SubtractiveCylinder", f"AAABay_{j+1}")
+        cyl.Radius = bay_d / 2
+        cyl.Height = bay_len + 0.2
+        cyl.Placement = App.Placement(
+            V(bay_mx_start - 0.1, bay_y, bay_cz),
+            App.Rotation(V(0, 1, 0), 90))
+        cyl.setExpression("Radius",
+            "(" + SP("aaa_d") + " + 2 * " + SP("aaa_rslop") + ") / 2")
+        doc.recompute()
+
+        slot = body.newObject("PartDesign::SubtractiveBox", f"BayTopOpen_{j+1}")
+        slot.Length = bay_len + 0.2
+        slot.Width = bay_d
+        slot.Height = plug_top + 0.1 - bay_cz
+        slot.Placement = App.Placement(
+            V(bay_mx_start - 0.1, bay_y - bay_d/2, bay_cz), ROT0)
+        doc.recompute()
+
+    # ── 5. Pico nest ──
+    pico_ny = 21.0 + 2 * 0.4   # 21.8
+    pico_nx = 80.0 + 2 * 0.4 + 0.4   # 81.2 (+2mm Pico nest at X=64 slice 05-01-2026; was 79.2)
+    pico_y_start = 46.0 / 2 - pico_ny / 2
+    pico_x_start = max(plug_x0 + 3.0,
+        ((plug_x0 + 3.0 + bay_mx_start) / 2 - pico_nx / 2))
+
+    nest = body.newObject("PartDesign::SubtractiveBox", "PicoNest")
+    nest.Length = pico_nx
+    nest.Width = pico_ny
+    nest.Height = plug_thick + 0.2
+    nest.Placement = App.Placement(V(pico_x_start, pico_y_start, plug_bot - 0.1), ROT0)
+    doc.recompute()
+
+    # ── 6. -X inset ──
+    inset = body.newObject("PartDesign::SubtractiveBox", "MinusX_Inset")
+    inset.Length = 29.0
+    inset.Width = pico_ny
+    inset.Height = plug_thick + 0.2
+    inset.Placement = App.Placement(V(plug_x0, pico_y_start, plug_bot - 0.1), ROT0)
+    inset.setExpression("Length", SP("conn_xl"))
+    doc.recompute()
+
+    # ── 7. +X display connector cutout ──
+    disp_cut = body.newObject("PartDesign::SubtractiveBox", "DispConnCutout")
+    disp_cut.Length = plug_x1 - bay_px_end + 0.1
+    disp_cut.Width = pico_ny
+    disp_cut.Height = 3.1
+    disp_cut.Placement = App.Placement(V(bay_px_end, pico_y_start, plug_bot - 0.1), ROT0)
+    disp_cut.setExpression("Height", SP("disp_cz") + " + 0.1")
+    doc.recompute()
+
+    # ── 8. Connecting block (additive, re-fills -X inset area) ──
+    conn = body.newObject("PartDesign::AdditiveBox", "ConnBlock")
+    conn.Length = 29.0
+    conn.Width = pico_ny
+    conn.Height = plug_thick
+    conn.Placement = App.Placement(V(plug_x0, pico_y_start, plug_bot), ROT0)
+    conn.setExpression("Length", SP("conn_xl"))
+    doc.recompute()
+
+    # Battery arcs through connecting block
+    # Terminated at local X=16 (global X≈80.3) so the arc doesn't extend
+    # into the joystick PCB compartment on the right side of the cradle.
+    # Stop before the clip slot area on +X side.
+    arc_x_start = 16.0                              # shortened — was 10.0; avoids joystick area
+    arc_x_end = bay_mx_start - 0.9 - 1.0 - 0.1     # = 18.4 (before clip area)
+    arc_len = arc_x_end - arc_x_start               # = 2.4
+    for j, bay_y in enumerate([7.85, 38.15]):
+        arc = body.newObject("PartDesign::SubtractiveCylinder", f"ConnBlockArc_{j+1}")
+        arc.Radius = bay_d / 2
+        arc.Height = arc_len
+        arc.Placement = App.Placement(
+            V(arc_x_start, bay_y, bay_cz),
+            App.Rotation(V(0, 1, 0), 90))
+        doc.recompute()
+
+    # TP4056 indent on connecting block top
+    tp_len = 28.0 + 2 * 0.2   # 28.4
+    tp_wid = 17.0 + 2 * 0.3   # 17.6
+    tp_y = (pico_y_start + pico_y_start + pico_ny) / 2 - tp_wid / 2
+    tp_indent = body.newObject("PartDesign::SubtractiveBox", "TP4056_Indent")
+    tp_indent.Length = tp_len
+    tp_indent.Width = tp_wid
+    tp_indent.Height = 1.1
+    tp_indent.Placement = App.Placement(V(plug_x0, tp_y, plug_top - 1.0), ROT0)
+    tp_indent.setExpression("Height", SP("tp_iz") + " + 0.1")
+    doc.recompute()
+
+    # ── 9. Battery clip slots (4) + retainer windows ──
+    clip_slot_y = 7.0 + 2 * 0.2   # 7.4
+    clip_slot_x = 0.5 + 2 * 0.2   # 0.9
+    ret_thick = 1.0
+    win_sz = 5.0
+    win_z_ext = 4.0   # PRESET: opened batt clip window at top
+
+    for j, bay_y in enumerate([7.85, 38.15]):
+        for bay_x, is_plus in [(bay_mx_start, False), (bay_px_end, True)]:
+            sx = (bay_x + ret_thick if is_plus
+                  else bay_x - clip_slot_x - ret_thick)
+            sy = bay_y - clip_slot_y / 2
+            sz_bot = bay_cz - 7.0/2 - 0.2   # -2.75
+
+            tag = f"_{j+1}{'P' if is_plus else 'M'}"
+            slot = body.newObject("PartDesign::SubtractiveBox", f"ClipSlot{tag}")
+            slot.Length = clip_slot_x
+            slot.Width = clip_slot_y
+            slot.Height = plug_top + 0.1 - sz_bot
+            slot.Placement = App.Placement(V(sx, sy, sz_bot), ROT0)
+            doc.recompute()
+
+            # Retainer window
+            wx = (bay_x - 0.1 if is_plus
+                  else bay_x - ret_thick - 0.1)
+            wy = bay_y - win_sz / 2
+            wz = bay_cz - win_sz / 2
+            wh = win_sz + win_z_ext   # 9.0 total (5 + 4 extend up)
+
+            win = body.newObject("PartDesign::SubtractiveBox", f"ClipWindow{tag}")
+            win.Length = ret_thick + 0.2
+            win.Width = win_sz
+            win.Height = wh
+            win.Placement = App.Placement(V(wx, wy, wz), ROT0)
+            win.setExpression("Width", SP("clip_win"))
+            win.setExpression("Height", SP("clip_win") + " + " + SP("clip_wze"))
+            doc.recompute()
+
+    # ── 10. Joystick PCB pit (cradle local) ─────────────────────────────
+    # The K1-1506SN-01 body is 10 mm tall — too tall to fit between the cover
+    # face plate (Z=18 global) and outer top (Z=23 global). To slot the body
+    # into the cover, the PCB drops below the cradle's mating face into a
+    # pit cut into the cradle plug. After the cradle's 180° Y flip:
+    #   - cradle plug_bot (local Z=-5.1) → global Z=18.1 (cradle's bottom)
+    #   - cradle plug_top (local Z=+7.0)  → global Z=6.0  (mating face)
+    # Pit opens DOWN globally (= UP in local). Depth = joy_pit_depth.
+    # XY centered at (joy_cx, enc_y/2 + joy_pcb_y_offset).
+    # 20×20 mm footprint — snug fit for 19.6 mm board (0.2 mm/side).
+    joy_pit_depth_v = 8.45
+    joy_pit_size = 20.0   # board 19.6 + 0.2 mm/side clearance (no well)
+    joy_cx_v = 81.35   # +2mm with enc_x extension (05-01-2026)
+    joy_pit_cy_local = 46.0 / 2           # enc_y/2 — centered on board bbox
+    joy_pit_cx_local = 100.7 - joy_cx_v   # global → local X (cradle translate now 100.7)
+    pit = body.newObject("PartDesign::SubtractiveBox", "JoystickPCBPit")
+    pit.Length = joy_pit_size
+    pit.Width = joy_pit_size
+    pit.Height = joy_pit_depth_v + 0.1
+    pit.Placement = App.Placement(
+        V(joy_pit_cx_local - joy_pit_size / 2,
+          joy_pit_cy_local - joy_pit_size / 2,
+          plug_bot - 0.05), ROT0)
+    pit.setExpression("Length", SP("joy_pit_xy"))
+    pit.setExpression("Width", SP("joy_pit_xy"))
+    pit.setExpression("Height", SP("joy_pit_depth") + " + 0.1")
+    doc.recompute()
+
+    # ── 11. Fill pit wall gap at FPC_Gap / ConnBlock boundary ──
+    # FPC_Gap removes material across the full Y width at X=3.2..6.3.
+    # ConnBlock only refills Y=12.1..33.9.  With the pit now 20 mm
+    # (down from 23), the pit +Y edge may sit inside the ConnBlock,
+    # making the +Y fill unnecessary.  Guard all fills with size checks.
+    fill_x0 = plug_x0                                       # 3.3 (flush with plug body)
+    fill_x1 = joy_pit_cx_local - joy_pit_size / 2           # pit -X edge
+    pit_top_z = plug_bot + joy_pit_depth_v + 0.05
+    ceil_x1 = plug_x0 + 3.0                                  # 6.3 (FPC gap +X edge)
+
+    # +Y fill: only needed if pit +Y edge extends past ConnBlock +Y
+    fill_y0 = pico_y_start + pico_ny                        # 33.9
+    fill_y1 = joy_pit_cy_local + joy_pit_size / 2           # pit +Y edge
+    if fill_y1 > fill_y0 and fill_x1 > fill_x0:
+        fill_py = body.newObject("PartDesign::AdditiveBox", "PitWallFill_PY")
+        fill_py.Length = fill_x1 - fill_x0
+        fill_py.Width = fill_y1 - fill_y0
+        fill_py.Height = plug_thick
+        fill_py.Placement = App.Placement(V(fill_x0, fill_y0, plug_bot), ROT0)
+        doc.recompute()
+
+        # Ceiling cap above pit
+        ceil_x0 = fill_x1
+        if ceil_x1 > ceil_x0:
+            fill_ceil = body.newObject("PartDesign::AdditiveBox", "PitWallFill_PY_Ceil")
+            fill_ceil.Length = ceil_x1 - ceil_x0
+            fill_ceil.Width = fill_y1 - fill_y0
+            fill_ceil.Height = plug_top - pit_top_z
+            fill_ceil.Placement = App.Placement(
+                V(ceil_x0, fill_y0, pit_top_z), ROT0)
+            doc.recompute()
+
+        # +Y closing wall
+        wall_depth = 0.2
+        fill_wall = body.newObject("PartDesign::AdditiveBox", "PitWallFill_PY_Wall")
+        fill_wall.Length = ceil_x1 - fill_x0
+        fill_wall.Width = wall_depth
+        fill_wall.Height = plug_thick
+        fill_wall.Placement = App.Placement(
+            V(fill_x0, fill_y1, plug_bot), ROT0)
+        doc.recompute()
+
+    # -Y fill: only needed if pit -Y edge extends past ConnBlock -Y
+    fill_y0_m = joy_pit_cy_local - joy_pit_size / 2
+    fill_y1_m = pico_y_start                                # 12.1
+    if fill_y0_m > fill_y1_m and fill_x1 > fill_x0:
+        fill_my = body.newObject("PartDesign::AdditiveBox", "PitWallFill_MY")
+        fill_my.Length = fill_x1 - fill_x0
+        fill_my.Width = fill_y0_m - fill_y1_m
+        fill_my.Height = plug_thick
+        fill_my.Placement = App.Placement(
+            V(fill_x0, fill_y1_m, plug_bot), ROT0)
+        doc.recompute()
+
+        ceil_x0 = fill_x1
+        if ceil_x1 > ceil_x0:
+            fill_ceil_m = body.newObject("PartDesign::AdditiveBox", "PitWallFill_MY_Ceil")
+            fill_ceil_m.Length = ceil_x1 - ceil_x0
+            fill_ceil_m.Width = fill_y0_m - fill_y1_m
+            fill_ceil_m.Height = plug_top - pit_top_z
+            fill_ceil_m.Placement = App.Placement(
+                V(ceil_x0, fill_y1_m, pit_top_z), ROT0)
+            doc.recompute()
+
+    # ── 12. Battery bay re-cuts through ConnBlock ──
+    # The ConnBlock (X=3.3..32.3, added after AAABay/BayTopOpen) covers
+    # up the battery bay profile from X=20.3..32.3.  Re-cut both bays
+    # from the clip holder area (X=18.4) to just past the ConnBlock +X
+    # edge so the pockets stay open.  The sealed -X wall (X=3.3..16)
+    # is preserved for printability.
+    conn_x1 = plug_x0 + 29.0 + 0.2                          # 32.5
+    bay_recut_x0 = bay_mx_start                                # 20.4 (past clip retainer)
+    bay_recut_len = conn_x1 - bay_recut_x0                    # 14.1
+
+    for j, by in enumerate([7.85, 38.15]):
+        # Cylinder — bay profile
+        arc = body.newObject("PartDesign::SubtractiveCylinder",
+                             f"ConnBlockBayCut_{j+1}")
+        arc.Radius = bay_d / 2
+        arc.Height = bay_recut_len
+        arc.Placement = App.Placement(
+            V(bay_recut_x0, by, bay_cz),
+            App.Rotation(V(0, 1, 0), 90))
+        arc.setExpression("Radius",
+            "(" + SP("aaa_d") + " + 2 * " + SP("aaa_rslop") + ") / 2")
+        doc.recompute()
+
+        # Top-open slot — opens bay above cylinder center
+        slot = body.newObject("PartDesign::SubtractiveBox",
+                              f"ConnBlockBayOpen_{j+1}")
+        slot.Length = bay_recut_len
+        slot.Width = bay_d
+        slot.Height = plug_top + 0.1 - bay_cz
+        slot.Placement = App.Placement(
+            V(bay_recut_x0, by - bay_d / 2, bay_cz), ROT0)
+        doc.recompute()
+
+    # ── 13. Active buzzer pocket (+X local = -X global = display side) ──
+    # The buzzer sits on the base plate floor and sticks up through the
+    # mating face into this pocket.  The pocket is open at the mating
+    # face (plug_top) and its ceiling reaches just below the display
+    # cable cutout (DispConnCutout ends at local Z = -2.1).  No shelf,
+    # no through-hole — just a circular bore in the existing solid plug.
+    buzz_d_v = 12.0
+    buzz_bore_r = (buzz_d_v + 0.2) / 2    # 6.1
+
+    # Center in cradle local — global X = 6.5 → local = 100.7 - 6.5 = 92.2
+    buzz_cx_local = 92.2
+    buzz_cy_local = 46.0 / 2               # 23.0
+
+    # Pocket: open at the mating face (plug_top = 7.0), ceiling at
+    # the buzzer top so solid material bridges across both sides of the
+    # cradle right at the speaker top.
+    # Buzzer top in cradle local Z = 11.0 - (0.6 + 9.5) = 0.9.
+    # Pocket depth = 7.0 - 0.9 = 6.1 mm (exactly the buzzer height
+    # above the mating face).
+    pocket_ceil_z = 0.9    # buzzer top level
+    pocket_h = plug_top - pocket_ceil_z + 0.1   # 6.2
+
+    pocket = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerPocket")
+    pocket.Radius = buzz_bore_r
+    pocket.Height = pocket_h
+    pocket.Placement = App.Placement(
+        V(buzz_cx_local, buzz_cy_local, pocket_ceil_z - 0.05), ROT0)
+    pocket.setExpression("Radius", "(" + SP("buzz_d") + " + 0.2) / 2")
+    doc.recompute()
+
+    feats = [o.Name for o in body.Group if "Origin" not in o.Name]
+    print(f"    AAACradle: {len(feats)} features")
+    return body
+
+
+# =====================================================================
+# TOP COVER  (preset: 4-26-final-face-for-now)
+# =====================================================================
+
+def build_top_cover(doc):
+    print("  Building Top Cover...")
+    body = doc.addObject("PartDesign::Body", "TopCover")
+
+    enc_x, enc_y = 98.9, 46.0
+    wall_mx, wall_px, wall_y = 5.0, 1.2, 2.0
+    ps = 5.0
+    face_bot = 7.0
+    fp_z = 1.0          # PRESET: 4-26-final (was 0.7)
+    face_top = face_bot + fp_z   # 8.0
+    bull_r = 4.0
+    edge_r = 2.2        # PRESET: 4-26-final (was 4.0)
+    total_h = face_top + bull_r   # 12.0
+    ext = 5.0
+
+    # ── 1. Outer shell (sketch + pad) ──
+    # Manual sketch — avoids over-constraining when pinned to origin
+    sk = body.newObject("Sketcher::SketchObject", "Sk_TC_Outline")
+    sk.AttachmentSupport = [(body.Origin.OriginFeatures[3], "")]
+    sk.MapMode = "FlatFace"
+    sk.AttachmentOffset = App.Placement(V(0, 0, -ext), ROT0)
+    sk.addGeometry(Part.LineSegment(V(0, 0, 0), V(enc_x, 0, 0)), False)
+    sk.addGeometry(Part.LineSegment(V(enc_x, 0, 0), V(enc_x, enc_y, 0)), False)
+    sk.addGeometry(Part.LineSegment(V(enc_x, enc_y, 0), V(0, enc_y, 0)), False)
+    sk.addGeometry(Part.LineSegment(V(0, enc_y, 0), V(0, 0, 0)), False)
+    sk.addConstraint(Sketcher.Constraint("Coincident", 0, 2, 1, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 1, 2, 2, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 2, 2, 3, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 3, 2, 0, 1))
+    sk.addConstraint(Sketcher.Constraint("Horizontal", 0))
+    sk.addConstraint(Sketcher.Constraint("Horizontal", 2))
+    sk.addConstraint(Sketcher.Constraint("Vertical", 1))
+    sk.addConstraint(Sketcher.Constraint("Vertical", 3))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 0, 1, -1, 1))  # pin to origin
+    c_w = sk.addConstraint(Sketcher.Constraint("DistanceX", 0, 1, 0, 2, enc_x))
+    c_h = sk.addConstraint(Sketcher.Constraint("DistanceY", 1, 1, 1, 2, enc_y))
+    sk.setExpression(f"Constraints[{c_w}]", SP("enc_x"))
+    sk.setExpression(f"Constraints[{c_h}]", SP("enc_y"))
+    doc.recompute()
+
+    pad = body.newObject("PartDesign::Pad", "Pad_Shell")
+    pad.Profile = sk
+    pad.Length = total_h + ext   # 17
+    pad.setExpression("Length",
+        SP("disp_z") + " + " + SP("tc_fp_z") + " + " +
+        SP("tc_bull") + " + " + SP("tc_wext"))
+    doc.recompute()
+
+    # ── 2. Fillet vertical edges (corner rounding) ──
+    vert = find_edges(pad, "vertical")
+    if vert:
+        fil = body.newObject("PartDesign::Fillet", "Fillet_Corners")
+        fil.Base = (pad, vert)
+        fil.Radius = 4.0
+        fil.setExpression("Radius", SP("corner_r"))
+        doc.recompute()
+
+    # ── 3. Fillet top edges (bullnose) ──
+    # Find edges on the top face (Z = total_h) for rounding
+    tip = body.Tip
+    top_edges = []
+    for i, e in enumerate(tip.Shape.Edges):
+        verts = e.Vertexes
+        if len(verts) == 2:
+            p1, p2 = verts[0].Point, verts[1].Point
+            mid_z = (p1.z + p2.z) / 2
+            # Only pick edges that are EXACTLY at the top (not mid-height)
+            if abs(p1.z - p2.z) < 0.01 and abs(mid_z - total_h) < 0.05:
+                top_edges.append(f"Edge{i + 1}")
+    if top_edges:
+        fil_top = body.newObject("PartDesign::Fillet", "Fillet_Bullnose")
+        fil_top.Base = (tip, top_edges)
+        fil_top.Radius = edge_r   # 2.2 — controls how flat the face is
+        fil_top.setExpression("Radius", SP("tc_edge_r"))
+        doc.recompute()
+
+    # ── 4. Interior cavity ──
+    cav_x0, cav_x1 = wall_mx, enc_x - wall_px
+    cav_y0, cav_y1 = wall_y, enc_y - wall_y
+    cav_h = face_bot + ext   # 12
+
+    cav = body.newObject("PartDesign::SubtractiveBox", "Cut_Cavity")
+    cav.Length = cav_x1 - cav_x0
+    cav.Width = cav_y1 - cav_y0
+    cav.Height = cav_h + 0.1
+    cav.Placement = App.Placement(V(cav_x0, cav_y0, -ext - 0.05), ROT0)
+    cav.setExpression("Length",
+        SP("enc_x") + " - " + SP("wall_mx") + " - " + SP("wall_px"))
+    cav.setExpression("Width", SP("enc_y") + " - 2 * " + SP("wall_y"))
+    cav.setExpression("Height", SP("disp_z") + " + " + SP("tc_wext") + " + 0.1")
+    doc.recompute()
+
+    # ── 5. Corner pillars (4, fill cavity corners) ──
+    pillar_origins = [
+        (wall_mx, wall_y),
+        (enc_x - wall_px - ps, wall_y),
+        (wall_mx, enc_y - wall_y - ps),
+        (enc_x - wall_px - ps, enc_y - wall_y - ps),
+    ]
+    pil_h = face_top + ext   # 13 (from -5 to 8)
+    for i, (ox, oy) in enumerate(pillar_origins):
+        pil = body.newObject("PartDesign::AdditiveBox", f"CoverPillar_{i+1}")
+        pil.Length = ps
+        pil.Width = ps
+        pil.Height = pil_h
+        pil.Placement = App.Placement(V(ox, oy, -ext), ROT0)
+        pil.setExpression("Length", SP("pillar"))
+        pil.setExpression("Width", SP("pillar"))
+        pil.setExpression("Height",
+            SP("disp_z") + " + " + SP("tc_fp_z") + " + " + SP("tc_wext"))
+        doc.recompute()
+
+    # ── 6. M3 screw bores (4 through pillars) ──
+    peg_pos = [
+        (wall_mx + ps/2, wall_y + ps/2),
+        (enc_x - wall_px - ps/2, wall_y + ps/2),
+        (wall_mx + ps/2, enc_y - wall_y - ps/2),
+        (enc_x - wall_px - ps/2, enc_y - wall_y - ps/2),
+    ]
+    for i, (px, py) in enumerate(peg_pos):
+        bore = body.newObject("PartDesign::SubtractiveCylinder", f"M3Bore_{i+1}")
+        bore.Radius = 3.2 / 2
+        bore.Height = face_bot + ext + 0.2
+        bore.Placement = App.Placement(V(px, py, -ext - 0.1), ROT0)
+        bore.setExpression("Radius", SP("m3_d") + " / 2")
+        doc.recompute()
+
+    # ── 7. Screen inlay pocket ──
+    disp_x0 = wall_mx + 0.4   # 3.4
+    disp_x1 = disp_x0 + 65.2  # 68.6
+    disp_y0 = enc_y/2 - 30.0/2  # 8.0
+    disp_y1 = disp_y0 + 30.0    # 38.0
+    inlay_x0 = disp_x0 - 0.3    # 3.1
+    inlay_x1 = disp_x1 + 0.3    # 68.7
+    inlay_y0 = disp_y0 - 0.35   # 7.65
+    inlay_y1 = disp_y1 + 0.35   # 38.35
+    inlay_depth = 3.0
+    # Inlay cuts UPWARD into face plate: Z = face_bot to face_bot + inlay_depth
+    # (SCAD: screen_inlay_bottom_z = face_plate_bottom = 7, top = 7 + 3 = 10)
+    inlay = body.newObject("PartDesign::SubtractiveBox", "Cut_ScreenInlay")
+    inlay.Length = inlay_x1 - inlay_x0
+    inlay.Width = inlay_y1 - inlay_y0
+    inlay.Height = inlay_depth + 0.1
+    inlay.Placement = App.Placement(V(inlay_x0, inlay_y0, face_bot - 0.05), ROT0)
+    inlay.setExpression("Height", SP("inlay_z") + " + 0.1")
+    doc.recompute()
+
+    # ── 8. FPC ribbon divet ──
+    # SCAD: Z = face_bot - fpc_extend (5) to face_bot + inlay_depth (10)
+    # Cuts through -X wall below face plate + into face plate above
+    fpc_x0 = 1.0
+    fpc_x1 = inlay_x0             # 3.1
+    fpc_y0 = enc_y/2 - 13.0/2    # 16.5
+    fpc_y1 = fpc_y0 + 13.0       # 29.5
+    fpc_z_extend = 2.0            # extends 2mm below face_bot into wall
+    fpc_z_bot = face_bot - fpc_z_extend   # 5.0
+    fpc_total_h = inlay_depth + fpc_z_extend  # 5.0 (Z=5 to Z=10)
+
+    fpc_cut = body.newObject("PartDesign::SubtractiveBox", "Cut_FPCDivet")
+    fpc_cut.Length = fpc_x1 - fpc_x0
+    fpc_cut.Width = fpc_y1 - fpc_y0
+    fpc_cut.Height = fpc_total_h + 0.1
+    fpc_cut.Placement = App.Placement(V(fpc_x0, fpc_y0, fpc_z_bot), ROT0)
+    fpc_cut.setExpression("Width", SP("fpc_dy"))
+    fpc_cut.setExpression("Height", SP("inlay_z") + " + " + SP("fpc_dze") + " + 0.1")
+    doc.recompute()
+
+    # ── 9. Display viewing window (through face plate + dome) ──
+    # Literal width/height must match the spreadsheet defaults (win_xl, win_yd)
+    # so the placement-based centering grows symmetrically when the window is
+    # resized. Using a stale literal here makes the cut shift toward one edge.
+    win_w = 50.0
+    win_h = 25.0
+    # Align Y center of the window with the joystick's Y center. Joystick is
+    # offset by joy_pcb_y_offset so SW1 lands centered on the through-hole;
+    # window follows so both stay on the same Y centerline.
+    joy_pcb_y_offset_v = 0.67
+    joy_cy_v = 46.0 / 2 + joy_pcb_y_offset_v
+    win_x0 = disp_x0 + (65.2 - win_w)/2 + 2.8
+    win_y0 = joy_cy_v - win_h / 2
+
+    win_z_height = total_h - face_bot + 0.2  # through face plate + dome
+    win = body.newObject("PartDesign::SubtractiveBox", "Cut_Window")
+    win.Length = win_w
+    win.Width = win_h
+    win.Height = win_z_height
+    win.Placement = App.Placement(V(win_x0, win_y0, face_bot - 0.1), ROT0)
+    win.setExpression("Length", SP("win_xl"))
+    win.setExpression("Width", SP("win_yd"))
+    doc.recompute()
+
+    # ── 10. Joystick body cutout (SQUARE — K1-1506SN-01 body is 10.2×10.2,
+    #       its corners reach r=7.2 mm from center which falls OUTSIDE a
+    #       12 mm round hole. The PCB is final/production so we cannot
+    #       relocate SW1; instead the cover gets a square cutout sized to
+    #       the body + joy_body_size clearance, shifted by joy_pcb_y_offset
+    #       so SW1's stick lands on the through-axis.) ──
+    joy_pcb_y_offset_v = 0.67
+    joy_cx = 81.35   # +2mm with enc_x extension (05-01-2026)
+    joy_cy = enc_y / 2 + joy_pcb_y_offset_v
+    joy_body_size_v = 10.6
+    joy_cut_h = total_h - face_bot + 0.2
+
+    # Round through-hole for the actuator stick (12 mm dia), kept from
+    # original design.
+    joy = body.newObject("PartDesign::SubtractiveCylinder", "Cut_Joystick")
+    joy.Radius = 12.0 / 2
+    joy.Height = joy_cut_h
+    joy.Placement = App.Placement(V(joy_cx, joy_cy, face_bot - 0.1), ROT0)
+    joy.setExpression("Radius", SP("joy_d") + " / 2")
+    doc.recompute()
+
+    # (Cut_JoyBody removed — the 14×14 mm pcbjoystick anchor pad now
+    #  provides the square body clearance instead of a separate subtractive
+    #  cutout; the 12 mm round Cut_Joystick remains for the actuator hole.)
+
+    # (JoyWell_Outer / JoyWell_Inner / Cut_JoyPCBPocket removed — the
+    #  anchor pad now locates the switch body, and the tightened cradle pit
+    #  (20 mm) holds the 19.6 mm PCB directly with 0.2 mm/side clearance.)
+
+    # ── 12. Joystick PCB anchor pad ──
+    # 14×14 mm outer frame with 12×12 mm square inner hole, centered on
+    # the joystick axis.  Extends from face_bot down to the PCB top face
+    # (6.85 mm) — acts as a locating collar for the K1-1506SN-01 switch
+    # body without intersecting the board.
+    anchor_outer = 14.0
+    anchor_inner = 12.0
+    # Anchor bottom meets the PCB top face:
+    #   pit floor global = 18.1 - 8.45 = 9.65
+    #   PCB thickness ≈ 1.5 mm → PCB top global = 11.15
+    #   cover local = global - 11.0 → PCB top local = 0.15
+    #   depth = face_bot - PCB top local = 7.0 - 0.15 = 6.85
+    anchor_depth = 6.85
+    anchor_r = 1.0
+
+    anc = body.newObject("PartDesign::AdditiveBox", "JoyAnchor_Outer")
+    anc.Length = anchor_outer
+    anc.Width = anchor_outer
+    anc.Height = anchor_depth
+    anc.Placement = App.Placement(
+        V(joy_cx - anchor_outer / 2,
+          joy_cy - anchor_outer / 2,
+          face_bot - anchor_depth), ROT0)
+    doc.recompute()
+
+    # Inner cutout — 12×12 mm square hole through the anchor
+    anc_in = body.newObject("PartDesign::SubtractiveBox", "JoyAnchor_Inner")
+    anc_in.Length = anchor_inner
+    anc_in.Width = anchor_inner
+    anc_in.Height = anchor_depth + 0.2
+    anc_in.Placement = App.Placement(
+        V(joy_cx - anchor_inner / 2,
+          joy_cy - anchor_inner / 2,
+          face_bot - anchor_depth - 0.1), ROT0)
+    doc.recompute()
+
+    # ── 13. Buzzer wall pocket (-X wall clearance) ──
+    # The buzzer bore extends past the cradle plug edge into the cover's
+    # -X wall.  Cut a cylindrical pocket so the buzzer body fits when the
+    # cradle is assembled inside the cover.
+    # Bore center global (6.5, 23.0), R = 6.3 (slight clearance).
+    buzz_pocket_cx = 8.5
+    buzz_pocket_cy = enc_y / 2   # 23.0
+    buzz_pocket_r = 6.3           # 12.6 mm — clears the 12.2 mm bore
+    # Z range: from the bottom of the cover wall to just above
+    # where the buzzer top would be (cover local).
+    # Buzzer top global Z = 10.1 → cover local = 10.1 - 9.0 = 1.1
+    # Cover wall bottom: local Z = -ext = -5.0
+    buzz_pocket_z_bot = -ext - 0.1   # -5.1
+    buzz_pocket_h = 1.2 - buzz_pocket_z_bot   # 6.3
+
+    bwp = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerWallPocket")
+    bwp.Radius = buzz_pocket_r
+    bwp.Height = buzz_pocket_h
+    bwp.Placement = App.Placement(
+        V(buzz_pocket_cx, buzz_pocket_cy, buzz_pocket_z_bot), ROT0)
+    doc.recompute()
+
+    feats = [o.Name for o in body.Group if "Origin" not in o.Name]
+    print(f"    TopCover: {len(feats)} features")
+    return body
+
+
+# =====================================================================
+# PICO 2 W BOARD (imported STEP + procedural 2×20 pin headers)
+# =====================================================================
+# Raspberry Pi only publishes the official STEP for the non-W Pico 2,
+# but the Pico 2 W is mechanically identical (same 51×21mm outline, same
+# USB-C and 40-pin layout — only the wireless module differs on top).
+# The official STEP omits headers, so we add them parametrically.
+# Source: https://datasheets.raspberrypi.com/pico/Pico-2-step.zip
+#
+# Orientation:
+#   True  → USB-C end at +X (mating with the +X-wall USB-C cutout)
+#   False → board flipped 180° about Z; USB-C end at -X, board's -X edge
+#           anchored to AAACradle Face44 (inner -X wall of PicoNest cavity)
+
+PICO_USB_PLUS_X = False
+# Anchor positions computed directly from cradle geometry so they don't
+# break when features are added/removed (face indices are fragile).
+# X-anchor: inner -X wall of PicoNest — cradle local X = pico_x_start +
+#   pico_nx = 6.3 + 79.2 = 85.5.  After 180° Y flip + translate(96.7):
+#   global X = 96.7 - 85.5 = 11.2.
+# Z-anchor: plug_top mating face — global Z = bp_top = 4.0 (no-solar).
+PICO_ANCHOR_X_GLOBAL = 13.2
+PICO_ANCHOR_Z_GLOBAL = 4.0   # no-solar: bp_top = 4.0
+
+
+def add_pico_with_headers(doc):
+    macro_dir = os.path.dirname(os.path.abspath(__file__))
+    step_path = os.path.normpath(os.path.join(
+        macro_dir, "..", "reference-boards",
+        "raspberry-pi-pico-2", "RaspberryPi-Pico-2.step"))
+
+    if not os.path.exists(step_path):
+        print(f"  ! Pico STEP not found: {step_path} — skipping import")
+        return None
+
+    print("  Importing Pico 2 W board + headers...")
+    shape = Part.Shape()
+    shape.read(step_path)
+
+    # ── Normalize orientation: shortest axis (board thickness) → +Z ──
+    # SolidWorks export uses Y-up for the board normal; map Y→Z so the
+    # board lies flat on the XY plane with components on +Z side.
+    bb0 = shape.BoundBox
+    dims = [bb0.XLength, bb0.YLength, bb0.ZLength]
+    short = dims.index(min(dims))
+    m = App.Matrix()
+    if short == 0:
+        m.rotateY(math.radians(90))
+    elif short == 1:
+        m.rotateX(math.radians(90))
+    shape = shape.transformGeometry(m)
+
+    # Ensure long board axis (51mm) lies along X — rotate 90° about Z if not.
+    bb_chk = shape.BoundBox
+    if bb_chk.YLength > bb_chk.XLength:
+        m_z = App.Matrix(); m_z.rotateZ(math.radians(90))
+        shape = shape.transformGeometry(m_z)
+
+    bb = shape.BoundBox
+    print(f"    Pico bbox after orient: "
+          f"{bb.XLength:.1f} × {bb.YLength:.1f} × {bb.ZLength:.1f}")
+
+    # ── Optional 180° Z reversal (USB-C end swap) ──
+    if not PICO_USB_PLUS_X:
+        m_zr = App.Matrix(); m_zr.rotateZ(math.radians(180))
+        shape = shape.transformGeometry(m_zr)
+        bb = shape.BoundBox
+
+    # ── Build 2×20 pin headers on the BOTTOM face of the board ──
+    # In the current (pre-Z-flip) frame, components are on +Z and the bare
+    # board bottom is at bb.ZMin. After the Z-flip below, the headers will
+    # end up on top (pins pointing +Z up into the cradle).
+    pcb_z_bot = bb.ZMin
+    pin_pitch = 2.54
+    pin_count = 20
+    row_inset = 1.0
+    pin1_inset = 1.61
+    pin_w = 0.64
+    pin_above = 8.6
+    shroud_h = 2.54
+
+    pieces = []
+    for row_y in (bb.YMin + row_inset, bb.YMax - row_inset):
+        strip_x0 = bb.XMin + pin1_inset - pin_pitch / 2
+        strip_len = pin_pitch * pin_count
+        # Plastic shroud below the board
+        pieces.append(Part.makeBox(
+            strip_len, pin_pitch, shroud_h,
+            V(strip_x0, row_y - pin_pitch / 2, pcb_z_bot - shroud_h)))
+        # Pins extending further below the shroud
+        for n in range(pin_count):
+            px = bb.XMin + pin1_inset + n * pin_pitch
+            pieces.append(Part.makeBox(
+                pin_w, pin_w, pin_above,
+                V(px - pin_w / 2, row_y - pin_w / 2,
+                  pcb_z_bot - shroud_h - pin_above)))
+    header_shape = Part.Compound(pieces)
+
+    # ── Z-flip: rotate 180° about world X axis (board upside down,
+    #    headers swing from below to above, pins point +Z) ──
+    m_flip_z = App.Matrix(); m_flip_z.rotateX(math.radians(180))
+    shape = shape.transformGeometry(m_flip_z)
+    header_shape = header_shape.transformGeometry(m_flip_z)
+
+    # ── Anchor combined assembly in global coords ──
+    enc_x_v, enc_y_v, wall_px_v = 98.9, 46.0, 1.2
+
+    bb_b = shape.BoundBox
+    bb_h = header_shape.BoundBox
+    cb_xmin = min(bb_b.XMin, bb_h.XMin)
+    cb_xmax = max(bb_b.XMax, bb_h.XMax)
+    cb_ymin = min(bb_b.YMin, bb_h.YMin)
+    cb_ymax = max(bb_b.YMax, bb_h.YMax)
+    cb_zmin = min(bb_b.ZMin, bb_h.ZMin)
+
+    def resolve_face_global(spec):
+        """Return the face's center point in global coords, or None."""
+        body_name, face_idx = spec
+        body = doc.getObject(body_name)
+        if body is None or len(body.Tip.Shape.Faces) < face_idx:
+            return None, None
+        f = body.Tip.Shape.Faces[face_idx - 1]
+        return body.Placement.multVec(f.CenterOfMass), f"{body_name}.Face{face_idx}"
+
+    if PICO_USB_PLUS_X:
+        target_x = enc_x_v - wall_px_v
+        dx = target_x - cb_xmax
+    else:
+        target_x = PICO_ANCHOR_X_GLOBAL
+        print(f"    X-anchored to PicoNest -X wall at global X={target_x:.2f}")
+        dx = target_x - cb_xmin
+
+    dy = enc_y_v / 2 - (cb_ymin + (cb_ymax - cb_ymin) / 2)
+
+    target_z = PICO_ANCHOR_Z_GLOBAL
+    print(f"    Z-anchored to plug_top mating face at global Z={target_z:.2f}")
+
+    # After the 180° X flip the board's back is at bb_b.ZMax and the
+    # component-side face (the planar PCB surface visible at Z=8.73 in the
+    # selection) sits one board thickness below. Land that plane on target_z.
+    PCB_THICKNESS = 1.0
+    pcb_plane_z = bb_b.ZMax - PCB_THICKNESS
+    dz = target_z - pcb_plane_z
+
+    m_pos = App.Matrix(); m_pos.move(V(dx, dy, dz))
+    shape = shape.transformGeometry(m_pos)
+    header_shape = header_shape.transformGeometry(m_pos)
+
+    pico = doc.addObject("Part::Feature", "Pico2W_Board")
+    pico.Shape = shape
+
+    headers = doc.addObject("Part::Feature", "Pico2W_Headers")
+    headers.Shape = header_shape
+
+    try:
+        headers.ViewObject.ShapeColor = (0.10, 0.10, 0.10)
+    except Exception:
+        pass
+
+    fb = shape.BoundBox
+    fh = header_shape.BoundBox
+    print(f"    Board placed: X=[{fb.XMin:.1f},{fb.XMax:.1f}]  "
+          f"Y=[{fb.YMin:.1f},{fb.YMax:.1f}]  Z=[{fb.ZMin:.2f},{fb.ZMax:.2f}]")
+    print(f"    Headers:      X=[{fh.XMin:.1f},{fh.XMax:.1f}]  "
+          f"Y=[{fh.YMin:.1f},{fh.YMax:.1f}]  Z=[{fh.ZMin:.2f},{fh.ZMax:.2f}]")
+    return pico, headers
+
+
+# =====================================================================
+# JOYSTICK PCB — KiCad-exported STEP for the 5-way switch breakout
+# =====================================================================
+# Hand-routed K1-1506SN-01 board from
+# hardware-design/joystick-pcb-by-hand/JoystickBoardDilder/. STEP exported
+# via `kicad-cli pcb export step` (board + tracks + pads + silkscreen).
+
+JOY_PCB_STEP_PATH = (
+    "PCB Designs/joystick-pcb-by-hand/JoystickBoardDilder/JoystickBoardDilder.step")
+
+
+def add_joystick_pcb(doc):
+    macro_dir = os.path.dirname(os.path.abspath(__file__))
+    step_path = os.path.normpath(os.path.join(
+        macro_dir, "..", JOY_PCB_STEP_PATH))
+
+    if not os.path.exists(step_path):
+        print(f"  ! Joystick PCB STEP not found: {step_path}")
+        return None
+
+    print("  Importing Joystick PCB (KiCad STEP)...")
+    shape = Part.Shape()
+    shape.read(step_path)
+
+    # Filter out SW1's small pin-lead solids (the 6 thin protrusions visible
+    # next to the switch body). Keep only solids whose volume exceeds a
+    # threshold large enough to drop pins but small enough to keep the
+    # switch body (10.2 × 10.2 × 10 mm = ~1040 mm³) and the PCB itself
+    # (~580 mm³ for a 19.6 × 19.6 × 1.5 mm board).
+    # Drop the SW1 pin-leads solid — KiCad's STEP export bundles all 6 pin
+    # leads as a single solid in the ~100-150 mm³ range. The PCB (~575 mm³),
+    # SW1 body (~470 mm³) and actuator stick (~14 mm³) are kept.
+    print(f"    Solid volumes: {[round(s.Volume, 1) for s in shape.Solids]}")
+    kept = []
+    for s in shape.Solids:
+        v = s.Volume
+        # Keep PCB + SW1 body + actuator stick (everything except the
+        # 100-150 mm³ pin-lead solid).
+        if 80.0 < v < 180.0:
+            continue
+        kept.append(s)
+    print(f"    Solids: kept {len(kept)} of {len(shape.Solids)} "
+          f"(dropped pin-lead solid in 80-180 mm³ band)")
+
+    shape = Part.Compound(kept)
+    bb = shape.BoundBox
+    print(f"    Joystick PCB raw bbox: "
+          f"{bb.XLength:.1f} × {bb.YLength:.1f} × {bb.ZLength:.1f}")
+
+    # PCB is production / final — anchor by PCB bbox center, not by SW1.
+    # KiCad's SW1 placement on the layout is intrinsic and not to be moved
+    # here. Instead, the COVER's joystick hole + pocket and the AAA cradle's
+    # JoystickPCBPit are shifted by `joy_pcb_y_offset` so they sit where SW1
+    # lands when the PCB is bbox-centered.
+    # PCB drops into the cradle pit so the SW1 body fits inside the cover.
+    # Pit floor in global Z = cradle plug_bot global (Z=18.1) - joy_pit_depth
+    # = 18.1 - 8.45 = 9.65. PCB bottom rests there (we use 9.55 with overlap).
+    joy_cx_g = 81.35   # +2mm with enc_x extension (05-01-2026)
+    joy_cy_g = 46.0 / 2           # = enc_y / 2 = 23.0 — PCB bbox-centered
+    # (was 46.0/2 + 0.67 which double-applied the SW1 offset; the cover
+    #  hole / pocket / pit already shift by joy_pcb_y_offset to land on
+    #  SW1's stick, so the PCB itself should sit at the true bbox center.)
+    pocket_floor_g = 18.1 - 8.45  # = 9.65 — PCB bottom rests on pit floor
+
+    bb_cx = (bb.XMin + bb.XMax) / 2
+    bb_cy = (bb.YMin + bb.YMax) / 2
+    dx = joy_cx_g - bb_cx
+    dy = joy_cy_g - bb_cy
+    dz = pocket_floor_g - bb.ZMin
+
+    m = App.Matrix(); m.move(V(dx, dy, dz))
+    shape = shape.transformGeometry(m)
+
+    obj = doc.addObject("Part::Feature", "JoystickPCB")
+    obj.Shape = shape
+
+    fb = shape.BoundBox
+    print(f"    Joystick PCB placed: X=[{fb.XMin:.1f},{fb.XMax:.1f}]  "
+          f"Y=[{fb.YMin:.1f},{fb.YMax:.1f}]  Z=[{fb.ZMin:.2f},{fb.ZMax:.2f}]")
+    # The KiCad STEP export now includes SW1 (K1-1506SN-01 5-way switch)
+    # because the typo'd 3D-model path in the .kicad_pcb is resolved via a
+    # local symlink (/home/rompasaurus/COdingProjects → CodingProjects).
+    # Re-export with: kicad-cli pcb export step --subst-models --include-tracks
+    # from joystick-pcb-by-hand/JoystickBoardDilder/.
+    return obj
+
+
+# =====================================================================
+# THUMBPIECE — snap cap over the K1-1506SN-01 5-way switch actuator stick
+# =====================================================================
+# Sits flush in the cover's 12 mm joystick circle cutout (top-of-cover Z=23),
+# OD = thumb_od (= joy_d - 1.0) for 0.5 mm radial clearance. Concave thumb
+# dish on the upper face. Rectangular snap socket on the underside fits
+# over the 3.2 × 3.2 mm actuator stick.
+#
+# Geometry references (from JoystickPCB STEP selections, global coords):
+#   stick X span 77.75 → 80.95  (center 79.35, width 3.2 mm)
+#   stick Y span 22.08 → 25.26  (center 23.68, width 3.18 mm)
+#   stick Z span 17.91 → 21.17  (top 21.17, height 3.26 mm)
+# With the PCB bbox-centered at enc_y/2 = 23.0, the stick center Y (23.68)
+# is now only +0.01 mm from the cover hole center (79.35, 23.67) — the
+# joystick peg sits effectively dead-center in the hole.
+
+def build_thumbpiece(doc):
+    print("  Building Thumbpiece...")
+    body = doc.addObject("PartDesign::Body", "Thumbpiece")
+
+    # ── Constants (global Z) ──
+    # Cover top face is at global Z = 23.0 (cover Placement Z=11 + local
+    # face_top=12). The 12 mm circle cutout opens here. The disc nests
+    # inside the hole — top sits just below cover top, OD = joy_d - 1.0
+    # for 0.5 mm radial clearance (1 mm total) so the joystick can swing
+    # for directional travel.
+    cover_top_z = 23.0
+    joy_cx_v = 81.35   # +2mm with enc_x extension (05-01-2026)
+    joy_cy_hole_v = 46.0 / 2 + 0.67       # 23.67 — cover hole / disc center
+    joy_cy_stick_v = 23.68                # actuator stick center (PCB bbox at enc_y/2)
+
+    thumb_od_v = 10.0
+    thumb_h_v = 4.5
+    top_clr_v = 0.1
+    top_z = cover_top_z - top_clr_v       # 22.90 — disc top
+    bot_z = top_z - thumb_h_v             # 18.40 — disc bottom
+
+    dish_r_v = 12.0
+    dish_d_v = 0.6   # shallow enough to leave a solid skin (~0.35 mm)
+                     # above the snap socket — keeps the peg covered.
+
+    sock_x_v = 3.3
+    sock_y_v = 3.3
+    sock_d_v = 3.5
+
+    # ── 1. Disc (additive cylinder, nested in 12 mm cover hole) ──
+    disc = body.newObject("PartDesign::AdditiveCylinder", "Thumb_Disc")
+    disc.Radius = thumb_od_v / 2
+    disc.Height = thumb_h_v
+    disc.Placement = App.Placement(
+        V(joy_cx_v, joy_cy_hole_v, bot_z), ROT0)
+    disc.setExpression("Radius", SP("thumb_od") + " / 2")
+    disc.setExpression("Height", SP("thumb_h"))
+
+    # ── 2. Concave thumb dish (subtractive sphere on top) ──
+    # Sphere positioned so its south pole sits at top_z - dish_d
+    # (= deepest point of dish). center_z = top_z + dish_r - dish_d.
+    dish = body.newObject("PartDesign::SubtractiveSphere", "Thumb_Dish")
+    dish.Radius = dish_r_v
+    dish.Placement = App.Placement(
+        V(joy_cx_v, joy_cy_hole_v,
+          top_z + dish_r_v - dish_d_v), ROT0)
+    dish.setExpression("Radius", SP("thumb_dish_r"))
+
+    # ── 3. Snap socket (subtractive box, cut up from disc bottom) ──
+    # Centered on the disc axis (joy_cx, joy_cy_hole) — with the PCB
+    # bbox-centered at enc_y/2, the stick is now only ~0.01 mm from the
+    # hole center so the socket is concentric with both the disc and the
+    # peg. Sized 3.3 × 3.3 mm for friction fit on the 3.2 × 3.2 mm
+    # rectangular peg.
+    # The +0.1 mm Z overlap keeps the cut clean at the disc's bottom face.
+    sock = body.newObject("PartDesign::SubtractiveBox", "Thumb_Socket")
+    sock.Length = sock_x_v
+    sock.Width = sock_y_v
+    sock.Height = sock_d_v + 0.1
+    sock.Placement = App.Placement(
+        V(joy_cx_v - sock_x_v / 2,
+          joy_cy_hole_v - sock_y_v / 2,
+          bot_z - 0.05), ROT0)
+    sock.setExpression("Length", SP("thumb_sock_x"))
+    sock.setExpression("Width", SP("thumb_sock_y"))
+    sock.setExpression("Height", SP("thumb_sock_d") + " + 0.1")
+
+    doc.recompute()
+
+    try:
+        body.ViewObject.ShapeColor = (0.15, 0.15, 0.18)   # dark thumb cap
+    except Exception:
+        pass
+
+    print(f"    Thumbpiece: OD={thumb_od_v}, H={thumb_h_v}, "
+          f"socket={sock_x_v}×{sock_y_v}×{sock_d_v}, "
+          f"Z=[{bot_z:.2f},{top_z:.2f}] (nested in cover hole)")
+    return body
+
+
+# =====================================================================
+# PERIPHERALS — AAA batteries, TP4056 USB-C charger, Waveshare e-ink
+# =====================================================================
+# All three are built procedurally from datasheet dimensions. Third-party
+# CAD models for these (TP4056 modules, Waveshare e-paper) are mostly
+# behind login/paywalls and Waveshare doesn't publish CAD for the
+# Pico-ePaper-2.13. Procedural geometry is fast, deterministic, and
+# parametric — same approach as the Pico's pin headers.
+
+def add_peripherals(doc):
+    print("  Adding peripherals (batteries, TP4056, e-ink display)...")
+
+    # ── AAA batteries (2x, one per cradle bay) ──
+    # 1.5V Li-Ion AAA / 10440 form factor: 10.5 mm dia × 39.5 mm length
+    # In cradle local: bay_mx_start=20.4 to bay_px_end=64.9 (44.5mm bay),
+    # cells centered with aaa_cspace=2.0 per end → cell X local 22.4..61.9.
+    # bay_y locals: 7.85, 38.15. bay_cz local: 0.95.
+    # Cradle Placement: 180° about Y, then translate (96.7, 0, bp_top+7.0=11).
+    # → global cell X = [96.7-61.9, 96.7-22.4] = [34.8, 74.3]
+    # → global cell Y = bay_y_local (Y unchanged by Y rotation)
+    # → global cell Z = 11.0 - bay_cz_local = 10.05
+    aaa_d = 10.5
+    aaa_len = 41.5
+    cell_x_min_g = 100.7 - 63.9   # +2mm cradle translate, +2mm cell length → cell -X global stays put
+    cell_y_g = {1: 7.85, 2: 38.15}
+    cell_z_g = 11.0 - 0.95
+    # Battery cylinder is along X axis, placed by cylinder center on -X end
+    # FreeCAD makeCylinder is along Z by default; rotate 90° about Y to align
+    # with X, with the cylinder origin at one end of the cell.
+    for idx in (1, 2):
+        body = Part.makeCylinder(aaa_d / 2, aaa_len)
+        # Rotate so cylinder axis is along +X (Z → +X)
+        body.translate(V(0, 0, -aaa_len / 2))   # center on origin
+        body.rotate(V(0, 0, 0), V(0, 1, 0), 90)  # axis Z → X
+        body.translate(V(cell_x_min_g + aaa_len / 2,
+                         cell_y_g[idx], cell_z_g))
+        cell = doc.addObject("Part::Feature", f"AAA_Battery_{idx}")
+        cell.Shape = body
+
+        # Positive terminal nub at +X end of cell (small cap, brighter color)
+        nub_d = 5.5
+        nub_h = 1.0
+        nub = Part.makeCylinder(nub_d / 2, nub_h)
+        nub.rotate(V(0, 0, 0), V(0, 1, 0), 90)
+        nub.translate(V(cell_x_min_g + aaa_len, cell_y_g[idx], cell_z_g))
+        nub_obj = doc.addObject("Part::Feature", f"AAA_Battery_{idx}_PosTerm")
+        nub_obj.Shape = nub
+        try:
+            cell.ViewObject.ShapeColor = (0.18, 0.18, 0.20)   # battery body grey
+            nub_obj.ViewObject.ShapeColor = (0.85, 0.78, 0.35)  # brass tip
+        except Exception:
+            pass
+
+    # ── TP4056 USB-C charger module ──
+    # Standard module: 28 mm × 17 mm × 1.6 mm PCB + USB-C bump (~9×7×3.4)
+    # Cradle's TP4056_Indent (cradle local): plug_x0=3.3 to plug_x0+tp_xl=31.3,
+    # tp_y=14.3 to tp_y+tp_yw=31.3, indent floor at local Z=6.0 (plug_top-tp_iz).
+    # After cradle 180° Y flip + translate: indent floor → global Z = 11-6 = 5.0.
+    # Board sits flat on indent floor, PCB on top, components hang BELOW (-Z)
+    # into the open space beneath the cradle (toward base plate).
+    tp_xl_v = 28.0
+    tp_yw_v = 17.0
+    tp_pcb_t = 1.6
+    tp_x_min_g = 100.7 - (3.3 + tp_xl_v)        # = 67.4 (+2mm with enclosure extension)
+    tp_y_min_g = 14.3
+    tp_z_bot_g = 11.0 - 6.0                    # = 5.0 (indent floor, no-solar)
+    # PCB top face mates with indent floor at tp_z_bot_g, PCB hangs below
+    tp_pcb = Part.makeBox(tp_xl_v, tp_yw_v, tp_pcb_t,
+                          V(tp_x_min_g, tp_y_min_g, tp_z_bot_g - tp_pcb_t))
+    # (TP4056_USBC connector visualization removed — module shape only)
+    # IC + capacitor lump — hangs below PCB (-Z), components face down
+    ic_lump = Part.makeBox(14, 8, 1.6,
+                           V(tp_x_min_g + 8, tp_y_min_g + 4.5,
+                             tp_z_bot_g - tp_pcb_t - 1.6))
+    tp_obj = doc.addObject("Part::Feature", "TP4056_Module")
+    tp_obj.Shape = Part.Compound([tp_pcb, ic_lump])
+    try:
+        tp_obj.ViewObject.ShapeColor = (0.10, 0.18, 0.50)   # navy blue PCB
+    except Exception:
+        pass
+
+    # ── Waveshare 2.13" e-paper display module ──
+    # Module sized to fit screen inlay (disp_xl=65, disp_yd=30, inlay_z=3).
+    # Active e-paper area approx 48×22 mm centered with the win_shift toward
+    # +X. Module thickness ~3.0 mm fitting the 3 mm inlay depth.
+    # TopCover Placement: V(0, 0, bp_top + tc_wall_ext = 9), no rotation.
+    # Inlay carves from local Z=face_bot=7 upward by inlay_depth=3 → global
+    # Z = 11+7 = 18 (module bottom = back of display PCB) to Z = 11+10 = 21
+    # (active screen surface visible through the window cut).
+    disp_xl_v, disp_yd_v = 65.2, 30.0
+    disp_x_min_g = 3.4   # disp_x0 = wall_mx + 0.4
+    disp_y_min_g = 8.0   # disp_y0 = enc_y/2 - disp_yd/2
+    disp_z_back_g = 9.0 + 7.0   # no-solar: bp_top(4) + wall_ext(5) = 9, + face_bot(7) = 16
+    disp_module_h = 3.0          # full module thickness
+    # Module body (PCB + plastic carrier)
+    disp_pcb = Part.makeBox(disp_xl_v, disp_yd_v, disp_module_h,
+                            V(disp_x_min_g, disp_y_min_g, disp_z_back_g))
+    # Active e-paper area on the +Z (visible) face — slightly raised
+    win_w_v, win_h_v = 48.0, 22.0
+    win_shift_v = 2.8
+    panel_x = disp_x_min_g + (disp_xl_v - win_w_v) / 2 + win_shift_v
+    panel_y = disp_y_min_g + (disp_yd_v - win_h_v) / 2
+    panel_z = disp_z_back_g + disp_module_h - 0.05
+    panel = Part.makeBox(win_w_v, win_h_v, 0.1,
+                         V(panel_x, panel_y, panel_z))
+    disp_obj = doc.addObject("Part::Feature", "EInkDisplay_Module")
+    disp_obj.Shape = disp_pcb
+    panel_obj = doc.addObject("Part::Feature", "EInkDisplay_Panel")
+    panel_obj.Shape = panel
+    try:
+        disp_obj.ViewObject.ShapeColor = (0.92, 0.92, 0.93)   # off-white carrier
+        panel_obj.ViewObject.ShapeColor = (0.98, 0.98, 0.98)  # paper white
+    except Exception:
+        pass
+
+    # ── Battery clip plates + springs (Swpeet 7×7 mm sheet metal kit) ──
+    # The cradle has 4 ClipSlot subtractions (1M/1P/2M/2P), one at each X-end
+    # of each bay. With the AAA cells' positive nub on the cell's local +X
+    # end (= cell's GLOBAL -X end after the cradle 180° Y flip), the polarity
+    # mapping in GLOBAL coords is:
+    #   ClipSlot_*P (cradle local +X, global X≈30.4) → POSITIVE plate
+    #     (cell's positive nub at global X=34.4 — the +X-end-of-cell-locally
+    #     becomes the -X-end-of-cell-globally after the flip)
+    #   ClipSlot_*M (cradle local -X, global X≈77.35) → NEGATIVE plate
+    #     (cell's flat negative end at global X=73.9; springs extend +X
+    #     toward the cell to provide compression)
+    # Cells wire in PARALLEL (2S 10440 would exceed Pico VSYS 5.5V max):
+    #   both POS plates → wire bus → TP4056 BAT+ (red) → Pico VSYS / VBUS
+    #   both NEG plates → wire bus → TP4056 BAT−  (black) → Pico GND
+    plate_w = 7.0       # plate Y/Z dimensions (Swpeet 7×7 mm)
+    plate_t = 0.5       # plate X thickness (sheet metal stamping)
+    spring_d = 5.0      # coil-spring outer diameter
+    spring_l = 4.0      # spring uncompressed length (extends into bay)
+    bump_d = 4.0        # positive contact bump diameter
+    bump_l = 3.0        # bump length (bridges plate face to cell + nub)
+    wire_d = 1.0        # wire stub OD
+    wire_l = 6.0        # short stub length
+
+    bay_y_g = {1: 7.85, 2: 38.15}
+    cell_pos_x_g = cell_x_min_g + aaa_len   # 73.9 — cell +X-globally end (positive nub)
+    cell_neg_x_g = cell_x_min_g             # 34.4 — cell -X-globally end (flat negative)
+
+    # In CRADLE LOCAL coords: 4 slots (computed in build_cradle):
+    #   P slots at local sx = 65.9 (slot face cell-side at local x = 65.9)
+    #   M slots at local sx = 18.5 (slot face cell-side at local x = 19.4)
+    # After cradle 180° Y flip + translate(96.7, 0, 11.0):
+    #   P slot face → global X = 96.7 - 65.9 = 30.8  (faces +X toward cell neg)
+    #   M slot face → global X = 96.7 - 19.4 = 77.3  (faces -X toward cell pos)
+    #
+    # So GLOBAL roles by suffix:
+    #   *P slots (global X=30.4) sit outboard of cell's NEGATIVE end (X=34.4)
+    #   *M slots (global X=76.9) sit outboard of cell's POSITIVE end (X=73.9)
+    pos_face_x_g = 78.9    # +X-face plate face (cell positive end side, M slots) — shifted +2mm
+    neg_face_x_g = 30.4    # -X-face plate face (cell negative end side, P slots) — stays put
+
+    clip_pieces_pos = []
+    clip_pieces_neg = []
+    spring_pieces = []
+    bump_pieces = []
+    pos_wires = []
+    neg_wires = []
+
+    for idx in (1, 2):
+        cy = bay_y_g[idx]
+
+        # POSITIVE plate (M slot, global +X side): plate face at pos_face_x_g
+        # facing -X toward the cell positive nub at cell_pos_x_g (=73.9).
+        plate_pos = Part.makeBox(plate_t, plate_w, plate_w,
+                                 V(pos_face_x_g, cy - plate_w/2, cell_z_g - plate_w/2))
+        clip_pieces_pos.append(plate_pos)
+        # Contact bump bridges plate face to cell positive nub
+        bump = Part.makeCylinder(bump_d/2, bump_l)
+        bump.rotate(V(0, 0, 0), V(0, 1, 0), -90)   # axis along -X
+        bump.translate(V(pos_face_x_g, cy, cell_z_g))
+        bump_pieces.append(bump)
+        # Wire stub on the exterior side (+X), pointing toward TP4056 area
+        wire_pos = Part.makeCylinder(wire_d/2, wire_l)
+        wire_pos.rotate(V(0, 0, 0), V(0, 1, 0), 90)   # axis along +X
+        wire_pos.translate(V(pos_face_x_g + plate_t, cy, cell_z_g))
+        pos_wires.append(wire_pos)
+
+        # NEGATIVE plate (P slot, global -X side): plate face at neg_face_x_g
+        # facing +X toward the cell negative end at cell_neg_x_g (=34.4).
+        plate_neg = Part.makeBox(plate_t, plate_w, plate_w,
+                                 V(neg_face_x_g - plate_t, cy - plate_w/2,
+                                   cell_z_g - plate_w/2))
+        clip_pieces_neg.append(plate_neg)
+        # Coil spring extends +X from plate face into the bay, compressed
+        # against cell's flat negative end (axial overlap at cell_neg_x_g).
+        spring = Part.makeCylinder(spring_d/2, spring_l)
+        spring.rotate(V(0, 0, 0), V(0, 1, 0), 90)   # axis along +X
+        spring.translate(V(neg_face_x_g, cy, cell_z_g))
+        spring_pieces.append(spring)
+        # Wire stub on the exterior side (-X)
+        wire_neg = Part.makeCylinder(wire_d/2, wire_l)
+        wire_neg.rotate(V(0, 0, 0), V(0, 1, 0), -90)   # axis along -X
+        wire_neg.translate(V(neg_face_x_g - plate_t, cy, cell_z_g))
+        neg_wires.append(wire_neg)
+
+    # Inter-cell parallel-wiring buses (visual indication only).
+    # Positive bus: connects both +plates' exterior wire stub ends, runs in Y
+    # at X just outboard of pos plates, Z at cell_z_g.
+    pos_bus_x = pos_face_x_g + plate_t + wire_l
+    pos_bus = Part.makeBox(wire_d, bay_y_g[2] - bay_y_g[1], wire_d,
+                           V(pos_bus_x - wire_d/2,
+                             bay_y_g[1], cell_z_g - wire_d/2))
+    pos_wires.append(pos_bus)
+    # Negative bus
+    neg_bus_x = neg_face_x_g - plate_t - wire_l
+    neg_bus = Part.makeBox(wire_d, bay_y_g[2] - bay_y_g[1], wire_d,
+                           V(neg_bus_x - wire_d/2,
+                             bay_y_g[1], cell_z_g - wire_d/2))
+    neg_wires.append(neg_bus)
+
+    plates_pos_obj = doc.addObject("Part::Feature", "BatteryClips_Positive")
+    plates_pos_obj.Shape = Part.Compound(clip_pieces_pos + bump_pieces)
+    plates_neg_obj = doc.addObject("Part::Feature", "BatteryClips_Negative")
+    plates_neg_obj.Shape = Part.Compound(clip_pieces_neg + spring_pieces)
+    pos_wires_obj = doc.addObject("Part::Feature", "BatteryWiring_Positive")
+    pos_wires_obj.Shape = Part.Compound(pos_wires)
+    neg_wires_obj = doc.addObject("Part::Feature", "BatteryWiring_Negative")
+    neg_wires_obj.Shape = Part.Compound(neg_wires)
+    try:
+        plates_pos_obj.ViewObject.ShapeColor = (0.85, 0.78, 0.35)   # brass plate
+        plates_neg_obj.ViewObject.ShapeColor = (0.85, 0.78, 0.35)
+        pos_wires_obj.ViewObject.ShapeColor = (0.85, 0.10, 0.10)    # red = +
+        neg_wires_obj.ViewObject.ShapeColor = (0.05, 0.05, 0.05)    # black = −
+    except Exception:
+        pass
+
+    print(f"    AAA cells:    X=[{cell_x_min_g:.1f},"
+          f"{cell_x_min_g+aaa_len:.1f}]  Y={list(cell_y_g.values())}  "
+          f"Z={cell_z_g:.2f}")
+    print(f"    Battery clips: POS plates X={pos_face_x_g} (M slots, near "
+          f"cell + nub at X={cell_pos_x_g})")
+    print(f"                   NEG plates X={neg_face_x_g} (P slots, near "
+          f"cell − end at X={cell_neg_x_g})")
+    print(f"    Wiring:       POS bus at X={pos_bus_x:.1f} (red, both +→TP4056 BAT+)")
+    print(f"                  NEG bus at X={neg_bus_x:.1f} (black, both −→TP4056 BAT−)")
+    print(f"    TP4056:       X=[{tp_x_min_g:.1f},{tp_x_min_g+tp_xl_v:.1f}]  "
+          f"Y=[{tp_y_min_g:.1f},{tp_y_min_g+tp_yw_v:.1f}]  Z_bot={tp_z_bot_g:.2f}")
+    print(f"    EInk display: X=[{disp_x_min_g:.1f},"
+          f"{disp_x_min_g+disp_xl_v:.1f}]  "
+          f"Y=[{disp_y_min_g:.1f},{disp_y_min_g+disp_yd_v:.1f}]  "
+          f"Z=[{disp_z_back_g:.2f},{disp_z_back_g+disp_module_h:.2f}]")
+
+
+# =====================================================================
+# SOLAR PANEL — AK 62 × 36 mm, ~2 mm thick, fits in the base plate's
+# bottom solar pit (cut by Cut_SolarPit at 62.4 × 36.4 × 2.0 mm with
+# 0.2 mm slop per edge). Two leads route through 3.1 mm holes in the
+# pit floor at sol_h1 / sol_h2.
+# =====================================================================
+# AK doesn't publish CAD models for these monocrystalline panels;
+# built procedurally from the dimensions used to design the pit.
+# Panel is two stacked boxes: a dark frame (top, against pit ceiling)
+# and a deep-blue cell layer on the visible bottom face. From outside
+# the device looking up at the base plate, you see the cell layer
+# inset by `sol_cell_inset` with a thin frame around it.
+
+## add_piezo_speaker REMOVED — using active buzzer instead ##
+
+
+def add_imu_module(doc):
+    """GY-521 (MPU-6050) 6-axis IMU module: 21 × 16 × 1.0 mm PCB.
+    Centered in the IMU_Pocket on the base plate."""
+    print("  Adding IMU module (GY-521 / MPU-6050)...")
+
+    floor_z = 0.6   # no-solar: 2.6 - 2.0
+    imu_xl = 21.0    # GY-521 PCB length
+    imu_yw = 16.0    # GY-521 PCB width
+    imu_pcb_t = 1.0
+
+    # Centered on the base plate (matches IMU_Pocket in build_base_plate)
+    imu_cx = 98.9 / 2   # 48.45
+    imu_cy = 46.0 / 2   # 23.0
+
+    pcb_x0 = imu_cx - imu_xl / 2
+    pcb_y0 = imu_cy - imu_yw / 2
+
+    # PCB
+    pcb = Part.makeBox(imu_xl, imu_yw, imu_pcb_t,
+                       V(pcb_x0, pcb_y0, floor_z))
+
+    # MPU-6050 QFN chip (4 × 4 × 0.9 mm) — centered on PCB
+    chip_x = 4.0
+    chip_y = 4.0
+    chip_z = 0.9
+    chip = Part.makeBox(chip_x, chip_y, chip_z,
+                        V(imu_cx - chip_x / 2,
+                          imu_cy - chip_y / 2,
+                          floor_z + imu_pcb_t))
+
+    # Passive components lump (voltage reg + caps, rough block)
+    comp = Part.makeBox(6.0, 4.0, 1.2,
+                        V(pcb_x0 + 2.0,
+                          pcb_y0 + imu_yw - 5.0,
+                          floor_z + imu_pcb_t))
+
+    # 8-pin header pads on one short edge (no pins soldered — just pads)
+    header_strip = Part.makeBox(1.5, 8 * 2.54, 0.3,
+                                V(pcb_x0 + imu_xl - 1.8,
+                                  imu_cy - (8 * 2.54) / 2,
+                                  floor_z + imu_pcb_t))
+
+    pcb_obj = doc.addObject("Part::Feature", "IMU_Module")
+    pcb_obj.Shape = Part.Compound([pcb, chip, comp, header_strip])
+    try:
+        pcb_obj.ViewObject.ShapeColor = (0.10, 0.12, 0.45)  # dark blue PCB
+    except Exception:
+        pass
+
+    print(f"    IMU: {imu_xl}×{imu_yw} mm at ({imu_cx:.1f}, {imu_cy:.1f})")
+
+
+def add_solar_panel(doc):
+    print("  Adding solar panel (AK 62×36)...")
+
+    # ── Geometry (global; base plate Placement is identity, so base
+    # plate local coords = global coords) ──
+    enc_x_v = 98.9              # +2mm with enclosure extension
+    enc_y_v = 46.0
+    sol_x_v = 62.4              # pit width (matches sol_x param) — unchanged: cutout doesn't grow
+    sol_y_v = 36.4              # pit depth
+    sol_z_v = 2.0               # pit Z depth (= panel total Z)
+
+    panel_x_v = 62.0            # actual panel width
+    panel_y_v = 36.0            # actual panel depth
+    panel_z_v = 2.0             # actual panel total Z (frame + cells)
+    cell_inset_v = 1.5          # frame margin around the active cells
+    cell_z_v = 0.25             # cell layer thickness
+
+    # Pit is centered on the base plate.
+    pit_x0 = enc_x_v / 2 - sol_x_v / 2     # 16.05
+    pit_y0 = enc_y_v / 2 - sol_y_v / 2     # 4.80
+    panel_x0 = enc_x_v / 2 - panel_x_v / 2  # 16.25
+    panel_y0 = enc_y_v / 2 - panel_y_v / 2  # 5.00
+
+    # Panel TOP face touches the pit ceiling at Z = sol_z_v = 2.0;
+    # panel BOTTOM face flush with base plate bottom at Z = 0.
+    panel_top_z = sol_z_v        # 2.0
+    panel_bot_z = panel_top_z - panel_z_v   # 0.0
+
+    # Frame body: covers the upper part of the panel volume (Z = cell_z..panel_z),
+    # full footprint. Color: very dark blue/black (panel back substrate).
+    frame_z0 = panel_bot_z + cell_z_v          # 0.25
+    frame = Part.makeBox(
+        panel_x_v, panel_y_v, panel_z_v - cell_z_v,
+        V(panel_x0, panel_y0, frame_z0))
+    frame_obj = doc.addObject("Part::Feature", "Solar_Frame")
+    frame_obj.Shape = frame
+
+    # Cell layer: thin slab on the bottom (visible) face, inset from the
+    # frame edges so a thin frame border shows around the cells.
+    cell_x0 = panel_x0 + cell_inset_v
+    cell_y0 = panel_y0 + cell_inset_v
+    cell_x_v = panel_x_v - 2 * cell_inset_v   # 59.0
+    cell_y_v = panel_y_v - 2 * cell_inset_v   # 33.0
+    cells = Part.makeBox(
+        cell_x_v, cell_y_v, cell_z_v,
+        V(cell_x0, cell_y0, panel_bot_z))
+    cells_obj = doc.addObject("Part::Feature", "Solar_Cells")
+    cells_obj.Shape = cells
+
+    # Lead wires — two short stubs through the wire holes in the pit
+    # floor. Hole positions are pit-local in the macro's spreadsheet:
+    #   sol_h1 = (2.5, 2.0)  → global (pit_x0 + 2.5, pit_y0 + 2.0)
+    #   sol_h2 = (60.0, 2.4) → global (pit_x0 + 60.0, pit_y0 + 2.4)
+    # Wires emerge from the panel back (Z = panel_top_z = 2.0) and rise
+    # up to ~Z=10 — clear of the base plate top (Z = 6) and into the
+    # cradle pocket. Slightly less than 3.1 mm hole dia so they fit
+    # comfortably (1.0 mm OD wire).
+    wire_d_v = 1.0
+    wire_top_z = 10.0
+    leads = [
+        ("Solar_Wire_Plus",  pit_x0 + 2.5, pit_y0 + 2.0, (0.85, 0.10, 0.10)),
+        ("Solar_Wire_Minus", pit_x0 + 60.0, pit_y0 + 2.4, (0.05, 0.05, 0.05)),
+    ]
+    for name, wx, wy, color in leads:
+        wire = Part.makeCylinder(
+            wire_d_v / 2, wire_top_z - panel_top_z,
+            V(wx, wy, panel_top_z))
+        w_obj = doc.addObject("Part::Feature", name)
+        w_obj.Shape = wire
+        try:
+            w_obj.ViewObject.ShapeColor = color
+        except Exception:
+            pass
+
+    try:
+        # Frame: dark navy/black panel substrate
+        frame_obj.ViewObject.ShapeColor = (0.08, 0.08, 0.12)
+        # Active cells: deep blue with a hint of purple — typical
+        # monocrystalline cell appearance
+        cells_obj.ViewObject.ShapeColor = (0.10, 0.15, 0.45)
+    except Exception:
+        pass
+
+    print(f"    Solar panel: X=[{panel_x0:.2f},{panel_x0+panel_x_v:.2f}]  "
+          f"Y=[{panel_y0:.2f},{panel_y0+panel_y_v:.2f}]  "
+          f"Z=[{panel_bot_z:.2f},{panel_top_z:.2f}]")
+    print(f"    Cells:       inset {cell_inset_v} mm, "
+          f"layer Z=[{panel_bot_z:.2f},{panel_bot_z+cell_z_v:.2f}]")
+    print(f"    Leads:       through wire holes at "
+          f"({pit_x0+2.5:.2f}, {pit_y0+2.0:.2f}) and "
+          f"({pit_x0+60.0:.2f}, {pit_y0+2.4:.2f})")
+    return frame_obj, cells_obj
+
+
+# =====================================================================
+# ACTIVE BUZZER — 12095 form factor (12 mm × 9.5 mm), 85 dB, wired
+# =====================================================================
+# Lunpog / generic 3-12V active piezo buzzer.  Cylindrical housing with
+# pre-attached 50 mm wire leads (red +, black −).  Sound hole on one
+# face.  Mounted with the sound hole facing down toward the base plate;
+# drops through the cradle's BuzzerThrough hole and rests on the
+# BuzzerFlange lip.  Sound exits through BuzzerSoundPort in the floor.
+# Wires exit the top (sealed) face and route inside the enclosure.
+
+def add_buzzer_module(doc):
+    """Procedural model of the 12095 active buzzer: 12 mm dia × 9.5 mm."""
+    print("  Adding active buzzer (12 mm × 9.5 mm, 12095)...")
+
+    enc_y_v = 46.0
+    buzz_d_v = 12.0
+    buzz_h_v = 9.5
+
+    # Global position — buzzer sits on the base plate pocket floor,
+    # sticking up through the mating face into the cradle pocket.
+    # Sound hole faces down toward the 2 mm hole in the base plate.
+    buzz_cx_g = 8.5
+    buzz_cy_g = enc_y_v / 2       # 23.0
+    buzz_z_bot_g = 0.6             # base plate pocket floor
+
+    # Housing — cylindrical can, sound hole at bottom facing base plate
+    housing = Part.makeCylinder(buzz_d_v / 2, buzz_h_v,
+                                V(buzz_cx_g, buzz_cy_g, buzz_z_bot_g))
+
+    # Wire stubs: exit the TOP face (sealed side) and route up inside
+    # the enclosure toward the Pico.  On a 12095 buzzer the wires come
+    # from the back (non-sound-hole) face.
+    wire_d = 1.0
+    wire_l = 15.0
+    wire_top_z = buzz_z_bot_g + buzz_h_v   # 11.1
+    wire_plus = Part.makeCylinder(wire_d / 2, wire_l)
+    wire_plus.rotate(V(0, 0, 0), V(0, 1, 0), 90)       # along +X
+    wire_plus.translate(V(buzz_cx_g, buzz_cy_g + 2.0, wire_top_z - 1.0))
+
+    wire_minus = Part.makeCylinder(wire_d / 2, wire_l)
+    wire_minus.rotate(V(0, 0, 0), V(0, 1, 0), 90)       # along +X
+    wire_minus.translate(V(buzz_cx_g, buzz_cy_g - 2.0, wire_top_z - 1.0))
+
+    buzz_obj = doc.addObject("Part::Feature", "ActiveBuzzer_Body")
+    buzz_obj.Shape = housing
+    wire_p = doc.addObject("Part::Feature", "ActiveBuzzer_WirePlus")
+    wire_p.Shape = wire_plus
+    wire_m = doc.addObject("Part::Feature", "ActiveBuzzer_WireMinus")
+    wire_m.Shape = wire_minus
+
+    try:
+        buzz_obj.ViewObject.ShapeColor = (0.12, 0.12, 0.12)    # black housing
+        wire_p.ViewObject.ShapeColor = (0.85, 0.10, 0.10)      # red +
+        wire_m.ViewObject.ShapeColor = (0.05, 0.05, 0.05)      # black −
+    except Exception:
+        pass
+
+    print(f"    Buzzer: {buzz_d_v} mm × {buzz_h_v} mm, "
+          f"bottom Z={buzz_z_bot_g} (on flange lip), "
+          f"top Z={buzz_z_bot_g + buzz_h_v:.1f}")
+
+
+# =====================================================================
+# MAIN — build all, assemble, save
+# =====================================================================
+
+def main():
+    doc_name = "Dilder_Rev2_Mk2_NoSolar_Buzzer"
+
+    # Close if already open
+    if App.ActiveDocument and App.ActiveDocument.Name == doc_name:
+        App.closeDocument(doc_name)
+
+    doc = App.newDocument(doc_name)
+    print("=" * 60)
+    print("Dilder Rev 2 Mk2 — Parametric FreeCAD PartDesign Build")
+    print("=" * 60)
+
+    print("\nSetting up Parameters spreadsheet...")
+    setup_spreadsheet(doc)
+
+    bp = build_base_plate(doc)
+    cr = build_cradle(doc)
+    tc = build_top_cover(doc)
+
+    # ── Assembly positioning ──
+    # Base plate top face is at Z = bp_h = 4.0 (no-solar)
+    # Both cover and cradle mate flush with that face.
+    bp_top = 4.0   # base plate top Z (no-solar: 6 - 2)
+
+    # Cover: wall extension goes 5mm below local z=0.
+    # Bottom face (local z=-5) flush with base plate top.
+    tc_wall_ext = 5.0
+    tc.Placement = App.Placement(V(0, 0, bp_top + tc_wall_ext), ROT0)
+
+    # Cradle: flipped 180° around Y (mirrors X and Z).
+    # Former plug_top face (local Z=7.0) → rotated to Z=-7.0.
+    # Flush with base plate top: -7.0 + Z_shift = bp_top → Z_shift = 11.0
+    cr.Placement = App.Placement(
+        V(100.7, 0, bp_top + 7.0),   # +2mm translate to keep cradle -X global flush at X=3.3 after enc_x extension
+        App.Rotation(V(0, 1, 0), 180))
+    doc.recompute()
+
+    # Pico import comes after assembly placements so face anchors resolve in
+    # global coords (cradle is rotated 180° about Y at this point).
+    pico_result = add_pico_with_headers(doc)
+
+    # Peripherals (AAA cells, TP4056, e-ink display) — built procedurally
+    # with positions in global coords already accounting for cradle/cover
+    # placements. Run after placements for the same reason.
+    add_peripherals(doc)
+
+    # Joystick PCB — KiCad STEP export, placed in the cover's joystick pocket
+    add_joystick_pcb(doc)
+
+    # Thumbpiece — snap cap over the K1-1506SN-01 actuator stick, sits
+    # flush within the cover's 12 mm joystick circle cutout
+    build_thumbpiece(doc)
+
+    # Piezo speaker REMOVED (using active buzzer instead)
+
+    # IMU — GY-521 (MPU-6050) centered in the base plate's IMU_Pocket
+    add_imu_module(doc)
+
+    # Solar panel REMOVED (no-solar variant)
+
+    # Active buzzer — 12 mm × 9.5 mm (12095), drops through cradle
+    # through-hole, rests on base plate flange lip, sound hole down
+    add_buzzer_module(doc)
+
+    # ── Body colors ──
+    try:
+        bp.ViewObject.ShapeColor = (0.6, 0.65, 0.7)    # steel blue-gray
+        cr.ViewObject.ShapeColor = (0.9, 0.75, 0.4)    # warm amber
+        tc.ViewObject.ShapeColor = (0.4, 0.55, 0.8)    # blue
+        tc.ViewObject.Transparency = 40
+    except Exception:
+        pass
+
+    doc.recompute()
+
+    # ── Feature summary ──
+    print("\nFeature tree:")
+    for body_obj in [bp, cr, tc]:
+        feats = [o.Name for o in body_obj.Group
+                 if "Origin" not in o.Name and "Sketch" not in o.TypeId]
+        sketches = [o.Name for o in body_obj.Group
+                    if "Sketch" in o.TypeId]
+        print(f"  {body_obj.Name}:")
+        print(f"    {len(sketches)} sketches, {len(feats)} operations")
+        for f in body_obj.Group:
+            if "Origin" in f.Name:
+                continue
+            kind = f.TypeId.split("::")[-1]
+            print(f"      {kind:30s}  {f.Name}")
+
+    # ── Save ──
+    save_dir = os.path.dirname(os.path.abspath(__file__))
+    save_path = os.path.join(save_dir, "Dilder_Rev2_Mk2_NoSolar_Buzzer.FCStd")
+    doc.saveAs(save_path)
+    print(f"\nSaved: {save_path}")
+
+    print("\n  Double-click any Sketch to edit geometry.")
+    print("  Change values in Parameters spreadsheet, then Ctrl+Shift+R.")
+    print("=" * 60)
+
+    try:
+        import FreeCADGui
+        FreeCADGui.activeDocument().activeView().viewAxometric()
+        FreeCADGui.SendMsgToActiveView("ViewFit")
+    except Exception:
+        pass
+
+    return doc
+
+
+if __name__ == "__main__" or True:
+    main()
