@@ -3792,3 +3792,45 @@ Every prompt entry below uses the following fields. Entries that don't yet list 
   - `website/docs/docs/tools/picotool-ota.md` (new) — Picotool & OTA reference
   - `website/docs/docs/software/dilder-hub.md` (new) — Dilder Hub firmware docs
   - `website/mkdocs.yml` — nav updated with new pages
+
+---
+
+### Prompt #276 — Testbench Hardware Session: WiFi Scan, Sound Patterns, MPU-6050, Active Buzzer
+
+- **Date:** 2026-05-07
+- **Model:** Claude Opus 4.6 (1M context)
+- **Tokens:** ~80,000+ (extended multi-turn session)
+- **Commits:**
+  - `ff836b7` — Dilder Hub: WiFi scan/keyboard, sound patterns, MPU-6050, active buzzer
+- **What happened:** Hands-on testbench session wiring and integrating multiple hardware components into the Dilder Hub firmware. Iterative debugging with real hardware feedback.
+- **Hardware changes:**
+  - Moved Waveshare VCC from VSYS (pin 39) to 3V3(OUT) (pin 36) to free VSYS for TP4056 charger board
+  - Wired TP4056 USB-C charger module (OUT+ to VSYS, OUT- to GND) — battery voltage now reads correctly
+  - Replaced passive piezo with active buzzer on GP14 — fixed screaming bug caused by PWM inverted polarity
+  - Wired MPU-6050 accelerometer/gyroscope via I2C0 (SDA=GP0, SCL=GP1) — auto-detects at 0x68 or 0x69
+- **Firmware additions:**
+  - Fixed `cyw43_arch_gpio_get` API call (1 arg, returns bool directly)
+  - CYW43 initialized at boot for battery VSYS sensing (GPIO 29 shared with CYW43 SPI)
+  - Active buzzer GPIO driver replacing PWM piezo code
+  - 6 sound patterns (beep, chirp, SOS, doorbell, alert, happy) with volume control
+  - WiFi submenu: on/off toggle, async network scanning, scrollable results list
+  - On-screen keyboard: 4x10 QWERTY grid + 5 special keys (SHIFT, SPC, DEL, DONE, CANCEL)
+  - `wifi_connect_to(ssid, password)` — connect to any network, not just hardcoded credentials
+  - MPU-6050 I2C driver with burst read, auto-detect, error checking
+  - Motion menu: live accel/gyro values, pedometer, tilt angles, temperature, I2C bus scanner
+  - Input debounce reduced from 200ms to 5ms, poll interval from 20ms to 5ms
+  - All menus now scroll when items exceed visible area
+- **New documentation:**
+  - `docs/mpu6050-wiring-guide.md` — full wiring table, pin map, I2C details, register reference
+  - `hardware-design/power-consumption-report.md` — 4 power scenarios (34-260mA), 8 reduction strategies, battery life projections (29h to 10 days), solar viability analysis
+  - `docs/session-2026-05-07-implementation.md` — complete session implementation recap
+- **Design notes:** TP4056 CHRG/STDBY pins to GPIOs deferred to full board PCB design for USB-C charge detection (CYW43 VBUS only detects Pico's own USB port)
+- **Files:**
+  - `dev-setup/dilder-hub/main.c` — +959/-125 lines (all firmware features)
+  - `dev-setup/dilder-hub/CMakeLists.txt` — added hardware_i2c
+  - `docs/mpu6050-wiring-guide.md` (new)
+  - `docs/session-2026-05-07-implementation.md` (new)
+  - `hardware-design/power-consumption-report.md` (new)
+  - `README.md` — updated hardware table, phase checklists, content links
+  - `website/docs/docs/software/dilder-hub.md` — updated features, menus, wiring, all new screens
+  - `PromptProgression.md` — this entry

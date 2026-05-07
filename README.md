@@ -104,14 +104,16 @@ See the [thumbpiece design write-up](website/docs/blog/posts/joystick-thumbpiece
 
 ## Hardware
 
-### Phase 1 — Pico W Prototype (current)
+### Phase 1 — Pico 2 W Prototype (current)
 
 | Component | Details |
 |-----------|---------|
-| Board | Raspberry Pi Pico W (or Pico WH with pre-soldered headers) |
-| Display | [Waveshare Pico-ePaper-2.13](https://www.waveshare.com/pico-epaper-2.13.htm) — 250x122px, black & white, SPI1, SSD1680 driver, Pico-native 40-pin plug-in module |
-| Power | USB micro-B (development); battery TBD |
-| Input | 5x 6x6mm tactile push buttons (3 nav + 2 action) via GPIO |
+| Board | Raspberry Pi Pico 2 W (RP2350, 40-pin headers) |
+| Display | [Waveshare Pico-ePaper-2.13](https://www.waveshare.com/pico-epaper-2.13.htm) — 250x122px, black & white, SPI1, SSD1680 driver |
+| Power | TP4056 USB-C charger module + LiPo 1000mAh (3.7V on VSYS) |
+| Input | DollaTek K1-1506SN-01 5-way joystick (GP2-GP6) |
+| Sound | Active buzzer on GP14 (3-12V, GPIO on/off) |
+| Motion | MPU-6050 accelerometer/gyroscope on I2C0 (GP0/GP1, 400kHz) |
 
 ### Future — Pi Zero Upgrade
 
@@ -148,8 +150,8 @@ Each phase maps to a section of the blog/YouTube series and can be followed inde
 - [x] Add Programs tab with animated octopus preview, firmware size estimation, and deploy
 - [x] Build IMG-receiver firmware — stream images from PC to Pico display via USB serial ([dev-setup/img-receiver/](dev-setup/img-receiver/))
 - [x] Build standalone deploy — runtime-rendered animation, runs without PC
-- [ ] Wire and test button inputs (GPIO)
-- [ ] Battery power prototype
+- [x] Wire and test joystick input (DollaTek 5-way, GP2-GP6)
+- [x] Battery power prototype (TP4056 USB-C + LiPo on VSYS, ADC3 voltage sense)
 
 ### Phase 2 — Firmware Foundation (C on Pico W)
 > *You are here*
@@ -181,11 +183,16 @@ Each phase maps to a section of the blog/YouTube series and can be followed inde
 - [ ] Add death/game-over state and reset/new-pet flow
 
 ### Phase 4 — UI & Menus
+> *Major progress*
 
-- [ ] Design menu system for e-ink (optimized for minimal refreshes)
-- [ ] Build status bar — icons for stats, clock, battery level
-- [ ] Add screen transitions between menu, pet view, and interactions
-- [ ] Implement settings screen (contrast, name pet, reset)
+- [x] Menu system with scrolling navigation (joystick up/down/center/left-back)
+- [x] Status bar — WiFi icon (top-left), battery icon with percentage (top-right), RTC clock header
+- [x] Screen transitions between octopus, menu overlay, and sub-screens (10 states)
+- [x] Sound settings — on/off, volume (low/med/high), 6 test patterns
+- [x] WiFi submenu — on/off toggle, network scanning, on-screen keyboard for password entry
+- [x] Motion menu — live accelerometer/gyro, pedometer, tilt, threshold adjust, I2C scanner
+- [x] Device info — firmware version, build date, battery voltage, WiFi status, NTP sync
+- [ ] Implement settings screen (name pet, reset)
 
 ### Phase 5 — Pi Zero Migration
 
@@ -204,14 +211,16 @@ Each phase maps to a section of the blog/YouTube series and can be followed inde
 - [x] Battery cradle with clip slots for Swpeet AAA contact plates (parallel wiring)
 - [x] Solar panel wire through-holes in base plate
 - [x] Print prototypes and iterate on fit (Rev 2 Mk2 current)
-- [ ] Implement battery power (dual 10440 or single 3000mAh LiPo via TP4056)
-- [ ] Implement sleep/wake cycle to conserve battery
+- [x] Implement battery power (LiPo 1000mAh via TP4056 USB-C on VSYS)
+- [ ] Implement sleep/wake cycle to conserve battery (see [power report](hardware-design/power-consumption-report.md))
 - [x] Publish STL/3MF files and build instructions ([hardware-design/freecad-mk2/](hardware-design/freecad-mk2/))
 
 ### Phase 7 — Extras & Community
 
-- [ ] Add sound (piezo buzzer for beeps/alerts)
-- [ ] Explore connectivity — Bluetooth/Wi-Fi pet interactions?
+- [x] Add sound — active buzzer with 6 patterns (beep, chirp, SOS, doorbell, alert, happy)
+- [x] WiFi connectivity — network scanning, on-screen keyboard, connect to any network
+- [x] MPU-6050 accelerometer/gyroscope with pedometer and tilt sensing
+- [ ] Explore connectivity — Bluetooth pet interactions?
 - [ ] Mini-games
 - [ ] Seasonal/event-based pet outfits or moods
 - [ ] Publish a "build your own" kit guide
@@ -225,6 +234,9 @@ Each phase maps to a section of the blog/YouTube series and can be followed inde
 |----------|-------------|
 | [PromptProgression.md](PromptProgression.md) | Every AI prompt used in development (104+), timestamped with token counts and file changes |
 | [docs/hardware-research.md](docs/hardware-research.md) | Component research, materials list, GPIO pinout, and enclosure concepts |
+| [docs/mpu6050-wiring-guide.md](docs/mpu6050-wiring-guide.md) | MPU-6050 accelerometer wiring, I2C details, and register reference |
+| [hardware-design/power-consumption-report.md](hardware-design/power-consumption-report.md) | Full power budget, battery life projections, and reduction strategies |
+| [docs/session-2026-05-07-implementation.md](docs/session-2026-05-07-implementation.md) | May 7 session — WiFi scan, keyboard, sound, MPU-6050, active buzzer |
 | [Emotion States](https://dilder.dev/docs/software/emotion-states/) | All 16 emotional states with rendered previews and animation strips |
 | [docs/keyboard-to-pico-input.md](docs/keyboard-to-pico-input.md) | Input mapping plan for interactive octopus control |
 | [Blog](https://dilder.dev/blog/) | Build journal — 8 posts covering planning through body animations |
