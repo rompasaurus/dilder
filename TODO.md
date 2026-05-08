@@ -4,6 +4,29 @@ A living task list updated each week. Newest entries at the top.
 
 ---
 
+## Week 4 — 2026-05-08 (NoSolar+Buzzer enclosure overhaul)
+
+### Completed Today
+
+- [x] Sound routing redesigned — removed through-floor port, added lateral cradle pit + horizontal channel exiting the cover -X side wall (`fdadd83`)
+- [x] Base plate sides extended +5 mm (bp_h 4 → 9) for cable routing room — USB-C cutout + USB platform auto-track up 5 mm; cradle/cover/peripheral Z values cascaded (`fdadd83`)
+- [x] BuzzerCradleRing containment ring added on base plate floor — 0.9 mm-thick ring keeps speaker laterally located (`fdadd83`)
+- [x] Speaker lifted +2 mm in Z (Z=2.6 instead of 0.6) — 2 mm gap for wires to route along floor; cradle BuzzerPocket deepened 2 mm to compensate (`fdadd83`)
+- [x] Wire pass-through notches in BuzzerCradleRing (don't cut floor — no holes on base plate underside) (`fdadd83`)
+- [x] IMU pocket resized to MPU-6050 spec (20 × 15.6 mm), 2 corner mounting pegs added (15 mm hole-to-hole spacing on +Y long edge) (`fdadd83`)
+- [x] PCB visualization updated — through-holes cut at peg positions (`fdadd83`)
+- [x] Square peg-washer body added — 6×6×1.5 mm with 2.7 mm hole, 2 separate printable instances (`IMUPegWasher_MX`/`_PX`) (`fdadd83`)
+- [x] Macro top-level docstring + many cascading Z comments rewritten to reflect new geometry (`fdadd83`)
+
+### Still Open
+
+- [ ] Print and verify the new no-solar-buzzer build — confirm speaker friction-fit in deeper cradle pocket, wire channels clear, IMU pegs align with MPU-6050 board holes
+- [ ] Verify the lateral sound channel actually projects audible sound out the cover side — may need to enlarge `buzz_port_d` past 2 mm
+- [ ] Decide whether the BuzzerCradleRing needs an internal lip/shelf to physically support the lifted speaker (currently friction-fit in cradle pocket only)
+- [ ] If the IMU board's hole positions don't match 15 mm spacing exactly, parameterize `imu_hole_spacing` from measurements
+
+---
+
 ## Week 3 — 2026-05-04 (Session Progress)
 
 ### Completed Today
