@@ -17,6 +17,8 @@ A living task list updated each week. Newest entries at the top.
 - [x] PCB visualization updated — through-holes cut at peg positions (`fdadd83`)
 - [x] Square peg-washer body added — 6×6×1.5 mm with 2.7 mm hole, 2 separate printable instances (`IMUPegWasher_MX`/`_PX`) (`fdadd83`)
 - [x] Macro top-level docstring + many cascading Z comments rewritten to reflect new geometry (`fdadd83`)
+- [x] IMU pegs nudged -1 mm in Y (`imu_hole_y_inset` 2.0 → 3.0) — peg/hole/washer Y from 28.8 → 27.8 (`<TWEAK_HASH>`)
+- [x] Wire channels now open-top slots cut through the full 5 mm BuzzerCradleRing height — wires drop in from above instead of threading through a hole (`<TWEAK_HASH>`)
 
 ### Still Open
 

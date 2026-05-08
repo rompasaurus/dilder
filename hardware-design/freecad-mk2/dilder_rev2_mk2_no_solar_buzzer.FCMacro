@@ -549,7 +549,7 @@ def build_base_plate(doc):
     imu_wall = 1.0   # retaining wall thickness
     imu_wall_h = 1.5 # wall height above pocket floor
     imu_hole_spacing = 15.0   # peg center-to-center along X
-    imu_hole_y_inset = 2.0    # peg distance from +Y long edge
+    imu_hole_y_inset = 3.0    # peg distance from +Y long edge (was 2.0; -1mm Y)
 
     # Center: middle of the base plate
     imu_cx = W / 2   # 48.45
@@ -651,19 +651,19 @@ def build_base_plate(doc):
     buzz_nest.setExpression("Height", SP("bp_h") + " - " + SP("bp_floor") + " + 0.1")
     doc.recompute()
 
-    # ── 19. Buzzer wire channels (2× notches in lower ring wall) ──
+    # ── 19. Buzzer wire channels (2× open-top slots through full ring height) ──
     # The speaker is lifted +2 mm so a 2 mm gap exists between the floor
     # and the speaker bottom — the wires (1 mm OD, exiting the speaker
     # bottom face at Y = buzz_cy ± 2.0) route freely through this gap. The
-    # channels just notch the lower ring wall so the wires can exit the
-    # BuzzerCradleRing toward the +X case interior. Bottom of the cut sits
-    # at floor level (Z=0.6) so no holes are punched through the base plate
-    # underside.
+    # slots cut all the way through the BuzzerCradleRing height so the
+    # wires can drop in from above instead of being fished through a hole.
+    # Bottom of the cut sits at floor level (Z=0.6) — no holes are punched
+    # through the base plate underside.
     wire_chan_w = 1.5
     wire_chan_x0 = 3.0     # well inside the ring (under speaker -X side)
     wire_chan_x1 = 18.0    # outside the ring on +X side
     wire_chan_z_bot = floor_z   # 0.6 — sits on floor; doesn't cut through
-    wire_chan_z_top = floor_z + 1.6   # 2.2 — cuts ring wall up to Z=2.2 (above wire OD)
+    wire_chan_z_top = floor_z + 5.1   # 5.7 — cuts through entire 5mm-tall ring
     for sign, label in [(-1, "Minus"), (+1, "Plus")]:
         wire_y = buzz_hole_cy + sign * 2.0
         chan = body.newObject(
@@ -2045,7 +2045,7 @@ def add_imu_module(doc):
     imu_yw = 15.6    # MPU-6050 PCB width
     imu_pcb_t = 1.0
     hole_spacing = 15.0
-    hole_y_inset = 2.0
+    hole_y_inset = 3.0   # matches IMUPeg y-inset on BasePlate (-1mm Y)
     hole_d = 3.0
 
     # Centered on the base plate (matches IMU_Pocket in build_base_plate)
@@ -2326,7 +2326,7 @@ def main():
     imu_cx_main = 98.9 / 2
     imu_cy_main = 46.0 / 2
     imu_yw_main = 15.6
-    imu_hole_y_inset_main = 2.0
+    imu_hole_y_inset_main = 3.0   # -1mm Y vs prior 2.0 inset
     imu_hole_spacing_main = 15.0
     peg_y_main = imu_cy_main + imu_yw_main / 2 - imu_hole_y_inset_main
     build_imu_washer(doc, "MX",
