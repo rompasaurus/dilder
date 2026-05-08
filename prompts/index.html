@@ -6054,6 +6054,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#prompt-278-2026-05-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #278 — 2026-05-08
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -8931,6 +8942,17 @@
     <span class="md-ellipsis">
       
         Prompt #277 — 2026-05-08
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-278-2026-05-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #278 — 2026-05-08
       
     </span>
   </a>
@@ -12799,6 +12821,26 @@
 <li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer-IMUPegWasher_PX.3mf</code> (new) — peg washer 3MF export</li>
 <li><code>TODO.md</code> — Week 4 section added</li>
 <li><code>PromptProgression.md</code> — entry for #277</li>
+<li><code>website/docs/prompts/index.md</code> — this entry</li>
+</ul>
+<hr />
+<h2 id="prompt-278-2026-05-08">Prompt #278 — 2026-05-08<a class="headerlink" href="#prompt-278-2026-05-08" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Prompt sequence:</strong> "ok slight mod need lets move the imu peg down 1mm on the y axis both of them, also with the speaker buzzer cradle ring the hole for the wires should be slot in the ring not a hole so that the wire don't have to be fished through the hole so let's extend the hole up the z axis so it cuts through the entirety of the ring" -&gt; "ok commit the changes and add to the notes and docs and push"</li>
+<li><strong>Input Tokens (est):</strong> ~150</li>
+<li><strong>Output Tokens (est):</strong> ~3,000</li>
+<li><strong>Commit:</strong> <code>312a65b</code> — Tweak IMU peg Y position and open-top wire channel slots</li>
+<li><strong>Summary:</strong> Two small follow-up adjustments to the no-solar-buzzer enclosure. (1) <strong>IMU pegs -1 mm Y</strong>: <code>imu_hole_y_inset</code> parameter changed 2.0 → 3.0 in three coordinated places — <code>build_base_plate</code> (<code>IMUPeg_MX</code>/<code>_PX</code> placements), <code>add_imu_module</code> (PCB through-hole positions), and <code>main()</code> (<code>IMUPegWasher_MX</code>/<code>_PX</code> placements). Net effect: peg/hole/washer Y moves from 28.8 → 27.8 (1 mm closer to the board's center along Y). (2) <strong>Wire channels now open-top slots</strong>: <code>wire_chan_z_top</code> raised from <code>floor_z + 1.6</code> (Z=2.2) to <code>floor_z + 5.1</code> (Z=5.7) so the cut extends through the full 5 mm-tall <code>BuzzerCradleRing</code> height. The slots are now open at the top — wires can drop in from above instead of being threaded laterally through a closed hole. Floor remains uncut (<code>wire_chan_z_bot = floor_z</code>) so no holes appear on the base plate underside. User regenerated the FCStd and re-exported <code>BasePlate</code>, <code>AAACradle</code>, <code>AAACradle_thiccc</code>, and a new <code>TopCover_thicccc</code> 3MF.</li>
+<li><strong>Layman summary:</strong> Two small tweaks. Moved both accelerometer board mounting pegs 1 mm closer to the middle of the board (the user measured the actual hole positions and they were a bit closer to center than first assumed). Changed the speaker wire channels from short notches near the bottom of the retaining ring to tall open-top slots that go all the way up — now you can just drop the wires into the slots from above instead of having to fish them through a closed-off hole.</li>
+<li><strong>Files:</strong></li>
+<li><code>hardware-design/freecad-mk2/dilder_rev2_mk2_no_solar_buzzer.FCMacro</code> — <code>imu_hole_y_inset</code> 2.0 → 3.0 in three places; <code>wire_chan_z_top</code> <code>floor_z + 1.6</code> → <code>floor_z + 5.1</code></li>
+<li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer.FCStd</code> — regenerated</li>
+<li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer-BasePlate.3mf</code> — re-exported with updated peg + slot geometry</li>
+<li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer-AAACradle.3mf</code> — re-exported</li>
+<li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer-AAACradle_thiccc.3mf</code> — re-exported (thicker variant)</li>
+<li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer-TopCover_thicccc.3mf</code> (new) — top cover thicker variant export</li>
+<li><code>TODO.md</code> — two tweak items added to Week 4 completed list</li>
+<li><code>PromptProgression.md</code> — entry for #278</li>
 <li><code>website/docs/prompts/index.md</code> — this entry</li>
 </ul>
 
