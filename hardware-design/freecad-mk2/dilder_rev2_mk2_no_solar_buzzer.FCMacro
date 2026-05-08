@@ -5,18 +5,22 @@ Dilder Rev 2 Mk2 — NO SOLAR + ACTIVE BUZZER variant
 Each built from constrained sketches + Pad/Pocket/Fillet/AdditivePrimitive chains.
 
 Variant: Based on the no-solar build. Adds a 12 mm × 9.5 mm (12095)
-active buzzer on the -X short wall (display side), nestled just below
-the FPC ribbon-cable bridge in the cover. The buzzer drops through a
-full through-hole in the cradle and rests on a flange ring in the base
-plate. Sound exits through a 10 mm port in the floor; wires route
-through the same hole.
+active buzzer on the -X short wall (display side). The buzzer sits on
+the base plate floor inside a containment ring, with its top resting
+against a small pit on the cradle's underside. Sound routes laterally
+through a horizontal channel cut in the cradle, continuing through the
+cover's -X side wall, exiting as a small hole on the cover side.
+Base plate sides are extended +5 mm (bp_h=9.0) for cable routing room.
 
 Presets baked:
-  Base plate:  no solar, thinner back  (bp_h=4.0, floor=0.6, no solar pit/holes)
-               + buzzer flange ring + sound port
+  Base plate:  no solar + 5 mm side ext  (bp_h=9.0, floor=0.6)
+               + BuzzerCradleRing (containment) + BuzzerNest (wall recess)
+               (no through-floor sound port; sound now exits the cover side)
   AAA cradle:  04-27 shortened + open window  (cell_len = 39.5, clip_win_z_ext = 4)
-               + buzzer mount shelf + 12 mm through-hole
+               + shallow BuzzerPocket (1.2 mm; speaker top rests against it)
+               + BuzzerSoundPit + BuzzerSoundChannel (lateral exit)
   Top cover:   4-26-final-face-for-now  (fp_z = 1.0, edge_curve_r = 2.2)
+               + BuzzerWallPocket + BuzzerSoundChannel (small side hole)
 
 All values live in the Parameters spreadsheet — change any cell, Ctrl+Shift+R.
 Save path (auto):  hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer.FCStd
@@ -145,7 +149,7 @@ PARAMS = [
     ("pillar",         5.0,  "Corner pillar side"),
     # ─── Base plate ───
     # SCAD builds at 8mm then shaves 2mm band (Z=4..6), effective height = 6
-    ("bp_h",           4.0,  "Base plate height Z (no solar: 6 - 2)"),
+    ("bp_h",           9.0,  "Base plate height Z (no solar 4.0 + 5mm side extension for cable routing)"),
     ("bp_fillet",      2.0,  "Bottom fillet radius"),
     ("bp_floor",       0.6,  "Pocket floor thickness (no solar: 2.6 - 2.0)"),
     ("cpx0",           5.1,  "Pocket X start (+2mm with wall_mx)"),
@@ -298,8 +302,8 @@ def build_base_plate(doc):
     body = doc.addObject("PartDesign::Body", "BasePlate")
 
     W, H = 98.9, 46.0
-    Z = 4.0           # no-solar: 6mm - 2mm (solar pit depth removed)
-    Z_preshave = 6.0   # adjusted pre-shave height (for USB-C Z calculation)
+    Z = 9.0           # no-solar 4.0 + 5mm side extension for cable routing
+    Z_preshave = 11.0  # tracks Z + 2 (USB-C Z origin uses pre-shave reference)
     floor_z = 0.6      # no-solar: 2.6 - 2.0 (keeps same pocket depth)
 
     # ── 1. Outer profile sketch (constrained rectangle at origin) ──
@@ -533,15 +537,19 @@ def build_base_plate(doc):
     # ── 12. Piezo speaker ring REMOVED (using active buzzer instead) ──
 
     # ── 14. MPU-6050 accelerometer pocket (centered between battery rails) ──
-    # GY-521 module: 21 × 16 × 1.0 mm PCB + ~2.3 mm components on top.
+    # GY-521 module: 20 × 15.6 × 1.0 mm PCB + ~2.3 mm components on top.
     # Centered on the base plate (enc_x/2, enc_y/2).
     # Retaining wall around a recessed pocket (module drops in flush).
-    imu_xl = 21.0    # GY-521 PCB X length
-    imu_yw = 16.0    # GY-521 PCB Y width
+    # 2 mounting holes on the +Y long edge, 15 mm apart center-to-center
+    # (so 2.5 mm in from each X-end).
+    imu_xl = 20.0    # MPU-6050 PCB X length
+    imu_yw = 15.6    # MPU-6050 PCB Y width
     imu_pcb_t = 1.0  # PCB thickness
     imu_slop = 0.2   # clearance per side
     imu_wall = 1.0   # retaining wall thickness
     imu_wall_h = 1.5 # wall height above pocket floor
+    imu_hole_spacing = 15.0   # peg center-to-center along X
+    imu_hole_y_inset = 2.0    # peg distance from +Y long edge
 
     # Center: middle of the base plate
     imu_cx = W / 2   # 48.45
@@ -572,6 +580,24 @@ def build_base_plate(doc):
         V(imu_cx - ipx / 2, imu_cy - ipy / 2, floor_z - 0.1), ROT0)
     doc.recompute()
 
+    # ── 14b. IMU corner mounting pegs (2 × 3mm pegs at +Y long-edge corners) ──
+    # 2.8 mm OD pegs (0.2 mm slop in 3 mm PCB hole). Rise from imu_pocket
+    # floor (floor_z - 0.1) up through the PCB and protrude 1.9 mm past PCB
+    # top — enough for the press-fit square washer (1.5 mm thick) to lock
+    # on. Hole spacing 15 mm center-to-center (per board spec).
+    peg_d_v = 2.8
+    peg_z_bot = floor_z - 0.1
+    peg_top_z = floor_z + imu_pcb_t + 1.9   # = 3.5 (PCB top + 1.9 mm)
+    peg_h_v = peg_top_z - peg_z_bot          # = 3.0
+    peg_y_v = imu_cy + imu_yw / 2 - imu_hole_y_inset   # +Y long edge, 2 mm inset
+    for sign, label in [(-1, "MX"), (+1, "PX")]:
+        peg_x_v = imu_cx + sign * imu_hole_spacing / 2
+        peg = body.newObject("PartDesign::AdditiveCylinder", f"IMUPeg_{label}")
+        peg.Radius = peg_d_v / 2
+        peg.Height = peg_h_v
+        peg.Placement = App.Placement(V(peg_x_v, peg_y_v, peg_z_bot), ROT0)
+        doc.recompute()
+
     # ── 15. Solar wire holes REMOVED (no-solar variant) ──
 
     # ── 16. USB reinforcement block ──
@@ -590,35 +616,64 @@ def build_base_plate(doc):
             V(W - 1.2 - usb_reinf_x, H/2 - usb_reinf_y/2, floor_z), ROT0)
         doc.recompute()
 
-    # ── 17. Buzzer sound hole (-X end, 2 mm through floor) ──
-    # The active buzzer lays flat on the pocket floor.  A small 2 mm hole
-    # dead-center lets sound exit through the base plate bottom.
-    # Global X = 100.7 - cradle_local_cx;  pushed as close to X=0 as
-    # possible (center at X=6.5 so the 12 mm body clears the outer wall).
+    # ── 17. Buzzer floor through-hole REMOVED ──
+    # Sound now routes laterally through a channel in the cradle and out a
+    # small hole in the cover -X wall (no through-floor port needed).
     buzz_hole_cx = 8.5
     buzz_hole_cy = H / 2   # 23.0
-    buzz_hole_r = 1.0       # 2 mm diameter
 
-    port = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerSoundPort")
-    port.Radius = buzz_hole_r
-    port.Height = floor_z + 0.2
-    port.Placement = App.Placement(V(buzz_hole_cx, buzz_hole_cy, -0.1), ROT0)
-    port.setExpression("Radius", SP("buzz_port_d") + " / 2")
-    port.setExpression("Height", SP("bp_floor") + " + 0.2")
+    # ── 17b. Buzzer containment ring (additive disc, becomes a ring after
+    # BuzzerNest carves the inner). Surrounds the speaker so it can rest in
+    # place on the base plate floor now that the cradle is 5 mm higher and
+    # no longer hugs the buzzer body sideways.
+    ring_or = (12.0 + 2.0) / 2   # 7.0 — buzz_d/2 + 1mm wall
+    ring_h = 5.0                 # tall enough to retain the 9.5 mm buzzer
+    ring = body.newObject("PartDesign::AdditiveCylinder", "BuzzerCradleRing")
+    ring.Radius = ring_or
+    ring.Height = ring_h
+    ring.Placement = App.Placement(
+        V(buzz_hole_cx, buzz_hole_cy, floor_z), ROT0)
+    ring.setExpression("Radius", "(" + SP("buzz_d") + " + 2.0) / 2")
     doc.recompute()
 
     # ── 18. Buzzer nest indentation (-X wall) ──
-    # The 12 mm buzzer at X=6.5 extends past the pocket edge (X=3.1)
+    # The 12 mm buzzer at X=8.5 extends past the pocket edge (X=5.1)
     # into the -X wall.  Cut a circular indent so the buzzer nestles in.
+    # Also carves the inner of the BuzzerCradleRing additive cylinder above,
+    # leaving a 0.9 mm thick retaining ring around the speaker.
     buzz_nest_r = (12.0 + 0.2) / 2   # 6.1 — matches cradle bore
     buzz_nest = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerNest")
     buzz_nest.Radius = buzz_nest_r
-    buzz_nest.Height = Z - floor_z + 0.1   # pocket depth (3.5 mm)
+    buzz_nest.Height = Z - floor_z + 0.1   # full wall depth above floor
     buzz_nest.Placement = App.Placement(
         V(buzz_hole_cx, buzz_hole_cy, floor_z - 0.05), ROT0)
     buzz_nest.setExpression("Radius", "(" + SP("buzz_d") + " + 0.2) / 2")
     buzz_nest.setExpression("Height", SP("bp_h") + " - " + SP("bp_floor") + " + 0.1")
     doc.recompute()
+
+    # ── 19. Buzzer wire channels (2× notches in lower ring wall) ──
+    # The speaker is lifted +2 mm so a 2 mm gap exists between the floor
+    # and the speaker bottom — the wires (1 mm OD, exiting the speaker
+    # bottom face at Y = buzz_cy ± 2.0) route freely through this gap. The
+    # channels just notch the lower ring wall so the wires can exit the
+    # BuzzerCradleRing toward the +X case interior. Bottom of the cut sits
+    # at floor level (Z=0.6) so no holes are punched through the base plate
+    # underside.
+    wire_chan_w = 1.5
+    wire_chan_x0 = 3.0     # well inside the ring (under speaker -X side)
+    wire_chan_x1 = 18.0    # outside the ring on +X side
+    wire_chan_z_bot = floor_z   # 0.6 — sits on floor; doesn't cut through
+    wire_chan_z_top = floor_z + 1.6   # 2.2 — cuts ring wall up to Z=2.2 (above wire OD)
+    for sign, label in [(-1, "Minus"), (+1, "Plus")]:
+        wire_y = buzz_hole_cy + sign * 2.0
+        chan = body.newObject(
+            "PartDesign::SubtractiveBox", f"BuzzerWireChannel_{label}")
+        chan.Length = wire_chan_x1 - wire_chan_x0
+        chan.Width = wire_chan_w
+        chan.Height = wire_chan_z_top - wire_chan_z_bot
+        chan.Placement = App.Placement(
+            V(wire_chan_x0, wire_y - wire_chan_w / 2, wire_chan_z_bot), ROT0)
+        doc.recompute()
 
     feats = [o.Name for o in body.Group if "Origin" not in o.Name]
     print(f"    BasePlate: {len(feats)} features")
@@ -818,7 +873,7 @@ def build_cradle(doc):
     # face plate (Z=18 global) and outer top (Z=23 global). To slot the body
     # into the cover, the PCB drops below the cradle's mating face into a
     # pit cut into the cradle plug. After the cradle's 180° Y flip:
-    #   - cradle plug_bot (local Z=-5.1) → global Z=18.1 (cradle's bottom)
+    #   - cradle plug_bot (local Z=-5.1) → global Z=21.1 (cradle's bottom, no-solar +5mm)
     #   - cradle plug_top (local Z=+7.0)  → global Z=6.0  (mating face)
     # Pit opens DOWN globally (= UP in local). Depth = joy_pit_depth.
     # XY centered at (joy_cx, enc_y/2 + joy_pcb_y_offset).
@@ -939,26 +994,23 @@ def build_cradle(doc):
         doc.recompute()
 
     # ── 13. Active buzzer pocket (+X local = -X global = display side) ──
-    # The buzzer sits on the base plate floor and sticks up through the
-    # mating face into this pocket.  The pocket is open at the mating
-    # face (plug_top) and its ceiling reaches just below the display
-    # cable cutout (DispConnCutout ends at local Z = -2.1).  No shelf,
-    # no through-hole — just a circular bore in the existing solid plug.
+    # The speaker is lifted +2 mm in Z (bottom at global Z=2.6, top at
+    # global Z=12.1) so the wires can route in the gap below it without
+    # cutting through the floor. The cradle BuzzerPocket is deepened by
+    # 2 mm to compensate so the speaker top still seats against the
+    # pocket ceiling.
+    # Pocket ceiling in cradle local Z = cradle_z_global - speaker_top_global
+    #                                  = 16.0 - 12.1 = 3.9.
+    # Pocket spans cradle local Z=3.85 (with -0.05 over-cut) to plug_top+0.1=7.1.
     buzz_d_v = 12.0
     buzz_bore_r = (buzz_d_v + 0.2) / 2    # 6.1
 
-    # Center in cradle local — global X = 6.5 → local = 100.7 - 6.5 = 92.2
+    # Center in cradle local — global X = 8.5 → local = 100.7 - 8.5 = 92.2
     buzz_cx_local = 92.2
     buzz_cy_local = 46.0 / 2               # 23.0
 
-    # Pocket: open at the mating face (plug_top = 7.0), ceiling at
-    # the buzzer top so solid material bridges across both sides of the
-    # cradle right at the speaker top.
-    # Buzzer top in cradle local Z = 11.0 - (0.6 + 9.5) = 0.9.
-    # Pocket depth = 7.0 - 0.9 = 6.1 mm (exactly the buzzer height
-    # above the mating face).
-    pocket_ceil_z = 0.9    # buzzer top level
-    pocket_h = plug_top - pocket_ceil_z + 0.1   # 6.2
+    pocket_ceil_z = 3.9    # buzzer top level (cradle local) — speaker now lifted +2mm
+    pocket_h = plug_top - pocket_ceil_z + 0.1   # 3.2
 
     pocket = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerPocket")
     pocket.Radius = buzz_bore_r
@@ -966,6 +1018,36 @@ def build_cradle(doc):
     pocket.Placement = App.Placement(
         V(buzz_cx_local, buzz_cy_local, pocket_ceil_z - 0.05), ROT0)
     pocket.setExpression("Radius", "(" + SP("buzz_d") + " + 0.2) / 2")
+    doc.recompute()
+
+    # ── 14. Sound pit + lateral channel (cradle) ──
+    # A small vertical pit is drilled UP from the pocket ceiling (= speaker
+    # top) into the cradle solid material above, then a horizontal channel
+    # runs from the pit out the cradle -X global side. The channel is
+    # continued through the cover -X wall (see TopCover BuzzerSoundChannel).
+    # Pit: from pocket ceiling (cradle local 3.9) UP in global = DOWN in
+    # cradle local to Z=1.9 (2 mm pit depth → global 14.1, above speaker top).
+    pit_bot_local = pocket_ceil_z - 2.0   # 1.9
+    pit_top_local = pocket_ceil_z         # 3.9
+    pit = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerSoundPit")
+    pit.Radius = 1.0
+    pit.Height = pit_top_local - pit_bot_local + 0.05
+    pit.Placement = App.Placement(
+        V(buzz_cx_local, buzz_cy_local, pit_bot_local), ROT0)
+    pit.setExpression("Radius", SP("buzz_port_d") + " / 2")
+    doc.recompute()
+
+    # Channel: horizontal cylinder, axis along +X cradle local (= -X global),
+    # centered at pit mid-Z. Starts at speaker center (buzz_cx_local) and
+    # extends past plug_x1 (95.4) so it exits the cradle's -X global face.
+    chan_z_local = (pit_top_local + pit_bot_local) / 2   # 2.9 (= global Z 13.1)
+    chan = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerSoundChannel")
+    chan.Radius = 1.0
+    chan.Height = 8.0   # 92.2 + 8.0 = 100.2 (well past plug_x1=95.4)
+    chan.Placement = App.Placement(
+        V(buzz_cx_local, buzz_cy_local, chan_z_local),
+        App.Rotation(V(0, 1, 0), 90))
+    chan.setExpression("Radius", SP("buzz_port_d") + " / 2")
     doc.recompute()
 
     feats = [o.Name for o in body.Group if "Origin" not in o.Name]
@@ -1205,10 +1287,10 @@ def build_top_cover(doc):
     anchor_outer = 14.0
     anchor_inner = 12.0
     # Anchor bottom meets the PCB top face:
-    #   pit floor global = 18.1 - 8.45 = 9.65
-    #   PCB thickness ≈ 1.5 mm → PCB top global = 11.15
-    #   cover local = global - 11.0 → PCB top local = 0.15
-    #   depth = face_bot - PCB top local = 7.0 - 0.15 = 6.85
+    #   pit floor global = 21.1 - 8.45 = 12.65 (no-solar +5mm side ext)
+    #   PCB thickness ≈ 1.5 mm → PCB top global = 14.15
+    #   cover local = global - 14.0 → PCB top local = 0.15
+    #   depth = face_bot - PCB top local = 7.0 - 0.15 = 6.85 (depth unchanged — anchor scales with cover)
     anchor_depth = 6.85
     anchor_r = 1.0
 
@@ -1235,24 +1317,43 @@ def build_top_cover(doc):
 
     # ── 13. Buzzer wall pocket (-X wall clearance) ──
     # The buzzer bore extends past the cradle plug edge into the cover's
-    # -X wall.  Cut a cylindrical pocket so the buzzer body fits when the
+    # -X wall. Cut a cylindrical pocket so the buzzer body fits when the
     # cradle is assembled inside the cover.
-    # Bore center global (6.5, 23.0), R = 6.3 (slight clearance).
+    # Bore center global (8.5, 23.0), R = 6.3 (slight clearance).
+    # With bp_top=9 → cover at global Z=14, the buzzer (top global Z=10.1)
+    # barely enters the cover wall, but we keep the pocket sized to clear
+    # the cradle's BuzzerPocket bore that opens out the cradle's -X face.
     buzz_pocket_cx = 8.5
     buzz_pocket_cy = enc_y / 2   # 23.0
     buzz_pocket_r = 6.3           # 12.6 mm — clears the 12.2 mm bore
-    # Z range: from the bottom of the cover wall to just above
-    # where the buzzer top would be (cover local).
-    # Buzzer top global Z = 10.1 → cover local = 10.1 - 9.0 = 1.1
-    # Cover wall bottom: local Z = -ext = -5.0
-    buzz_pocket_z_bot = -ext - 0.1   # -5.1
-    buzz_pocket_h = 1.2 - buzz_pocket_z_bot   # 6.3
+    buzz_pocket_z_bot = -ext - 0.1   # -5.1 cover local (= global Z=8.9)
+    # Pocket top at cover local Z = 1.0 (= global Z=15.0), well above the
+    # speaker top at global Z=12.1 (lifted +2mm) and clearing the lateral
+    # sound channel at global Z=13.1.
+    buzz_pocket_h = 1.0 - buzz_pocket_z_bot   # 6.1
 
     bwp = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerWallPocket")
     bwp.Radius = buzz_pocket_r
     bwp.Height = buzz_pocket_h
     bwp.Placement = App.Placement(
         V(buzz_pocket_cx, buzz_pocket_cy, buzz_pocket_z_bot), ROT0)
+    doc.recompute()
+
+    # ── 14. Buzzer sound channel exit (small hole through -X wall) ──
+    # Continues the cradle's BuzzerSoundChannel out the cover's -X side.
+    # Channel center global (Y=23.0, Z=13.1) — 1 mm above the lifted speaker
+    # top so the bottom of the channel is flush with the speaker top.
+    # Cover local Z = 13.1 - (bp_top + tc_wall_ext) = 13.1 - 14.0 = -0.9.
+    # Cylinder runs from cover local X=-1 (just outside) to X=6 (well past
+    # the wall_mx=5 inner face so the cut is clean).
+    chan_z_cover_local = -0.9
+    chan = body.newObject("PartDesign::SubtractiveCylinder", "BuzzerSoundChannel")
+    chan.Radius = 1.0
+    chan.Height = 7.0
+    chan.Placement = App.Placement(
+        V(-1.0, enc_y / 2, chan_z_cover_local),
+        App.Rotation(V(0, 1, 0), 90))
+    chan.setExpression("Radius", SP("buzz_port_d") + " / 2")
     doc.recompute()
 
     feats = [o.Name for o in body.Group if "Origin" not in o.Name]
@@ -1280,9 +1381,9 @@ PICO_USB_PLUS_X = False
 # X-anchor: inner -X wall of PicoNest — cradle local X = pico_x_start +
 #   pico_nx = 6.3 + 79.2 = 85.5.  After 180° Y flip + translate(96.7):
 #   global X = 96.7 - 85.5 = 11.2.
-# Z-anchor: plug_top mating face — global Z = bp_top = 4.0 (no-solar).
+# Z-anchor: plug_top mating face — global Z = bp_top = 9.0 (no-solar +5mm extension).
 PICO_ANCHOR_X_GLOBAL = 13.2
-PICO_ANCHOR_Z_GLOBAL = 4.0   # no-solar: bp_top = 4.0
+PICO_ANCHOR_Z_GLOBAL = 9.0   # no-solar +5mm side ext: bp_top = 9.0
 
 
 def add_pico_with_headers(doc):
@@ -1483,14 +1584,14 @@ def add_joystick_pcb(doc):
     # JoystickPCBPit are shifted by `joy_pcb_y_offset` so they sit where SW1
     # lands when the PCB is bbox-centered.
     # PCB drops into the cradle pit so the SW1 body fits inside the cover.
-    # Pit floor in global Z = cradle plug_bot global (Z=18.1) - joy_pit_depth
-    # = 18.1 - 8.45 = 9.65. PCB bottom rests there (we use 9.55 with overlap).
+    # Pit floor in global Z = cradle plug_bot global (Z=21.1) - joy_pit_depth
+    # = 21.1 - 8.45 = 12.65. PCB bottom rests there (no-solar +5mm side ext).
     joy_cx_g = 81.35   # +2mm with enc_x extension (05-01-2026)
     joy_cy_g = 46.0 / 2           # = enc_y / 2 = 23.0 — PCB bbox-centered
     # (was 46.0/2 + 0.67 which double-applied the SW1 offset; the cover
     #  hole / pocket / pit already shift by joy_pcb_y_offset to land on
     #  SW1's stick, so the PCB itself should sit at the true bbox center.)
-    pocket_floor_g = 18.1 - 8.45  # = 9.65 — PCB bottom rests on pit floor
+    pocket_floor_g = 21.1 - 8.45  # = 12.65 — PCB bottom rests on pit floor (cradle plug_bot global = bp_top(9)+7+5.1)
 
     bb_cx = (bb.XMin + bb.XMax) / 2
     bb_cy = (bb.YMin + bb.YMax) / 2
@@ -1536,12 +1637,12 @@ def build_thumbpiece(doc):
     body = doc.addObject("PartDesign::Body", "Thumbpiece")
 
     # ── Constants (global Z) ──
-    # Cover top face is at global Z = 23.0 (cover Placement Z=11 + local
+    # Cover top face is at global Z = 28.0 (cover Placement Z=14 + local
     # face_top=12). The 12 mm circle cutout opens here. The disc nests
     # inside the hole — top sits just below cover top, OD = joy_d - 1.0
     # for 0.5 mm radial clearance (1 mm total) so the joystick can swing
     # for directional travel.
-    cover_top_z = 23.0
+    cover_top_z = 28.0   # bp_top(9) + tc_wall_ext(5) + total_h(face_top 8 + bull_r 4 + face_top extra fp_z) — actual cover top global Z. With +5mm extension: was 23.0, now 28.0.
     joy_cx_v = 81.35   # +2mm with enc_x extension (05-01-2026)
     joy_cy_hole_v = 46.0 / 2 + 0.67       # 23.67 — cover hole / disc center
     joy_cy_stick_v = 23.68                # actuator stick center (PCB bbox at enc_y/2)
@@ -1628,15 +1729,14 @@ def add_peripherals(doc):
     # In cradle local: bay_mx_start=20.4 to bay_px_end=64.9 (44.5mm bay),
     # cells centered with aaa_cspace=2.0 per end → cell X local 22.4..61.9.
     # bay_y locals: 7.85, 38.15. bay_cz local: 0.95.
-    # Cradle Placement: 180° about Y, then translate (96.7, 0, bp_top+7.0=11).
-    # → global cell X = [96.7-61.9, 96.7-22.4] = [34.8, 74.3]
+    # Cradle Placement: 180° about Y, then translate (100.7, 0, bp_top+7.0=16).
     # → global cell Y = bay_y_local (Y unchanged by Y rotation)
-    # → global cell Z = 11.0 - bay_cz_local = 10.05
+    # → global cell Z = 16.0 - bay_cz_local = 15.05
     aaa_d = 10.5
     aaa_len = 41.5
     cell_x_min_g = 100.7 - 63.9   # +2mm cradle translate, +2mm cell length → cell -X global stays put
     cell_y_g = {1: 7.85, 2: 38.15}
-    cell_z_g = 11.0 - 0.95
+    cell_z_g = 16.0 - 0.95   # cradle global Z = bp_top(9) + 7 = 16
     # Battery cylinder is along X axis, placed by cylinder center on -X end
     # FreeCAD makeCylinder is along Z by default; rotate 90° about Y to align
     # with X, with the cylinder origin at one end of the cell.
@@ -1676,7 +1776,7 @@ def add_peripherals(doc):
     tp_pcb_t = 1.6
     tp_x_min_g = 100.7 - (3.3 + tp_xl_v)        # = 67.4 (+2mm with enclosure extension)
     tp_y_min_g = 14.3
-    tp_z_bot_g = 11.0 - 6.0                    # = 5.0 (indent floor, no-solar)
+    tp_z_bot_g = 16.0 - 6.0                    # = 10.0 (indent floor, no-solar +5mm)
     # PCB top face mates with indent floor at tp_z_bot_g, PCB hangs below
     tp_pcb = Part.makeBox(tp_xl_v, tp_yw_v, tp_pcb_t,
                           V(tp_x_min_g, tp_y_min_g, tp_z_bot_g - tp_pcb_t))
@@ -1696,14 +1796,14 @@ def add_peripherals(doc):
     # Module sized to fit screen inlay (disp_xl=65, disp_yd=30, inlay_z=3).
     # Active e-paper area approx 48×22 mm centered with the win_shift toward
     # +X. Module thickness ~3.0 mm fitting the 3 mm inlay depth.
-    # TopCover Placement: V(0, 0, bp_top + tc_wall_ext = 9), no rotation.
+    # TopCover Placement: V(0, 0, bp_top + tc_wall_ext = 14), no rotation.
     # Inlay carves from local Z=face_bot=7 upward by inlay_depth=3 → global
-    # Z = 11+7 = 18 (module bottom = back of display PCB) to Z = 11+10 = 21
+    # Z = 14+7 = 21 (module bottom = back of display PCB) to Z = 14+10 = 24
     # (active screen surface visible through the window cut).
     disp_xl_v, disp_yd_v = 65.2, 30.0
     disp_x_min_g = 3.4   # disp_x0 = wall_mx + 0.4
     disp_y_min_g = 8.0   # disp_y0 = enc_y/2 - disp_yd/2
-    disp_z_back_g = 9.0 + 7.0   # no-solar: bp_top(4) + wall_ext(5) = 9, + face_bot(7) = 16
+    disp_z_back_g = 14.0 + 7.0   # no-solar +5mm: bp_top(9) + wall_ext(5) = 14, + face_bot(7) = 21
     disp_module_h = 3.0          # full module thickness
     # Module body (PCB + plastic carrier)
     disp_pcb = Part.makeBox(disp_xl_v, disp_yd_v, disp_module_h,
@@ -1756,7 +1856,7 @@ def add_peripherals(doc):
     # In CRADLE LOCAL coords: 4 slots (computed in build_cradle):
     #   P slots at local sx = 65.9 (slot face cell-side at local x = 65.9)
     #   M slots at local sx = 18.5 (slot face cell-side at local x = 19.4)
-    # After cradle 180° Y flip + translate(96.7, 0, 11.0):
+    # After cradle 180° Y flip + translate(100.7, 0, 16.0):
     #   P slot face → global X = 96.7 - 65.9 = 30.8  (faces +X toward cell neg)
     #   M slot face → global X = 96.7 - 19.4 = 77.3  (faces -X toward cell pos)
     #
@@ -1874,26 +1974,99 @@ def add_peripherals(doc):
 ## add_piezo_speaker REMOVED — using active buzzer instead ##
 
 
+# =====================================================================
+# IMU PEG WASHER — square 6×6×1.5 mm, snap-fits on 2.8 mm peg
+# =====================================================================
+# Two identical washer bodies, one per IMU corner peg. Hole is 2.7 mm
+# (interference fit on the 2.8 mm peg — PLA flex allows snap-on).
+# Bodies are placed in the assembly above each peg so the rendered
+# scene shows the full mounted board. Print separately.
+
+def build_imu_washer(doc, instance_idx, peg_x, peg_y):
+    print(f"  Building IMU peg washer {instance_idx}...")
+    body = doc.addObject("PartDesign::Body", f"IMUPegWasher_{instance_idx}")
+
+    side = 6.0
+    thick = 1.5
+    hole_d = 2.7   # interference fit on 2.8 mm peg
+
+    # Square plate sketch
+    sk = body.newObject("Sketcher::SketchObject", f"Sk_Washer_{instance_idx}")
+    sk.AttachmentSupport = [(body.Origin.OriginFeatures[3], "")]
+    sk.MapMode = "FlatFace"
+    x0 = -side / 2
+    y0 = -side / 2
+    sk.addGeometry(Part.LineSegment(V(x0, y0, 0), V(x0 + side, y0, 0)), False)
+    sk.addGeometry(Part.LineSegment(V(x0 + side, y0, 0), V(x0 + side, y0 + side, 0)), False)
+    sk.addGeometry(Part.LineSegment(V(x0 + side, y0 + side, 0), V(x0, y0 + side, 0)), False)
+    sk.addGeometry(Part.LineSegment(V(x0, y0 + side, 0), V(x0, y0, 0)), False)
+    sk.addConstraint(Sketcher.Constraint("Coincident", 0, 2, 1, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 1, 2, 2, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 2, 2, 3, 1))
+    sk.addConstraint(Sketcher.Constraint("Coincident", 3, 2, 0, 1))
+    sk.addConstraint(Sketcher.Constraint("Horizontal", 0))
+    sk.addConstraint(Sketcher.Constraint("Horizontal", 2))
+    sk.addConstraint(Sketcher.Constraint("Vertical", 1))
+    sk.addConstraint(Sketcher.Constraint("Vertical", 3))
+    doc.recompute()
+
+    pad = body.newObject("PartDesign::Pad", "Pad_Washer")
+    pad.Profile = sk
+    pad.Length = thick
+    doc.recompute()
+
+    # Center hole — SubtractiveCylinder cuts through
+    hole = body.newObject("PartDesign::SubtractiveCylinder", "WasherHole")
+    hole.Radius = hole_d / 2
+    hole.Height = thick + 0.2
+    hole.Placement = App.Placement(V(0, 0, -0.1), ROT0)
+    doc.recompute()
+
+    # Position above the peg so it sits with bottom on PCB top (Z=1.6).
+    # Washer top at Z = 1.6 + 1.5 = 3.1 — within the peg height (top at 3.5).
+    body.Placement = App.Placement(V(peg_x, peg_y, 1.6), ROT0)
+
+    try:
+        body.ViewObject.ShapeColor = (0.85, 0.85, 0.88)  # light grey
+    except Exception:
+        pass
+
+    return body
+
+
 def add_imu_module(doc):
-    """GY-521 (MPU-6050) 6-axis IMU module: 21 × 16 × 1.0 mm PCB.
-    Centered in the IMU_Pocket on the base plate."""
-    print("  Adding IMU module (GY-521 / MPU-6050)...")
+    """MPU-6050 6-axis IMU module: 20 × 15.6 × 1.0 mm PCB.
+    Centered in the IMU_Pocket on the base plate.
+    PCB has 2 mounting holes 15 mm apart on the +Y long edge."""
+    print("  Adding IMU module (MPU-6050)...")
 
     floor_z = 0.6   # no-solar: 2.6 - 2.0
-    imu_xl = 21.0    # GY-521 PCB length
-    imu_yw = 16.0    # GY-521 PCB width
+    imu_xl = 20.0    # MPU-6050 PCB length
+    imu_yw = 15.6    # MPU-6050 PCB width
     imu_pcb_t = 1.0
+    hole_spacing = 15.0
+    hole_y_inset = 2.0
+    hole_d = 3.0
 
     # Centered on the base plate (matches IMU_Pocket in build_base_plate)
-    imu_cx = 98.9 / 2   # 48.45
+    imu_cx = 98.9 / 2   # 49.45
     imu_cy = 46.0 / 2   # 23.0
 
     pcb_x0 = imu_cx - imu_xl / 2
     pcb_y0 = imu_cy - imu_yw / 2
 
-    # PCB
-    pcb = Part.makeBox(imu_xl, imu_yw, imu_pcb_t,
-                       V(pcb_x0, pcb_y0, floor_z))
+    # PCB blank
+    pcb_solid = Part.makeBox(imu_xl, imu_yw, imu_pcb_t,
+                             V(pcb_x0, pcb_y0, floor_z))
+
+    # Mounting holes — cut through PCB at the 2 corner positions
+    hole_y = imu_cy + imu_yw / 2 - hole_y_inset
+    for sign in (-1, +1):
+        hole_x = imu_cx + sign * hole_spacing / 2
+        hole_cyl = Part.makeCylinder(
+            hole_d / 2, imu_pcb_t + 0.2,
+            V(hole_x, hole_y, floor_z - 0.1))
+        pcb_solid = pcb_solid.cut(hole_cyl)
 
     # MPU-6050 QFN chip (4 × 4 × 0.9 mm) — centered on PCB
     chip_x = 4.0
@@ -1917,13 +2090,14 @@ def add_imu_module(doc):
                                   floor_z + imu_pcb_t))
 
     pcb_obj = doc.addObject("Part::Feature", "IMU_Module")
-    pcb_obj.Shape = Part.Compound([pcb, chip, comp, header_strip])
+    pcb_obj.Shape = Part.Compound([pcb_solid, chip, comp, header_strip])
     try:
         pcb_obj.ViewObject.ShapeColor = (0.10, 0.12, 0.45)  # dark blue PCB
     except Exception:
         pass
 
-    print(f"    IMU: {imu_xl}×{imu_yw} mm at ({imu_cx:.1f}, {imu_cy:.1f})")
+    print(f"    IMU: {imu_xl}×{imu_yw} mm at ({imu_cx:.1f}, {imu_cy:.1f}), "
+          f"holes 15 mm apart")
 
 
 def add_solar_panel(doc):
@@ -2025,9 +2199,10 @@ def add_solar_panel(doc):
 # =====================================================================
 # Lunpog / generic 3-12V active piezo buzzer.  Cylindrical housing with
 # pre-attached 50 mm wire leads (red +, black −).  Sound hole on one
-# face.  Mounted with the sound hole facing down toward the base plate;
-# drops through the cradle's BuzzerThrough hole and rests on the
-# BuzzerFlange lip.  Sound exits through BuzzerSoundPort in the floor.
+# face.  Mounted with the sound hole facing UP toward the cradle so sound
+# enters the cradle's BuzzerSoundPit and exits through the lateral
+# BuzzerSoundChannel out the cover's -X wall.  The buzzer is held in place
+# by the BuzzerCradleRing on the base plate floor.
 # Wires exit the top (sealed) face and route inside the enclosure.
 
 def add_buzzer_module(doc):
@@ -2038,30 +2213,32 @@ def add_buzzer_module(doc):
     buzz_d_v = 12.0
     buzz_h_v = 9.5
 
-    # Global position — buzzer sits on the base plate pocket floor,
-    # sticking up through the mating face into the cradle pocket.
-    # Sound hole faces down toward the 2 mm hole in the base plate.
+    # Global position — speaker is lifted +2 mm above the base plate floor
+    # (Z=2.6 instead of 0.6) so the wire end face has a 2 mm gap below it
+    # for the wires to route in. The speaker is held by friction in the
+    # cradle's BuzzerPocket above (which is 2 mm deeper to compensate).
+    # Sound hole now faces UP toward the cradle's BuzzerSoundPit.
     buzz_cx_g = 8.5
     buzz_cy_g = enc_y_v / 2       # 23.0
-    buzz_z_bot_g = 0.6             # base plate pocket floor
+    buzz_z_bot_g = 2.6             # lifted +2 mm — wire gap below
 
-    # Housing — cylindrical can, sound hole at bottom facing base plate
+    # Housing — cylindrical can
     housing = Part.makeCylinder(buzz_d_v / 2, buzz_h_v,
                                 V(buzz_cx_g, buzz_cy_g, buzz_z_bot_g))
 
-    # Wire stubs: exit the TOP face (sealed side) and route up inside
-    # the enclosure toward the Pico.  On a 12095 buzzer the wires come
-    # from the back (non-sound-hole) face.
+    # Wire stubs: exit the BOTTOM face (wire end resting on the base plate
+    # gap) and route along the floor toward +X. Each wire bends down then
+    # horizontal once it clears the speaker bottom.
     wire_d = 1.0
     wire_l = 15.0
-    wire_top_z = buzz_z_bot_g + buzz_h_v   # 11.1
+    wire_z = buzz_z_bot_g - 1.0   # 1.6 — center 1 mm below speaker bottom
     wire_plus = Part.makeCylinder(wire_d / 2, wire_l)
     wire_plus.rotate(V(0, 0, 0), V(0, 1, 0), 90)       # along +X
-    wire_plus.translate(V(buzz_cx_g, buzz_cy_g + 2.0, wire_top_z - 1.0))
+    wire_plus.translate(V(buzz_cx_g, buzz_cy_g + 2.0, wire_z))
 
     wire_minus = Part.makeCylinder(wire_d / 2, wire_l)
     wire_minus.rotate(V(0, 0, 0), V(0, 1, 0), 90)       # along +X
-    wire_minus.translate(V(buzz_cx_g, buzz_cy_g - 2.0, wire_top_z - 1.0))
+    wire_minus.translate(V(buzz_cx_g, buzz_cy_g - 2.0, wire_z))
 
     buzz_obj = doc.addObject("Part::Feature", "ActiveBuzzer_Body")
     buzz_obj.Shape = housing
@@ -2106,9 +2283,9 @@ def main():
     tc = build_top_cover(doc)
 
     # ── Assembly positioning ──
-    # Base plate top face is at Z = bp_h = 4.0 (no-solar)
+    # Base plate top face is at Z = bp_h = 9.0 (no-solar + 5 mm side ext)
     # Both cover and cradle mate flush with that face.
-    bp_top = 4.0   # base plate top Z (no-solar: 6 - 2)
+    bp_top = 9.0   # base plate top Z (no-solar 4.0 + 5 mm cable-routing ext)
 
     # Cover: wall extension goes 5mm below local z=0.
     # Bottom face (local z=-5) flush with base plate top.
@@ -2141,8 +2318,21 @@ def main():
 
     # Piezo speaker REMOVED (using active buzzer instead)
 
-    # IMU — GY-521 (MPU-6050) centered in the base plate's IMU_Pocket
+    # IMU — MPU-6050 centered in the base plate's IMU_Pocket
     add_imu_module(doc)
+
+    # IMU peg washers — 2 separate bodies, snap onto the corner pegs
+    # (positions match the IMUPeg_MX / IMUPeg_PX placements on BasePlate).
+    imu_cx_main = 98.9 / 2
+    imu_cy_main = 46.0 / 2
+    imu_yw_main = 15.6
+    imu_hole_y_inset_main = 2.0
+    imu_hole_spacing_main = 15.0
+    peg_y_main = imu_cy_main + imu_yw_main / 2 - imu_hole_y_inset_main
+    build_imu_washer(doc, "MX",
+                     imu_cx_main - imu_hole_spacing_main / 2, peg_y_main)
+    build_imu_washer(doc, "PX",
+                     imu_cx_main + imu_hole_spacing_main / 2, peg_y_main)
 
     # Solar panel REMOVED (no-solar variant)
 
