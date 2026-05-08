@@ -6043,6 +6043,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#prompt-277-2026-05-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #277 — 2026-05-08
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -8909,6 +8920,17 @@
     <span class="md-ellipsis">
       
         Prompt #276 — 2026-05-07
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompt-277-2026-05-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt #277 — 2026-05-08
       
     </span>
   </a>
@@ -12757,6 +12779,27 @@
 <li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer.FCStd</code> (new) — generated FreeCAD model</li>
 <li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer-*.3mf</code> (new, 5 files) — 3MF print exports (base plate, cradle, top cover, thumbpiece, full assembly)</li>
 <li><code>website/docs/prompts/index.md</code> — prompt #276 added</li>
+</ul>
+<hr />
+<h2 id="prompt-277-2026-05-08">Prompt #277 — 2026-05-08<a class="headerlink" href="#prompt-277-2026-05-08" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Prompt sequence:</strong> Remove base plate through-floor sound port → route sound laterally through cradle pit + horizontal channel exiting the cover -X side wall → extend base plate sides +5 mm for cable routing room → add containment ring around speaker → 2 wire indent channels into ring cutout for the wire-end-down speaker orientation → resize MPU-6050 pocket to 20 × 15.6 mm with 2 corner mounting pegs (15 mm spacing) and 2 separate snap-on square peg washers → cut through-holes in PCB visualization → lift speaker +2 mm Z and deepen cradle pocket to compensate (so wires route in floor gap) → fix base plate underside through-holes from wire channels by clamping cut to floor level → commit, update docs/notes/todos, push</li>
+<li><strong>Input Tokens (est):</strong> ~1,400</li>
+<li><strong>Output Tokens (est):</strong> ~50,000</li>
+<li><strong>Commits:</strong></li>
+<li><code>fdadd83</code> — Sound routing redesign: lateral channel, taller base, IMU pegs</li>
+<li><code>ce4bb05</code> — Update TODO and prompt logs for the no-solar-buzzer overhaul</li>
+<li><strong>Summary:</strong> Major no-solar-buzzer enclosure overhaul across 7 design iterations on <code>dilder_rev2_mk2_no_solar_buzzer.FCMacro</code>. (1) <strong>Lateral sound routing</strong> replaces the through-floor port: removed <code>BuzzerSoundPort</code>; cradle <code>BuzzerPocket</code> made shallow + deepened 2 mm after the speaker lift; new <code>BuzzerSoundPit</code> (vertical) + <code>BuzzerSoundChannel</code> (horizontal R=1 cylinder) tunnel from above the speaker out the cradle's -X global face; matching <code>BuzzerSoundChannel</code> cut through cover -X wall exits as a small side hole. Cover <code>BuzzerWallPocket</code> reshaped (4.1 → 6.1 mm tall) to clear the channel. (2) <strong>Base plate +5 mm Z extension</strong> (<code>bp_h</code> 4.0 → 9.0): <code>Z</code>/<code>Z_preshave</code> updated; <code>bp_top</code> and <code>PICO_ANCHOR_Z_GLOBAL</code> cascade; cradle Z (<code>11.0</code> → <code>16.0</code>) and cover Z (<code>9.0</code> → <code>14.0</code>) refs in peripherals (<code>cell_z_g</code>, <code>tp_z_bot_g</code>, <code>disp_z_back_g</code>, <code>pocket_floor_g</code>, <code>cover_top_z</code>) rewritten; stale 18.1 → 21.1 fixed in joystick PCB pit code. USB-C cutout + platform auto-track up via <code>Z_preshave</code>. (3) <strong><code>BuzzerCradleRing</code></strong> (additive 14 mm OD × 5 mm tall) on floor, before <code>BuzzerNest</code> cut → 0.9 mm-thick speaker retaining ring. (4) <strong>Speaker +2 mm Z</strong> (<code>buzz_z_bot_g</code> 0.6 → 2.6) — wires exit bottom face into a 2 mm gap; <code>pocket_ceil_z</code> 5.9 → 3.9 in cradle local. (5) <strong>Wire pass-through notches</strong> (<code>BuzzerWireChannel_Plus</code>/<code>_Minus</code>): 2× 1.5 mm wide, at Y = <code>buzz_cy ± 2.0</code>, X = 3 → 18; bottom Z fixed at <code>floor_z</code> (0.6) on iteration after through-floor holes were observed — now they only notch the lower ring wall. (6) <strong>IMU pocket</strong> 21×16 → 20×15.6 mm; new <code>imu_hole_spacing = 15.0</code> and <code>imu_hole_y_inset = 2.0</code> parameters. (7) <strong>2 corner pegs</strong> (<code>IMUPeg_MX</code>/<code>_PX</code>): 2.8 mm OD × 3 mm tall AdditiveCylinders at <code>imu_cx ± 7.5</code>, +Y long edge. (8) <strong>PCB visualization</strong>: 3 mm through-holes cut at peg positions in <code>add_imu_module</code>. (9) <strong>Snap-on peg washers</strong>: new <code>build_imu_washer()</code> body builder, square 6×6×1.5 mm with 2.7 mm hole (interference fit), <code>IMUPegWasher_MX</code>/<code>_PX</code> placed in assembly. Top-level docstring + ~12 cascading comments rewritten for new geometry. Macro parses cleanly via <code>python3 -m ast</code>.</li>
+<li><strong>Layman summary:</strong> Reworked the buzzer-equipped Dilder case in seven rounds. Moved the sound exit from a hole on the bottom of the case to a small hole on the side, drilling a tunnel through the speaker cradle and out through the side wall. Made the base plate walls 5 mm taller so wires have somewhere to live inside the case. Added a thin circular wall around the speaker to keep it from sliding around. Lifted the speaker 2 mm higher so its wires (which come out of the bottom face) have a 2 mm gap underneath to route through, then notched the speaker ring so the wires can exit toward the rest of the electronics. Updated the accelerometer board pocket to the right size, added two 3 mm corner pegs (15 mm apart), and designed two separately-printed square washers that snap onto the pegs to lock the board down. Cut matching holes in the on-screen visualization. Caught and fixed a bug where the wire channels were leaving visible holes on the base plate underside.</li>
+<li><strong>Files:</strong></li>
+<li><code>hardware-design/freecad-mk2/dilder_rev2_mk2_no_solar_buzzer.FCMacro</code> — +290/-100: sound routing redesign, base plate +5 mm Z extension with cascaded refs, BuzzerCradleRing + WireChannels + IMU pegs in build_base_plate; deeper BuzzerPocket + BuzzerSoundPit + BuzzerSoundChannel in build_cradle; BuzzerSoundChannel + extended BuzzerWallPocket in build_top_cover; new build_imu_washer() builder; updated add_imu_module() with hole cuts; lifted speaker in add_buzzer_module()</li>
+<li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer.FCStd</code> — regenerated FreeCAD document</li>
+<li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer-AAACradle_thiccc.3mf</code> (new) — thicker variant cradle export</li>
+<li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer-BasePlate_thiccc.3mf</code> (new) — thicker variant base plate export</li>
+<li><code>hardware-design/freecad-mk2/Dilder_Rev2_Mk2_NoSolar_Buzzer-IMUPegWasher_PX.3mf</code> (new) — peg washer 3MF export</li>
+<li><code>TODO.md</code> — Week 4 section added</li>
+<li><code>PromptProgression.md</code> — entry for #277</li>
+<li><code>website/docs/prompts/index.md</code> — this entry</li>
 </ul>
 
 
