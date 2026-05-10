@@ -13498,7 +13498,6 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "8f08fcac-7fb0-44ee-8285-058eb6adf8e1")
 		(property "Reference" "U4"
 			(at 149.86 367.03 0)
@@ -13554,7 +13553,7 @@
 			)
 		)
 		(property "MNF PART NUMBER" "C6186"
-			(at 149.86 373.38 0)
+			(at 149.606 372.364 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -13594,7 +13593,8 @@
 			)
 		)
 		(property "LCSC" "C6186"
-			(at 149.86 373.38 0)
+			(at 138.938 376.936 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -13831,7 +13831,7 @@
 	)
 	(symbol
 		(lib_id "MCU_Module:RaspberryPi_Pico_W_Extensive")
-		(at 62.23 77.47 0)
+		(at 96.52 97.79 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -13842,7 +13842,7 @@
 		(fields_autoplaced yes)
 		(uuid "9ff79d7e-b985-4df3-af3e-220843c7319d")
 		(property "Reference" "A1"
-			(at 64.3733 111.76 0)
+			(at 98.6633 132.08 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -13853,7 +13853,7 @@
 			)
 		)
 		(property "Value" "RaspberryPi_Pico_W"
-			(at 64.3733 114.3 0)
+			(at 98.6633 134.62 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -13864,7 +13864,7 @@
 			)
 		)
 		(property "Footprint" "Module:RaspberryPi_Pico_W_SMD"
-			(at 62.23 124.46 0)
+			(at 96.52 144.78 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -13875,7 +13875,7 @@
 			)
 		)
 		(property "Datasheet" "https://datasheets.raspberrypi.com/picow/pico-w-datasheet.pdf"
-			(at 62.23 127 0)
+			(at 96.52 147.32 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -13886,7 +13886,7 @@
 			)
 		)
 		(property "Description" "Versatile and inexpensive wireless microcontroller module (with full pinout for test point and debug connections) powered by RP2040 dual-core Arm Cortex-M0+ processor up to 133 MHz, 264kB SRAM, 2MB QSPI flash, Infineon CYW43439 2.4GHz 802.11n wireless LAN; also supports Raspberry Pi Pico 2 W"
-			(at 62.23 129.54 0)
+			(at 96.52 149.86 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)

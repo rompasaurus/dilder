@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "lilka_connector") (type "KiCad") (uri "/home/rompasaurus/CodingProjects/Dilder/hardware-design/examples/02-lilka-console/hardware/v2/symbols/connector.kicad_sym") (options "") (descr ""))
+)
