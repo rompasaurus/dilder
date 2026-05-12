@@ -2,6 +2,87 @@
 
 A living task list updated each week. Newest entries at the top.
 
+## Status legend
+
+- `[x]` — done
+- `[ ]` — open
+- `[~]` — in progress / partial
+
+## Index
+
+- [Week 5 — 2026-05-12 (Full Board schematic: accel, joystick, power switch)](#week-5--2026-05-12-full-board-schematic-accel-joystick-power-switch)
+- [Week 4 — 2026-05-08 (NoSolar+Buzzer enclosure overhaul)](#week-4--2026-05-08-nosolarbuzzer-enclosure-overhaul)
+- [Week 3 — 2026-05-04 (Joystick PCB arrival, firmware versioning, V4 driver)](#week-3--2026-05-04-session-progress)
+
+---
+
+## Week 5 — 2026-05-12 (Full Board schematic: accel, joystick, power switch)
+
+Project: **Dilder-PCB** — Dilder Full PCB Rev 1 (KiCad). All work in the working tree (not yet committed).
+
+### Completed Today
+
+#### Component selection (BOM additions)
+
+- [x] **3-axis accelerometer chosen: SC7A20HTR** (Silan, LCSC `C19274408`) — LIS2DH-register-compatible, $0.16 @ qty 1k, 99,130 in stock at JLCPCB. Evaluated and rejected: LIS2DH12 ($0.44, 2.7× more expensive), genuine MPU-6050 ($8, TDK EOL'd 2020), QMI8658C (0 stock), MSA3S02/MSA321 (no docs), STK8321 (custom driver), QMA6100P (custom driver)
+- [x] **Joystick confirmed: K1-1506SN-01** (Korean Hroparts, LCSC `C145910`) — same part already verified on hand-routed joystick PCB; no center/up swap risk
+- [x] **Power switch chosen: MSK12C02** (Shou Han, LCSC `C431540`) — side-actuated SPDT SMD slide switch, $0.06 @ qty 1, 102k stock
+- [x] **Passives library populated** — C1525 (100nF 0402), C15850 (10µF 0805), C25768 (2.2k 0402)
+
+#### KiCad library work (`JLCPCB_lib.kicad_sym`)
+
+- [x] Pulled SC7A20HTR + footprint + 3D model via `easyeda2kicad --lcsc_id=C19274408`
+- [x] Pulled K1-1506SN-01 via `--lcsc_id=C145910`
+- [x] Pulled MSK12C02 via `--lcsc_id=C431540`
+- [x] Patched SC7A20HTR pin electrical types: SDO/CS → `input`, SDx/SCx → `bidirectional`, VDD/VDDIO/GND/GNDIO → `power_in`, INT1/INT2 → `output`, NC pads → `no_connect`
+- [x] Patched K1-1506SN-01 with semantic pin names (`UP/DOWN/LEFT/RIGHT/CENTER/COM`) replacing the easyeda numeric names; all pins → `passive`
+- [x] Patched 100nF / 10µF caps + 2.2k resistor pin types from `unspecified` / `input` → `passive`
+
+#### SC7A20 schematic wiring (ERC clean)
+
+- [x] Placed SC7A20HTR at (46.99, 130.81) in schematic
+- [x] I²C0 bus wired: SDx → `I2C0_SDA` → Pico GP0, SCx → `I2C0_SCL` → Pico GP1 — matches `dilder-hub/main.c:181-182` exactly, zero firmware change needed
+- [x] Interrupt: INT1 → `ACCEL_INT1` → Pico GP15 (avoided original GP22 plan because schematic uses GP22 for `EINK_BUSY`)
+- [x] CS pulled to `+3V3` to lock I²C mode; SDO grounded to set address `0x18`
+- [x] Decoupling caps placed: C4 (100nF on VDDIO), C5 (10µF bulk), C6 (100nF on VDD) — all GND returns to power ports
+- [x] I²C pull-ups installed: R6/R7 (2 kΩ, functional substitute for 2.2 kΩ) — corrected from series-resistor topology after audit
+- [x] NC pins (pin 4, 6, 11) carry no-connect flags
+- [x] Three orphan-net `PCM_4ms_Power-symbol:+3.3V` placements caught and replaced with standard `power:+3V3` (on VDDIO, VDD, CS in sequence)
+- [x] ERC: 0 errors, 0 warnings
+
+#### Planning / mechanical decisions
+
+- [x] Joystick placement decided: **back-mount on B.Cu** via `F` flip in PCB editor (thumb-access pattern). Will DNP in JLC BOM and hand-solder to avoid double-side assembly fee
+- [x] Power switch placement decided: **Option A** — switch sits between battery+ and TP4056 BAT pin, so USB-only operation still works when switch is off. Pad 3 leaves NC (no slider-position short to GND); 4 mount tabs tied to GND
+- [x] Verified GP map vs `board_config.h:226-241` — accel uses GP0/GP1/GP15 (free), joystick uses GP2-GP6 (free, matches firmware), e-ink uses GP17-GP22 (already wired)
+
+### Resolved from earlier weeks
+
+- [x] **"Determine a power on/off (leave power) mechanism"** (Week 3 carryover) — MSK12C02 picked, schematic plan locked
+- [x] **"Fix KiCad joystick Rev 2 — re-route with corrected COM/UP pin assignment"** (Week 3 new items) — folded into Full Board schematic with verified pin map; standalone Rev 2 not needed
+- [x] **"Add pin-1 silkscreen dot to future PCB orders"** (Week 3 new items) — incorporated as a layout-step reminder; planned for Full Board
+
+### Still Open
+
+- [ ] Place SC7A20 + joystick + slide switch footprints on the PCB layout (`F8 → Update PCB from Schematic`)
+- [ ] Press `F` to flip the joystick to B.Cu and confirm silkscreen mirrors correctly
+- [ ] Route I²C0 traces (GP0/GP1 → SC7A20) with the standard rules: ≤25 mm length, no acute corners, keep clear of switching nodes
+- [ ] Drop GND vias under SC7A20 center pad (3-4 minimum) for thermal/return path
+- [ ] Confirm `BAT_RAW` / `BAT_SW` nets propagated correctly after the slide switch is wired in
+- [ ] Mark joystick row as DNP in the BOM/CPL export so JLC skips double-side assembly
+- [ ] Replace R6/R7 with the imported 2.2 kΩ (`0402WGF2202TCE` / C25768) for BOM consistency — currently 2 kΩ (`0402WGF2001TCE`), functional but off-BOM
+- [ ] Reconcile schematic vs firmware e-ink pin assignments — schematic uses GP17-GP22, `board_config.h:226-231` still says GP8-GP13; one side needs to change
+- [ ] Add the new `PIN_I2C_SDA` / `PIN_I2C_SCL` / `PIN_ACCEL_INT1` / `ACCEL_I2C_ADDR` defines to `board_config.h` under `BOARD_PICO2_W`
+- [ ] Patch `dilder-hub/main.c` MPU-6050 driver → SC7A20 / LIS2DH-style driver (register map: WHO_AM_I=0x33 at reg 0x0F, CTRL_REG1=0x20, OUT_X_L=0x28 with auto-increment MSB=1, 10-bit data right-shifted 6, ±2g = 256 LSB/g) — ~50 lines of changes, no consumer-API impact
+- [ ] Commit today's schematic work to git (currently uncommitted in working tree)
+
+### New Items from Today
+
+- [ ] Add pin-1 silkscreen dot to SC7A20 + joystick + slide switch footprints before fab (lesson from Week 3's JLC placement-verification round-trip)
+- [ ] Disable the `PCM_4ms_Power-symbol` library in KiCad preferences to prevent re-introducing orphan `+3.3V` nets (3 caught + fixed today)
+- [ ] Update `IMU-DAC-SPEAKER-GUIDE.md` lines 33-34 — it still says I²C is on GP4/GP5, which conflicts with BTN_UP/BTN_RIGHT in `board_config.h`. Correct mapping is GP0/GP1
+- [ ] Plan firmware patch: change MPU driver address probe from {0x68, 0x69} to {0x18, 0x19} and WHO_AM_I expected value to 0x33
+
 ---
 
 ## Week 4 — 2026-05-08 (NoSolar+Buzzer enclosure overhaul)
@@ -56,18 +137,18 @@ A living task list updated each week. Newest entries at the top.
 - [ ] Research if wireless firmware deployment is possible to streamline deploy and testing pipeline
 - [x] ~~Wednesday: wire up joystick mount~~ (done — wired and tested 2026-05-04)
 - [ ] Add a chamfer and joystick retention square so that it fits around snugly the base of the joystick
-- [ ] Determine a power on/off (leave power) mechanism
+- [x] ~~Determine a power on/off (leave power) mechanism~~ (done — MSK12C02 slide switch picked, wired in Full Board schematic 2026-05-12)
 - [ ] With joystick implement menu and settings system
 - [ ] Stand: create a landing page and progression synopsis; purge the stale folders and pointers; perhaps migrate to a V2 repo and project structure
-- [ ] Compile a schematic for all the planned hardware; scour the web for best components and JLCPCB's basic components (add flash memory, high voltage level components)
+- [~] Compile a schematic for all the planned hardware; scour the web for best components and JLCPCB's basic components (add flash memory, high voltage level components) — *in progress: Full Board schematic now has Pico 2 W, e-ink header, charger, USB-C, accelerometer (SC7A20), joystick (K1-1506SN-01), power switch (MSK12C02). Still needed: speaker/DAC, flash memory*
 - [ ] Estimate a board/print cost
 - [ ] Run battery life benchmarks
 - [ ] Estimate how thin this device could be with a dedicated board
 
 ### New Items from Today
 
-- [ ] Fix KiCad joystick PCB Rev 2 — re-route with corrected COM/UP pin assignment, re-order from JLCPCB
+- [x] ~~Fix KiCad joystick PCB Rev 2 — re-route with corrected COM/UP pin assignment, re-order from JLCPCB~~ (done — folded into Full Board schematic 2026-05-12 with verified K1-1506SN-01 pin map, no center/up swap)
 - [ ] Verify all 5 joystick directions work with corrected wiring (swap COM/UP wires on current board as interim fix)
 - [ ] Tune V4 two-pass partial refresh — blacks still slightly washed out with fast waveform, may need custom LUT or voltage adjustment
-- [ ] Add pin-1 silkscreen dot to future PCB orders to prevent orientation ambiguity
+- [x] ~~Add pin-1 silkscreen dot to future PCB orders to prevent orientation ambiguity~~ (carried forward into Week 5 as a per-footprint reminder)
 - [ ] Investigate why V4 display's internal LUT produces weaker blacks than V3's custom LUT — may need to source V3 panels or create hybrid driver
