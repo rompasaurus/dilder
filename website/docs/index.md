@@ -33,6 +33,44 @@ Jamal still sits in the armchair. He still wears the hat. He watches us build hi
 
 ---
 
+## :sparkles: Milestone — Dilder Full Board Rev 1 Complete! :sparkles:
+
+After two months of breadboards, flying wires, and a small army of off-the-shelf modules, **every part of the Dilder now lives on a single PCB**. The Full Board Rev 1 layout is done — schematic finalized, 4-layer stackup configured, board routed end-to-end, and the 3D preview is green-and-gorgeous.
+
+This is the moment Dilder graduates from "breadboard inside a case" to **actual hardware product**.
+
+<div class="grid" markdown>
+
+<figure markdown="span">
+  ![Dilder Full Board Rev 1 — front silkscreen with The Dildafication Begins tagline](assets/images/hardware/pcb/full-board-rev1/full-board-rev1-front-silkscreen-dildafication-begins.png){ width="420" loading=lazy }
+  <figcaption>Front of the board — Pico 2 W, TP4056 charger, USB-C, IMU, button pads. Tagline: "The Dildafication Begins."</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Dilder Full Board Rev 1 — back silkscreen with octopus mascot and joystick footprint](assets/images/hardware/pcb/full-board-rev1/full-board-rev1-back-silkscreen-mascot.png){ width="420" loading=lazy }
+  <figcaption>Back of the board — joystick switch, e-paper SPI breakout, solar + battery JST connectors, octopus mascot.</figcaption>
+</figure>
+
+</div>
+
+<div class="grid" markdown>
+
+<figure markdown="span">
+  ![Dilder Full Board Rev 1 — 3D top view of the routed board with Pico module placed](assets/images/hardware/pcb/full-board-rev1/full-board-rev1-3d-top-view.png){ width="420" loading=lazy }
+  <figcaption>3D top view from KiCad — Pico 2 W in its 2×20 header, charger circuit on the right.</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Dilder Full Board Rev 1 — 3D render with e-paper display floating above the board](assets/images/hardware/pcb/full-board-rev1/full-board-rev1-3d-with-epaper-display-spaced.png){ width="420" loading=lazy }
+  <figcaption>Screen fit-check — the Waveshare e-paper module floats exactly where the case expects it.</figcaption>
+</figure>
+
+</div>
+
+[Read the full milestone write-up :material-arrow-right:](blog/posts/dilder-full-board-rev1.md){ .md-button .md-button--primary }
+
+---
+
 ## The Current Build — Mk2 Translucent Prototype
 
 The latest revision: printed in **natural/clear PETG** so every internal component is visible through the case walls. Running the Conspiratorial Octopus personality on battery power.
@@ -298,14 +336,16 @@ The STEP model of the finished board is imported directly into the FreeCAD assem
 
 ## Current Phase
 
-!!! info "Phase 2 — Firmware Foundation (C on Pico W)"
+!!! success "Phase 2 — Firmware Foundation (C on Pico 2 W) :tada: Full Board Rev 1 Complete"
     Phase 1 (hardware + tooling) is complete. The unit is **fully soldered and battery-powered** — running off a 10440 Li-ion cell with USB-C charging via TP4056 confirmed working. Two enclosure variants available: **Solar** (with AK 62x36mm panel) and **NoSolar** (slimmer, USB-only).
 
-    **Done:** Runtime rendering engine | 16 emotions | Body animations | Custom fat/lazy bodies | 823 quotes | C-faithful preview renderer | DevTool with firmware size estimation | **GPIO joystick input** | On-screen input indicator | **Soldered unit** | **Battery power** | **USB-C charging** | **NoSolar variant** | **Mk2 translucent case** | **Joystick PCB from JLCPCB** | **V4 display driver (two-pass partial refresh)** | **Firmware version system (v0.5.4)** | **KiCad pin swap fix**
+    **:sparkles: New milestone:** the **Dilder Full Board Rev 1** is fully designed in KiCad — schematic finalized, 4-layer stackup configured, board routed end-to-end, and the 3D preview verified. Every component the case carries now lives on a single PCB.
 
-    **In Progress:** V4 partial refresh tuning (blacks slightly washed vs V3). Custom PCB design — **ESP32-S3-WROOM-1-N16R8** (WiFi+BLE, 16MB flash, 8MB PSRAM), 4-layer board in KiCad. **Full Board** all-in-one PCB design.
+    **Done:** Runtime rendering engine | 16 emotions | Body animations | Custom fat/lazy bodies | 823 quotes | C-faithful preview renderer | DevTool with firmware size estimation | **GPIO joystick input** | On-screen input indicator | **Soldered unit** | **Battery power** | **USB-C charging** | **NoSolar variant** | **Mk2 translucent case** | **Joystick PCB from JLCPCB** | **V4 display driver (two-pass partial refresh)** | **Firmware version system (v0.5.4)** | **KiCad pin swap fix** | **:star: Full Board Rev 1 schematic + 4-layer routed PCB**
 
-    **Next:** Swap COM/UP wires and test all 5 joystick directions | Wire up piezo speaker | Implement menu system | Order corrected Rev 2 joystick PCB | Battery life benchmarks
+    **In Progress:** V4 partial refresh tuning (blacks slightly washed vs V3). Awaiting first batch of Full Board Rev 1 bare PCBs from fab.
+
+    **Next:** **Order Full Board Rev 1 from JLCPCB** :material-arrow-right: **Solder the extended components onto the bare board** (USB-C, TP4056, IMU, slide switch, decoupling caps) :material-arrow-right: **Design a new FreeCAD case based on the Full Board measurements** — slimmer, no more internal channels for module wiring | Wire up piezo speaker | Implement menu system | Battery life benchmarks
 
 ---
 
