@@ -1,0 +1,87 @@
+ERC report (2026-05-10T12:54:20, Encoding UTF8)
+Report includes: Warnings
+
+***** Sheet /
+[lib_symbol_mismatch]: Symbol 'USB_C_Receptacle_USB2.0_14P' doesn't match copy in library 'Connector'
+    ; warning
+    @(1900 mils, 14000 mils): Symbol J1 [USB_C_Receptacle_USB2.0_14P]
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(2250 mils, 13600 mils): Horizontal Wire, length 150 mils
+[lib_symbol_issues]: The current configuration does not include the symbol library 'MaTouch 1.9“ TFT Breakout v1.1-eagle-import'
+    ; warning
+    @(2800 mils, 13350 mils): Symbol #SUPPLY03 [5V]
+[lib_symbol_issues]: The current configuration does not include the symbol library 'MaTouch 1.9“ TFT Breakout v1.1-eagle-import'
+    ; warning
+    @(2800 mils, 14900 mils): Symbol #SUPPLY04 [5V]
+[lib_symbol_issues]: The current configuration does not include the symbol library '03_EINK-SchDoc-rescue'
+    ; warning
+    @(2900 mils, 9300 mils): Symbol P4 [SFV24R-1STE1HLF-]
+[isolated_pin_label]: Label connected to only one pin
+    ; warning
+    @(3050 mils, 9000 mils): Global Label 'IO33_DISP_BUSY'
+[isolated_pin_label]: Label connected to only one pin
+    ; warning
+    @(3050 mils, 9100 mils): Global Label 'IO34_DISP_RESET'
+[isolated_pin_label]: Label connected to only one pin
+    ; warning
+    @(3050 mils, 9200 mils): Global Label 'IO48_DISP_DATA/nCMD'
+[isolated_pin_label]: Label connected to only one pin
+    ; warning
+    @(3050 mils, 9300 mils): Global Label 'IO17_DISP_nCS'
+[isolated_pin_label]: Label connected to only one pin
+    ; warning
+    @(3050 mils, 9400 mils): Global Label 'IO18_DISP_SCL'
+[isolated_pin_label]: Label connected to only one pin
+    ; warning
+    @(3050 mils, 9500 mils): Global Label 'IO21_DISP_SDA'
+[isolated_pin_label]: Label connected to only one pin
+    ; warning
+    @(3100 mils, 8400 mils): Global Label 'RESE'
+[isolated_pin_label]: Label connected to only one pin
+    ; warning
+    @(3550 mils, 8700 mils): Global Label 'VDD_CPU'
+[lib_symbol_issues]: The current configuration does not include the symbol library 'MaTouch 1.9“ TFT Breakout v1.1-eagle-import'
+    ; warning
+    @(3550 mils, 14900 mils): Symbol #SUPPLY01 [5V]
+[lib_symbol_issues]: The current configuration does not include the symbol library 'MaTouch 1.9“ TFT Breakout v1.1-eagle-import'
+    ; warning
+    @(4100 mils, 8200 mils): Symbol #+3V014 [+3V3]
+[same_local_global_label]: Local and global labels have same name
+    ; warning
+    @(4100 mils, 14050 mils): Global Label 'USB_D-'
+    @(2950 mils, 14000 mils): Label 'USB_D-'
+[same_local_global_label]: Local and global labels have same name
+    ; warning
+    @(5300 mils, 2850 mils): Global Label 'USB_D+'
+    @(2950 mils, 14200 mils): Label 'USB_D+'
+[lib_symbol_issues]: The current configuration does not include the symbol library 'MaTouch 1.9“ TFT Breakout v1.1-eagle-import'
+    ; warning
+    @(5750 mils, 9100 mils): Symbol #+3V015 [+3V3]
+[lib_symbol_mismatch]: Symbol 'AO3400A' doesn't match copy in library 'Transistor_FET'
+    ; warning
+    @(6600 mils, 9800 mils): Symbol Q3 [AO3400A]
+[lib_symbol_mismatch]: Symbol 'SolderJumper_3_Bridged12' doesn't match copy in library 'Jumper'
+    ; warning
+    @(6850 mils, 10400 mils): Symbol JP1 [SolderJumper_3_Bridged12]
+[lib_symbol_issues]: The current configuration does not include the symbol library 'MaTouch 1.9“ TFT Breakout v1.1-eagle-import'
+    ; warning
+    @(8750 mils, 14400 mils): Symbol #SUPPLY05 [5V]
+[lib_symbol_mismatch]: Symbol 'LED' doesn't match copy in library 'Device'
+    ; warning
+    @(9000 mils, 14900 mils): Symbol D1 [LED]
+[same_local_global_label]: Local and global labels have same name
+    ; warning
+    @(11100 mils, 14600 mils): Global Label 'VBAT'
+    @(13800 mils, 13775 mils): Label 'VBAT'
+[lib_symbol_issues]: The current configuration does not include the symbol library 'MaTouch 1.9“ TFT Breakout v1.1-eagle-import'
+    ; warning
+    @(14050 mils, 13100 mils): Symbol #SUPPLY06 [5V]
+
+ ** ERC messages: 24  Errors 0  Warnings 24
+
+ ** Ignored checks:
+    - Global label only appears once in the schematic
+    - Four connection points are joined together
+    - SPICE model issue
+    - Assigned footprint doesn't match footprint filters
