@@ -1,6 +1,6 @@
 # Dilder Hub — All-In-One Firmware
 
-The combined firmware that brings together all Dilder features: animated octopus with 16 moods, joystick menu navigation, WiFi scanning with on-screen keyboard, active buzzer with sound patterns, MPU-6050 accelerometer/gyroscope with pedometer, battery monitoring, and 10 navigable screens.
+The combined firmware that brings together all Dilder features: animated octopus with 16 moods, joystick menu navigation, **accelerometer-driven auto-rotation** (wide + tall "longways" layouts), a **step / activity tracker**, WiFi with **saved networks** and NTP clock sync, **Bluetooth LE phone pairing**, **WiFi OTA updates**, an active buzzer with sound patterns, battery monitoring, and navigable menu screens.
 
 ---
 
@@ -9,15 +9,20 @@ The combined firmware that brings together all Dilder features: animated octopus
 | Feature | Details |
 |---------|---------|
 | **Octopus Display** | 16 animated moods with 823 quotes, RTC clock header, mood-based body transforms |
+| **Auto-Rotation** | SC7A20 tilt classifier picks 3 orientations; dedicated wide + tall "longways" layouts (speech-bubble quote above the octopus) |
+| **Activity Tracker** | Low-power pedometer — step count + active minutes from the accelerometer, shown on the home screen |
 | **Mood Selector** | Joystick-navigable picker for all 16 moods + "ALL (RANDOM)" |
-| **WiFi** | CYW43 STA mode, network scanning, on-screen keyboard for password entry |
+| **WiFi** | CYW43 STA mode, network scanning (sorted by signal), on-screen keyboard for password entry |
+| **Saved Networks** | Credentials cached to the last flash sector — survives reboot **and** OTA; save / forget in-menu, no password re-entry (seeded with Moop Ship + MoopsterCell) |
 | **NTP Time Sync** | Syncs RTC to pool.ntp.org on WiFi connect (UTC+2 CEST) |
-| **Network Menu** | WiFi on/off, scan networks, connect to any network, live status display |
+| **Bluetooth LE** | BTstack peripheral "Dilder Hub" — **passkey pairing** (6-digit code on e-ink, MITM-protected) + custom GATT service exposing live mood/steps and a phone command byte |
+| **WiFi OTA** | picowota bootloader ported to RP2350 — hold joystick **UP** at boot to reflash over WiFi; USB reflash needs no BOOTSEL button |
 | **Sound** | Active buzzer with 6 patterns (beep, chirp, SOS, doorbell, alert, happy), volume control, on/off toggle |
-| **Motion** | MPU-6050 accelerometer/gyroscope — live values, pedometer, tilt angles, temperature, I2C bus scanner |
+| **Motion** | SC7A20 accelerometer (I²C, 0x18) — live values, pedometer, tilt angles, I2C bus scanner |
+| **Set Time** | On-device date/time setter (year → minute) |
 | **Device Info** | Firmware version, build date, display variant, battery voltage, WiFi status |
 | **Battery Monitor** | ADC3 reads VSYS/3 via CYW43 SPI lock — shows percentage or USB-powered status |
-| **Status Icons** | WiFi icon (top-left), battery icon with lightning bolt (top-right) |
+| **Status Icons** | WiFi icon (top-left), Bluetooth rune (shown when paired), battery icon with lightning bolt (top-right) — both orientations |
 
 ---
 
@@ -31,14 +36,16 @@ The tagline below the speech bubble shows the current mood name (e.g. "- CONSPIR
 
 ### Menu (STATE_MENU)
 
-Press joystick DOWN on the main screen. Overlay on the bottom half showing:
+Press joystick DOWN on the main screen. Renders upright in both the wide and tall holds:
 
 1. **MOOD SELECT** — pick a personality
-2. **NETWORK** — WiFi on/off, scan, connect, status
-3. **SOUND** — test patterns, volume, on/off
-4. **MOTION** — accelerometer, pedometer, tilt, I2C scan
-5. **DEVICE INFO** — system information
-6. **BACK** — return to octopus
+2. **NETWORK** — WiFi on/off, scan, saved networks, status
+3. **BLUETOOTH** — pair to a phone (passkey on screen)
+4. **SOUND** — test patterns, volume, on/off
+5. **MOTION** — accelerometer, pedometer, tilt, I2C scan
+6. **DEVICE INFO** — system information
+7. **SET TIME** — set date & time
+8. **BACK** — return to octopus
 
 Navigate: UP/DOWN to move, CENTER to select, LEFT to go back.
 
@@ -126,12 +133,12 @@ Gyro readout and acceleration magnitude displayed at the bottom. Refreshes every
 
 | Component | Pin | GPIO | Function |
 |-----------|-----|------|----------|
-| Display CLK | 14 | GP10 | SPI1 SCK |
-| Display DIN | 15 | GP11 | SPI1 TX |
-| Display CS | 12 | GP9 | Chip select |
-| Display DC | 11 | GP8 | Data/command |
-| Display RST | 16 | GP12 | Reset |
-| Display BUSY | 17 | GP13 | Busy flag |
+| Display CS | 22 | GP17 | SPI0 CSn |
+| Display CLK (SCL) | 24 | GP18 | SPI0 SCK |
+| Display DIN (SDA) | 25 | GP19 | SPI0 TX |
+| Display DC | 26 | GP20 | Data/command |
+| Display RST (RES) | 27 | GP21 | Reset |
+| Display BUSY | 29 | GP22 | Busy flag |
 | Joystick L | 4 | GP2 | Left |
 | Joystick D | 5 | GP3 | Down |
 | Joystick UP | 6 | GP4 | Up |

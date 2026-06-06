@@ -151,8 +151,15 @@
  * The "||" means "or" — if either symbol is defined, we enter
  * this branch.  This way the right pins are selected whether
  * you use our build system or the Pico SDK's default setup.
+ *
+ * NOTE: we explicitly exclude BOARD_DILDER_PICO here.  The Dilder PCB
+ * build also defines PICO_BOARD (it is a Pico 2 W), so without this
+ * guard the catch-all `defined(PICO_BOARD)` would match first and
+ * apply the wrong (breadboard SPI1) e-ink pins instead of the PCB's
+ * SPI0 wiring.  The `&& !defined(BOARD_DILDER_PICO)` lets the build
+ * fall through to the dedicated DILDER_PICO branch below.
  */
-#if defined(BOARD_PICO_W) || defined(PICO_BOARD)
+#if (defined(BOARD_PICO_W) || defined(PICO_BOARD)) && !defined(BOARD_DILDER_PICO)
 
 #define BOARD_NAME          "Pico W"
 
@@ -222,13 +229,22 @@
 
 #define BOARD_NAME          "Pico 2 W"
 
-/* e-Paper display — SPI1 (same pins as Pico W) */
-#define PIN_EPD_CLK         10   /* GP10  SPI1 SCK   pin 14 */
-#define PIN_EPD_DIN         11   /* GP11  SPI1 TX    pin 15 */
-#define PIN_EPD_CS           9   /* GP9              pin 12 */
-#define PIN_EPD_DC           8   /* GP8              pin 11 */
-#define PIN_EPD_RST         12   /* GP12             pin 16 */
-#define PIN_EPD_BUSY        13   /* GP13             pin 17 */
+/*
+ * e-Paper display — SPI0, GP17-GP22.
+ *
+ * The breadboard Pico 2 W now MIRRORS the Dilder PCB wiring (SPI0) so you can
+ * validate the exact PCB GPIO map on a breadboard before the board arrives.
+ * (The legacy BOARD_PICO_W / RP2040 breadboard above still uses SPI1.)
+ * Wire the WeAct 2.13" panel the same as the PCB's J1 header:
+ *     BUSY → GP22   RES → GP21   DC → GP20
+ *     CS   → GP17   SCL → GP18   SDA → GP19
+ */
+#define PIN_EPD_CLK         18   /* GP18  SPI0 SCK   pin 24 — J1.5 SCL */
+#define PIN_EPD_DIN         19   /* GP19  SPI0 TX    pin 25 — J1.6 SDA */
+#define PIN_EPD_CS          17   /* GP17  SPI0 CSn   pin 22 — J1.4 CS  */
+#define PIN_EPD_DC          20   /* GP20             pin 26 — J1.3 DC  */
+#define PIN_EPD_RST         21   /* GP21             pin 27 — J1.2 RES */
+#define PIN_EPD_BUSY        22   /* GP22             pin 29 — J1.1 BUSY*/
 
 /* 5-way joystick / buttons (same pins as Pico W — K1-1506SN-01 breakout PCB) */
 #define PIN_BTN_LEFT         2   /* GP2   pin 4  — PCB pad "L"  */
@@ -240,11 +256,78 @@
 /* Piezo speaker — same pin as Pico W */
 #define PIN_SPEAKER          7   /* GP7   pin 10 — piezo + lead  */
 
-/* SPI controller — same as Pico W (SPI1). */
-#define EPD_SPI_CONTROLLER   1   /* SPI1 */
+/* SPI controller — SPI0 (GP18 SCK / GP19 TX), matching the Dilder PCB. */
+#define EPD_SPI_CONTROLLER   0   /* SPI0 */
 #define EPD_SPI_FREQ_HZ      4000000  /* 4 MHz */
 
 /* Flash size — the Pico 2 W has 4 MB of onboard flash (2x Pico W). */
+#define BOARD_FLASH_KB       4096  /* 4 MB */
+
+/* ================================================================
+ *  Dilder PCB Rev 1  (Raspberry Pi Pico 2 W, custom carrier board)
+ * ================================================================
+ *
+ * #elif defined(BOARD_DILDER_PICO)
+ *
+ * This is the REAL Dilder printed circuit board (not a breadboard).
+ * It carries a soldered Pico 2 W module, the WeAct 2.13" e-ink panel,
+ * a 5-way joystick, an SC7A20 accelerometer, and a piezo speaker.
+ *
+ * The pin assignments here are NOT the same as the generic Pico W /
+ * Pico 2 W breadboard pinout above — the PCB routes the e-ink display
+ * to a different GPIO group.  These numbers come straight from the
+ * board schematic (Dilder-PCB: SCHEMATIC-OVERVIEW.md "GPIO Allocation
+ * Map" and BOARD_DESIGN_SPEC.md "E-ink display integration").
+ *
+ *   Build with:  cmake -DTARGET_BOARD=DILDER_PICO -DPICO_BOARD=pico2_w ..
+ */
+#elif defined(BOARD_DILDER_PICO)
+
+#define BOARD_NAME          "Dilder PCB (Pico 2 W)"
+
+/*
+ * e-Paper display — SPI0.
+ *
+ * On the Dilder PCB the WeAct display header (J1) is wired to GP17-GP22,
+ * which puts the clock/data lines on the RP2350's SPI0 peripheral:
+ *   GP18 = SPI0 SCK, GP19 = SPI0 TX (MOSI), GP17 = SPI0 CSn.
+ * DC/RES/BUSY are plain GPIO.  This is why EPD_SPI_CONTROLLER is 0
+ * here (SPI0) versus 1 (SPI1) on the breadboard Pico targets.
+ *
+ *   J1 pin → net (WeAct module signal):
+ *     1 BUSY  → GP22    2 RES → GP21    3 DC → GP20
+ *     4 CS    → GP17    5 SCL → GP18    6 SDA → GP19
+ *     7 GND          8 VCC (+3V3)
+ */
+#define PIN_EPD_CLK         18   /* GP18  SPI0 SCK   J1.5 SCL  pin 24 */
+#define PIN_EPD_DIN         19   /* GP19  SPI0 TX    J1.6 SDA  pin 25 */
+#define PIN_EPD_CS          17   /* GP17  SPI0 CSn   J1.4 CS   pin 22 */
+#define PIN_EPD_DC          20   /* GP20             J1.3 DC   pin 26 */
+#define PIN_EPD_RST         21   /* GP21             J1.2 RES  pin 27 */
+#define PIN_EPD_BUSY        22   /* GP22             J1.1 BUSY pin 29 */
+
+/* 5-way joystick (K1-1506SN-01, SW2 on the PCB back side).
+ * Same GPIOs as the breadboard build — the PCB kept these. */
+#define PIN_BTN_LEFT         2   /* GP2   pin 4  — SW2 pad 2 LEFT   */
+#define PIN_BTN_DOWN         3   /* GP3   pin 5  — SW2 pad 3 DOWN   */
+#define PIN_BTN_UP           4   /* GP4   pin 6  — SW2 pad 1 UP     */
+#define PIN_BTN_RIGHT        5   /* GP5   pin 7  — SW2 pad 5 RIGHT  */
+#define PIN_BTN_CENTER       6   /* GP6   pin 9  — SW2 pad 6 CENTER */
+
+/* Piezo speaker — PWM output (reserved net on the PCB). */
+#define PIN_SPEAKER          7   /* GP7   pin 10 — buzzer/piezo     */
+
+/* I²C0 — SC7A20 accelerometer (and any future I²C peripheral).
+ * 2.2 kΩ bus pull-ups to +3V3 are on the board (R6/R7). */
+#define PIN_I2C_SDA          0   /* GP0   pin 1  — I2C0_SDA → SC7A20 */
+#define PIN_I2C_SCL          1   /* GP1   pin 2  — I2C0_SCL → SC7A20 */
+#define PIN_ACCEL_INT        15  /* GP15  pin 20 — SC7A20 INT1 (motion wake) */
+
+/* SPI controller — SPI0 (see note above). */
+#define EPD_SPI_CONTROLLER   0   /* SPI0 */
+#define EPD_SPI_FREQ_HZ      4000000  /* 4 MHz */
+
+/* Flash size — the soldered Pico 2 W module has 4 MB of onboard flash. */
 #define BOARD_FLASH_KB       4096  /* 4 MB */
 
 /* ================================================================

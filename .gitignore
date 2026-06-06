@@ -4,6 +4,7 @@ website/site/
 # ─── Build artifacts ───
 # Pico SDK firmware builds (all projects)
 dev-setup/*/build/
+dev-setup/*/build-ota/
 # picowota bootloader build
 picowota/build/
 # Firmware build outputs anywhere

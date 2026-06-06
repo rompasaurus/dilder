@@ -85,29 +85,37 @@ The **Display** dropdown in the top toolbar selects the e-ink variant (V2/V3/V3a
 
 ## WiFi OTA via picowota
 
-An alternative approach using the [picowota](https://github.com/usedbytes/picowota) WiFi bootloader. Currently limited — flash operations don't work on RP2350 hardware. Documented here for reference.
+Wireless firmware updates using the [picowota](https://github.com/usedbytes/picowota) WiFi bootloader, **ported to the RP2350 / Pico 2 W**. Flash a combined bootloader+app image once over USB; every update after that goes over WiFi.
+
+### RP2350 port
+
+Upstream picowota targets the RP2040. For the Pico 2 W its two linker scripts (`standalone.ld`, `bootloader_shell.ld`) were ported to the RP2350 memory map:
+
+- **512 KB RAM** with scratch banks at `0x20080000` / `0x20081000` (was 264 KB at `0x20040000`)
+- **4 MB flash** (`FLASH_APP` grows to `4096k − 364k`)
+- Added the **`.embedded_block` / IMAGE_DEF** the RP2350 bootrom requires to recognize and enter the image — *the* fix that makes combined images bootable
+- `boot2` relaxed to optional (`<= 256` bytes); dropped the RP2040 "binary info in first 256 bytes" assert (the M33 vector table is larger)
+
+The bootloader **must** be built `pico2_w` (a `pico_w` build is RP2040 Cortex-M0+ and won't boot on the M33).
 
 ### How It Works
 
-1. Flash the picowota bootloader via USB (once)
-2. The Pico creates a WiFi network or joins yours
-3. The DevTool sends firmware over TCP port 4242
-4. The Pico reboots into the new firmware
+1. Build a **combined** image — picowota bootloader + dilder-hub app, linked for the RP2350. A single `-DPICOWOTA_OTA=ON` build emits both `picowota_dilder_hub.uf2` (USB) and `dilder_hub.elf` (the standalone OTA payload at `0x1005b000`).
+2. Flash the combined `.uf2` via USB **once**.
+3. Enter the bootloader: hold **joystick UP at power-on**, pull **GPIO15 low + reset**, or click **Reboot to Bootloader**. (A fresh device with no valid app stays in the bootloader on its own.)
+4. The DevTool sends the standalone `dilder_hub.elf` over TCP port 4242.
+5. The Pico verifies the image CRC and reboots into the new firmware.
 
 ### DevTool Tab: Pico 2 W OTA
 
 **Tab 8** provides:
 
-- **Bootloader Setup** — install picowota submodule, build with WiFi credentials, flash via USB
-- **WiFi Configuration** — AP mode (Pico creates network) or STA mode (joins your WiFi). Credentials persist in `~/.config/dilder-devtool/ota-settings.json`
+- **Bootloader Setup** — install picowota submodule, build the combined image (`pico2_w`) with your WiFi credentials + Display variant, flash via USB
+- **WiFi Configuration** — AP mode (Pico creates network) or STA mode (joins your WiFi). The same SSID/password are baked into both the bootloader and the app. Credentials persist in `~/.config/dilder-devtool/ota-settings.json`
 - **Device Discovery** — probe single IP or scan /24 subnet
-- **Flash OTA** — firmware list with clean build + OTA flash option
+- **Flash OTA** — `Flash OTA` pushes the existing `build-ota/dilder_hub.elf`; `Clean Build & Flash OTA` rebuilds the OTA image natively then pushes it
 
-### Current Limitation
-
-The picowota bootloader connects to WiFi successfully on the Pico 2 W (confirmed via router — device appears at 192.168.2.184 as "PicoW"). However, flash ERASE operations return ERR. The RP2040-compatibility-mode build can initialize WiFi (CYW43 chip is identical) but can't write to the RP2350's flash hardware through picowota's abstraction layer.
-
-**Workaround:** Use picotool (Tab 9) instead. picotool works reliably for all flash operations.
+> **Only picowota-integrated apps can be OTA'd** — currently `dilder-hub`. Other programs link at `0x10000000` and must be flashed over USB (picotool tab). To make another app OTA-capable, add the `-DPICOWOTA_OTA` integration block to its `CMakeLists.txt` like dilder-hub's.
 
 ### picowota_client.py
 
@@ -118,10 +126,10 @@ A standalone Python TCP client for the picowota protocol, located at `tools/devt
 python3 picowota_client.py --scan --subnet 192.168.2 dummy
 
 # Flash firmware
-python3 picowota_client.py 192.168.4.1 firmware.elf
+python3 picowota_client.py 192.168.4.1 dilder_hub.elf
 ```
 
-Supports ELF, UF2, and raw binary files. Implements the full serial-flash protocol: SYNC, INFO, ERASE, WRITE, SEAL, GOTO.
+Supports ELF, UF2, and raw binary files. Implements the full serial-flash protocol: SYNC, INFO, ERASE, WRITE, SEAL, GOGO. It reconstructs the flash image from the ELF's physical addresses, so it pushes the standalone OTA image (linked at `0x1005b000`), not a normal `0x10000000` build.
 
 ---
 

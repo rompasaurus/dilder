@@ -133,16 +133,108 @@ APP_VERSION = "1.1.0"
 # ── Target boards ──────────────────────────────────────────────────────────
 BOARD_PICO_W = "pico_w"
 BOARD_PICO2_W = "pico2_w"
+BOARD_DILDER_PICO = "dilder_pico"
 BOARD_ESP32S3 = "esp32s3"
 
 BOARD_LABELS = {
     BOARD_PICO_W:  "Pico W (RP2040)",
     BOARD_PICO2_W: "Pico 2 W (RP2350)",
+    BOARD_DILDER_PICO: "Dilder PCB (Pico 2 W)",
     BOARD_ESP32S3: "ESP32-S3 (Olimex)",
 }
 
 # Boards that use the Pico SDK (UF2/BOOTSEL workflow)
-PICO_BOARDS = {BOARD_PICO_W, BOARD_PICO2_W}
+PICO_BOARDS = {BOARD_PICO_W, BOARD_PICO2_W, BOARD_DILDER_PICO}
+
+# Boards built on the RP2350 (Pico 2 W silicon).  The Dilder PCB carries a
+# soldered Pico 2 W module, so it behaves exactly like a Pico 2 W for the
+# toolchain: PICO_BOARD=pico2_w, rp2350 platform, "RP2350" BOOTSEL drive.
+# Use this set anywhere a board was previously tested for being a Pico 2 W.
+RP2350_BOARDS = {BOARD_PICO2_W, BOARD_DILDER_PICO}
+
+# Boards wired per the Dilder PCB Rev 1 schematic (e-ink on SPI0, GP17-22).
+DILDER_PCB_BOARDS = {BOARD_DILDER_PICO}
+
+# ── e-ink wiring (breadboard vs Dilder PCB) ─────────────────────────────────
+# The on-device programs in dev-setup/ drive the panel through a vendored copy
+# of the Waveshare driver at <prog>/lib/Config/DEV_Config.c.  That file is
+# gitignored (fetched at setup time, not version-controlled) and hard-codes the
+# breadboard e-ink pins on SPI1:
+#     RST=GP12 DC=GP8 CS=GP9 BUSY=GP13 CLK=GP10 MOSI=GP11   (#define SPI_PORT spi1)
+#
+# The Dilder PCB Rev 1 routes the WeAct 2.13" header to GP17-22 on SPI0 instead
+# (see Dilder-PCB/SCHEMATIC-OVERVIEW.md "GPIO Allocation Map").  Rather than fork
+# the vendored library, we rewrite its pin block + SPI_PORT in place right before
+# each build, driven by the selected target board.  This keeps the retargeting
+# logic in version control (here) even though the file it edits is not, and it
+# survives re-vendoring because it is re-applied on every build.
+# The breadboard prototype now MIRRORS the Dilder PCB SPI0 wiring (GP17-22) so
+# you can validate the exact PCB GPIO map on a breadboard before the board
+# arrives. Both maps are therefore SPI0. (The historical RP2040 breadboard used
+# SPI1 / GP10-13 — kept here only as a reference comment.)
+#   legacy breadboard SPI1: RST=12 DC=8 CS=9 BUSY=13 CLK=10 MOSI=11
+EINK_PINS_DILDER_PCB = {"RST": 21, "DC": 20, "CS": 17, "BUSY": 22, "CLK": 18, "MOSI": 19}
+EINK_PINS_BREADBOARD = EINK_PINS_DILDER_PCB  # breadboard mirrors the PCB (SPI0)
+
+# Friendly labels for the top-toolbar display picker.  Index 0 is the default
+# (the WeAct panel used on the Dilder PCB).  display_label_to_key() converts the
+# chosen label back to the build key (V2/V3/V3a/V4) passed as DISPLAY_VARIANT.
+TOOLBAR_DISPLAY_LABELS = [
+    "WeAct 2.13\" B&W (SSD1680)",
+    "Waveshare 2.13\" V4 (SSD1680)",
+    "Waveshare 2.13\" V3 (SSD1680)",
+    "Waveshare 2.13\" V3a (SSD1680)",
+    "Waveshare 2.13\" V2 (SSD1675B)",
+]
+
+
+def display_label_to_key(label):
+    """Map a friendly display label to its build variant key (default V4).
+
+    WeAct 2.13" B&W and Waveshare "V4" are the same SSD1680 controller, so both
+    map to "V4".
+    """
+    if "V2" in label:
+        return "V2"
+    if "V3a" in label:
+        return "V3a"
+    if "V3" in label:
+        return "V3"
+    return "V4"
+
+
+def apply_eink_wiring(proj_dir, pcb):
+    """Force a program's vendored DEV_Config.c onto the Dilder SPI0 wiring.
+
+    Both the PCB and the breadboard prototype use SPI0 / GP17-22, so this maps
+    the display pins (and SPI_PORT) onto that wiring regardless of `pcb`.
+    Idempotent and best-effort: returns a short summary string if it changed
+    anything, else None (including when the vendored file is absent, e.g. the
+    lib has not been fetched yet).
+    """
+    import re
+    cfg = Path(proj_dir) / "lib" / "Config" / "DEV_Config.c"
+    if not cfg.exists():
+        return None
+    pins = EINK_PINS_DILDER_PCB if pcb else EINK_PINS_BREADBOARD
+    # Both the PCB and the (now SPI0) breadboard use SPI0.
+    spi_port = "spi0"
+    try:
+        text = cfg.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    orig = text
+    for name, num in pins.items():
+        text = re.sub(rf"(EPD_{name}_PIN\s*=\s*)\d+(\s*;)", rf"\g<1>{num}\g<2>", text)
+    text = re.sub(r"(#define\s+SPI_PORT\s+)spi[01]\b", rf"\g<1>{spi_port}", text)
+    if text != orig:
+        try:
+            cfg.write_text(text, encoding="utf-8")
+        except OSError:
+            return None
+        return ("Dilder PCB (SPI0, GP17-22)" if pcb
+                else "breadboard mirroring PCB (SPI0, GP17-22)")
+    return None
 
 # ESP32-S3 flash size (Olimex DevKit-Lipo N8R8)
 ESP32_FLASH_KB = 8192  # 8 MB
@@ -977,7 +1069,7 @@ class FlashUtility(ttk.Frame):
     @staticmethod
     def _pico_instructions(board=None):
         board_name = BOARD_LABELS.get(board, "Pico W (RP2040)")
-        drive = "RP2350" if board == BOARD_PICO2_W else "RPI-RP2"
+        drive = "RP2350" if board in RP2350_BOARDS else "RPI-RP2"
         return (
             f"To flash the {board_name}:\n\n"
             f"1. Unplug the board from USB\n"
@@ -1029,7 +1121,7 @@ If auto-reset fails:
 
         # ── Flash control ──
         init_label = BOARD_LABELS.get(self._current_board, "Pico W")
-        init_drive = "RP2350" if self._current_board == BOARD_PICO2_W else "RPI-RP2"
+        init_drive = "RP2350" if self._current_board in RP2350_BOARDS else "RPI-RP2"
         self.flash_frame = ttk.LabelFrame(self, text=f"Flash to {init_label}", padding=10)
         self.flash_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
 
@@ -1126,7 +1218,7 @@ If auto-reset fails:
             self._set_instructions(self._ESP32_INSTRUCTIONS)
         else:
             board_label = BOARD_LABELS.get(board, "Pico W")
-            bootsel_label = "RP2350" if board == BOARD_PICO2_W else "RPI-RP2"
+            bootsel_label = "RP2350" if board in RP2350_BOARDS else "RPI-RP2"
             self.flash_frame.config(text=f"Flash to {board_label}")
             self.detect_btn.config(text=f"Detect {bootsel_label}", command=self._detect_mount)
             self.flash_btn_main.config(command=self._flash)
@@ -1157,7 +1249,7 @@ If auto-reset fails:
     # ── Pico W flash methods ──
 
     def _detect_mount(self):
-        bootsel_label = "RP2350" if self._current_board == BOARD_PICO2_W else "RPI-RP2"
+        bootsel_label = "RP2350" if self._current_board in RP2350_BOARDS else "RPI-RP2"
         mount = find_rpi_rp2_mount()
         if mount:
             self.mount_label.config(text=f"{bootsel_label}: {mount}", foreground=FG_GREEN)
@@ -1189,10 +1281,10 @@ If auto-reset fails:
 
     def _build_project(self, proj_dir):
         build_dir = proj_dir / "build"
-        pico_board = "pico2_w" if self._current_board == BOARD_PICO2_W else "pico_w"
+        pico_board = "pico2_w" if self._current_board in RP2350_BOARDS else "pico_w"
 
         # Detect stale CMake cache from a different board/platform and clean
-        expected_platform = "rp2350" if self._current_board == BOARD_PICO2_W else "rp2040"
+        expected_platform = "rp2350" if self._current_board in RP2350_BOARDS else "rp2040"
         cmake_cache = build_dir / "CMakeCache.txt"
         if cmake_cache.exists():
             try:
@@ -1479,12 +1571,14 @@ class PinViewer(ttk.Frame):
     """Visual GPIO pin assignment reference — switches between Pico W and ESP32-S3."""
 
     _PICO_W_PINOUT = """\
-Pico W GPIO Pin Assignments — Dilder Project
+Pico 2 W GPIO Pin Assignments — Dilder Project
 ══════════════════════════════════════════════
+Breadboard wiring MIRRORS the Dilder PCB (SPI0,
+GP17-22) so you can validate the PCB map first.
 
                ┌───USB───┐
-   GP0  [ 1]   │         │  [40]  VBUS
-   GP1  [ 2]   │  PICO   │  [39]  VSYS
+▶  GP0  [ 1]   │         │  [40]  VBUS        I2C0 SDA → SC7A20
+▶  GP1  [ 2]   │ PICO 2  │  [39]  VSYS        I2C0 SCL → SC7A20
    GND  [ 3]   │    W    │  [38]  GND       ◄── e-ink GND
 ▶  GP2  [ 4]   │         │  [37]  3V3_EN
 ▶  GP3  [ 5]   │         │  [36]  3V3(OUT)  ◄── e-ink VCC
@@ -1492,36 +1586,37 @@ Pico W GPIO Pin Assignments — Dilder Project
 ▶  GP5  [ 7]   │         │  [34]  GP28
    GND  [ 8]   │         │  [33]  AGND
 ▶  GP6  [ 9]   │         │  [32]  GP27
-   GP7  [10]   │         │  [31]  GP26
-▶  GP8  [11]   │         │  [30]  RUN
-▶  GP9  [12]   │         │  [29]  GP22
+▶  GP7  [10]   │         │  [31]  GP26
+   GP8  [11]   │         │  [30]  RUN
+   GP9  [12]   │         │  [29]  GP22  [22] ◄── BUSY
    GND  [13]   │         │  [28]  GND
-▶ GP10  [14]   │         │  [27]  GP21
-▶ GP11  [15]   │         │  [26]  GP20
-▶ GP12  [16]   │         │  [25]  GP19
-▶ GP13  [17]   │         │  [24]  GP18
+  GP10  [14]   │         │  [27]  GP21  [21] ◄── RST
+  GP11  [15]   │         │  [26]  GP20  [20] ◄── DC
+  GP12  [16]   │         │  [25]  GP19  [19] ◄── DIN (SPI0 TX)
+  GP13  [17]   │         │  [24]  GP18  [18] ◄── CLK (SPI0 SCK)
    GND  [18]   │         │  [23]  GND
-  GP14  [19]   │         │  [22]  GP17
-  GP15  [20]   └─────────┘  [21]  GP16
+  GP14  [19]   │         │  [22]  GP17  [17] ◄── CS
+▶ GP15  [20]   └─────────┘  [21]  GP16        (GP15 = accel INT)
 
 ▶ = used by Dilder
 
 ═══════════════════════════════════════════════
-Display (SPI1)                 Buttons
+Display (SPI0)                 Buttons
 ═══════════════════════════════════════════════
-VCC  → 3V3(OUT) pin 36        UP     → GP2  pin 4
+VCC  → 3V3(OUT) pin 36        UP     → GP4  pin 6
 GND  → GND      pin 38        DOWN   → GP3  pin 5
-DIN  → GP11     pin 15        LEFT   → GP4  pin 6
-CLK  → GP10     pin 14        RIGHT  → GP5  pin 7
-CS   → GP9      pin 12        CENTER → GP6  pin 9
-DC   → GP8      pin 11
-RST  → GP12     pin 16
-BUSY → GP13     pin 17
+CS   → GP17     pin 22        LEFT   → GP2  pin 4
+SCL  → GP18     pin 24        RIGHT  → GP5  pin 7
+SDA  → GP19     pin 25        CENTER → GP6  pin 9
+DC   → GP20     pin 26
+RES  → GP21     pin 27        Speaker → GP7  pin 10
+BUSY → GP22     pin 29        Accel I2C0 → GP0/GP1
+                              SC7A20 INT → GP15 pin 20
 
 ═══════════════════════════════════════════════
 SPI Configuration
 ═══════════════════════════════════════════════
-Controller:  SPI1
+Controller:  SPI0  (GP18 SCK, GP19 TX, GP17 CSn)
 Mode:        Mode 0 (CPOL=0, CPHA=0)
 Clock:       4 MHz
 CS:          Active LOW
@@ -1632,7 +1727,7 @@ Bit order:   MSB first
         """Switch the displayed pinout for the selected board."""
         if board == BOARD_ESP32S3:
             self._show_pinout(self._ESP32S3_PINOUT)
-        elif board == BOARD_PICO2_W:
+        elif board in RP2350_BOARDS:
             self._show_pinout(self._PICO2_W_PINOUT)
         else:
             self._show_pinout(self._PICO_W_PINOUT)
@@ -1723,7 +1818,7 @@ class ConnectionUtility(ttk.Frame):
         f = scroll_frame
         board = self.app.target_board
         bn = BOARD_LABELS.get(board, "Pico W (RP2040)")
-        drive = "RP2350" if board == BOARD_PICO2_W else "RPI-RP2"
+        drive = "RP2350" if board in RP2350_BOARDS else "RPI-RP2"
 
         # Step 1
         self._step_header(f, "Step 1", f"Plug in the {bn} via USB")
@@ -2588,7 +2683,7 @@ class DocumentationTab(ttk.Frame):
         """Return structured documentation content (adapts to selected board)."""
         board = self.app.target_board
         bn = BOARD_LABELS.get(board, "Pico W (RP2040)")
-        drive = "RP2350" if board == BOARD_PICO2_W else "RPI-RP2"
+        drive = "RP2350" if board in RP2350_BOARDS else "RPI-RP2"
         return [
             {
                 "title": "Dilder DevTool",
@@ -2701,8 +2796,8 @@ class DocumentationTab(ttk.Frame):
                 "content": [
                     {"type": "text", "text": (
                         f"Visual reference of the {bn} 40-pin header with all Dilder "
-                        "project assignments. Shows display SPI1 pins, button pins, "
-                        "power connections, and SPI configuration."
+                        "project assignments. Shows display SPI0 pins (GP17-22), button "
+                        "pins, power connections, and SPI configuration."
                     )},
                 ],
             },
@@ -4899,6 +4994,41 @@ HOMESICK_QUOTES = [
 ]
 
 
+def _with_mood(quotes, mood):
+    """Tag every quote in a list with `mood`, preserving any inline ('text',
+    'mood') tag a quote already carries. Used to build combined sets where each
+    source list must keep its own emotional category (otherwise concatenating
+    plain-string lists under a single default_mood collapses them all to one
+    mood — which is what left 12 of 16 Dilder moods empty)."""
+    out = []
+    for q in quotes:
+        text, m = _parse_quote(q)
+        out.append((text, m or mood))
+    return out
+
+
+# Every mood category, each tagged with its own mood so the firmware's
+# per-mood filter (pick_quote) has distinct phrases for all 16 states.
+DILDER_HUB_QUOTES = (
+    _with_mood(SASSY_QUOTES, None) +            # NORMAL (+ inline weird/unhinged/chaotic)
+    _with_mood(SUPPORTIVE_QUOTES, None) +       # NORMAL
+    _with_mood(CONSPIRATORIAL_QUOTES, "weird") +
+    _with_mood(ANGRY_QUOTES, "angry") +
+    _with_mood(SAD_QUOTES, "sad") +
+    _with_mood(CHAOTIC_QUOTES, "chaotic") +
+    _with_mood(HUNGRY_QUOTES, "hungry") +
+    _with_mood(TIRED_QUOTES, "tired") +
+    _with_mood(SLAPHAPPY_QUOTES, "slaphappy") +
+    _with_mood(LAZY_QUOTES, "lazy") +
+    _with_mood(FAT_QUOTES, "fat") +
+    _with_mood(CHILL_QUOTES, "chill") +
+    _with_mood(CREEPY_QUOTES, "creepy") +
+    _with_mood(EXCITED_QUOTES, "excited") +
+    _with_mood(NOSTALGIC_QUOTES, "nostalgic") +
+    _with_mood(HOMESICK_QUOTES, "homesick")
+)
+
+
 def _body_transform(mood, frame_count):
     """Return body transform parameters for a mood and frame.
 
@@ -5336,10 +5466,11 @@ class ProgramsTab(ttk.Frame):
     }
 
     DISPLAY_VARIANTS = [
-        ("V2",  "2.13\" V2 (SSD1675B)"),
-        ("V3",  "2.13\" V3 (SSD1680)"),
-        ("V3a", "2.13\" V3a (SSD1680, rev A)"),
-        ("V4",  "2.13\" V4 (SSD1680, internal LUT)"),
+        ("V4",  "WeAct 2.13\" B&W (SSD1680)"),
+        ("V4",  "Waveshare 2.13\" V4 (SSD1680, internal LUT)"),
+        ("V3",  "Waveshare 2.13\" V3 (SSD1680)"),
+        ("V3a", "Waveshare 2.13\" V3a (SSD1680, rev A)"),
+        ("V2",  "Waveshare 2.13\" V2 (SSD1675B)"),
     ]
 
     def __init__(self, parent, app):
@@ -5437,7 +5568,7 @@ class ProgramsTab(ttk.Frame):
             values=[label for _, label in self.DISPLAY_VARIANTS],
             state="readonly", font=("JetBrains Mono", 9),
         )
-        self.display_combo.current(3)  # Default: V4 (current hardware)
+        self.display_combo.current(0)  # Default: WeAct 2.13" B&W (SSD1680 == V4)
         self.display_combo.pack(fill=tk.X)
         self.display_combo.bind("<<ComboboxSelected>>", self._on_display_changed)
 
@@ -5608,7 +5739,7 @@ class ProgramsTab(ttk.Frame):
         est_kb = self._estimate_firmware_kb(key)
         board = self.app.target_board
         flash_kb = (self.ESP32_FLASH_KB if board == BOARD_ESP32S3
-                    else self.PICO2_FLASH_KB if board == BOARD_PICO2_W
+                    else self.PICO2_FLASH_KB if board in RP2350_BOARDS
                     else self.PICO_FLASH_KB)
         board_label = BOARD_LABELS.get(board, "Board")
         free_kb = flash_kb - est_kb
@@ -5654,20 +5785,13 @@ class ProgramsTab(ttk.Frame):
         "excited_octopus":        (EXCITED_QUOTES,        "~ EXCITED OCTOPUS ~",        "excited"),
         "nostalgic_octopus":      (NOSTALGIC_QUOTES,      "~ NOSTALGIC OCTOPUS ~",      "nostalgic"),
         "homesick_octopus":       (HOMESICK_QUOTES,       "~ HOMESICK OCTOPUS ~",       "homesick"),
-        "mood_selector":          (SASSY_QUOTES + SUPPORTIVE_QUOTES + ANGRY_QUOTES +
-                                   CONSPIRATORIAL_QUOTES + SAD_QUOTES + CHAOTIC_QUOTES +
-                                   HUNGRY_QUOTES + TIRED_QUOTES + SLAPHAPPY_QUOTES +
-                                   LAZY_QUOTES + FAT_QUOTES + CHILL_QUOTES +
-                                   CREEPY_QUOTES + EXCITED_QUOTES + NOSTALGIC_QUOTES +
-                                   HOMESICK_QUOTES,
-                                   "~ MOOD SELECTOR ~", None),
-        "joystick_mood_selector": (SASSY_QUOTES + SUPPORTIVE_QUOTES + ANGRY_QUOTES +
-                                   CONSPIRATORIAL_QUOTES + SAD_QUOTES + CHAOTIC_QUOTES +
-                                   HUNGRY_QUOTES + TIRED_QUOTES + SLAPHAPPY_QUOTES +
-                                   LAZY_QUOTES + FAT_QUOTES + CHILL_QUOTES +
-                                   CREEPY_QUOTES + EXCITED_QUOTES + NOSTALGIC_QUOTES +
-                                   HOMESICK_QUOTES,
-                                   "~ JOYSTICK MOOD ~", None),
+        # Combined sets use DILDER_HUB_QUOTES, where every source list is
+        # mood-tagged. (Concatenating the raw plain-string lists under a single
+        # default_mood collapses them all to mood 0 — the bug that left 12 of
+        # 16 moods empty and made every state show the same NORMAL phrases.)
+        "dilder_hub":             (DILDER_HUB_QUOTES, "~ DILDER HUB ~", None),
+        "mood_selector":          (DILDER_HUB_QUOTES, "~ MOOD SELECTOR ~", None),
+        "joystick_mood_selector": (DILDER_HUB_QUOTES, "~ JOYSTICK MOOD ~", None),
     }
 
     def _show_static_preview(self, prog_key):
@@ -5927,6 +6051,13 @@ class ProgramsTab(ttk.Frame):
         img_receiver_dir = DEV_SETUP / "img-receiver"
         uf2_path = img_receiver_dir / "build" / "img_receiver.uf2"
 
+        # Retarget the vendored e-ink driver to the selected board's wiring
+        # before the container compiles it.
+        _w = apply_eink_wiring(img_receiver_dir,
+                               self.app.target_board in DILDER_PCB_BOARDS)
+        if _w:
+            self._log_build(f"e-ink wiring set for {_w}")
+
         try:
             # Step 1: Check Docker is available
             self._log_build("Checking Docker is available...")
@@ -5975,7 +6106,7 @@ class ProgramsTab(ttk.Frame):
             self._log_build("Docker image ready.")
 
             # Step 3: Run cmake + ninja inside container
-            pico_board = "pico2_w" if self.app.target_board == BOARD_PICO2_W else "pico_w"
+            pico_board = "pico2_w" if self.app.target_board in RP2350_BOARDS else "pico_w"
             self._log_build(f"Compiling img-receiver firmware ({pico_board})...\n"
                             "Running cmake + ninja in container.")
 
@@ -6274,6 +6405,7 @@ class ProgramsTab(ttk.Frame):
 
     # Maps program keys to their firmware directory name
     _FIRMWARE_DIRS = {
+        "dilder_hub":             "dilder-hub",
         "sassy_octopus":          "sassy-octopus",
         "supportive_octopus":     "supportive-octopus",
         "angry_octopus":          "angry-octopus",
@@ -6368,6 +6500,14 @@ class ProgramsTab(ttk.Frame):
             fw_name = fw_dir.replace("-", "_")
             prog_name = self.PROGRAMS[prog_key]["name"]
 
+            # Retarget the vendored e-ink driver to the Dilder SPI0 wiring
+            # (GP17-22) before the container compiles it. Both the PCB and the
+            # breadboard prototype now use this same SPI0 map.
+            _w = apply_eink_wiring(DEV_SETUP / fw_dir,
+                                   self.app.target_board in DILDER_PCB_BOARDS)
+            if _w:
+                self._log_build(f"e-ink wiring set for {_w}")
+
             img_proc = subprocess.Popen(
                 ["docker", "compose", "build", "--progress=plain",
                  docker_svc],
@@ -6390,7 +6530,7 @@ class ProgramsTab(ttk.Frame):
                 return
 
             # Step 4: Compile firmware
-            pico_board = "pico2_w" if self.app.target_board == BOARD_PICO2_W else "pico_w"
+            pico_board = "pico2_w" if self.app.target_board in RP2350_BOARDS else "pico_w"
             self._log_build(f"Compiling standalone firmware ({pico_board}, display: {variant})...")
 
             proc = subprocess.Popen(
@@ -6571,8 +6711,9 @@ class OTAUpdateTab(ttk.Frame):
         boot_frame.pack(fill=tk.X, padx=4, pady=(4, 2))
 
         ttk.Label(boot_frame,
-                  text="Flash the picowota bootloader to the Pico 2 W via USB.\n"
-                       "This is a one-time step — hold BOOTSEL and plug in.",
+                  text="Build the combined picowota + dilder-hub image (RP2350 / "
+                       "pico2_w) and flash it once via USB. One-time step — set "
+                       "WiFi & Display first, then hold BOOTSEL and plug in.",
                   foreground=FG_DIM, wraplength=380,
                   font=("JetBrains Mono", 8)).pack(anchor=tk.W)
 
@@ -6585,12 +6726,12 @@ class OTAUpdateTab(ttk.Frame):
         self._setup_btn.pack(side=tk.LEFT, padx=(0, 4))
 
         self._build_bl_btn = ttk.Button(
-            boot_btns, text="Build Bootloader",
+            boot_btns, text="Build Combined Image",
             command=self._build_bootloader)
         self._build_bl_btn.pack(side=tk.LEFT, padx=(0, 4))
 
         self._flash_bl_btn = ttk.Button(
-            boot_btns, text="Flash Bootloader (USB)",
+            boot_btns, text="Flash Combined (USB)",
             command=self._flash_bootloader_usb)
         self._flash_bl_btn.pack(side=tk.LEFT)
 
@@ -6725,12 +6866,13 @@ class OTAUpdateTab(ttk.Frame):
         self._display_variant = tk.StringVar(value="V4")
         self._variant_combo = ttk.Combobox(
             variant_row, textvariable=self._display_variant,
-            values=["V2 — 2.13\" V2 (SSD1675B)",
-                    "V3 — 2.13\" V3 (SSD1680)",
-                    "V3a — 2.13\" V3a (SSD1680, rev A)",
-                    "V4 — 2.13\" V4 (SSD1680, internal LUT)"],
-            state="readonly", width=36)
-        self._variant_combo.set("V4 — 2.13\" V4 (SSD1680, internal LUT)")
+            values=["V4 — WeAct 2.13\" B&W (SSD1680)",
+                    "V4 — Waveshare 2.13\" V4 (SSD1680, internal LUT)",
+                    "V3 — Waveshare 2.13\" V3 (SSD1680)",
+                    "V3a — Waveshare 2.13\" V3a (SSD1680, rev A)",
+                    "V2 — Waveshare 2.13\" V2 (SSD1675B)"],
+            state="readonly", width=40)
+        self._variant_combo.set("V4 — WeAct 2.13\" B&W (SSD1680)")
         self._variant_combo.pack(side=tk.LEFT, padx=(0, 4))
 
         # Custom firmware path
@@ -6948,16 +7090,23 @@ class OTAUpdateTab(ttk.Frame):
         display_name = self._dir_to_display(fw_dir)
 
         build_dir = DEV_SETUP / fw_dir / "build"
+        ota_elf = DEV_SETUP / fw_dir / "build-ota" / f"{fw_name}.elf"
         elf_path = build_dir / f"{fw_name}.elf"
         uf2_path = build_dir / f"{fw_name}.uf2"
 
-        if elf_path.exists():
+        if ota_elf.exists():
+            # Standalone OTA image (linked at the picowota app offset) — the
+            # one that can actually be pushed wirelessly.
+            size_kb = ota_elf.stat().st_size // 1024
+            status = "OTA-ready"
+            size_str = f"{size_kb}KB"
+        elif elf_path.exists():
             size_kb = elf_path.stat().st_size // 1024
-            status = "Built"
+            status = "Built (USB)"
             size_str = f"{size_kb}KB"
         elif uf2_path.exists():
             size_kb = uf2_path.stat().st_size // 1024
-            status = "Built"
+            status = "Built (USB)"
             size_str = f"{size_kb}KB"
         else:
             status = "Not built"
@@ -6981,9 +7130,15 @@ class OTAUpdateTab(ttk.Frame):
 
         fw_dir = all_dirs[key]
         fw_name = fw_dir.replace("-", "_")
-        build_dir = DEV_SETUP / fw_dir / "build"
 
-        # Prefer .elf for OTA (picowota needs ELF), fall back to .uf2
+        # Prefer the picowota standalone OTA image (linked at the app offset
+        # 0x1005b000) from build-ota/. That is what the bootloader expects —
+        # a normal build/ image is linked at 0x10000000 and CANNOT be OTA'd.
+        ota_elf = DEV_SETUP / fw_dir / "build-ota" / f"{fw_name}.elf"
+        if ota_elf.exists():
+            return key, str(ota_elf), fw_dir, fw_name
+
+        build_dir = DEV_SETUP / fw_dir / "build"
         elf_path = build_dir / f"{fw_name}.elf"
         uf2_path = build_dir / f"{fw_name}.uf2"
 
@@ -7020,12 +7175,16 @@ The Pico 2 W normally needs you to hold BOOTSEL,
 plug in USB, and copy a .uf2 file. OTA replaces
 that with WiFi — no USB cable, no button.
 
-It works by putting a tiny WiFi bootloader
-(picowota) on your Pico 2 W ONCE via USB. After
-that, picowota listens for firmware updates over
-WiFi. You send new firmware from this tab.
+It works by putting a WiFi bootloader (picowota)
+on your Pico 2 W ONCE via USB, bundled with an
+initial dilder-hub app. After that, picowota
+listens for firmware updates over WiFi and you
+send new firmware from this tab.
 
 Target: Raspberry Pi Pico 2 W (RP2350, 4MB flash)
+The picowota bootloader is built RP2350-native
+(pico2_w) — its linker scripts were ported to the
+RP2350 memory map + IMAGE_DEF boot block.
 
 ════════════════════
 FIRST-TIME SETUP (USB — you only do this once)
@@ -7036,7 +7195,9 @@ Step 1: INSTALL SUBMODULE
   project. Just click the button — it runs git.
 
 Step 2: CONFIGURE WIFI
-  Tell picowota how to connect to WiFi.
+  Tell picowota how to connect to WiFi. The same
+  SSID/password are baked into both the bootloader
+  AND the dilder-hub app.
 
   • AP mode (recommended for getting started):
     The Pico creates its OWN WiFi network.
@@ -7050,30 +7211,36 @@ Step 2: CONFIGURE WIFI
     You'll need to scan to find the Pico's IP.
 
 Step 3: BUILD BOOTLOADER
-  What it does: Compiles the picowota bootloader
-  with YOUR WiFi credentials baked in. The output
-  is a .uf2 file that contains:
-    - The picowota WiFi bootloader
-    - Your WiFi SSID/password (so it can connect)
-  This is NOT your firmware — it's just the
-  bootloader that enables wireless updates.
+  Compiles, for the Pico 2 W (pico2_w), a COMBINED
+  image = picowota bootloader + dilder-hub app +
+  your WiFi credentials. Output (in
+  dev-setup/dilder-hub/build-ota):
+    • picowota_dilder_hub.uf2 — flash via USB (next)
+    • dilder_hub.elf          — the standalone OTA
+      payload pushed wirelessly later
+  Pick your e-ink Display variant first; it is
+  compiled into the bundled app.
 
 Step 4: FLASH BOOTLOADER (USB)
-  What it does: Copies the bootloader .uf2 to your
-  Pico via the normal BOOTSEL method.
+  Copies picowota_dilder_hub.uf2 to your Pico via
+  the normal BOOTSEL method.
   Hold BOOTSEL → plug in USB → click the button.
   THIS IS THE LAST TIME you need USB.
-  After this, the Pico has WiFi update capability.
+  The Pico now has WiFi update capability and runs
+  dilder-hub.
 
 ════════════════════
 WIRELESS UPDATES (no USB needed — every time)
 ════════════════════
 
 Step 1: PUT PICO IN BOOTLOADER MODE
-  The Pico needs to be running picowota (not your
-  firmware) to accept OTA updates. Two ways:
+  The Pico must run picowota (not the app) to accept
+  OTA updates. Three ways:
+  • Hold the JOYSTICK UP while powering on dilder-hub
   • Pull GPIO15 low and press reset
   • Click "Reboot to Bootloader" (if USB connected)
+  (On a fresh device with no valid app yet, it stays
+  in the bootloader automatically.)
 
 Step 2: CONNECT TO THE PICO
   • AP mode: Connect your laptop to the Pico's
@@ -7086,13 +7253,22 @@ Step 3: FIND THE DEVICE
   Green = bootloader found and ready.
 
 Step 4: PICK FIRMWARE AND FLASH
-  Select a program from the list, then:
-  • "Flash OTA" — sends an already-built firmware
-  • "Clean Build & Flash OTA" — rebuilds from
-    scratch via Docker, then sends it wirelessly
+  Select dilder-hub from the list (look for the
+  "OTA-ready" status), then:
+  • "Flash OTA" — sends the already-built
+    build-ota/dilder_hub.elf
+  • "Clean Build & Flash OTA" — rebuilds the OTA
+    image (pico2_w, -DPICOWOTA_OTA), then sends it
 
   The progress bar shows erase → write → seal.
   When done, the Pico reboots into your firmware.
+
+  NOTE: only apps that integrate picowota can be
+  OTA'd — currently dilder-hub. Other programs link
+  at 0x10000000 and must be flashed over USB from
+  the Programs tab. (To make another app OTA-capable,
+  add the picowota integration to its CMakeLists like
+  dilder-hub's -DPICOWOTA_OTA block.)
 
 ════════════════════
 ALWAYS WORKS: USB FALLBACK
@@ -7100,9 +7276,9 @@ ALWAYS WORKS: USB FALLBACK
 
 If anything goes wrong, BOOTSEL + USB still works.
 You can never brick the Pico — worst case, you
-hold BOOTSEL, plug in USB, and flash a .uf2 file
-the old-fashioned way. picowota doesn't touch the
-hardware bootloader.
+hold BOOTSEL, plug in USB, and re-flash the combined
+.uf2 (or any plain app .uf2) the old-fashioned way.
+picowota doesn't touch the hardware bootrom.
 
 ════════════════════
 SETTINGS PERSISTENCE
@@ -7169,8 +7345,131 @@ and restored when you reopen the DevTool.
 
         threading.Thread(target=_run, daemon=True).start()
 
+    @staticmethod
+    def _find_pico_sdk():
+        """Locate the Pico SDK (PICO_SDK_PATH env, then common paths).
+        Returns the path string, or None if not found."""
+        sdk_path = os.environ.get("PICO_SDK_PATH", "")
+        if sdk_path and Path(sdk_path, "pico_sdk_init.cmake").exists():
+            return sdk_path
+        for candidate in (Path.home() / "pico" / "pico-sdk",
+                          Path.home() / "pico-sdk",
+                          Path("/opt/pico-sdk"),
+                          PROJECT_ROOT / "pico-sdk"):
+            if (candidate / "pico_sdk_init.cmake").exists():
+                return str(candidate)
+        return None
+
+    @staticmethod
+    def _is_ota_capable(fw_dir):
+        """True if the app's CMakeLists integrates picowota (so it can be
+        built as a standalone OTA image). Only such apps can be flashed
+        wirelessly — a normal build is linked at 0x10000000, not the picowota
+        app offset."""
+        cmake = DEV_SETUP / fw_dir / "CMakeLists.txt"
+        try:
+            text = cmake.read_text()
+        except OSError:
+            return False
+        return "picowota_build_combined" in text or "PICOWOTA_OTA" in text
+
+    def _compile_ota_image(self, fw_dir, fw_name, variant, ssid, password,
+                           mode, clean=True):
+        """Native cmake+ninja build of an app's picowota OTA artifacts.
+
+        Builds in dev-setup/<fw_dir>/build-ota with -DPICOWOTA_OTA=ON for the
+        Pico 2 W (RP2350), producing the combined bootloader+app UF2 (USB
+        first-flash) and the standalone app ELF (wireless OTA payload, linked
+        at 0x1005b000).
+
+        Runs synchronously — call from a worker thread. Logs via self.app.log.
+        Returns (combined_uf2_path | None, standalone_elf_path | None).
+        """
+        def log(m):
+            self.after(0, lambda: self.app.log(m))
+
+        sdk_path = self._find_pico_sdk()
+        if not sdk_path:
+            log("[ota] ERROR: Pico SDK not found. Set PICO_SDK_PATH "
+                "(SDK 2.x required for RP2350).")
+            return None, None
+        log(f"[ota] Pico SDK: {sdk_path}")
+
+        build_dir = DEV_SETUP / fw_dir / "build-ota"
+        ap_flag = "1" if mode == "ap" else "0"
+
+        env = os.environ.copy()
+        env.update({
+            "PICO_SDK_PATH": sdk_path,
+            "PICOWOTA_WIFI_SSID": ssid,
+            "PICOWOTA_WIFI_PASS": password,
+            "PICOWOTA_WIFI_AP": ap_flag,
+        })
+
+        # Clean so a stale cache can't pin the wrong board/creds.
+        if clean and build_dir.exists():
+            log("[ota] Cleaning build-ota directory...")
+            shutil.rmtree(str(build_dir))
+        build_dir.mkdir(parents=True, exist_ok=True)
+
+        # WiFi creds passed as -D cache vars (so ninja's auto-reconfigure keeps
+        # them) AND env vars. WIFI_* feeds the app; PICOWOTA_WIFI_* the bootloader.
+        log(f"[ota] cmake configure (pico2_w, OTA, display={variant})...")
+        cmake_cmd = [
+            "cmake", "-G", "Ninja",
+            "-DPICO_BOARD=pico2_w", "-DPICOWOTA_OTA=ON",
+            f"-DPICO_SDK_PATH={sdk_path}",
+            f"-DDISPLAY_VARIANT={variant}",
+            f"-DWIFI_SSID={ssid}", f"-DWIFI_PASS={password}",
+            f"-DPICOWOTA_WIFI_SSID={ssid}", f"-DPICOWOTA_WIFI_PASS={password}",
+            f"-DPICOWOTA_WIFI_AP={ap_flag}",
+            ".."]
+        r = subprocess.run(cmake_cmd, cwd=str(build_dir), env=env,
+                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                           text=True, timeout=180)
+        if r.returncode != 0:
+            for line in (r.stdout or "").strip().split("\n")[-12:]:
+                log(f"[cmake] {line}")
+            return None, None
+
+        log("[ota] ninja build...")
+        r = subprocess.run(["ninja"], cwd=str(build_dir), env=env,
+                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                           text=True, timeout=600)
+        if r.returncode != 0:
+            for line in (r.stdout or "").strip().split("\n")[-15:]:
+                log(f"[ninja] {line}")
+            return None, None
+
+        combined_elf = build_dir / f"picowota_{fw_name}.elf"
+        combined_uf2 = build_dir / f"picowota_{fw_name}.uf2"
+        standalone_elf = build_dir / f"{fw_name}.elf"
+
+        # SDK 2.x ships no ELF2UF2 cmake module — make the combined UF2 with picotool.
+        if combined_elf.exists() and not combined_uf2.exists():
+            log("[ota] Converting combined ELF -> UF2 (picotool)...")
+            c = subprocess.run(
+                ["picotool", "uf2", "convert", str(combined_elf), str(combined_uf2)],
+                capture_output=True, text=True, timeout=60)
+            if c.returncode != 0:
+                log(f"[picotool] {(c.stderr or '').strip()}")
+
+        return (combined_uf2 if combined_uf2.exists() else None,
+                standalone_elf if standalone_elf.exists() else None)
+
     def _build_bootloader(self):
-        """Build picowota combined bootloader with WiFi config."""
+        """Build the picowota + dilder_hub COMBINED image for the Pico 2 W.
+
+        A single `-DPICOWOTA_OTA=ON` build (in dev-setup/dilder-hub/build-ota)
+        produces BOTH artifacts the OTA workflow needs:
+          - picowota_dilder_hub.uf2  → flash ONCE over USB; installs the
+            picowota WiFi bootloader plus an initial dilder_hub app.
+          - dilder_hub.elf           → standalone OTA payload, linked at the
+            picowota app offset (0x1005b000), for wireless updates.
+
+        The bootloader is built RP2350-native (pico2_w); the picowota linker
+        scripts have been ported to the RP2350 memory map + IMAGE_DEF block.
+        """
         ssid = self._ssid.get().strip()
         password = self._password.get().strip()
         mode = self._wifi_mode.get()
@@ -7179,8 +7478,16 @@ and restored when you reopen the DevTool.
             messagebox.showwarning("WiFi Config", "Enter a WiFi SSID first.")
             return
 
-        self.app.log(f"[ota] Building bootloader: mode={mode}, ssid={ssid}")
-        self._boot_status.config(text="Building bootloader...",
+        variant = self._get_variant_key()
+        # The bundled dilder-hub uses the Dilder SPI0 e-ink wiring (GP17-22),
+        # shared by the PCB and the breadboard prototype.
+        _w = apply_eink_wiring(DEV_SETUP / "dilder-hub",
+                               self.app.target_board in DILDER_PCB_BOARDS)
+        if _w:
+            self.app.log(f"[ota] e-ink wiring set for {_w}")
+        self.app.log(f"[ota] Building combined bootloader+app: mode={mode}, "
+                     f"ssid={ssid}, display={variant}")
+        self._boot_status.config(text="Building combined image (pico2_w)...",
                                   foreground=FG_YELLOW)
         self._build_bl_btn.config(state=tk.DISABLED)
 
@@ -7194,142 +7501,32 @@ and restored when you reopen the DevTool.
                         text="picowota not installed", foreground=FG_RED))
                     return
 
-                build_dir = pw_dir / "build"
-                build_dir.mkdir(exist_ok=True)
-
-                # picowota bootloader always builds as pico_w (RP2040).
-                # The Pico 2 W runs RP2040 binaries in compatibility mode.
-                # Building as pico2_w compiles but the TCP server doesn't
-                # start — the RP2350-native picowota port is incomplete.
-                pico_board = "pico_w"
-                self.after(0, lambda: self.app.log(
-                    f"[ota] Bootloader target: {pico_board} (RP2040 compat — works on Pico 2 W)"))
-
-                # Find Pico SDK — check env var first, then common locations
-                sdk_path = os.environ.get("PICO_SDK_PATH", "")
-                if sdk_path:
+                if not (DEV_SETUP / "dilder-hub" / "CMakeLists.txt").exists():
                     self.after(0, lambda: self.app.log(
-                        f"[ota] Using PICO_SDK_PATH from environment: {sdk_path}"))
-                else:
-                    search_paths = [
-                        Path.home() / "pico" / "pico-sdk",
-                        Path.home() / "pico-sdk",
-                        Path("/opt/pico-sdk"),
-                        PROJECT_ROOT / "pico-sdk",
-                    ]
-                    for candidate in search_paths:
-                        if (candidate / "pico_sdk_init.cmake").exists():
-                            sdk_path = str(candidate)
-                            self.after(0, lambda sp=sdk_path: self.app.log(
-                                f"[ota] Found Pico SDK at: {sp}"))
-                            break
-
-                if not sdk_path:
-                    searched = ", ".join(str(p) for p in search_paths)
-                    self.after(0, lambda: self.app.log(
-                        f"[ota] ERROR: Pico SDK not found. Set PICO_SDK_PATH or install to one of: {searched}"))
+                        "[ota] ERROR: dilder-hub project not found (needed for the combined image)"))
                     self.after(0, lambda: self._boot_status.config(
-                        text="Error: Pico SDK not found — see log", foreground=FG_RED))
+                        text="dilder-hub not found", foreground=FG_RED))
                     return
-
-                # Verify SDK has the required file
-                if not Path(sdk_path, "pico_sdk_init.cmake").exists():
-                    self.after(0, lambda: self.app.log(
-                        f"[ota] ERROR: PICO_SDK_PATH={sdk_path} exists but pico_sdk_init.cmake is missing"))
-                    self.after(0, lambda: self._boot_status.config(
-                        text="Error: SDK path invalid — see log", foreground=FG_RED))
-                    return
-
-                ap_flag = "1" if mode == "ap" else "0"
-
-                env = os.environ.copy()
-                env["PICO_SDK_PATH"] = sdk_path
-                env["PICOWOTA_WIFI_SSID"] = ssid
-                env["PICOWOTA_WIFI_PASS"] = password
-                env["PICOWOTA_WIFI_AP"] = ap_flag
 
                 self.after(0, lambda: self.app.log(
                     f"[ota] WiFi: mode={'AP' if mode == 'ap' else 'STA'}, ssid={ssid}"))
 
-                # Nuke stale build to prevent ninja cmake re-run without env vars
-                if build_dir.exists():
+                combined_uf2, standalone_elf = self._compile_ota_image(
+                    "dilder-hub", "dilder_hub", variant, ssid, password, mode,
+                    clean=True)
+
+                if combined_uf2:
+                    size_kb = combined_uf2.stat().st_size // 1024
                     self.after(0, lambda: self.app.log(
-                        "[ota] Cleaning stale build directory..."))
-                    shutil.rmtree(str(build_dir))
-                    build_dir.mkdir()
-
-                # CMake configure — pass WiFi creds as both env vars AND
-                # -D cache variables so ninja's auto-reconfigure doesn't
-                # lose them (ninja re-runs cmake without our env)
-                self.after(0, lambda: self._boot_status.config(
-                    text="CMake configure...", foreground=FG_YELLOW))
-                self.after(0, lambda: self.app.log(
-                    f"[ota] Running cmake in {build_dir}..."))
-
-                cmake_cmd = [
-                    "cmake", "-G", "Ninja",
-                    f"-DPICO_BOARD={pico_board}",
-                    f"-DPICO_SDK_PATH={sdk_path}",
-                    f"-DPICOWOTA_WIFI_SSID={ssid}",
-                    f"-DPICOWOTA_WIFI_PASS={password}",
-                    f"-DPICOWOTA_WIFI_AP={ap_flag}",
-                    ".."]
-                result = subprocess.run(
-                    cmake_cmd,
-                    cwd=str(build_dir), env=env,
-                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                    text=True, timeout=120)
-
-                if result.returncode != 0:
-                    # Show last 10 lines of combined output
-                    output_lines = result.stdout.strip().split("\n") if result.stdout else []
-                    for line in output_lines[-10:]:
-                        self.after(0, lambda l=line: self.app.log(f"[cmake] {l}"))
-                    err_summary = output_lines[-1] if output_lines else "unknown error"
-                    self.after(0, lambda e=err_summary: self._boot_status.config(
-                        text=f"CMake failed: {e[:60]}", foreground=FG_RED))
-                    return
-
-                self.after(0, lambda: self.app.log("[ota] CMake configure OK"))
-
-                # Ninja build
-                self.after(0, lambda: self._boot_status.config(
-                    text="Building (ninja)...", foreground=FG_YELLOW))
-                self.after(0, lambda: self.app.log("[ota] Running ninja build..."))
-
-                result = subprocess.run(
-                    ["ninja"],
-                    cwd=str(build_dir), env=env,
-                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                    text=True, timeout=300)
-
-                if result.returncode != 0:
-                    output_lines = result.stdout.strip().split("\n") if result.stdout else []
-                    for line in output_lines[-15:]:
-                        self.after(0, lambda l=line: self.app.log(f"[ninja] {l}"))
-                    err_summary = output_lines[-1] if output_lines else "unknown error"
-                    self.after(0, lambda e=err_summary: self._boot_status.config(
-                        text=f"Build failed: {e[:60]}", foreground=FG_RED))
-                    return
-
-                self.after(0, lambda: self.app.log("[ota] Ninja build OK"))
-
-                # Find the combined .uf2
-                uf2_files = list(build_dir.glob("picowota*.uf2"))
-                if uf2_files:
-                    uf2 = uf2_files[0]
-                    size_kb = uf2.stat().st_size // 1024
-                    self.after(0, lambda: self.app.log(
-                        f"[ota] Bootloader built: {uf2.name} ({size_kb}KB)"))
+                        f"[ota] Combined image ready: {combined_uf2.name} ({size_kb}KB). "
+                        "OTA payload: build-ota/dilder_hub.elf"))
                     self.after(0, lambda: self._boot_status.config(
-                        text=f"Built: {uf2.name} ({size_kb}KB)",
+                        text=f"Built {combined_uf2.name} ({size_kb}KB) — flash via USB next",
                         foreground=FG_GREEN))
+                    self.after(0, self._populate_firmware_tree)
                 else:
-                    self.after(0, lambda: self.app.log(
-                        "[ota] Build completed but no .uf2 found"))
                     self.after(0, lambda: self._boot_status.config(
-                        text="Built but no .uf2 found", foreground=FG_YELLOW))
-
+                        text="Build failed or no .uf2 — see log", foreground=FG_RED))
             except subprocess.TimeoutExpired:
                 self.after(0, lambda: self.app.log("[ota] Build timed out"))
                 self.after(0, lambda: self._boot_status.config(
@@ -7339,20 +7536,21 @@ and restored when you reopen the DevTool.
                 self.after(0, lambda: self._boot_status.config(
                     text=f"Error: {e}", foreground=FG_RED))
             finally:
-                self.after(0, lambda: self._build_bl_btn.config(
-                    state=tk.NORMAL))
+                self.after(0, lambda: self._build_bl_btn.config(state=tk.NORMAL))
 
         threading.Thread(target=_run, daemon=True).start()
 
     def _flash_bootloader_usb(self):
-        """Flash the combined bootloader via USB BOOTSEL."""
-        pw_dir = PROJECT_ROOT / self.PICOWOTA_DIR / "build"
-        uf2_files = list(pw_dir.glob("picowota*.uf2")) if pw_dir.exists() else []
+        """Flash the combined bootloader+app image via USB BOOTSEL."""
+        # The combined image is produced by the dilder-hub OTA build.
+        build_dir = DEV_SETUP / "dilder-hub" / "build-ota"
+        uf2_files = (list(build_dir.glob("picowota_*.uf2"))
+                     if build_dir.exists() else [])
 
         if not uf2_files:
             messagebox.showwarning(
                 "No Bootloader",
-                "Build the bootloader first (step 3).")
+                "Build the combined image first (step 3 — 'Build Bootloader').")
             return
 
         uf2_path = uf2_files[0]
@@ -7361,7 +7559,7 @@ and restored when you reopen the DevTool.
         mount = find_rpi_rp2_mount()
         if not mount:
             board = self.app.target_board
-            drive = "RP2350" if board == BOARD_PICO2_W else "RPI-RP2"
+            drive = "RP2350" if board in RP2350_BOARDS else "RPI-RP2"
             messagebox.showwarning(
                 "No BOOTSEL Drive",
                 f"Hold BOOTSEL, plug in the Pico, then try again.\n"
@@ -7496,14 +7694,36 @@ and restored when you reopen the DevTool.
     # ── OTA flash ──
 
     def _clean_build_and_flash_ota(self):
-        """Clean build the selected firmware via Docker, then flash OTA."""
+        """Clean-build the selected app's OTA image natively, then flash it wirelessly.
+
+        Uses a native cmake+ninja -DPICOWOTA_OTA=ON build (not Docker) because
+        the OTA payload must be the picowota standalone image linked at the app
+        offset — a normal Docker build links at 0x10000000 and cannot be OTA'd.
+        """
         key, _, fw_dir, fw_name = self._get_selected_firmware()
         if not key:
             messagebox.showwarning("Select Firmware",
                                    "Select a firmware from the list first.")
             return
 
+        if not self._is_ota_capable(fw_dir):
+            messagebox.showwarning(
+                "Not OTA-capable",
+                f"'{fw_dir}' is not set up for wireless updates.\n\n"
+                "Only apps that integrate picowota (add_subdirectory(picowota) +\n"
+                "picowota_build_combined behind -DPICOWOTA_OTA) can be flashed over\n"
+                "WiFi — currently dilder-hub. A normal build links at 0x10000000;\n"
+                "an OTA image must link at the picowota app offset.\n\n"
+                "Flash other apps via USB from the Programs tab instead.")
+            return
+
+        ssid = self._ssid.get().strip()
+        password = self._password.get().strip()
+        mode = self._wifi_mode.get()
         ip = self._device_ip.get().strip()
+        if not ssid:
+            messagebox.showwarning("WiFi Config", "Enter a WiFi SSID first.")
+            return
         if not ip:
             messagebox.showwarning("Device",
                                    "Enter or discover a device IP first.")
@@ -7517,137 +7737,48 @@ and restored when you reopen the DevTool.
         self._progress_var.set(0)
 
         variant = self._get_variant_key()
-        self.app.log(f"[ota] Clean build + OTA flash: {fw_name} ({variant}) → {ip}")
-        self._flash_status.config(text="Starting clean build...",
+        _w = apply_eink_wiring(DEV_SETUP / fw_dir,
+                               self.app.target_board in DILDER_PCB_BOARDS)
+        if _w:
+            self.app.log(f"[ota] e-ink wiring set for {_w}")
+        self.app.log(f"[ota] Clean OTA build + flash: {fw_name} ({variant}) → {ip}")
+        self._flash_status.config(text="Starting clean OTA build...",
                                    foreground=FG_YELLOW)
 
         def _run():
             try:
-                # Step 1: Nuke existing build dir
-                build_dir = DEV_SETUP / fw_dir / "build"
-                if build_dir.exists():
-                    shutil.rmtree(str(build_dir))
-                    self.after(0, lambda: self.app.log(
-                        f"[ota] Cleaned {build_dir}"))
-
-                # Step 2: Check Docker
-                self.after(0, lambda: self._flash_status.config(
-                    text="Checking Docker...", foreground=FG_YELLOW))
-                self.after(0, lambda: self._progress_var.set(5))
-
-                docker_check = subprocess.run(
-                    ["docker", "info"], capture_output=True, timeout=10)
-                if docker_check.returncode != 0:
-                    self.after(0, lambda: self._flash_status.config(
-                        text="Docker not running. Start Docker first.",
-                        foreground=FG_RED))
-                    return
-
-                # Step 3: Generate quotes.h if this is an octopus program
-                # (tool programs don't need it)
+                # Generate quotes.h for octopus-style programs that need it.
                 if hasattr(self.app, "programs_tab"):
                     programs_tab = self.app.programs_tab
                     if key in getattr(programs_tab, "_OCTOPUS_CONFIGS", {}):
                         self.after(0, lambda: self._flash_status.config(
-                            text="Generating quotes.h...",
-                            foreground=FG_YELLOW))
-                        self.after(0, lambda: self._progress_var.set(8))
+                            text="Generating quotes.h...", foreground=FG_YELLOW))
                         programs_tab._generate_quotes_header(key)
 
-                # Step 4: Build Docker image
                 self.after(0, lambda: self._flash_status.config(
-                    text="Building Docker image...", foreground=FG_YELLOW))
+                    text="Clean building OTA image (pico2_w)...",
+                    foreground=FG_YELLOW))
                 self.after(0, lambda: self._progress_var.set(10))
 
-                docker_svc = f"build-{fw_dir}"
+                _combined, standalone_elf = self._compile_ota_image(
+                    fw_dir, fw_name, variant, ssid, password, mode, clean=True)
 
-                img_proc = subprocess.Popen(
-                    ["docker", "compose", "build", "--progress=plain",
-                     docker_svc],
-                    cwd=str(DEV_SETUP),
-                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                    text=True)
-                for line in img_proc.stdout:
-                    line = line.rstrip()
-                    if line:
-                        self.after(0, lambda l=line: self.app.log(
-                            f"[docker] {l}"))
-                img_proc.wait(timeout=600)
-
-                if img_proc.returncode != 0:
+                if not standalone_elf:
                     self.after(0, lambda: self._flash_status.config(
-                        text="Docker image build failed.", foreground=FG_RED))
+                        text="OTA build failed — see log.", foreground=FG_RED))
                     return
 
-                # Step 5: Compile firmware
-                pico_board = ("pico2_w" if self.app.target_board == BOARD_PICO2_W
-                              else "pico_w")
-                self.after(0, lambda: self._flash_status.config(
-                    text=f"Compiling {fw_name} ({pico_board}, {variant})...",
-                    foreground=FG_YELLOW))
-                self.after(0, lambda: self._progress_var.set(25))
-
-                proc = subprocess.Popen(
-                    ["docker", "compose", "run", "--rm",
-                     "-e", f"DISPLAY_VARIANT={variant}",
-                     "-e", f"PICO_BOARD={pico_board}",
-                     docker_svc],
-                    cwd=str(DEV_SETUP),
-                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                    text=True)
-
-                for line in proc.stdout:
-                    line = line.rstrip()
-                    if line:
-                        self.after(0, lambda l=line: self.app.log(
-                            f"[build] {l}"))
-                        self.after(0, lambda l=line:
-                                   self._flash_status.config(
-                                       text=f"Compiling...\n{l[:50]}"))
-
-                proc.wait(timeout=300)
-
-                if proc.returncode != 0:
-                    self.after(0, lambda: self._flash_status.config(
-                        text="Build failed — check log.", foreground=FG_RED))
-                    return
-
-                # Step 6: Verify output
-                elf_path = DEV_SETUP / fw_dir / "build" / f"{fw_name}.elf"
-                uf2_path = DEV_SETUP / fw_dir / "build" / f"{fw_name}.uf2"
-
-                if elf_path.exists():
-                    flash_path = str(elf_path)
-                    size_kb = elf_path.stat().st_size // 1024
-                elif uf2_path.exists():
-                    flash_path = str(uf2_path)
-                    size_kb = uf2_path.stat().st_size // 1024
-                else:
-                    self.after(0, lambda: self._flash_status.config(
-                        text="Build OK but no .elf/.uf2 found.",
-                        foreground=FG_RED))
-                    return
-
+                size_kb = standalone_elf.stat().st_size // 1024
                 self.after(0, lambda: self.app.log(
-                    f"[ota] Build complete: {size_kb}KB. Flashing OTA..."))
+                    f"[ota] OTA image built: {size_kb}KB. Flashing to {ip}..."))
                 self.after(0, lambda: self._flash_status.config(
                     text=f"Built {size_kb}KB — connecting to {ip}...",
                     foreground=FG_YELLOW))
                 self.after(0, lambda: self._progress_var.set(50))
 
-                # Step 7: OTA flash
-                self._do_ota_flash(flash_path, ip, progress_offset=50)
-
-                # Refresh the tree to show updated build status
+                self._do_ota_flash(str(standalone_elf), ip, progress_offset=50)
                 self.after(0, self._populate_firmware_tree)
 
-            except subprocess.TimeoutExpired:
-                self.after(0, lambda: self._flash_status.config(
-                    text="Build timed out.", foreground=FG_RED))
-            except FileNotFoundError:
-                self.after(0, lambda: self._flash_status.config(
-                    text="Docker not found. Install Docker first.",
-                    foreground=FG_RED))
             except Exception as e:
                 self.after(0, lambda: self._flash_status.config(
                     text=f"Error: {str(e)[:100]}", foreground=FG_RED))
@@ -7664,7 +7795,7 @@ and restored when you reopen the DevTool.
     def _flash_ota(self):
         """Flash firmware wirelessly via picowota TCP protocol."""
         # Check tree selection first, then custom path
-        key, fw_path, _, _ = self._get_selected_firmware()
+        key, fw_path, fw_dir, _ = self._get_selected_firmware()
         custom_path = self._firmware_path.get().strip()
 
         if custom_path and Path(custom_path).exists():
@@ -7674,6 +7805,17 @@ and restored when you reopen the DevTool.
                 "Firmware",
                 "Select a built firmware from the list,\n"
                 "or browse to a custom .elf/.uf2 file.")
+            return
+        # Guard: a tree selection that isn't an OTA standalone image can't be
+        # pushed wirelessly (a normal build links at 0x10000000). Custom paths
+        # are allowed through — the user may point at a valid standalone image.
+        elif fw_dir and not self._is_ota_capable(fw_dir):
+            messagebox.showwarning(
+                "Not OTA-capable",
+                f"'{fw_dir}' has no picowota OTA build.\n\n"
+                "Only apps integrating picowota (currently dilder-hub) can be\n"
+                "flashed over WiFi. Build it with 'Build Bootloader' first, or\n"
+                "flash other apps via USB from the Programs tab.")
             return
 
         ip = self._device_ip.get().strip()
@@ -8166,6 +8308,13 @@ class PicotoolTab(ttk.Frame):
             command=self._clean_build_and_flash)
         self._build_flash_btn.pack(side=tk.LEFT, padx=(0, 4))
 
+        # Deploy the combined picowota + dilder-hub OTA image (ignores the tree
+        # selection) and verify the WiFi creds baked into it while flashing.
+        self._ota_btn = ttk.Button(
+            action_row, text="Deploy dilder-hub OTA",
+            command=self._flash_ota_combined)
+        self._ota_btn.pack(side=tk.LEFT, padx=(0, 4))
+
         ttk.Button(action_row, text="Refresh List",
                    command=self._populate_firmware_tree).pack(side=tk.RIGHT)
 
@@ -8547,6 +8696,66 @@ REQUIREMENTS
                 "Firmware",
                 "Select a built firmware or browse for a .uf2 file.")
             return
+        self._start_picotool_flash(uf2_path)
+
+    def _flash_ota_combined(self):
+        """Deploy the combined picowota + dilder-hub OTA image over USB,
+        verifying the WiFi network credentials baked into it first."""
+        uf2 = DEV_SETUP / "dilder-hub" / "build-ota" / "picowota_dilder_hub.uf2"
+        if not uf2.exists():
+            messagebox.showwarning(
+                "OTA image not built",
+                "Build it first in the Pico 2 W OTA tab → 'Build Combined "
+                f"Image'.\n\nExpected:\n{uf2}")
+            return
+        ok, note = self._verify_ota_wifi()
+        self.app.log(f"[picotool] OTA WiFi check: {note}")
+        if not ok and not messagebox.askyesno(
+                "WiFi not verified",
+                f"{note}\n\nFlash anyway? OTA discovery will fail until the "
+                "image carries valid WiFi credentials — set them in the "
+                "Pico 2 W OTA tab and rebuild the combined image."):
+            return
+        self._start_picotool_flash(str(uf2), wifi_note=note)
+
+    def _verify_ota_wifi(self):
+        """Confirm the built OTA image actually carries WiFi credentials.
+
+        Cross-checks the SSID the OTA tab last saved against the bytes baked
+        into build-ota/picowota_dilder_hub.elf (picowota compiles the SSID in
+        as a string literal). Returns (ok: bool, message: str).
+        """
+        settings_file = (Path.home() / ".config" / "dilder-devtool"
+                         / "ota-settings.json")
+        ssid, mode = "", "sta"
+        try:
+            s = json.loads(settings_file.read_text())
+            ssid = (s.get("ssid") or "").strip()
+            mode = s.get("wifi_mode", "sta")
+        except (OSError, json.JSONDecodeError):
+            pass
+        if not ssid:
+            return False, ("no WiFi SSID configured — set SSID/password in the "
+                           "Pico 2 W OTA tab, then rebuild the combined image")
+        elf = (DEV_SETUP / "dilder-hub" / "build-ota"
+               / "picowota_dilder_hub.elf")
+        try:
+            in_image = ssid.encode("utf-8") in elf.read_bytes()
+        except OSError:
+            return False, (f"SSID '{ssid}' configured but build-ota ELF is "
+                           "missing — rebuild the combined image (OTA tab)")
+        mode_str = "AP (broadcasts its own network)" if mode == "ap" else "STA (joins your network)"
+        if in_image:
+            return True, f"will use '{ssid}' — {mode_str}; SSID verified in image"
+        return False, (f"SSID '{ssid}' NOT found in the built image — it looks "
+                       "stale; rebuild via OTA tab → Build Combined Image")
+
+    def _start_picotool_flash(self, uf2_path, wifi_note=None):
+        """Shared flash routine: reboot to BOOTSEL → copy .uf2 → eject.
+
+        `wifi_note` (when flashing an OTA image) is logged and shown during the
+        copy so the WiFi config the image will use is visible while it flashes.
+        """
         if not self._picotool_path:
             messagebox.showwarning("picotool", "Install picotool first.")
             return
@@ -8555,10 +8764,13 @@ REQUIREMENTS
 
         self._is_flashing = True
         self._flash_btn.config(state=tk.DISABLED)
+        self._ota_btn.config(state=tk.DISABLED)
         self._progress_var.set(0)
         fw_name = Path(uf2_path).name
 
         self.app.log(f"[picotool] Flashing {fw_name}...")
+        if wifi_note:
+            self.app.log(f"[picotool] OTA WiFi target: {wifi_note}")
         self._flash_status.config(text="Rebooting to BOOTSEL...",
                                    foreground=FG_YELLOW)
 
@@ -8594,8 +8806,10 @@ REQUIREMENTS
                     f"[picotool] BOOTSEL mounted at {mount}"))
 
                 # Step 3: Copy .uf2
-                self.after(0, lambda: self._flash_status.config(
-                    text=f"Copying {fw_name}...", foreground=FG_YELLOW))
+                copy_msg = (f"Copying {fw_name}  |  WiFi: {wifi_note}"
+                            if wifi_note else f"Copying {fw_name}...")
+                self.after(0, lambda m=copy_msg: self._flash_status.config(
+                    text=m, foreground=FG_YELLOW))
                 self.after(0, lambda: self._progress_var.set(60))
 
                 dest = Path(mount) / fw_name
@@ -8637,6 +8851,8 @@ REQUIREMENTS
             finally:
                 self._is_flashing = False
                 self.after(0, lambda: self._flash_btn.config(
+                    state=tk.NORMAL))
+                self.after(0, lambda: self._ota_btn.config(
                     state=tk.NORMAL))
 
         threading.Thread(target=_run, daemon=True).start()
@@ -8726,6 +8942,11 @@ REQUIREMENTS
                 # Step 5: Compile
                 pico_board = "pico2_w"
                 variant = self.app._display_variant.get() or "V4"
+                _w = apply_eink_wiring(DEV_SETUP / fw_dir,
+                                       self.app.target_board in DILDER_PCB_BOARDS)
+                if _w:
+                    self.after(0, lambda m=_w: self.app.log(
+                        f"[picotool] e-ink wiring set for {m}"))
                 self.after(0, lambda: self._flash_status.config(
                     text=f"Compiling ({pico_board}, {variant})...",
                     foreground=FG_YELLOW))
@@ -9399,15 +9620,21 @@ class DilderDevTool(tk.Tk):
         self.board_status.pack(side=tk.LEFT, padx=(12, 0))
 
         # ── Display variant selector ──
+        # `_display_variant` holds the build KEY (V2/V3/V3a/V4) that gets passed
+        # straight through as DISPLAY_VARIANT=.  The combo shows friendly panel
+        # names via a separate label var and maps them back to a key on select,
+        # so the WeAct 2.13" B&W panel is a first-class, clearly-named choice
+        # (it is the same SSD1680 controller as Waveshare "V4").
         ttk.Label(toolbar, text="Display:", foreground=FG_DIM,
                   font=("JetBrains Mono", 9)).pack(side=tk.LEFT, padx=(12, 2))
-        self._display_variant = tk.StringVar(value="V4")
+        self._display_variant = tk.StringVar(value="V4")          # build key
+        self._display_label = tk.StringVar(value=TOOLBAR_DISPLAY_LABELS[0])
         self.display_combo = ttk.Combobox(
-            toolbar, textvariable=self._display_variant,
-            values=["V2", "V3", "V3a", "V4"],
-            state="readonly", font=("JetBrains Mono", 10), width=4,
+            toolbar, textvariable=self._display_label,
+            values=TOOLBAR_DISPLAY_LABELS,
+            state="readonly", font=("JetBrains Mono", 10), width=30,
         )
-        self.display_combo.set("V4")
+        self.display_combo.bind("<<ComboboxSelected>>", self._on_toolbar_display_changed)
         self.display_combo.pack(side=tk.LEFT, padx=2)
 
         # ── Vertical PanedWindow (notebook on top, log on bottom, resizable) ──
@@ -9567,6 +9794,12 @@ class DilderDevTool(tk.Tk):
         self.log_text.configure(state=tk.NORMAL)
         self.log_text.delete("1.0", tk.END)
         self.log_text.configure(state=tk.DISABLED)
+
+    def _on_toolbar_display_changed(self, event=None):
+        """Toolbar display picker — map the friendly panel label to a build key."""
+        key = display_label_to_key(self._display_label.get())
+        self._display_variant.set(key)
+        self.log(f"[display] {self._display_label.get()}  ->  driver {key}")
 
     def _on_board_changed(self, event=None):
         """Handle board selector change."""

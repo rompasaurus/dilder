@@ -29,7 +29,7 @@
 ******************************************************************************/
 #include "DEV_Config.h"
 
-#define SPI_PORT spi1
+#define SPI_PORT spi0
 
 /**
  * GPIO
@@ -91,13 +91,13 @@ void DEV_Delay_ms(UDOUBLE xms)
 void DEV_GPIO_Init(void)
 {
 
-	EPD_RST_PIN     = 12;
-	EPD_DC_PIN      = 8;
-	EPD_BUSY_PIN    = 13;
+	EPD_RST_PIN     = 21;
+	EPD_DC_PIN      = 20;
+	EPD_BUSY_PIN    = 22;
 	
-	EPD_CS_PIN      = 9;
-	EPD_CLK_PIN		= 10;
-	EPD_MOSI_PIN	= 11;
+	EPD_CS_PIN      = 17;
+	EPD_CLK_PIN		= 18;
+	EPD_MOSI_PIN	= 19;
 
 	DEV_GPIO_Mode(EPD_RST_PIN, 1);
 	DEV_GPIO_Mode(EPD_DC_PIN, 1);

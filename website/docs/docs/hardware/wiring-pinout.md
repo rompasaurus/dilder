@@ -108,18 +108,22 @@ The Waveshare Pico-ePaper-2.13 is a **Pico-native module** with a **40-pin femal
 !!! warning "Power off before wiring"
     Always disconnect USB before connecting or disconnecting jumper wires. The e-ink panel can be damaged by voltage spikes.
 
-### Display Pin Mapping (Pico W)
+### Display Pin Mapping (Pico 2 W — SPI0, mirrors the Dilder PCB)
 
-| e-Paper Signal | Function | Pico W GPIO | Pico W Pin # | Direction |
+The breadboard prototype uses the **same SPI0 wiring as the Dilder PCB** (J1
+header, GP17-22) so you can validate the exact PCB GPIO map before the board
+arrives.
+
+| e-Paper Signal | Function | Pico 2 W GPIO | Pico 2 W Pin # | Direction |
 |---|---|---|---|---|
 | VSYS | System power (1.8-5.5V) | VSYS | 39 | → display |
 | GND | Ground | GND | 38 | → display |
-| DIN | SPI MOSI — pixel data | GP11 (SPI1 TX) | 15 | → display |
-| CLK | SPI clock | GP10 (SPI1 SCK) | 14 | → display |
-| CS | Chip select (active LOW) | GP9 (SPI1 CSn) | 12 | → display |
-| DC | Data / command select | GP8 | 11 | → display |
-| RST | Reset (active LOW) | GP12 | 16 | → display |
-| BUSY | Busy flag (HIGH = refreshing) | GP13 | 17 | ← display |
+| SDA (DIN) | SPI MOSI — pixel data | GP19 (SPI0 TX) | 25 | → display |
+| SCL (CLK) | SPI clock | GP18 (SPI0 SCK) | 24 | → display |
+| CS | Chip select (active LOW) | GP17 (SPI0 CSn) | 22 | → display |
+| DC | Data / command select | GP20 | 26 | → display |
+| RES (RST) | Reset (active LOW) | GP21 | 27 | → display |
+| BUSY | Busy flag (HIGH = refreshing) | GP22 | 29 | ← display |
 
 #### Signal Quick Reference
 
@@ -149,7 +153,7 @@ When the button is pressed it pulls the GPIO line LOW → software reads as pres
 
 ### Button GPIO Assignments
 
-Pins chosen to avoid SPI1 (display) and leave SPI0 free for future use.
+Pins chosen to avoid the display SPI0 bus (GP17-22) and the I2C0 accelerometer (GP0/GP1).
 
 | Button | Pico W GPIO | Pico W Pin # | Internal pull-up |
 |--------|-------------|-------------|-----------------|
@@ -179,14 +183,14 @@ if BUTTONS['center'].value() == 0:
 
 ## Full GPIO Pin Budget
 
-| Function | Pico W GPIO | Pico W Pin # | Interface |
+| Function | Pico 2 W GPIO | Pico 2 W Pin # | Interface |
 |----------|-------------|-------------|-----------|
-| e-ink DC | GP8 | 11 | Digital out |
-| e-ink CS | GP9 | 12 | SPI1 CSn |
-| e-ink CLK | GP10 | 14 | SPI1 SCK |
-| e-ink DIN | GP11 | 15 | SPI1 TX |
-| e-ink RST | GP12 | 16 | Digital out |
-| e-ink BUSY | GP13 | 17 | Digital in |
+| e-ink CS | GP17 | 22 | SPI0 CSn |
+| e-ink CLK (SCL) | GP18 | 24 | SPI0 SCK |
+| e-ink DIN (SDA) | GP19 | 25 | SPI0 TX |
+| e-ink DC | GP20 | 26 | Digital out |
+| e-ink RST (RES) | GP21 | 27 | Digital out |
+| e-ink BUSY | GP22 | 29 | Digital in |
 | e-ink VSYS | VSYS | 39 | Power (onboard regulator) |
 | e-ink GND | GND | 38 | Ground |
 | Button UP | GP2 | 4 | Digital in |
@@ -205,14 +209,15 @@ if BUTTONS['center'].value() == 0:
 
 ---
 
-## Pico W Pin Map (Visual)
+## Pico 2 W Pin Map (Visual)
 
-Pins used by this project are highlighted. Full electrical specs in the [Pico W reference](../reference/pico-w.md).
+Pins used by this project are highlighted. The display lives on **SPI0 (GP17-22)**,
+mirroring the Dilder PCB. Full electrical specs in the [Pico 2 W reference](../reference/pico-2-w.md).
 
 ```
                ┌───USB───┐
-   GP0  [ 1]   │         │  [40]  VBUS
-   GP1  [ 2]   │  PICO   │  [39]  VSYS      ◄── e-ink VSYS
+▶  GP0  [ 1]   │         │  [40]  VBUS      I2C0 SDA → SC7A20
+▶  GP1  [ 2]   │ PICO 2  │  [39]  VSYS      ◄── e-ink VSYS
    GND  [ 3]   │    W    │  [38]  GND       ◄── e-ink GND
 ▶  GP2  [ 4]   │         │  [37]  3V3_EN
 ▶  GP3  [ 5]   │         │  [36]  3V3(OUT)
@@ -220,23 +225,22 @@ Pins used by this project are highlighted. Full electrical specs in the [Pico W 
 ▶  GP5  [ 7]   │         │  [34]  GP28
    GND  [ 8]   │         │  [33]  AGND
 ▶  GP6  [ 9]   │         │  [32]  GP27
-   GP7  [10]   │         │  [31]  GP26
-▶  GP8  [11]   │         │  [30]  RUN
-▶  GP9  [12]   │         │  [29]  GP22
+▶  GP7  [10]   │         │  [31]  GP26
+   GP8  [11]   │         │  [30]  RUN
+   GP9  [12]   │         │  [29]  GP22  ◄── e-ink BUSY
    GND  [13]   │         │  [28]  GND
-▶ GP10  [14]   │         │  [27]  GP21
-▶ GP11  [15]   │         │  [26]  GP20
-▶ GP12  [16]   │         │  [25]  GP19
-▶ GP13  [17]   │         │  [24]  GP18
+  GP10  [14]   │         │  [27]  GP21  ◄── e-ink RES
+  GP11  [15]   │         │  [26]  GP20  ◄── e-ink DC
+  GP12  [16]   │         │  [25]  GP19  ◄── e-ink SDA (SPI0 TX)
+  GP13  [17]   │         │  [24]  GP18  ◄── e-ink SCL (SPI0 SCK)
    GND  [18]   │         │  [23]  GND
-  GP14  [19]   │         │  [22]  GP17
-  GP15  [20]   └─────────┘  [21]  GP16
+  GP14  [19]   │         │  [22]  GP17  ◄── e-ink CS
+▶ GP15  [20]   └─────────┘  [21]  GP16
 
-▶ = used by Dilder
+▶ = used by Dilder    (GP15 = SC7A20 accel INT)
 
-Left side (pins 4–17):  Buttons (GP2–GP6) + Display SPI (GP8–GP13)
-Right side (pin 39):    VSYS power to display (onboard regulator)
-Right side (pin 38):    GND to display
+Left side:   Buttons (GP2-GP6), Speaker (GP7), I2C0 accel (GP0/GP1)
+Right side:  Display SPI0 (GP17-GP22), VSYS/GND power to display
 ```
 
 ---
@@ -244,16 +248,16 @@ Right side (pin 38):    GND to display
 ## Wiring Diagram (Text)
 
 ```
-Pico W (on breadboard)
+Pico 2 W (on breadboard — SPI0, mirrors the Dilder PCB)
 │
 ├─ Pin 39 (VSYS)    ──────────── e-Paper VSYS
 ├─ Pin 38 (GND)     ──────────── e-Paper GND ── breadboard GND rail
-├─ Pin 15 (GP11 / SPI1 TX)  ──── e-Paper DIN
-├─ Pin 14 (GP10 / SPI1 SCK) ──── e-Paper CLK
-├─ Pin 12 (GP9  / SPI1 CSn) ──── e-Paper CS
-├─ Pin 11 (GP8)  ─────────────── e-Paper DC
-├─ Pin 16 (GP12) ─────────────── e-Paper RST
-├─ Pin 17 (GP13) ─────────────── e-Paper BUSY
+├─ Pin 22 (GP17 / SPI0 CSn) ──── e-Paper CS
+├─ Pin 24 (GP18 / SPI0 SCK) ──── e-Paper SCL (CLK)
+├─ Pin 25 (GP19 / SPI0 TX)  ──── e-Paper SDA (DIN)
+├─ Pin 26 (GP20) ─────────────── e-Paper DC
+├─ Pin 27 (GP21) ─────────────── e-Paper RES (RST)
+├─ Pin 29 (GP22) ─────────────── e-Paper BUSY
 │
 ├─ Pin 4  (GP2)  ─── [BTN UP]     ─── GND
 ├─ Pin 5  (GP3)  ─── [BTN DOWN]   ─── GND
@@ -266,11 +270,12 @@ Pico W (on breadboard)
 
 ## SPI Configuration
 
-The e-ink display uses **SPI1** on the Pico W. No kernel configuration needed — SPI is set up in MicroPython code.
+The e-ink display uses **SPI0** (GP18 SCK, GP19 TX, GP17 CSn) on the Pico 2 W,
+matching the Dilder PCB.
 
 | SPI Parameter | Value |
 |---------------|-------|
-| Controller | SPI1 |
+| Controller | SPI0 |
 | Mode | Mode 0 (CPOL=0, CPHA=0) |
 | Bit order | MSB first |
 | Clock speed | 4 MHz (typical) |
@@ -279,9 +284,9 @@ The e-ink display uses **SPI1** on the Pico W. No kernel configuration needed �
 ```python
 from machine import Pin, SPI
 
-spi = SPI(1, baudrate=4_000_000, polarity=0, phase=0,
-          sck=Pin(10), mosi=Pin(11))
-cs = Pin(9, Pin.OUT, value=1)   # active LOW, start HIGH
+spi = SPI(0, baudrate=4_000_000, polarity=0, phase=0,
+          sck=Pin(18), mosi=Pin(19))
+cs = Pin(17, Pin.OUT, value=1)   # active LOW, start HIGH
 ```
 
 ---

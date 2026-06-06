@@ -49,7 +49,7 @@ OP_CRCC = b"CRCC"
 OP_ERAS = b"ERAS"
 OP_WRIT = b"WRIT"
 OP_SEAL = b"SEAL"
-OP_GOTO = b"OGO\x00"  # 4 bytes, null-padded
+OP_GOTO = b"GOGO"  # CMD_GO in picowota main.c: 'G','O','G','O'
 OP_INFO = b"INFO"
 
 # Response codes
@@ -422,10 +422,11 @@ class PicowotaClient:
         self.seal(image.addr, total_len, crc)
         report(STAGE_SEAL, 1, 1)
 
-        # 6. GOTO entry point
+        # 6. GOTO the vector-table base. picowota's jump_to_vtor() reads the
+        # initial SP from [vtor] and the reset handler from [vtor+4], so this
+        # must be the image base (the vector table), NOT the ELF entry point.
         report(STAGE_GOTO, 0, 1)
-        entry = image.entry if image.entry else image.addr
-        self.goto(entry)
+        self.goto(image.addr)
         report(STAGE_GOTO, 1, 1)
 
         report(STAGE_DONE, 1, 1)
@@ -467,13 +468,13 @@ def scan_for_picowota(timeout: float = 3.0,
         except (socket.timeout, ConnectionRefusedError, OSError):
             pass
 
+    # One worker per address so every IP is probed concurrently. A dead host
+    # blocks its worker for the full `timeout` (no SYN-ACK), so with too few
+    # workers the upper half of the subnet is never reached before we give up.
     import concurrent.futures
-    with concurrent.futures.ThreadPoolExecutor(max_workers=64) as pool:
-        futures = []
-        for i in range(1, 255):
-            ip = f"{subnet}.{i}"
-            futures.append(pool.submit(_probe, ip))
-        concurrent.futures.wait(futures, timeout=timeout + 2)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=254) as pool:
+        futures = [pool.submit(_probe, f"{subnet}.{i}") for i in range(1, 255)]
+        concurrent.futures.wait(futures, timeout=timeout + 5)
 
     found.sort(key=lambda x: x[1])
     return found

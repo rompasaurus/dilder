@@ -6,11 +6,11 @@
  * chat bubble, and text at display time.  This means ALL quotes fit
  * in flash (~10KB of strings vs ~4MB of bitmaps).
  *
- * Wiring (same as all Dilder firmware):
+ * Wiring — Dilder PCB / breadboard SPI0 (GP17-22, see DEV_Config.c):
  *   VCC  -> 3V3(OUT) pin 36    GND  -> GND      pin 38
- *   DIN  -> GP11     pin 15    CLK  -> GP10     pin 14
- *   CS   -> GP9      pin 12    DC   -> GP8      pin 11
- *   RST  -> GP12     pin 16    BUSY -> GP13     pin 17
+ *   CS   -> GP17     pin 22    SCL  -> GP18     pin 24  (SPI0 SCK)
+ *   SDA  -> GP19     pin 25    DC   -> GP20     pin 26  (SPI0 TX)
+ *   RES  -> GP21     pin 27    BUSY -> GP22     pin 29
  */
 
 #include <stdio.h>
@@ -23,6 +23,8 @@
 #include "hardware/pwm.h"
 #include "hardware/adc.h"
 #include "hardware/i2c.h"
+#include "hardware/flash.h"
+#include "hardware/sync.h"
 #include "lwip/dns.h"
 #include "lwip/pbuf.h"
 #include "lwip/udp.h"
@@ -30,6 +32,10 @@
 #include "DEV_Config.h"
 #include "version.h"
 #include "wifi_config.h"
+#include "bt.h"
+#ifdef PICOWOTA_OTA
+#include "picowota/reboot.h"
+#endif
 
 /* ─── Joystick pins ─── */
 #define JOY_LEFT   2
@@ -106,13 +112,68 @@ static void joystick_init(void) {
 #define INPUT_RIGHT  4
 #define INPUT_CENTER 5
 
+/* ─── Input orientation remap ───────────────────────────────────────────
+ * The joystick's physical up/down/left/right are remapped to logical
+ * directions through a rotation, so the firmware can match how the device is
+ * actually held.  On the Dilder board (held screen-left / joystick-right) the
+ * physical axes read reversed, so we default to 180° (up<->down, left<->right).
+ *
+ * This is the single hook the accelerometer feature will drive: once the IMU
+ * is installed, call input_set_rotation() from the orientation logic and every
+ * joystick read auto-rotates — no other code changes needed.
+ */
+typedef enum { ROT_0 = 0, ROT_90 = 1, ROT_180 = 2, ROT_270 = 3 } input_rotation_t;
+static input_rotation_t input_rotation = ROT_180;  /* default for the Dilder hold */
+
+/* Display orientation state (declared early so the accel orientation_update()
+ * can drive it). display_rotation is the panel-map angle (see transpose);
+ * g_orientation is the 0..3 hold from the accelerometer. */
+static int display_rotation = 90;
+static int g_orientation = 0;
+
+/* While calibrating: 1 = log accel/orientation to serial AND draw an on-screen
+ * HUD (accel + orientation). Set to 0 once the orientation map is dialed in. */
+#define ORIENT_DEBUG 0
+#define FACE_DEBUG 0
+
+void input_set_rotation(input_rotation_t r) { input_rotation = r; }
+
+/* ── Orientation model: 3 valid holds (joystick ABOVE the screen is ignored) ──
+ *   OR_LAND_R = landscape, joystick RIGHT  → WIDE side-by-side
+ *   OR_LAND_L = landscape, joystick LEFT   → WIDE side-by-side (flipped)
+ *   OR_TALL   = portrait,  joystick BOTTOM → TALL longways
+ * Per-orientation display + joystick input rotation in one table — CALIBRATE
+ * from the on-screen HUD, then adjust this table and the classifier. */
+enum { OR_LAND_R = 0, OR_LAND_L = 1, OR_TALL = 2 };
+typedef struct { bool tall; int disp_rot; input_rotation_t in_rot; } orient_cfg_t;
+static const orient_cfg_t ORIENT_CFG[3] = {
+    /* OR_LAND_R */ { false, 90,  ROT_180 },
+    /* OR_LAND_L */ { false, 270, ROT_0   },
+    /* OR_TALL   */ { true,  180, ROT_270 },   /* joystick-bottom: display flipped, input +180 */
+};
+static bool orientation_is_tall(void) { return ORIENT_CFG[g_orientation].tall; }
+
+/* Directions in clockwise order; the rotation is how many 90° CW steps the
+ * device is turned, so a press maps forward around the ring by that many. */
+static const uint8_t CW_RING[4] = { INPUT_UP, INPUT_RIGHT, INPUT_DOWN, INPUT_LEFT };
+
+static uint8_t rotate_input(uint8_t dir) {
+    if (dir == INPUT_NONE || dir == INPUT_CENTER) return dir;  /* center is rotation-invariant */
+    for (int i = 0; i < 4; i++) {
+        if (CW_RING[i] == dir)
+            return CW_RING[(i + (int)input_rotation) & 3];
+    }
+    return dir;
+}
+
 static uint8_t read_joystick(void) {
-    if (!gpio_get(JOY_UP))     return INPUT_UP;
-    if (!gpio_get(JOY_DOWN))   return INPUT_DOWN;
-    if (!gpio_get(JOY_LEFT))   return INPUT_LEFT;
-    if (!gpio_get(JOY_RIGHT))  return INPUT_RIGHT;
-    if (!gpio_get(JOY_CENTER)) return INPUT_CENTER;
-    return INPUT_NONE;
+    uint8_t raw = INPUT_NONE;
+    if      (!gpio_get(JOY_UP))     raw = INPUT_UP;
+    else if (!gpio_get(JOY_DOWN))   raw = INPUT_DOWN;
+    else if (!gpio_get(JOY_LEFT))   raw = INPUT_LEFT;
+    else if (!gpio_get(JOY_RIGHT))  raw = INPUT_RIGHT;
+    else if (!gpio_get(JOY_CENTER)) raw = INPUT_CENTER;
+    return rotate_input(raw);
 }
 
 /* ─── App states ─── */
@@ -126,6 +187,9 @@ static uint8_t read_joystick(void) {
 #define STATE_NET_SCAN    7   /* Scan results list */
 #define STATE_NET_KEYBOARD 8  /* On-screen keyboard for WiFi password */
 #define STATE_MOTION       9  /* Accelerometer / pedometer menu */
+#define STATE_SET_TIME    10  /* Manual date/time setter */
+#define STATE_SAVED_NETS  11  /* Saved WiFi networks (connect / forget) */
+#define STATE_BLUETOOTH   12  /* Bluetooth pairing screen */
 
 /* ─── WiFi state ─── */
 static bool wifi_enabled = false;
@@ -175,27 +239,36 @@ static char kb_char_at(int row, int col, bool shift) {
     return c;
 }
 
-/* ─── MPU-6050 accelerometer/gyro (I2C0 on GP0/GP1) ─── */
+/* ─── SC7A20 accelerometer (I2C0 on GP0/GP1) ───────────────────────────────
+ * The Dilder PCB fits an SC7A20HTR — LIS2DH12 / LIS3DH register-compatible,
+ * NOT an MPU-6050. PCB wiring (U1): SDO->GND => I2C addr 0x18, CS->3V3 => I2C
+ * mode, INT1->GP15. Differences from the old MPU driver:
+ *   - address 0x18 (not 0x68)
+ *   - WHO_AM_I at 0x0F (SC7A20 reports 0x11; ST parts report 0x33)
+ *   - accel data at OUT_X_L 0x28, LITTLE-endian (low byte first)
+ *   - multi-byte reads REQUIRE the auto-increment bit (0x80) in the sub-address
+ *   - no gyro, no usable temperature (those vars stay 0)
+ * Variable/function names (accel_x.., mpu_ok, accel_g, tilt_*) are kept so the
+ * existing UI/render code compiles unchanged.
+ */
 #define MPU_I2C    i2c0
-static uint8_t mpu_addr = 0x68;  /* auto-detected in mpu_init */
+static uint8_t mpu_addr = 0x18;  /* SC7A20 SDO=GND -> 0x18 (0x19 if SDO=VDD) */
 #define MPU_SDA    0   /* GP0 = pin 1 */
 #define MPU_SCL    1   /* GP1 = pin 2 */
 
-/* Registers */
-#define MPU_PWR_MGMT_1   0x6B
-#define MPU_WHO_AM_I     0x75
-#define MPU_ACCEL_XOUT_H 0x3B
-#define MPU_GYRO_XOUT_H  0x43
-#define MPU_TEMP_OUT_H   0x41
-#define MPU_ACCEL_CONFIG  0x1C
-#define MPU_GYRO_CONFIG   0x1B
+/* LIS2DH / LIS3DH / SC7A20 registers */
+#define SC_WHO_AM_I   0x0F
+#define SC_CTRL_REG1  0x20
+#define SC_CTRL_REG4  0x23
+#define SC_OUT_X_L    0x28
+#define SC_AUTO_INC   0x80   /* OR into the sub-address for multi-byte transfer */
 
 static bool mpu_ok = false;
 
-/* Raw sensor data */
+/* Raw sensor data (accel only — SC7A20 has no gyro/temp) */
 static int16_t accel_x, accel_y, accel_z;
-static int16_t gyro_x, gyro_y, gyro_z;
-static float   mpu_temp_c;
+static int16_t gyro_x, gyro_y, gyro_z;   /* unused on SC7A20 — held at 0 */
+static float   mpu_temp_c;               /* unused on SC7A20 — held at 0 */
 
 /* Pedometer state */
 static uint32_t step_count = 0;
@@ -215,6 +288,7 @@ static int mpu_read_reg(uint8_t reg) {
 }
 
 static bool mpu_read_burst(uint8_t reg, uint8_t *dst, uint8_t len) {
+    reg |= SC_AUTO_INC;  /* SC7A20/LIS2DH need this for multi-byte reads */
     if (i2c_write_blocking(MPU_I2C, mpu_addr, &reg, 1, true) < 0) return false;
     return i2c_read_blocking(MPU_I2C, mpu_addr, dst, len, false) == len;
 }
@@ -225,60 +299,63 @@ static void mpu_init(void) {
     gpio_set_function(MPU_SCL, GPIO_FUNC_I2C);
     gpio_pull_up(MPU_SDA);
     gpio_pull_up(MPU_SCL);
-    sleep_ms(100);  /* Let MPU boot */
+    sleep_ms(20);  /* SC7A20 boot/turn-on time */
 
-    /* Try both possible addresses */
-    uint8_t try_addrs[] = {0x68, 0x69};
+    /* SC7A20 SDO->GND is 0x18 on the Dilder PCB; probe 0x18 then 0x19. */
+    uint8_t try_addrs[] = {0x18, 0x19};
     bool found = false;
     for (int a = 0; a < 2; a++) {
         uint8_t addr = try_addrs[a];
-        uint8_t reg = MPU_WHO_AM_I;
+        uint8_t reg = SC_WHO_AM_I;
         uint8_t who = 0;
         int w = i2c_write_blocking(MPU_I2C, addr, &reg, 1, true);
         int r = i2c_read_blocking(MPU_I2C, addr, &who, 1, false);
-        printf("[MPU] Probe 0x%02X: w=%d r=%d who=0x%02X\n", addr, w, r, who);
+        printf("[ACCEL] Probe 0x%02X: w=%d r=%d who=0x%02X\n", addr, w, r, who);
         if (w >= 0 && r >= 0) {
             mpu_addr = addr;
             found = true;
-            printf("[MPU] Using address 0x%02X\n", addr);
+            /* Known IDs: SC7A20=0x11, ST LIS2DH12/LIS3DH=0x33. Accept either;
+               warn (but still try) if a clone reports something else yet ACKs. */
+            if (who != 0x11 && who != 0x33)
+                printf("[ACCEL] Unexpected WHO_AM_I 0x%02X (continuing anyway)\n", who);
+            printf("[ACCEL] SC7A20 found at 0x%02X\n", addr);
             break;
         }
     }
 
     if (!found) {
-        printf("[MPU] NOT DETECTED on I2C0\n");
+        printf("[ACCEL] NOT DETECTED on I2C0 (tried 0x18/0x19)\n");
         mpu_ok = false;
         return;
     }
 
-    mpu_write_reg(MPU_PWR_MGMT_1, 0x00);  /* Wake up (clear sleep bit) */
-    sleep_ms(100);
-    mpu_write_reg(MPU_ACCEL_CONFIG, 0x00); /* +/- 2g */
-    mpu_write_reg(MPU_GYRO_CONFIG, 0x00);  /* +/- 250 deg/s */
+    /* CTRL_REG1 0x57: 100 Hz ODR, normal mode, X/Y/Z enabled. */
+    mpu_write_reg(SC_CTRL_REG1, 0x57);
+    /* CTRL_REG4 0x88: block-data-update, +/-2g full scale, high-resolution. */
+    mpu_write_reg(SC_CTRL_REG4, 0x88);
+    sleep_ms(10);
     mpu_ok = true;
-    printf("[MPU] MPU-6050 initialized OK at 0x%02X\n", mpu_addr);
+    printf("[ACCEL] SC7A20 initialized OK at 0x%02X\n", mpu_addr);
 }
 
 static void mpu_read_all(void) {
     if (!mpu_ok) return;
 
-    /* Burst read accel (6 bytes) + temp (2 bytes) + gyro (6 bytes) = 14 bytes from 0x3B */
-    uint8_t buf[14];
-    mpu_read_burst(MPU_ACCEL_XOUT_H, buf, 14);
+    /* 6 bytes from OUT_X_L (auto-increment): XL,XH,YL,YH,ZL,ZH. Data is
+       left-justified 16-bit (12 significant bits) and LITTLE-endian. */
+    uint8_t buf[6];
+    if (!mpu_read_burst(SC_OUT_X_L, buf, 6)) return;
 
-    accel_x = (int16_t)((buf[0] << 8) | buf[1]);
-    accel_y = (int16_t)((buf[2] << 8) | buf[3]);
-    accel_z = (int16_t)((buf[4] << 8) | buf[5]);
+    accel_x = (int16_t)((buf[1] << 8) | buf[0]);
+    accel_y = (int16_t)((buf[3] << 8) | buf[2]);
+    accel_z = (int16_t)((buf[5] << 8) | buf[4]);
 
-    int16_t temp_raw = (int16_t)((buf[6] << 8) | buf[7]);
-    mpu_temp_c = temp_raw / 340.0f + 36.53f;
-
-    gyro_x = (int16_t)((buf[8]  << 8) | buf[9]);
-    gyro_y = (int16_t)((buf[10] << 8) | buf[11]);
-    gyro_z = (int16_t)((buf[12] << 8) | buf[13]);
+    /* SC7A20 has no gyro and no usable temperature path here. */
+    gyro_x = gyro_y = gyro_z = 0;
+    mpu_temp_c = 0.0f;
 }
 
-/* Convert raw accel to g (at +/-2g range, 16384 LSB/g) */
+/* Convert raw accel to g. +/-2g high-res ~= 16384 LSB/g (same scale as before). */
 static float accel_g(int16_t raw) { return raw / 16384.0f; }
 
 /* Convert raw gyro to deg/s (at +/-250, 131 LSB/(deg/s)) */
@@ -308,6 +385,108 @@ static void pedometer_update(void) {
         step_count++;
     } else if (step_above && mag < (step_threshold - 0.3f)) {
         step_above = false;
+    }
+}
+
+/* ─── Daily activity tracking (steps + active time) ───────────────────────
+ * steps_today is the running pedometer delta; active_seconds_today accrues
+ * whenever there's real movement. Both reset when the RTC date rolls over.
+ * Sampled cheaply (pedometer at ~20 Hz on the main screen, activity at ~4 Hz).
+ * LOW-POWER ROADMAP: the SC7A20 INT1 line is on GP15 — the next step is to arm
+ * its activity/wake interrupt so the MCU can sleep and only sample on motion. */
+static uint32_t steps_today = 0;
+static uint32_t active_seconds_today = 0;
+static int8_t   activity_day = -1;       /* RTC day the tally belongs to */
+static uint32_t last_step_total = 0;     /* step_count snapshot for the delta */
+static uint32_t active_accum_ms = 0;
+
+static void activity_update(uint32_t dt_ms) {
+    datetime_t t; rtc_get_datetime(&t);
+    if (t.day != activity_day) {         /* new day → reset */
+        activity_day = t.day;
+        steps_today = 0;
+        active_seconds_today = 0;
+        last_step_total = step_count;
+        active_accum_ms = 0;
+    }
+    if (step_count >= last_step_total)
+        steps_today += step_count - last_step_total;
+    last_step_total = step_count;
+
+    /* Movement = accel magnitude deviating from 1 g (rest). */
+    if (fabsf(accel_magnitude() - 1.0f) > 0.12f) {
+        active_accum_ms += dt_ms;
+        if (active_accum_ms >= 1000) {
+            active_seconds_today += active_accum_ms / 1000;
+            active_accum_ms %= 1000;
+        }
+    }
+}
+
+/* ─── Orientation → display + input rotation (accelerometer auto-rotate) ───
+ * Classifies the in-plane gravity vector into one of 4 holds and, with
+ * hysteresis, sets g_orientation. The canvas setters then pick a compatible
+ * display_rotation, and the joystick input rotation follows too.
+ *
+ * CALIBRATION: the accel-sign → orientation mapping and the input map below
+ * are first-pass guesses — confirm each physical hold on the device and adjust.
+ * Throttled to ~4 Hz; cheap enough to leave running. */
+static void orientation_update(void) {
+    if (!mpu_ok) return;
+    static uint32_t last_ms = 0;
+    uint32_t now = to_ms_since_boot(get_absolute_time());
+    if (now - last_ms < 250) return;
+    last_ms = now;
+
+    mpu_read_all();
+    pedometer_update();          /* coarse step sampling at this 4 Hz cadence */
+    activity_update(250);        /* daily steps + active-time accrual */
+    float ax = accel_g(accel_x), ay = accel_g(accel_y), az = accel_g(accel_z);
+
+    /* In-plane gravity angle (degrees, 0..360). Measured anchors:
+     *   joystick LEFT  → (X+0.9, Y0.0) → ~0°
+     *   joystick RIGHT → (X0.1, Y+0.8) → ~83° (≈90°)
+     *   joystick BOTTOM (tall) → TODO: read the HUD in that hold and set below. */
+    float ang = atan2f(ay, ax) * 57.2958f;
+    if (ang < 0) ang += 360.0f;
+
+#if ORIENT_DEBUG
+    printf("[ORIENT] ax=%.2f ay=%.2f az=%.2f  ang=%.0f  o=%d tall=%d rot=%d\n",
+           (double)ax, (double)ay, (double)az, (double)ang,
+           g_orientation, orientation_is_tall(), display_rotation);
+#endif
+
+    /* Anchor angle per orientation — classify to the nearest. CALIBRATE: the
+     * landscape two come from your readings; OR_TALL is a guess until you send
+     * the joystick-bottom angle. */
+    static const float OR_ANGLE[3] = {
+        [OR_LAND_R] = 90.0f,    /* joystick right  */
+        [OR_LAND_L] = 270.0f,   /* joystick left   (calibrated) */
+        [OR_TALL]   = 0.0f,     /* joystick bottom (calibrated) */
+    };
+    /* Joystick-ABOVE (joystick at TOP ≈ 180°) is ignored: keep current. */
+    const float IGNORE_CENTER = 180.0f, IGNORE_HALF = 55.0f;
+
+    /* Need enough in-plane gravity to be meaningful (else the device is flat). */
+    if (sqrtf(ax * ax + ay * ay) < 0.35f) return;
+
+    float di = fabsf(ang - IGNORE_CENTER); if (di > 180) di = 360 - di;
+    if (di < IGNORE_HALF) return;                 /* joystick above → ignore */
+
+    int o = 0; float best = 1e9f;
+    for (int i = 0; i < 3; i++) {
+        float d = fabsf(ang - OR_ANGLE[i]); if (d > 180) d = 360 - d;
+        if (d < best) { best = d; o = i; }
+    }
+
+    /* Hysteresis: require a few stable reads before switching. */
+    static int cand = 0, stable = 0;
+    if (o == cand) { if (stable < 3) stable++; }
+    else { cand = o; stable = 0; }
+
+    if (stable >= 3 && g_orientation != cand) {
+        g_orientation = cand;
+        input_set_rotation(ORIENT_CFG[g_orientation].in_rot);  /* joystick follows */
     }
 }
 
@@ -424,10 +603,41 @@ static int current_mood = -1;  /* -1 = all moods (random) */
 #define EXPR_HOMESICK  17
 
 /* Landscape frame buffer (1 = black pixel, packed MSB-first) */
-static uint8_t frame[IMG_ROW_BYTES * IMG_H];
+/* The logical drawing canvas. Two shapes share one buffer:
+ *   WIDE  250x122 (row bytes 32) — side-by-side octopus screen + all menus
+ *   TALL  122x250 (row bytes 16) — the "longways" stacked layout
+ * transpose_to_display() rotates whichever canvas is active onto the fixed
+ * 122x250 panel. Buffer is sized for the larger (tall: 16*250 = 4000). */
+#define CANVAS_BYTES_MAX 4000
+static uint8_t frame[CANVAS_BYTES_MAX];
+static int canvas_w        = IMG_W;          /* default WIDE */
+static int canvas_h        = IMG_H;
+static int canvas_row_bytes = IMG_ROW_BYTES;
+
+/* Orientation enum/config + orientation_is_tall() are declared earlier (next
+ * to the orientation state) so the accel classifier can use them. */
+static void set_canvas_wide(void) {
+    canvas_w = 250; canvas_h = 122; canvas_row_bytes = 32;
+    /* Wide screens must use a wide angle (90/270); a tall hold viewing a wide
+     * menu falls back to 90 until the tall-menu rework lands. */
+    display_rotation = orientation_is_tall() ? 90 : ORIENT_CFG[g_orientation].disp_rot;
+}
+static void set_canvas_tall(void) {
+    canvas_w = 122; canvas_h = 250; canvas_row_bytes = 16;
+    display_rotation = ORIENT_CFG[g_orientation].disp_rot;
+}
 
 /* Display buffer (portrait orientation for e-ink driver) */
 static uint8_t display_buf[((DISP_W + 7) / 8) * DISP_H];
+
+/* Layout origin — lets the octopus art be repositioned (e.g. bottom of the
+ * tall canvas) without touching any of the px_set_off drawing routines. */
+static int layout_ox = 0, layout_oy = 0;
+
+/* Forward decls — status icons are defined later but used by the tall layout. */
+static void draw_battery_icon(int x0, int y0);
+static void draw_wifi_icon(int x0, int y0, bool connected);
+static void draw_bt_icon(int x0, int y0);
 
 /* Vertical offset — pushes octopus + bubble down to make room for clock */
 #define Y_OFF 12
@@ -448,19 +658,19 @@ static int row_wobble(int y) {
 
 /* ─── Pixel helpers ─── */
 static inline void px_set(int x, int y) {
-    if (x >= 0 && x < IMG_W && y >= 0 && y < IMG_H)
-        frame[y * IMG_ROW_BYTES + x / 8] |= (0x80 >> (x & 7));
+    if (x >= 0 && x < canvas_w && y >= 0 && y < canvas_h)
+        frame[y * canvas_row_bytes + x / 8] |= (0x80 >> (x & 7));
 }
 static inline void px_clr(int x, int y) {
-    if (x >= 0 && x < IMG_W && y >= 0 && y < IMG_H)
-        frame[y * IMG_ROW_BYTES + x / 8] &= ~(0x80 >> (x & 7));
+    if (x >= 0 && x < canvas_w && y >= 0 && y < canvas_h)
+        frame[y * canvas_row_bytes + x / 8] &= ~(0x80 >> (x & 7));
 }
-/* Offset versions — add Y_OFF + body transform before drawing */
+/* Offset versions — add layout origin + Y_OFF + body transform before drawing */
 static inline void px_set_off(int x, int y) {
-    px_set(x + body_dx + row_wobble(y), y + Y_OFF + body_dy);
+    px_set(x + body_dx + row_wobble(y) + layout_ox, y + Y_OFF + body_dy + layout_oy);
 }
 static inline void px_clr_off(int x, int y) {
-    px_clr(x + body_dx + row_wobble(y), y + Y_OFF + body_dy);
+    px_clr(x + body_dx + row_wobble(y) + layout_ox, y + Y_OFF + body_dy + layout_oy);
 }
 
 /* ─── Octopus body (RLE: y, num_spans, x0, x1, ...) terminated by 0xFF ─── */
@@ -1215,6 +1425,26 @@ static void draw_text(int x0, int y0, const char *text, int max_w) {
     }
 }
 
+/* Double-size text (each font pixel → 2x2 block); no wrap. Used for the BLE passkey. */
+static void draw_text_2x(int x0, int y0, const char *text) {
+    int cx = x0;
+    for (const char *p = text; *p; p++) {
+        char c = *p;
+        if (c >= 'a' && c <= 'z') c -= 32;
+        int idx = font_index(c);
+        for (int row = 0; row < 7; row++) {
+            uint8_t bits = font5x7[idx][row];
+            for (int col = 0; col < 5; col++)
+                if (bits & (0x10 >> col)) {
+                    int px = cx + col * 2, py = y0 + row * 2;
+                    px_set(px, py);     px_set(px + 1, py);
+                    px_set(px, py + 1); px_set(px + 1, py + 1);
+                }
+        }
+        cx += 16;   /* 5px*2 + 2px*2 gap */
+    }
+}
+
 /* ─── Frame composition ─── */
 
 /* ─── RTC clock helpers ─── */
@@ -1311,23 +1541,19 @@ static void setup_body_transform(uint8_t mood, uint32_t f) {
     }
 }
 
-static void render_frame(const Quote *q, int expr, uint32_t frame_idx) {
-    /* Clear to white */
-    memset(frame, 0, sizeof(frame));
-
-    /* 0. Date & time header at top center (no Y offset) */
-    draw_clock_header();
-
-    /* 0b. Set up body animation transform for this frame */
+/* Draw just the octopus (body + eyes + pupils + brows + mouth) at the current
+ * layout origin. Shared by the wide and tall layouts. */
+static void draw_octopus(const Quote *q, int expr, uint32_t frame_idx) {
+    /* Set up body animation transform for this frame */
     setup_body_transform(q->mood, frame_idx);
 
-    /* 1. Body (with Y_OFF + body transform) */
+    /* Body (with Y_OFF + body transform) */
     draw_body_transformed();
 
-    /* 2. Eyes (white sockets, with Y_OFF) */
+    /* Eyes (white sockets, with Y_OFF) */
     draw_eyes();
 
-    /* 3. Pupils (mood-specific, with Y_OFF) */
+    /* Pupils (mood-specific, with Y_OFF) */
     switch (q->mood) {
         case MOOD_WEIRD:    draw_pupils_weird();    break;
         case MOOD_UNHINGED: draw_pupils_unhinged(); break;
@@ -1376,42 +1602,162 @@ static void render_frame(const Quote *q, int expr, uint32_t frame_idx) {
         default:             draw_mouth_smirk();     break;
     }
 
-    /* 5. Chat bubble outline (with Y_OFF via draw_bubble) */
-    draw_bubble();
+}
 
-    /* 6. Quote text inside bubble (manually offset) */
+/* ── WIDE layout: octopus left, chat bubble + quote right (the classic view) ── */
+static void render_frame(const Quote *q, int expr, uint32_t frame_idx) {
+    set_canvas_wide();
+    memset(frame, 0, sizeof(frame));
+    layout_ox = 0; layout_oy = 0;
+
+    draw_clock_header();
+    draw_octopus(q, expr, frame_idx);
+
+    /* Chat bubble + quote */
+    draw_bubble();
     draw_text(81, 11 + Y_OFF, q->text, 158);
 
-    /* 7. Tagline — show current mood/emotion name */
+    /* Tagline — current mood/emotion name */
     int tag_y = 5 + 70 + 5 + Y_OFF;
     if (tag_y + 7 < IMG_H) {
         char mood_tag[40];
         snprintf(mood_tag, sizeof(mood_tag), "- %s -",
                  current_mood < 0 ? mood_names[q->mood] : mood_names[current_mood]);
-        /* Uppercase it */
         for (char *p = mood_tag; *p; p++)
             if (*p >= 'a' && *p <= 'z') *p -= 32;
         draw_text(81, tag_y, mood_tag, 170);
     }
 }
 
+/* ── TALL "longways" layout (122x250): 2-row status bar / quote / octopus
+ * at the bottom. Pixel positions are first-pass and meant for on-device
+ * tuning. ── */
+/* Reserved bottom band of the tall canvas for the menu/status strip. The
+ * interactive menu (STATE_MENU) renders here when in a tall hold. */
+#define TALL_STRIP_Y 172
+
+static void render_octopus_tall(const Quote *q, int expr, uint32_t frame_idx) {
+    set_canvas_tall();          /* 122 x 250 */
+    memset(frame, 0, sizeof(frame));
+
+    /* ── Status bar (y0..24): wifi + bt + battery, then date/time ── */
+    draw_wifi_icon(0, 1, wifi_connected);
+    if (dilder_bt_state() == BT_PAIRED) draw_bt_icon(18, 1);
+    draw_battery_icon(104, 1);
+    {
+        datetime_t t; rtc_get_datetime(&t);
+        int hr12 = t.hour % 12; if (hr12 == 0) hr12 = 12;
+        const char *ampm = (t.hour < 12) ? "AM" : "PM";
+        char line[40];
+        snprintf(line, sizeof(line), "%s %d  %d:%02d%s",
+                 month_names[t.month - 1], t.day, hr12, t.min, ampm);
+        int x = (122 - (int)strlen(line) * 6) / 2; if (x < 0) x = 0;
+        draw_text(x, 14, line, 122);
+    }
+    for (int x = 4; x < 118; x++) px_set(x, 24);
+
+    /* ── Quote bubble — dropped DOWN so its bottom sits just above the octopus
+     *    head (~y125), with a speech-tail caret at the bottom-right so it reads
+     *    like a quote. Text is CAPPED so it can't overrun the face. ── */
+    {
+        const int bx0 = 4, by0 = 48, bx1 = 117, by1 = 120;
+        for (int x = bx0 + 2; x <= bx1 - 2; x++) { px_set(x, by0); px_set(x, by1); }
+        for (int y = by0 + 2; y <= by1 - 2; y++) { px_set(bx0, y); px_set(bx1, y); }
+
+        /* Speech-tail caret hanging off the bottom-right, pointing at the head. */
+        int tipx = bx1 - 14, tipy = by1 + 9;
+        for (int i = 0; i <= 12; i++) px_set(bx1 - 26 + i, by1 + (i * 9) / 12); /* left edge */
+        for (int i = 0; i <= 9;  i++) px_set(bx1 - 8 - (i * 6) / 9, by1 + i);   /* right edge */
+        px_set(tipx, tipy);
+        for (int x = bx1 - 25; x < bx1 - 8; x++) px_clr(x, by1);                /* open the mouth */
+
+        char qbuf[96];
+        snprintf(qbuf, sizeof(qbuf), "%s", q->text);
+        if (strlen(qbuf) > 90) { qbuf[88] = qbuf[89] = qbuf[90] = '.'; qbuf[91] = 0; }
+        draw_text(bx0 + 4, by0 + 5, qbuf, (bx1 - bx0) - 8);
+    }
+
+    /* ── Octopus, moved down so the gaps above (bubble) and below (status
+     *    block) are roughly even. Face lands ~y150. ── */
+    const int OCT_OX = (122 - 65) / 2 - 5;
+    const int OCT_OY = 113;
+    layout_ox = OCT_OX;
+    layout_oy = OCT_OY;
+    draw_octopus(q, expr, frame_idx);
+    layout_ox = 0; layout_oy = 0;
+
+#if FACE_DEBUG
+    /* TEMP: solid square at the computed left-eye position. If you SEE it on
+     * the octopus face, the position is right and the eyes/mouth draw is the
+     * bug; if you don't, the face is being clipped/placed off. */
+    for (int yy = -3; yy <= 3; yy++)
+        for (int xx = -3; xx <= 3; xx++)
+            px_set(22 + OCT_OX + xx, 25 + Y_OFF + OCT_OY + yy);
+#endif
+
+    /* ── Bottom status block, pushed to the very bottom. Order (top→bottom):
+     *    emotion state (centered), then STEPS (label left / count right). ── */
+    {
+        const int blk_div = 214, mood_y = 220, step_y = 234;
+        for (int x = 4; x < 118; x++) px_set(x, blk_div);
+
+        char mt[40];
+        snprintf(mt, sizeof(mt), "- %s -",
+                 current_mood < 0 ? mood_names[q->mood] : mood_names[current_mood]);
+        for (char *p = mt; *p; p++) if (*p >= 'a' && *p <= 'z') *p -= 32;
+        int mx = (122 - (int)strlen(mt) * 6) / 2; if (mx < 0) mx = 0;
+        draw_text(mx, mood_y, mt, 122);          /* emotion, centered */
+
+        char cnt[16];
+        snprintf(cnt, sizeof(cnt), "%lu", (unsigned long)steps_today);
+        draw_text(4, step_y, "STEPS", 122);                      /* label left */
+        int cx = 118 - (int)strlen(cnt) * 6; if (cx < 40) cx = 40;
+        draw_text(cx, step_y, cnt, 122);                         /* count right */
+    }
+}
+
+/* On-screen orientation HUD for calibration (compact: accel ×10, 0..3 hold).
+ * Drawn last so it sits on top; gated by ORIENT_DEBUG. */
+static void draw_orient_hud(void) {
+#if ORIENT_DEBUG
+    char hud[28];
+    snprintf(hud, sizeof(hud), "O%d X%d Y%d Z%d", g_orientation,
+             (int)(accel_g(accel_x) * 10), (int)(accel_g(accel_y) * 10),
+             (int)(accel_g(accel_z) * 10));
+    /* In tall mode the top is the status bar — drop the HUD into the empty
+     * band just below it so the date doesn't overlap it. */
+    int hy = (canvas_w == 122) ? 40 : 2;
+    draw_text(2, hy, hud, canvas_w);
+#endif
+}
+
 /* ─── Transpose landscape → portrait for e-ink driver ─── */
 
+/* Map the active canvas onto the fixed 122x250 panel at display_rotation.
+ *   90 / 270  → WIDE canvas (250x122): legacy 90 = current view
+ *   0  / 180  → TALL canvas (122x250): the longways layout
+ * The orientation logic keeps content upright by choosing the rotation. */
 static void transpose_to_display(void) {
-    uint16_t dst_row_bytes = (DISP_W + 7) / 8;
+    const int PW = DISP_W;   /* panel width  = 122 */
+    const int PH = DISP_H;   /* panel height = 250 */
+    uint16_t dst_row_bytes = (PW + 7) / 8;
     memset(display_buf, 0xFF, sizeof(display_buf));
 
-    for (int y = 0; y < IMG_H; y++) {
-        for (int x = 0; x < IMG_W; x++) {
-            int src_byte = y * IMG_ROW_BYTES + x / 8;
-            int src_bit  = 7 - (x & 7);
-            if ((frame[src_byte] >> src_bit) & 1) {
-                int dx = y;
-                int dy = 249 - x;
-                int dst_byte = dy * dst_row_bytes + dx / 8;
-                int dst_bit  = 7 - (dx & 7);
-                display_buf[dst_byte] &= ~(1 << dst_bit);
+    for (int y = 0; y < canvas_h; y++) {
+        for (int x = 0; x < canvas_w; x++) {
+            int src_byte = y * canvas_row_bytes + x / 8;
+            if (!((frame[src_byte] >> (7 - (x & 7))) & 1)) continue;
+            int dx, dy;
+            switch (display_rotation) {
+                case 0:   dx = x;          dy = y;          break;  /* tall */
+                case 180: dx = PW - 1 - x; dy = PH - 1 - y; break;  /* tall flipped */
+                case 270: dx = PW - 1 - y; dy = x;          break;  /* wide flipped */
+                case 90:                                            /* wide (legacy) */
+                default:  dx = y;          dy = PH - 1 - x; break;
             }
+            if (dx < 0 || dx >= PW || dy < 0 || dy >= PH) continue;
+            int dst_byte = dy * dst_row_bytes + dx / 8;
+            display_buf[dst_byte] &= ~(1 << (7 - (dx & 7)));
         }
     }
 }
@@ -1522,6 +1868,13 @@ static void init_rtc_from_compile_time(void) {
  *     to a VSYS threshold. */
 static bool battery_adc_ready = false;
 
+/* Multiply VSYS reading by this to calibrate out ADC-ref / divider tolerance.
+ * 1.0 = no correction. If the % is consistently off, measure the pack with a
+ * meter and set this to (meter_volts / reported_volts). */
+#ifndef VSYS_CAL
+#define VSYS_CAL 1.0f
+#endif
+
 static void battery_init(void) {
     adc_gpio_init(29);          /* disable digital pulls on ADC3 */
     battery_adc_ready = true;
@@ -1542,7 +1895,10 @@ static float read_vsys_volts(void) {
     cyw43_thread_exit();
 
     float raw = (float)acc / (float)N;
-    return raw * 3.3f / 4095.0f * 3.0f;   /* 3:1 divider */
+    /* 3:1 divider, 3.3 V ADC ref. VSYS_CAL corrects for ADC-ref / divider
+     * tolerance — measure the battery with a multimeter and set this to
+     * (actual_volts / reported_volts) if the reading is consistently off. */
+    return raw * 3.3f / 4095.0f * 3.0f * VSYS_CAL;
 }
 
 static bool is_usb_powered(void) {
@@ -1550,13 +1906,35 @@ static bool is_usb_powered(void) {
     return cyw43_arch_gpio_get(CYW43_WL_GPIO_VBUS_PIN);
 }
 
+/* Single-cell LiPo voltage -> % via a piecewise discharge curve. A straight
+ * (V-3.0)/1.2 line badly misreports the flat mid-range (e.g. 3.7 V is ~45%
+ * real, but linear claims ~58%). Points are resting voltages; under load the
+ * reading sags, so treat % as approximate. */
+static int lipo_percent(float v) {
+    static const float curve[][2] = {
+        {4.20f,100},{4.15f,95},{4.11f,90},{4.08f,85},{4.02f,80},
+        {3.98f,75},{3.95f,70},{3.91f,65},{3.87f,60},{3.85f,55},
+        {3.84f,50},{3.82f,45},{3.80f,40},{3.79f,35},{3.77f,30},
+        {3.75f,25},{3.73f,20},{3.71f,15},{3.69f,10},{3.61f,5},
+        {3.50f,2},{3.30f,0},
+    };
+    const int N = (int)(sizeof(curve) / sizeof(curve[0]));
+    if (v >= curve[0][0])   return 100;
+    if (v <= curve[N-1][0]) return 0;
+    for (int i = 0; i < N - 1; i++) {
+        if (v <= curve[i][0] && v > curve[i+1][0]) {
+            float span = curve[i][0] - curve[i+1][0];
+            float frac = (v - curve[i+1][0]) / span;
+            return (int)(curve[i+1][1] + frac * (curve[i][1] - curve[i+1][1]) + 0.5f);
+        }
+    }
+    return 0;
+}
+
 /* Returns 0..100 from VSYS, or -1 if running on USB. */
 static int read_battery_percent(void) {
     if (is_usb_powered()) return -1;
-    float vsys = read_vsys_volts();
-    if (vsys >= 4.2f) return 100;
-    if (vsys <= 3.0f) return 0;
-    return (int)((vsys - 3.0f) / 1.2f * 100.0f);
+    return lipo_percent(read_vsys_volts());
 }
 
 /* ─── Battery icon (16x10 pixels) ─── */
@@ -1620,21 +1998,52 @@ static void draw_wifi_icon(int x0, int y0, bool connected) {
     }
 }
 
+/* Short Bresenham line in canvas space (for the BT glyph). */
+static void icon_line(int x0, int y0, int x1, int y1) {
+    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = dx + dy;
+    for (;;) {
+        px_set(x0, y0);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = 2 * err;
+        if (e2 >= dy) { err += dy; x0 += sx; }
+        if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+}
+
+/* Bluetooth rune (~7px wide, 9px tall), stem at x0+3. Drawn only when paired. */
+static void draw_bt_icon(int x0, int y0) {
+    int cx = x0 + 3, w = 3;
+    int top = y0, bot = y0 + 8, u = y0 + 2, l = y0 + 6;
+    icon_line(cx, top, cx, bot);     /* vertical stem            */
+    icon_line(cx, top, cx + w, u);   /* top apex  → upper knee   */
+    icon_line(cx + w, u, cx - w, l); /* upper knee → lower-left  */
+    icon_line(cx, bot, cx + w, l);   /* bottom apex → lower knee */
+    icon_line(cx + w, l, cx - w, u); /* lower knee → upper-left  */
+}
+
 /* ─── Menu items ─── */
 static const char *menu_items[] = {
     "MOOD SELECT",
     "NETWORK",
+    "BLUETOOTH",
     "SOUND",
     "MOTION",
     "DEVICE INFO",
+    "SET TIME",
     "BACK",
 };
-#define MENU_COUNT 6
+#define MENU_COUNT 8
+#define MENU_IDX_BLUETOOTH 2
+#define MENU_IDX_SET_TIME  6
+#define MENU_IDX_BACK      7
 
 /* ─── Helper: draw inverted text (white on black bar) ─── */
 static void draw_inverted_line(int y, const char *text) {
+    int hx_end = canvas_w - 6;          /* canvas-aware: 244 wide, 116 tall */
     for (int hy = y - 1; hy < y + 8; hy++)
-        for (int hx = 6; hx < 244; hx++)
+        for (int hx = 6; hx < hx_end; hx++)
             px_set(hx, hy);
     int cx = 10;
     for (const char *c = text; *c; c++) {
@@ -1684,6 +2093,209 @@ static void render_menu(int selected) {
     }
 }
 
+/* ─── Menu redrawn + scaled for the TALL (122x250) orientation ───
+ * A full vertical list (all items fit, no scrolling needed). */
+static void render_menu_tall(int selected) {
+    set_canvas_tall();
+    memset(frame, 0, sizeof(frame));
+
+    draw_text(44, 8, "MENU", 122);
+    for (int x = 4; x < 118; x++) px_set(x, 20);
+
+    for (int i = 0; i < MENU_COUNT; i++) {
+        int y = 34 + i * 18;          /* roomy spacing in the tall view */
+        char line[40];
+        if (i == selected) {
+            snprintf(line, sizeof(line), "> %s", menu_items[i]);
+            draw_inverted_line(y, line);
+        } else {
+            snprintf(line, sizeof(line), "  %s", menu_items[i]);
+            draw_text(8, y, line, 122);
+        }
+    }
+
+    for (int x = 4; x < 118; x++) px_set(x, 236);
+    draw_text(6, 240, "C:SELECT L:BACK", 122);
+}
+
+/* ─── Generic TALL (122x250) renderers, so every menu/list is readable and
+ *     navigable when the device is held joystick-at-bottom. Input is already
+ *     orientation-agnostic, so screens only need a tall render variant. ─── */
+static void render_list_tall(const char *title, const char *const *items,
+                             int count, int sel, const char *footer) {
+    set_canvas_tall();
+    memset(frame, 0, sizeof(frame));
+    draw_text(6, 8, title, 122);
+    for (int x = 4; x < 118; x++) px_set(x, 20);
+
+    int vis = 9;                          /* ~9 rows fit (250px / 20) */
+    int start = 0;
+    if (sel > vis - 2) start = sel - (vis - 2);
+    if (start + vis > count) start = count - vis;
+    if (start < 0) start = 0;
+    for (int i = 0; i < vis && (start + i) < count; i++) {
+        int idx = start + i, y = 30 + i * 20;
+        char line[44];
+        if (idx == sel) {
+            snprintf(line, sizeof(line), "> %s", items[idx]);
+            draw_inverted_line(y, line);
+        } else {
+            snprintf(line, sizeof(line), "  %s", items[idx]);
+            draw_text(8, y, line, 122);
+        }
+    }
+    for (int x = 4; x < 118; x++) px_set(x, 232);
+    draw_text(6, 236, footer ? footer : "C:SEL L:BACK", 122);
+}
+
+static void render_text_tall(const char *title, const char *const *lines, int n) {
+    set_canvas_tall();
+    memset(frame, 0, sizeof(frame));
+    draw_text(6, 8, title, 122);
+    for (int x = 4; x < 118; x++) px_set(x, 20);
+    for (int i = 0; i < n; i++) draw_text(6, 30 + i * 16, lines[i], 122);
+    draw_text(6, 236, "L:BACK", 122);
+}
+
+/* ─── Saved WiFi networks store — data (flash-backed; functions defined later
+ * near the WiFi connect code). Last flash sector survives reboot + OTA. ─── */
+#define SAVED_MAGIC   0x4D4F4F50u    /* 'MOOP' */
+#define MAX_SAVED     8
+#define SAVED_FLASH_OFFSET  (PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE)
+typedef struct { char ssid[33]; char pass[64]; } saved_net_t;
+typedef struct { uint32_t magic, count; saved_net_t nets[MAX_SAVED]; } saved_store_t;
+static saved_store_t g_saved;
+static const char *saved_find_pass(const char *ssid);   /* fwd (used in handlers) */
+
+/* ─── Saved networks screen (connect / forget) ─── */
+static int saved_sel = 0;
+
+static void render_saved_nets(void) {
+    if (g_saved.count == 0) saved_sel = 0;
+    else if (saved_sel >= (int)g_saved.count) saved_sel = g_saved.count - 1;
+
+    if (orientation_is_tall()) {
+        static const char *items[MAX_SAVED];
+        for (uint32_t i = 0; i < g_saved.count; i++) items[i] = g_saved.nets[i].ssid;
+        if (g_saved.count == 0) {
+            set_canvas_tall(); memset(frame, 0, sizeof(frame));
+            draw_text(6, 8, "SAVED NETWORKS", 122);
+            draw_text(8, 60, "NONE SAVED", 122);
+            draw_text(6, 236, "L:BACK", 122);
+            return;
+        }
+        render_list_tall("SAVED NETWORKS", items, g_saved.count, saved_sel,
+                         "C:JOIN R:FORGET L:BACK");
+        return;
+    }
+
+    memset(frame, 0, sizeof(frame));
+    draw_text(30, 3, "SAVED NETWORKS", IMG_W);
+    for (int x = 10; x < 240; x++) px_set(x, 14);
+    if (g_saved.count == 0) {
+        draw_text(50, 55, "NONE SAVED", IMG_W);
+    } else {
+        char line[40];
+        for (uint32_t i = 0; i < g_saved.count && i < 7; i++) {
+            int y = 22 + i * 12;
+            if ((int)i == saved_sel) {
+                snprintf(line, sizeof(line), "> %s", g_saved.nets[i].ssid);
+                draw_inverted_line(y, line);
+            } else {
+                snprintf(line, sizeof(line), "  %s", g_saved.nets[i].ssid);
+                draw_text(10, y, line, IMG_W);
+            }
+        }
+    }
+    draw_text(8, 110, "C:JOIN  R:FORGET  LEFT:BACK", IMG_W);
+}
+
+/* ─── Bluetooth pairing screen ─── */
+static void render_bluetooth(void) {
+    bool tall = orientation_is_tall();
+    if (tall) set_canvas_tall(); else set_canvas_wide();
+    memset(frame, 0, sizeof(frame));
+    draw_text(tall ? 6 : 30, tall ? 8 : 3, "BLUETOOTH", canvas_w);
+    for (int x = 4; x < canvas_w - 4; x++) px_set(x, tall ? 20 : 14);
+
+    char line[40];
+
+    /* ── Pairing: show the 6-digit passkey big; phone enters it. ── */
+    if (dilder_bt_state() == BT_PAIRING) {
+        int y = tall ? 44 : 26, dy = tall ? 20 : 14;
+        draw_text(8, y, "ENTER THIS CODE ON", canvas_w); y += dy;
+        draw_text(8, y, "YOUR PHONE:", canvas_w); y += dy + dy;
+        snprintf(line, sizeof(line), "%06lu", (unsigned long)dilder_bt_passkey());
+        /* double-size centred passkey */
+        int tw = (int)strlen(line) * 16;
+        draw_text_2x((canvas_w - tw) / 2, y, line);
+        draw_text(tall ? 6 : 8, tall ? 236 : 110, "LEFT:CANCEL", canvas_w);
+        return;
+    }
+
+    const char *st;
+    switch (dilder_bt_state()) {
+        case BT_STARTING:    st = "STARTING..."; break;
+        case BT_ADVERTISING: st = "DISCOVERABLE"; break;
+        case BT_CONNECTED:   st = "CONNECTED"; break;
+        case BT_PAIRED:      st = "PAIRED"; break;
+        default:             st = "OFF"; break;
+    }
+
+    int y = tall ? 36 : 26, dy = tall ? 18 : 13;
+    draw_text(8, y, "NAME: Dilder Hub", canvas_w); y += dy;
+    snprintf(line, sizeof(line), "STATUS: %s", st);
+    draw_text(8, y, line, canvas_w); y += dy;
+    if (dilder_bt_peer()[0]) {
+        snprintf(line, sizeof(line), "PEER: %s", dilder_bt_peer());
+        draw_text(8, y, line, canvas_w); y += dy;
+    }
+    y += dy;
+    if (dilder_bt_state() == BT_PAIRED) {
+        draw_text(8, y, "PAIRED! PHONE CAN NOW", canvas_w); y += dy;
+        draw_text(8, y, "READ MOOD & STEPS.", canvas_w);
+    } else {
+        draw_text(8, y, "FIND \"Dilder Hub\" ON", canvas_w); y += dy;
+        draw_text(8, y, "YOUR PHONE & PAIR.", canvas_w);
+    }
+
+    draw_text(tall ? 6 : 8, tall ? 236 : 110, "C:RESTART  LEFT:BACK", canvas_w);
+}
+
+/* ─── Manual date/time setter ─── */
+static datetime_t settime_dt;
+static int settime_field = 0;   /* 0=year 1=month 2=day 3=hour 4=min */
+
+static void render_set_time(void) {
+    bool tall = orientation_is_tall();
+    if (tall) set_canvas_tall(); else set_canvas_wide();
+    memset(frame, 0, sizeof(frame));
+
+    draw_text(tall ? 8 : 30, tall ? 10 : 3, "SET DATE / TIME", canvas_w);
+    for (int x = 4; x < canvas_w - 4; x++) px_set(x, tall ? 22 : 14);
+
+    char f[5][14];
+    snprintf(f[0], 14, "YEAR  %d", settime_dt.year);
+    snprintf(f[1], 14, "MONTH %02d", settime_dt.month);
+    snprintf(f[2], 14, "DAY   %02d", settime_dt.day);
+    snprintf(f[3], 14, "HOUR  %02d", settime_dt.hour);
+    snprintf(f[4], 14, "MIN   %02d", settime_dt.min);
+
+    int y0 = tall ? 44 : 26, dy = tall ? 22 : 13;
+    for (int i = 0; i < 5; i++) {
+        int y = y0 + i * dy;
+        char line[20];
+        if (i == settime_field) {
+            snprintf(line, sizeof(line), "> %s", f[i]);
+            draw_inverted_line(y, line);
+        } else {
+            snprintf(line, sizeof(line), "  %s", f[i]);
+            draw_text(8, y, line, canvas_w);
+        }
+    }
+    draw_text(4, tall ? 232 : 108, "U/D ADJ  L/R FIELD  C SAVE", canvas_w);
+}
+
 /* ─── Draw sound submenu ─── */
 #define SND_ITEM_PATTERN 0
 #define SND_ITEM_ONOFF   1
@@ -1711,6 +2323,11 @@ static void render_sound_menu(int sel) {
     items[SND_ITEM_VOL] = vol_buf;
     items[SND_ITEM_BACK] = "BACK";
 
+    if (orientation_is_tall()) {
+        render_list_tall("SOUND", items, SND_MENU_COUNT, sel, "C:PLAY L:BACK");
+        return;
+    }
+
     for (int i = 0; i < SND_MENU_COUNT; i++) {
         int y = 22 + i * 12;
         if (i == sel) {
@@ -1728,6 +2345,23 @@ static void render_sound_menu(int sel) {
 
 /* ─── Draw device info screen ─── */
 static void render_info_screen(void) {
+    if (orientation_is_tall()) {
+        static char L[7][40]; static const char *lp[7]; int n = 0;
+        datetime_t t; rtc_get_datetime(&t);
+        int h = t.hour % 12; if (h == 0) h = 12;
+        int pct = read_battery_percent();
+        snprintf(L[n], 40, "FW V%s", DILDER_VERSION); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "DISP %s", DISPLAY_NAME); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "%s %d %d:%02d%s", month_names[t.month - 1], t.day,
+                 h, t.min, t.hour < 12 ? "A" : "P"); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "MOOD %s", current_mood < 0 ? "ALL" : mood_names[current_mood]); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "QUOTES %d", QUOTE_COUNT); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "WIFI %s", wifi_connected ? wifi_ip_str : "OFF"); lp[n] = L[n]; n++;
+        if (pct < 0) snprintf(L[n], 40, "POWER USB"); else snprintf(L[n], 40, "BATT %d%%", pct);
+        lp[n] = L[n]; n++;
+        render_text_tall("DEVICE INFO", lp, n);
+        return;
+    }
     memset(frame, 0, sizeof(frame));
     draw_text(30, 3, "DEVICE INFO", IMG_W);
     for (int x = 10; x < 240; x++) px_set(x, 14);
@@ -1770,6 +2404,13 @@ static void render_info_screen(void) {
 
 /* ─── Draw mood select screen ─── */
 static void render_mood_select(int selected) {
+    if (orientation_is_tall()) {
+        static const char *items[MOOD_COUNT + 1];
+        items[0] = "ALL MOODS";
+        for (int i = 0; i < MOOD_COUNT; i++) items[i + 1] = mood_names[i];
+        render_list_tall("SELECT MOOD", items, MOOD_COUNT + 1, selected, "C:SET L:BACK");
+        return;
+    }
     memset(frame, 0, sizeof(frame));
     draw_text(30, 3, "SELECT MOOD", IMG_W);
     for (int x = 10; x < 240; x++) px_set(x, 14);
@@ -1807,6 +2448,18 @@ static void render_mood_select(int selected) {
 
 /* ─── Draw network status screen (read-only) ─── */
 static void render_network_screen(void) {
+    if (orientation_is_tall()) {
+        static char L[6][40]; static const char *lp[6]; int n = 0;
+        snprintf(L[n], 40, "WIFI: %s", wifi_enabled ? "ON" : "OFF"); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "SSID: %s", wifi_ssid_display); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "STATE: %s", !wifi_enabled ? "OFF" :
+                 wifi_connected ? "CONNECTED" : "DISCONN"); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "IP: %s", wifi_connected ? wifi_ip_str : "---"); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "SIGNAL: %d dBm", wifi_connected ? (int)wifi_rssi : 0); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "NTP: %s", ntp_synced ? "SYNCED" : "NOT SYNCED"); lp[n] = L[n]; n++;
+        render_text_tall("WIFI STATUS", lp, n);
+        return;
+    }
     memset(frame, 0, sizeof(frame));
     draw_text(30, 3, "WIFI STATUS", IMG_W);
     for (int x = 10; x < 240; x++) px_set(x, 14);
@@ -1840,9 +2493,10 @@ static void render_network_screen(void) {
 /* ─── Draw network submenu ─── */
 #define NET_ITEM_ONOFF      0
 #define NET_ITEM_SCAN       1
-#define NET_ITEM_STATUS     2
-#define NET_ITEM_BACK       3
-#define NET_MENU_COUNT      4
+#define NET_ITEM_SAVED      2
+#define NET_ITEM_STATUS     3
+#define NET_ITEM_BACK       4
+#define NET_MENU_COUNT      5
 
 static void render_net_menu(int sel) {
     memset(frame, 0, sizeof(frame));
@@ -1855,8 +2509,14 @@ static void render_net_menu(int sel) {
     snprintf(onoff_buf, sizeof(onoff_buf), "WIFI: %s", wifi_enabled ? "ON" : "OFF");
     items[NET_ITEM_ONOFF] = onoff_buf;
     items[NET_ITEM_SCAN] = "SCAN NETWORKS";
+    items[NET_ITEM_SAVED] = "SAVED NETWORKS";
     items[NET_ITEM_STATUS] = "STATUS";
     items[NET_ITEM_BACK] = "BACK";
+
+    if (orientation_is_tall()) {
+        render_list_tall("NETWORK", items, NET_MENU_COUNT, sel, "C:SEL L:BACK");
+        return;
+    }
 
     for (int i = 0; i < NET_MENU_COUNT; i++) {
         int y = 22 + i * 12;
@@ -1876,6 +2536,26 @@ static void render_net_menu(int sel) {
 
 /* ─── Draw scan results ─── */
 static void render_scan_results(void) {
+    if (orientation_is_tall()) {
+        if (scan_in_progress || scan_count == 0) {
+            set_canvas_tall(); memset(frame, 0, sizeof(frame));
+            draw_text(6, 8, "WIFI NETWORKS", 122);
+            for (int x = 4; x < 118; x++) px_set(x, 20);
+            draw_text(8, 60, scan_in_progress ? "SCANNING..." : "NO NETWORKS", 122);
+            draw_text(6, 236, scan_in_progress ? "L:CANCEL" : "L:BACK", 122);
+            return;
+        }
+        static char rows[MAX_SCAN_RESULTS][26];
+        static const char *items[MAX_SCAN_RESULTS];
+        for (int i = 0; i < scan_count; i++) {
+            char lock = (scan_results[i].auth_mode != 0) ? '~' : ' ';
+            snprintf(rows[i], sizeof(rows[i]), "%c%-11.11s%ddB",
+                     lock, scan_results[i].ssid, (int)scan_results[i].rssi);
+            items[i] = rows[i];
+        }
+        render_list_tall("WIFI NETWORKS", items, scan_count, scan_sel, "C:JOIN L:BACK");
+        return;
+    }
     memset(frame, 0, sizeof(frame));
     draw_text(30, 3, "WIFI NETWORKS", IMG_W);
     for (int x = 10; x < 240; x++) px_set(x, 14);
@@ -1906,11 +2586,15 @@ static void render_scan_results(void) {
         int idx = start + i;
         int y = 20 + i * 12;
         char lock = (scan_results[idx].auth_mode != 0) ? '~' : ' ';
+        /* SSID truncated to a fixed field so the signal (dBm) lines up; list
+           is sorted strongest-first. */
         if (idx == scan_sel) {
-            snprintf(buf, sizeof(buf), "> %c%s", lock, scan_results[idx].ssid);
+            snprintf(buf, sizeof(buf), "> %c%-22.22s %ddBm", lock,
+                     scan_results[idx].ssid, (int)scan_results[idx].rssi);
             draw_inverted_line(y, buf);
         } else {
-            snprintf(buf, sizeof(buf), "  %c%s", lock, scan_results[idx].ssid);
+            snprintf(buf, sizeof(buf), "  %c%-22.22s %ddBm", lock,
+                     scan_results[idx].ssid, (int)scan_results[idx].rssi);
             draw_text(10, y, buf, IMG_W);
         }
     }
@@ -2039,8 +2723,9 @@ static void render_motion_menu(int sel) {
              (double)accel_g(accel_x), (double)accel_g(accel_y), (double)accel_g(accel_z));
     items[MOT_ITEM_LIVE] = live_buf;
 
-    static char ped_buf[25];
-    snprintf(ped_buf, sizeof(ped_buf), "STEPS: %lu", (unsigned long)step_count);
+    static char ped_buf[42];
+    snprintf(ped_buf, sizeof(ped_buf), "TODAY: %lu ST  %ld MIN",
+             (unsigned long)steps_today, (long)(active_seconds_today / 60));
     items[MOT_ITEM_PEDOMETER] = ped_buf;
 
     static char tilt_buf[30];
@@ -2056,6 +2741,11 @@ static void render_motion_menu(int sel) {
 
     items[MOT_ITEM_I2CSCAN] = "I2C BUS SCAN";
     items[MOT_ITEM_BACK] = "BACK";
+
+    if (orientation_is_tall()) {
+        render_list_tall("MOTION", items, MOT_MENU_COUNT, sel, "C:SEL L:BACK");
+        return;
+    }
 
     /* Scrolling window — 5 items visible */
     int vis = 5;
@@ -2240,6 +2930,21 @@ static int wifi_scan_callback(void *env, const cyw43_ev_scan_result_t *result) {
     return 0;
 }
 
+/* Sort discovered networks by signal strength, strongest first. RSSI is in
+ * dBm (negative), so a larger value = stronger. Simple insertion sort — the
+ * list is tiny (<= MAX_SCAN_RESULTS). */
+static void wifi_sort_by_rssi(void) {
+    for (int i = 1; i < scan_count; i++) {
+        scan_entry_t key = scan_results[i];
+        int j = i - 1;
+        while (j >= 0 && scan_results[j].rssi < key.rssi) {
+            scan_results[j + 1] = scan_results[j];
+            j--;
+        }
+        scan_results[j + 1] = key;
+    }
+}
+
 static void wifi_start_scan(void) {
     scan_count = 0;
     scan_sel = 0;
@@ -2249,6 +2954,64 @@ static void wifi_start_scan(void) {
     cyw43_wifi_scan_options_t opts = {0};
     cyw43_wifi_scan(&cyw43_state, &opts, NULL, wifi_scan_callback);
     printf("[WiFi] Scan started\n");
+}
+
+/* ─── Saved WiFi networks: flash-backed store (data declared earlier) ─── */
+static void saved_write_flash(void) {
+    static uint8_t buf[FLASH_SECTOR_SIZE];
+    memset(buf, 0xFF, sizeof(buf));
+    memcpy(buf, &g_saved, sizeof(g_saved));
+    uint32_t ints = save_and_disable_interrupts();
+    flash_range_erase(SAVED_FLASH_OFFSET, FLASH_SECTOR_SIZE);
+    flash_range_program(SAVED_FLASH_OFFSET, buf, FLASH_SECTOR_SIZE);
+    restore_interrupts(ints);
+}
+
+static void saved_seed_defaults(void) {
+    memset(&g_saved, 0, sizeof(g_saved));
+    g_saved.magic = SAVED_MAGIC;
+    g_saved.count = 2;
+    strncpy(g_saved.nets[0].ssid, "Moop Ship",    sizeof(g_saved.nets[0].ssid) - 1);
+    strncpy(g_saved.nets[0].pass, WIFI_PASS,       sizeof(g_saved.nets[0].pass) - 1);
+    strncpy(g_saved.nets[1].ssid, "MoopsterCell",  sizeof(g_saved.nets[1].ssid) - 1);
+    strncpy(g_saved.nets[1].pass, WIFI_PASS,       sizeof(g_saved.nets[1].pass) - 1);
+}
+
+static void saved_load(void) {
+    const saved_store_t *fl = (const saved_store_t *)(XIP_BASE + SAVED_FLASH_OFFSET);
+    if (fl->magic == SAVED_MAGIC && fl->count <= MAX_SAVED) {
+        memcpy(&g_saved, fl, sizeof(g_saved));
+    } else {
+        saved_seed_defaults();   /* first boot — persist the two defaults */
+        saved_write_flash();
+    }
+}
+
+static const char *saved_find_pass(const char *ssid) {
+    for (uint32_t i = 0; i < g_saved.count; i++)
+        if (strcmp(g_saved.nets[i].ssid, ssid) == 0) return g_saved.nets[i].pass;
+    return NULL;
+}
+
+static void saved_add(const char *ssid, const char *pass) {
+    for (uint32_t i = 0; i < g_saved.count; i++)
+        if (strcmp(g_saved.nets[i].ssid, ssid) == 0) {       /* update existing */
+            strncpy(g_saved.nets[i].pass, pass, sizeof(g_saved.nets[i].pass) - 1);
+            saved_write_flash(); return;
+        }
+    if (g_saved.count < MAX_SAVED) {                          /* add new */
+        strncpy(g_saved.nets[g_saved.count].ssid, ssid, sizeof(g_saved.nets[0].ssid) - 1);
+        strncpy(g_saved.nets[g_saved.count].pass, pass, sizeof(g_saved.nets[0].pass) - 1);
+        g_saved.count++;
+        saved_write_flash();
+    }
+}
+
+static void saved_forget(int idx) {
+    if (idx < 0 || idx >= (int)g_saved.count) return;
+    for (uint32_t i = idx; i + 1 < g_saved.count; i++) g_saved.nets[i] = g_saved.nets[i + 1];
+    g_saved.count--;
+    saved_write_flash();
 }
 
 /* ─── WiFi connect (accepts arbitrary SSID/password) ─── */
@@ -2309,10 +3072,21 @@ static int pick_quote(void) {
     return matches[rng_next() % count];
 }
 
+/* Push the current mood + step count to the BLE status characteristic so a
+ * paired phone can read/subscribe. No-op (and no notify) when unchanged. */
+static void bt_push_status(void) {
+    if (!dilder_bt_active()) return;
+    char s[24];
+    snprintf(s, sizeof(s), "%s %lu",
+             current_mood < 0 ? "ALL" : mood_names[current_mood],
+             (unsigned long)steps_today);
+    dilder_bt_set_status(s);
+}
+
 /* ─── Main ─── */
 int main(void) {
     stdio_init_all();
-    sleep_ms(1000);
+    sleep_ms(50);   /* brief settle; was 1000ms of pure boot delay for USB serial */
     printf("DILDER HUB v%s (%s) | display: %s | %d quotes | built %s %s\n",
            DILDER_VERSION, DILDER_VERSION_DATE, DISPLAY_NAME, QUOTE_COUNT, __DATE__, __TIME__);
 
@@ -2325,6 +3099,17 @@ int main(void) {
 
     joystick_init();
     speaker_init();
+
+#ifdef PICOWOTA_OTA
+    /* Hold the joystick UP at power-on to drop into the picowota WiFi
+       bootloader for an over-the-air firmware update. Pull-ups are active
+       (joystick is active-low), so give them a moment to settle first. */
+    sleep_ms(20);
+    if (!gpio_get(JOY_UP)) {
+        speaker_tone(2000, 60);  /* audible "entering OTA" cue */
+        picowota_reboot(true);
+    }
+#endif
 
     /* Startup chime */
     speaker_tone(1000, 80); sleep_ms(30);
@@ -2340,9 +3125,14 @@ int main(void) {
     if (cyw43_arch_init()) {
         printf("WARNING: CYW43 init failed — battery reads may be 0\n");
     }
+    /* WiFi is NOT auto-connected at boot — that blocked startup for up to ~15s.
+       Credentials are cached (saved-networks store, seeded with Moop Ship +
+       MoopsterCell), so connecting from the Network menu needs no password
+       entry. The clock NTP-syncs whenever WiFi is connected. */
 
     battery_init();
     mpu_init();
+    saved_load();   /* load cached WiFi networks (seeds Moop Ship + MoopsterCell) */
 
     /* ─── State machine ─── */
     uint8_t state = STATE_OCTOPUS;
@@ -2354,13 +3144,15 @@ int main(void) {
     int snd_sel = 0;
 
     uint32_t last_input_ms = 0;
-    #define INPUT_DEBOUNCE 5
+    /* Joystick debounce, ms. Off — a 5-way SMD switch bounces ~1 ms and the
+     * real nav latency is the e-ink refresh, not debounce. */
+    #define INPUT_DEBOUNCE 0
 
     /* Helper macro for polling input in sub-screens */
     #define POLL_INPUT(ms) \
         for (int _pi = 0; _pi < ((ms)/5); _pi++) { \
             sleep_ms(5); \
-            if (wifi_enabled || scan_in_progress) cyw43_arch_poll(); \
+            if (wifi_enabled || scan_in_progress || dilder_bt_active()) cyw43_arch_poll(); \
             if (to_ms_since_boot(get_absolute_time()) - last_input_ms < INPUT_DEBOUNCE) continue; \
             uint8_t inp = read_joystick(); \
             if (inp == INPUT_NONE) continue; \
@@ -2371,8 +3163,13 @@ int main(void) {
     while (true) {
         uint32_t now = to_ms_since_boot(get_absolute_time());
 
+        /* Default every screen to the WIDE canvas; the tall octopus layout
+         * overrides this for itself. Refresh accel orientation (auto-rotate). */
+        set_canvas_wide();
+        orientation_update();
+
         /* Poll WiFi / scan */
-        if (wifi_enabled || scan_in_progress) cyw43_arch_poll();
+        if (wifi_enabled || scan_in_progress || dilder_bt_active()) cyw43_arch_poll();
 
         switch (state) {
 
@@ -2385,20 +3182,42 @@ int main(void) {
             if (expr == EXPR_OPEN && frame_idx > 0)
                 qi = pick_quote();
 
-            render_frame(&quotes[qi], expr, frame_idx);
-            /* WiFi icon top-left, battery icon top-right */
-            draw_wifi_icon(0, 1, wifi_connected);
-            draw_battery_icon(234, 1);
-            draw_text(175, 113, "DOWN:MENU", IMG_W);
+            if (orientation_is_tall()) {
+                /* Longways layout draws its own 2-row status bar (wifi + batt,
+                 * date + time), quote, and octopus at the bottom. */
+                render_octopus_tall(&quotes[qi], expr, frame_idx);
+            } else {
+                render_frame(&quotes[qi], expr, frame_idx);
+                draw_wifi_icon(0, 1, wifi_connected);   /* top-left */
+                if (dilder_bt_state() == BT_PAIRED) draw_bt_icon(18, 1);
+                draw_battery_icon(234, 1);               /* top-right */
+                {
+                    char sbuf[20];
+                    snprintf(sbuf, sizeof(sbuf), "STEPS %lu",
+                             (unsigned long)steps_today);
+                    draw_text(5, 113, sbuf, IMG_W);      /* left of the screen */
+                }
+                draw_text(175, 113, "DOWN:MENU", IMG_W);
+            }
+            draw_orient_hud();   /* calibration overlay (ORIENT_DEBUG) */
             transpose_to_display();
 
             EPD_Partial(display_buf);
+            bt_push_status();    /* keep a paired phone's mood/steps read fresh */
             frame_idx++;
 
             /* Poll 3 seconds for joystick */
+            int o0 = g_orientation;
             for (int i = 0; i < 600 && state == STATE_OCTOPUS; i++) {
                 sleep_ms(5);
-                if (wifi_enabled || scan_in_progress) cyw43_arch_poll();
+                if (wifi_enabled || scan_in_progress || dilder_bt_active()) cyw43_arch_poll();
+                orientation_update();
+                if (g_orientation != o0) break;  /* re-render on rotate */
+                if (dilder_bt_active() && dilder_bt_take_command() >= 0) {
+                    qi = pick_quote();   /* phone poked us → fresh quote */
+                    speaker_tone(1600, 60);
+                    break;               /* re-render */
+                }
                 if (to_ms_since_boot(get_absolute_time()) - last_input_ms < INPUT_DEBOUNCE) continue;
                 uint8_t inp = read_joystick();
                 if (inp == INPUT_DOWN) {
@@ -2415,34 +3234,112 @@ int main(void) {
 
         /* ════════ MENU ════════ */
         case STATE_MENU: {
-            const Quote *q = &quotes[qi];
-            render_frame(q, mood_cycle(q->mood)[frame_idx % 4], frame_idx);
-            render_menu(menu_sel);
+            /* Responsive menu: the e-ink refresh blocks for ~300ms, so instead
+             * of refreshing on every keypress (and missing presses during the
+             * blackout) we sample the joystick continuously (~8ms), move the
+             * selection immediately in memory, and only repaint once input
+             * SETTLES. Holding fast-scrolls; rapid taps accumulate; CENTER/LEFT
+             * are edge-triggered so a held press can't double-fire. */
+            int      need_draw = 1;
+            int      moved     = 0;
+            uint8_t  prev      = INPUT_NONE;
+            uint32_t last_move = 0;
+            uint32_t key_down  = 0;       /* when the current hold started */
+            int      was_tall  = orientation_is_tall();
+            for (;;) {
+                if (need_draw) {
+                    if (orientation_is_tall()) {
+                        render_menu_tall(menu_sel);
+                    } else {
+                        const Quote *q = &quotes[qi];
+                        render_frame(q, mood_cycle(q->mood)[frame_idx % 4], frame_idx);
+                        render_menu(menu_sel);
+                    }
+                    transpose_to_display();
+                    EPD_Partial(display_buf);
+                    need_draw = 0; moved = 0;
+                }
+
+                sleep_ms(8);
+                if (wifi_enabled || scan_in_progress || dilder_bt_active()) cyw43_arch_poll();
+                orientation_update();                 /* keep auto-rotate live */
+                uint8_t  j = read_joystick();
+                uint32_t t = to_ms_since_boot(get_absolute_time());
+
+                if (orientation_is_tall() != was_tall) {   /* rotated → redraw */
+                    was_tall = orientation_is_tall(); need_draw = 1; continue;
+                }
+
+                if (j == INPUT_CENTER && prev != INPUT_CENTER) {
+                    speaker_tone(1000, 40);
+                    switch (menu_sel) {
+                        case 0: state = STATE_MOOD_SELECT; mood_sel = current_mood + 1; break;
+                        case 1: state = STATE_NET_MENU; break;
+                        case MENU_IDX_BLUETOOTH: state = STATE_BLUETOOTH; break;
+                        case 3: state = STATE_SOUND; snd_sel = 0; break;
+                        case 4: state = STATE_MOTION; break;
+                        case 5: state = STATE_INFO; break;
+                        case MENU_IDX_SET_TIME:
+                            rtc_get_datetime(&settime_dt); settime_field = 0;
+                            state = STATE_SET_TIME; break;
+                        default: state = STATE_OCTOPUS; break;
+                    }
+                    break;
+                }
+                if (j == INPUT_LEFT && prev != INPUT_LEFT) {
+                    speaker_tone(500, 40); state = STATE_OCTOPUS; break;
+                }
+                if (j == INPUT_UP || j == INPUT_DOWN) {
+                    int edge = (prev != j);
+                    /* Move once on press. Only auto-repeat after a clear HOLD
+                     * (>400ms, longer than a normal tap) so a single press can
+                     * never skip two options; then repeat fast (~120ms). */
+                    int repeat = !edge && (t - key_down) > 400 && (t - last_move) > 120;
+                    if (edge) key_down = t;
+                    if (edge || repeat) {
+                        menu_sel = (menu_sel + (j == INPUT_UP ? -1 : 1) + MENU_COUNT) % MENU_COUNT;
+                        last_move = t; moved = 1;
+                        speaker_tone(620, 12);
+                    }
+                }
+                prev = j;
+
+                /* Repaint only after the user pauses post-move: a fast scroll
+                 * yields one repaint at the end; deliberate taps repaint each. */
+                if (moved && j == INPUT_NONE && (t - last_move) > 130) need_draw = 1;
+            }
+            break;
+        }
+
+        /* ════════ SET DATE / TIME ════════ */
+        case STATE_SET_TIME: {
+            render_set_time();
             transpose_to_display();
             EPD_Partial(display_buf);
 
             POLL_INPUT(4000)
-                if (inp == INPUT_UP) {
-                    menu_sel = (menu_sel - 1 + MENU_COUNT) % MENU_COUNT;
+                if (inp == INPUT_LEFT) {
+                    settime_field = (settime_field + 4) % 5;
                     speaker_tone(600, 30); break;
-                } else if (inp == INPUT_DOWN) {
-                    menu_sel = (menu_sel + 1) % MENU_COUNT;
+                } else if (inp == INPUT_RIGHT) {
+                    settime_field = (settime_field + 1) % 5;
                     speaker_tone(600, 30); break;
-                } else if (inp == INPUT_CENTER) {
-                    speaker_tone(1000, 50);
-                    
-                    switch (menu_sel) {
-                        case 0: state = STATE_MOOD_SELECT; mood_sel = current_mood + 1; break;
-                        case 1: state = STATE_NET_MENU; break;
-                        case 2: state = STATE_SOUND; snd_sel = 0; break;
-                        case 3: state = STATE_MOTION; break;
-                        case 4: state = STATE_INFO; break;
-                        default: state = STATE_OCTOPUS; break;
+                } else if (inp == INPUT_UP || inp == INPUT_DOWN) {
+                    int d = (inp == INPUT_UP) ? 1 : -1;
+                    switch (settime_field) {
+                        case 0: settime_dt.year += d; break;
+                        case 1: settime_dt.month = (settime_dt.month - 1 + 12 + d) % 12 + 1; break;
+                        case 2: settime_dt.day   = (settime_dt.day   - 1 + 31 + d) % 31 + 1; break;
+                        case 3: settime_dt.hour  = (settime_dt.hour  + 24 + d) % 24; break;
+                        case 4: settime_dt.min   = (settime_dt.min   + 60 + d) % 60; break;
                     }
-                    break;
-                } else if (inp == INPUT_LEFT) {
-                    state = STATE_OCTOPUS; 
-                    speaker_tone(500, 50); break;
+                    speaker_tone(700, 20); break;
+                } else if (inp == INPUT_CENTER) {
+                    settime_dt.dotw = 0; settime_dt.sec = 0;
+                    rtc_set_datetime(&settime_dt);
+                    ntp_synced = false;        /* manually set */
+                    speaker_tone(1000, 60);
+                    state = STATE_MENU; break;
                 }
             POLL_END
             break;
@@ -2591,6 +3488,8 @@ int main(void) {
                         case NET_ITEM_SCAN:
                             wifi_start_scan();
                             state = STATE_NET_SCAN; break;
+                        case NET_ITEM_SAVED:
+                            saved_sel = 0; state = STATE_SAVED_NETS; break;
                         case NET_ITEM_STATUS:
                             state = STATE_NETWORK; break;
                         case NET_ITEM_BACK:
@@ -2602,13 +3501,73 @@ int main(void) {
             break;
         }
 
+        /* ════════ SAVED NETWORKS ════════ */
+        case STATE_SAVED_NETS: {
+            render_saved_nets();
+            transpose_to_display();
+            EPD_Partial(display_buf);
+            POLL_INPUT(4000)
+                if (g_saved.count > 0 && inp == INPUT_UP) {
+                    saved_sel = (saved_sel - 1 + g_saved.count) % g_saved.count;
+                    speaker_tone(600, 30); break;
+                } else if (g_saved.count > 0 && inp == INPUT_DOWN) {
+                    saved_sel = (saved_sel + 1) % g_saved.count;
+                    speaker_tone(600, 30); break;
+                } else if (g_saved.count > 0 && inp == INPUT_CENTER) {
+                    speaker_tone(1000, 50);
+                    show_connecting_screen(g_saved.nets[saved_sel].ssid);
+                    wifi_connect_to(g_saved.nets[saved_sel].ssid,
+                                    g_saved.nets[saved_sel].pass);
+                    state = STATE_NETWORK; break;
+                } else if (g_saved.count > 0 && inp == INPUT_RIGHT) {
+                    saved_forget(saved_sel);     /* forget + persist */
+                    speaker_tone(400, 60); break;
+                } else if (inp == INPUT_LEFT) {
+                    state = STATE_NET_MENU; speaker_tone(500, 50); break;
+                }
+            POLL_END
+            break;
+        }
+
+        /* ════════ BLUETOOTH ════════ */
+        case STATE_BLUETOOTH: {
+            dilder_bt_init();   /* idempotent: powers on BLE + starts advertising */
+            bt_state_t shown = (bt_state_t)255;
+            int was_tall = orientation_is_tall();
+            uint8_t prev = INPUT_NONE;
+            for (;;) {
+                if (dilder_bt_state() != shown || orientation_is_tall() != was_tall) {
+                    shown = dilder_bt_state();
+                    was_tall = orientation_is_tall();
+                    render_bluetooth();
+                    transpose_to_display();
+                    EPD_Partial(display_buf);
+                }
+                sleep_ms(10);
+                cyw43_arch_poll();      /* service BLE (and WiFi) events */
+                orientation_update();
+                uint8_t j = read_joystick();
+                if (j == INPUT_LEFT && prev != INPUT_LEFT) {
+                    speaker_tone(500, 40); state = STATE_MENU; break;   /* BLE stays on */
+                }
+                if (j == INPUT_CENTER && prev != INPUT_CENTER) {
+                    dilder_bt_stop(); dilder_bt_init();                 /* restart advertising */
+                }
+                prev = j;
+            }
+            break;
+        }
+
         /* ════════ SCAN RESULTS ════════ */
         case STATE_NET_SCAN: {
             /* Check if scan finished */
             if (scan_in_progress && !cyw43_wifi_scan_active(&cyw43_state)) {
                 scan_in_progress = false;
                 scan_complete = true;
-                printf("[WiFi] Scan complete: %d networks\n", scan_count);
+                wifi_sort_by_rssi();   /* strongest signal first */
+                scan_sel = 0;          /* highlight the strongest network */
+                printf("[WiFi] Scan complete: %d networks (sorted by signal)\n",
+                       scan_count);
             }
 
             render_scan_results();
@@ -2633,10 +3592,16 @@ int main(void) {
                     if (inp == INPUT_CENTER) {
                         speaker_tone(1000, 50);
                         selected_network = scan_sel;
+                        const char *saved_pw = saved_find_pass(scan_results[scan_sel].ssid);
                         if (scan_results[scan_sel].auth_mode == 0) {
                             /* Open network — connect directly */
                             show_connecting_screen(scan_results[scan_sel].ssid);
                             wifi_connect_to(scan_results[scan_sel].ssid, "");
+                            state = STATE_NETWORK;
+                        } else if (saved_pw) {
+                            /* Cached credentials — connect with no password entry */
+                            show_connecting_screen(scan_results[scan_sel].ssid);
+                            wifi_connect_to(scan_results[scan_sel].ssid, saved_pw);
                             state = STATE_NETWORK;
                         } else {
                             /* Needs password — keyboard */
@@ -2713,6 +3678,8 @@ int main(void) {
                                 speaker_tone(1200, 80);
                                 show_connecting_screen(scan_results[selected_network].ssid);
                                 wifi_connect_to(scan_results[selected_network].ssid, pw_buf);
+                                if (wifi_connected)   /* remember it for next time */
+                                    saved_add(scan_results[selected_network].ssid, pw_buf);
                                 state = STATE_NETWORK;
                                 break;
                             case KB_SP_CANCEL:

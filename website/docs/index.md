@@ -71,6 +71,44 @@ This is the moment Dilder graduates from "breadboard inside a case" to **actual 
 
 ---
 
+## Latest Milestone — The Firmware Comes Alive
+
+The custom **Dilder Board** is running the real firmware, and it grew a brain this month: the octopus **auto-rotates** with the device, **counts your steps**, **remembers your WiFi**, flashes itself **over the air**, and now **pairs to your phone over Bluetooth LE** with a passkey shown right on the e-ink.
+
+<div class="grid" markdown>
+
+<figure markdown="span">
+  ![Bare custom Dilder Board — green PCB with Raspberry Pi Pico 2 W, TP4056 charger, solar pads, and the octopus silkscreen reading "Dilder Board"](assets/images/firmware/dilder-custom-pcb-bare.jpg){ width="420" loading=lazy }
+  <figcaption>The custom Dilder Board — Pico 2 W, TP4056 charging, solar pads, USB-C.</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Dilder Board running firmware on the bench — e-ink reads "STOP LOOKING AT ME. STOP IT. I SAID STOP." with the octopus, clock, and NORMAL mood](assets/images/firmware/dilder-board-running-normal-quote.jpg){ width="420" loading=lazy }
+  <figcaption>Firmware live on the custom board — clock, mood line, and menu prompt.</figcaption>
+</figure>
+
+</div>
+
+<div class="grid" markdown>
+
+<figure markdown="span">
+  ![Dilder Board with joystick on a world map — wide layout showing "I SWEAR THIS OCEAN GETS STUPIDER EVERY DAY.", ANGRY mood, STEPS 3, and WiFi/Bluetooth/battery status icons](assets/images/firmware/dilder-board-wide-angry-steps.jpg){ width="420" loading=lazy }
+  <figcaption>Wide layout — live step count and the new WiFi / Bluetooth / battery status bar.</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Dilder Board in tall portrait orientation — speech-bubble quote "I KEEP SWIMMING EAST HOPING IT'LL FEEL LIKE HOME EVENTUALLY." above a HOMESICK octopus, STEPS 4, Bluetooth icon lit](assets/images/firmware/dilder-board-tall-homesick.jpg){ width="420" loading=lazy }
+  <figcaption>Auto-rotated tall "longways" layout — speech bubble, HOMESICK octopus, Bluetooth paired.</figcaption>
+</figure>
+
+</div>
+
+**This milestone added:** auto-rotating UI (3 orientations) · accelerometer step + activity tracking · saved WiFi with NTP clock · **Bluetooth LE pairing** (passkey-secured, phone-readable mood/steps) · WiFi OTA + buttonless USB reflash · WiFi/BT/battery status icons.
+
+[Read the full firmware milestone :material-arrow-right:](blog/posts/firmware-comes-alive-bluetooth-autorotate.md){ .md-button .md-button--primary }
+
+---
+
 ## The Current Build — Mk2 Translucent Prototype
 
 The latest revision: printed in **natural/clear PETG** so every internal component is visible through the case walls. Running the Conspiratorial Octopus personality on battery power.
@@ -341,7 +379,7 @@ The STEP model of the finished board is imported directly into the FreeCAD assem
 
     **:sparkles: New milestone:** the **Dilder Full Board Rev 1** is fully designed in KiCad — schematic finalized, 4-layer stackup configured, board routed end-to-end, and the 3D preview verified. Every component the case carries now lives on a single PCB.
 
-    **Done:** Runtime rendering engine | 16 emotions | Body animations | Custom fat/lazy bodies | 823 quotes | C-faithful preview renderer | DevTool with firmware size estimation | **GPIO joystick input** | On-screen input indicator | **Soldered unit** | **Battery power** | **USB-C charging** | **NoSolar variant** | **Mk2 translucent case** | **Joystick PCB from JLCPCB** | **V4 display driver (two-pass partial refresh)** | **Firmware version system (v0.5.4)** | **KiCad pin swap fix** | **:star: Full Board Rev 1 schematic + 4-layer routed PCB**
+    **Done:** Runtime rendering engine | 16 emotions | Body animations | Custom fat/lazy bodies | 823 quotes | C-faithful preview renderer | DevTool with firmware size estimation | **GPIO joystick input** | On-screen input indicator | **Soldered unit** | **Battery power** | **USB-C charging** | **NoSolar variant** | **Mk2 translucent case** | **Joystick PCB from JLCPCB** | **V4 display driver (two-pass partial refresh)** | **Firmware version system (v0.5.4)** | **KiCad pin swap fix** | **:star: Full Board Rev 1 schematic + 4-layer routed PCB** | **Custom Dilder Board bring-up** | **Accelerometer (SC7A20)** | **Auto-rotating UI (3 orientations + tall layout)** | **Step / activity tracker** | **Saved WiFi + NTP clock** | **WiFi OTA (picowota → RP2350)** | **Bluetooth LE pairing (passkey)** | **WiFi/BT/battery status icons**
 
     **In Progress:** V4 partial refresh tuning (blacks slightly washed vs V3). Awaiting first batch of Full Board Rev 1 bare PCBs from fab.
 
