@@ -195,6 +195,9 @@ static uint8_t read_joystick(void) {
 static bool wifi_enabled = false;
 static bool wifi_connected = false;
 static bool ntp_synced = false;
+
+/* Bluetooth is OFF by default to save power; toggled on in the Bluetooth screen. */
+static bool bt_enabled = false;
 static int32_t wifi_rssi = 0;
 static char wifi_ssid_display[33] = "---";
 static char wifi_ip_str[20] = "---";
@@ -421,6 +424,42 @@ static void activity_update(uint32_t dt_ms) {
             active_accum_ms %= 1000;
         }
     }
+}
+
+/* ─── Pocket / not-viewed detection → freeze e-ink redraws to save power ─────
+ * There's no proximity sensor, so "being viewed" is inferred from the
+ * accelerometer: the main screen stops refreshing (e-ink holds its last image
+ * at ZERO power) after a stretch of stillness, or immediately when the device
+ * is laid face-down. Any handling/jostle — or a button press — wakes it and
+ * forces a fresh redraw. (Continuous in-pocket walking looks like handling
+ * without a proximity/IR sensor; arming the SC7A20 INT1 line on GP15 for
+ * hardware motion-wake is the future path to true MCU sleep.) */
+#define VIEW_IDLE_MS 30000u            /* stillness before the screen freezes */
+static bool     g_screen_idle  = false;
+static uint32_t last_motion_ms = 0;
+
+static void viewing_update(void) {
+    static uint32_t last_ms = 0;
+    static float    prev_mag = 1.0f;
+    uint32_t now = to_ms_since_boot(get_absolute_time());
+    if (!mpu_ok) { last_motion_ms = now; return; }   /* no accel → never sleep */
+    if (now - last_ms < 200) return;                 /* ~5 Hz is plenty */
+    last_ms = now;
+    float mag = accel_magnitude();
+    float az  = accel_g(accel_z);
+    bool moving    = fabsf(mag - prev_mag) > 0.06f;  /* handling / jostle */
+    bool face_down = az < -0.55f;                    /* screen-down on a surface */
+    prev_mag = mag;
+    if (moving && !face_down) last_motion_ms = now;
+}
+
+static bool screen_is_viewed(void) {   /* recent motion, not laid face-down */
+    return (to_ms_since_boot(get_absolute_time()) - last_motion_ms) < VIEW_IDLE_MS;
+}
+
+static void wake_screen(void) {        /* user is present → unfreeze + redraw */
+    g_screen_idle  = false;
+    last_motion_ms = to_ms_since_boot(get_absolute_time());
 }
 
 /* ─── Orientation → display + input rotation (accelerometer auto-rotate) ───
@@ -2233,17 +2272,27 @@ static void render_bluetooth(void) {
         return;
     }
 
+    int y = tall ? 36 : 26, dy = tall ? 18 : 13;
+    draw_text(8, y, "NAME: Dilder Hub", canvas_w); y += dy;
+
+    /* ── Disabled: radio is off to save power. ── */
+    if (!bt_enabled) {
+        draw_text(8, y, "STATUS: OFF (DISABLED)", canvas_w); y += dy + dy;
+        draw_text(8, y, "BLUETOOTH IS OFF TO", canvas_w); y += dy;
+        draw_text(8, y, "SAVE POWER.", canvas_w);
+        draw_text(tall ? 6 : 8, tall ? 236 : 110, "C:ENABLE & PAIR  LEFT:BACK", canvas_w);
+        return;
+    }
+
     const char *st;
     switch (dilder_bt_state()) {
         case BT_STARTING:    st = "STARTING..."; break;
         case BT_ADVERTISING: st = "DISCOVERABLE"; break;
         case BT_CONNECTED:   st = "CONNECTED"; break;
         case BT_PAIRED:      st = "PAIRED"; break;
-        default:             st = "OFF"; break;
+        default:             st = "ON"; break;
     }
 
-    int y = tall ? 36 : 26, dy = tall ? 18 : 13;
-    draw_text(8, y, "NAME: Dilder Hub", canvas_w); y += dy;
     snprintf(line, sizeof(line), "STATUS: %s", st);
     draw_text(8, y, line, canvas_w); y += dy;
     if (dilder_bt_peer()[0]) {
@@ -2259,7 +2308,7 @@ static void render_bluetooth(void) {
         draw_text(8, y, "YOUR PHONE & PAIR.", canvas_w);
     }
 
-    draw_text(tall ? 6 : 8, tall ? 236 : 110, "C:RESTART  LEFT:BACK", canvas_w);
+    draw_text(tall ? 6 : 8, tall ? 236 : 110, "C:DISABLE  LEFT:BACK", canvas_w);
 }
 
 /* ─── Manual date/time setter ─── */
@@ -3182,29 +3231,33 @@ int main(void) {
             if (expr == EXPR_OPEN && frame_idx > 0)
                 qi = pick_quote();
 
-            if (orientation_is_tall()) {
-                /* Longways layout draws its own 2-row status bar (wifi + batt,
-                 * date + time), quote, and octopus at the bottom. */
-                render_octopus_tall(&quotes[qi], expr, frame_idx);
-            } else {
-                render_frame(&quotes[qi], expr, frame_idx);
-                draw_wifi_icon(0, 1, wifi_connected);   /* top-left */
-                if (dilder_bt_state() == BT_PAIRED) draw_bt_icon(18, 1);
-                draw_battery_icon(234, 1);               /* top-right */
-                {
-                    char sbuf[20];
-                    snprintf(sbuf, sizeof(sbuf), "STEPS %lu",
-                             (unsigned long)steps_today);
-                    draw_text(5, 113, sbuf, IMG_W);      /* left of the screen */
+            /* Skip the redraw entirely while pocketed/idle — the e-ink keeps
+             * showing the last frame for free; this is the main power saver. */
+            if (!g_screen_idle) {
+                if (orientation_is_tall()) {
+                    /* Longways layout draws its own 2-row status bar (wifi + batt,
+                     * date + time), quote, and octopus at the bottom. */
+                    render_octopus_tall(&quotes[qi], expr, frame_idx);
+                } else {
+                    render_frame(&quotes[qi], expr, frame_idx);
+                    draw_wifi_icon(0, 1, wifi_connected);   /* top-left */
+                    if (dilder_bt_state() == BT_PAIRED) draw_bt_icon(18, 1);
+                    draw_battery_icon(234, 1);               /* top-right */
+                    {
+                        char sbuf[20];
+                        snprintf(sbuf, sizeof(sbuf), "STEPS %lu",
+                                 (unsigned long)steps_today);
+                        draw_text(5, 113, sbuf, IMG_W);      /* left of the screen */
+                    }
+                    draw_text(175, 113, "DOWN:MENU", IMG_W);
                 }
-                draw_text(175, 113, "DOWN:MENU", IMG_W);
-            }
-            draw_orient_hud();   /* calibration overlay (ORIENT_DEBUG) */
-            transpose_to_display();
+                draw_orient_hud();   /* calibration overlay (ORIENT_DEBUG) */
+                transpose_to_display();
 
-            EPD_Partial(display_buf);
-            bt_push_status();    /* keep a paired phone's mood/steps read fresh */
-            frame_idx++;
+                EPD_Partial(display_buf);
+                bt_push_status();    /* keep a paired phone's mood/steps read fresh */
+                frame_idx++;
+            }
 
             /* Poll 3 seconds for joystick */
             int o0 = g_orientation;
@@ -3212,14 +3265,21 @@ int main(void) {
                 sleep_ms(5);
                 if (wifi_enabled || scan_in_progress || dilder_bt_active()) cyw43_arch_poll();
                 orientation_update();
-                if (g_orientation != o0) break;  /* re-render on rotate */
+                viewing_update();
+                if (!screen_is_viewed()) {
+                    g_screen_idle = true;            /* pocketed/still → freeze frame */
+                } else if (g_screen_idle) {
+                    wake_screen(); break;            /* motion → wake + redraw */
+                }
+                if (g_orientation != o0) { wake_screen(); break; }  /* re-render on rotate */
                 if (dilder_bt_active() && dilder_bt_take_command() >= 0) {
                     qi = pick_quote();   /* phone poked us → fresh quote */
                     speaker_tone(1600, 60);
-                    break;               /* re-render */
+                    wake_screen(); break;            /* re-render */
                 }
                 if (to_ms_since_boot(get_absolute_time()) - last_input_ms < INPUT_DEBOUNCE) continue;
                 uint8_t inp = read_joystick();
+                if (inp != INPUT_NONE) wake_screen();   /* any press = user present */
                 if (inp == INPUT_DOWN) {
                     last_input_ms = to_ms_since_boot(get_absolute_time());
                     state = STATE_MENU; menu_sel = 0;
@@ -3531,27 +3591,32 @@ int main(void) {
 
         /* ════════ BLUETOOTH ════════ */
         case STATE_BLUETOOTH: {
-            dilder_bt_init();   /* idempotent: powers on BLE + starts advertising */
+            if (bt_enabled && !dilder_bt_active()) dilder_bt_init();    /* resume if left on */
             bt_state_t shown = (bt_state_t)255;
-            int was_tall = orientation_is_tall();
-            uint8_t prev = INPUT_NONE;
+            int  was_tall  = orientation_is_tall();
+            bool shown_en  = !bt_enabled;     /* mismatch forces the first render */
+            uint8_t prev   = INPUT_NONE;
             for (;;) {
-                if (dilder_bt_state() != shown || orientation_is_tall() != was_tall) {
+                if (dilder_bt_state() != shown || orientation_is_tall() != was_tall
+                        || bt_enabled != shown_en) {
                     shown = dilder_bt_state();
                     was_tall = orientation_is_tall();
+                    shown_en = bt_enabled;
                     render_bluetooth();
                     transpose_to_display();
                     EPD_Partial(display_buf);
                 }
                 sleep_ms(10);
-                cyw43_arch_poll();      /* service BLE (and WiFi) events */
+                if (dilder_bt_active()) cyw43_arch_poll();   /* only when radio is on */
                 orientation_update();
                 uint8_t j = read_joystick();
                 if (j == INPUT_LEFT && prev != INPUT_LEFT) {
-                    speaker_tone(500, 40); state = STATE_MENU; break;   /* BLE stays on */
+                    speaker_tone(500, 40); state = STATE_MENU; break;
                 }
                 if (j == INPUT_CENTER && prev != INPUT_CENTER) {
-                    dilder_bt_stop(); dilder_bt_init();                 /* restart advertising */
+                    bt_enabled = !bt_enabled;
+                    if (bt_enabled) { dilder_bt_init(); speaker_tone(1200, 60); }
+                    else            { dilder_bt_stop(); speaker_tone(600, 60); }  /* radio OFF → save power */
                 }
                 prev = j;
             }

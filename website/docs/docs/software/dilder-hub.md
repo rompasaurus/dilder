@@ -15,7 +15,8 @@ The combined firmware that brings together all Dilder features: animated octopus
 | **WiFi** | CYW43 STA mode, network scanning (sorted by signal), on-screen keyboard for password entry |
 | **Saved Networks** | Credentials cached to the last flash sector — survives reboot **and** OTA; save / forget in-menu, no password re-entry (seeded with Moop Ship + MoopsterCell) |
 | **NTP Time Sync** | Syncs RTC to pool.ntp.org on WiFi connect (UTC+2 CEST) |
-| **Bluetooth LE** | BTstack peripheral "Dilder Hub" — **passkey pairing** (6-digit code on e-ink, MITM-protected) + custom GATT service exposing live mood/steps and a phone command byte |
+| **Bluetooth LE** | BTstack peripheral "Dilder Hub" — **passkey pairing** (6-digit code on e-ink, MITM-protected) + custom GATT service exposing live mood/steps and a phone command byte. **OFF by default; CENTER on the Bluetooth screen enables/disables the radio** to save power |
+| **Power Saving** | **Pocket / idle screen freeze** — the accelerometer stops e-ink redraws after ~30 s of stillness (or immediately when laid face-down); the frozen image holds at zero power and any motion or button press wakes it. Bluetooth fully powers off when disabled |
 | **WiFi OTA** | picowota bootloader ported to RP2350 — hold joystick **UP** at boot to reflash over WiFi; USB reflash needs no BOOTSEL button |
 | **Sound** | Active buzzer with 6 patterns (beep, chirp, SOS, doorbell, alert, happy), volume control, on/off toggle |
 | **Motion** | SC7A20 accelerometer (I²C, 0x18) — live values, pedometer, tilt angles, I2C bus scanner |
