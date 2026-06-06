@@ -1611,15 +1611,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#display-pin-mapping-pico-w" class="md-nav__link">
+  <a href="#display-pin-mapping-pico-2-w-spi0-mirrors-the-dilder-pcb" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Display Pin Mapping (Pico W)
+        Display Pin Mapping (Pico 2 W — SPI0, mirrors the Dilder PCB)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Display Pin Mapping (Pico W)">
+    <nav class="md-nav" aria-label="Display Pin Mapping (Pico 2 W — SPI0, mirrors the Dilder PCB)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1683,10 +1683,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pico-w-pin-map-visual" class="md-nav__link">
+  <a href="#pico-2-w-pin-map-visual" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pico W Pin Map (Visual)
+        Pico 2 W Pin Map (Visual)
       
     </span>
   </a>
@@ -3581,15 +3581,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#display-pin-mapping-pico-w" class="md-nav__link">
+  <a href="#display-pin-mapping-pico-2-w-spi0-mirrors-the-dilder-pcb" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Display Pin Mapping (Pico W)
+        Display Pin Mapping (Pico 2 W — SPI0, mirrors the Dilder PCB)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Display Pin Mapping (Pico W)">
+    <nav class="md-nav" aria-label="Display Pin Mapping (Pico 2 W — SPI0, mirrors the Dilder PCB)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3653,10 +3653,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pico-w-pin-map-visual" class="md-nav__link">
+  <a href="#pico-2-w-pin-map-visual" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pico W Pin Map (Visual)
+        Pico 2 W Pin Map (Visual)
       
     </span>
   </a>
@@ -3920,14 +3920,17 @@
 <p class="admonition-title">Power off before wiring</p>
 <p>Always disconnect USB before connecting or disconnecting jumper wires. The e-ink panel can be damaged by voltage spikes.</p>
 </div>
-<h3 id="display-pin-mapping-pico-w">Display Pin Mapping (Pico W)<a class="headerlink" href="#display-pin-mapping-pico-w" title="Permanent link">&para;</a></h3>
+<h3 id="display-pin-mapping-pico-2-w-spi0-mirrors-the-dilder-pcb">Display Pin Mapping (Pico 2 W — SPI0, mirrors the Dilder PCB)<a class="headerlink" href="#display-pin-mapping-pico-2-w-spi0-mirrors-the-dilder-pcb" title="Permanent link">&para;</a></h3>
+<p>The breadboard prototype uses the <strong>same SPI0 wiring as the Dilder PCB</strong> (J1
+header, GP17-22) so you can validate the exact PCB GPIO map before the board
+arrives.</p>
 <table>
 <thead>
 <tr>
 <th>e-Paper Signal</th>
 <th>Function</th>
-<th>Pico W GPIO</th>
-<th>Pico W Pin #</th>
+<th>Pico 2 W GPIO</th>
+<th>Pico 2 W Pin #</th>
 <th>Direction</th>
 </tr>
 </thead>
@@ -3947,45 +3950,45 @@
 <td>→ display</td>
 </tr>
 <tr>
-<td>DIN</td>
+<td>SDA (DIN)</td>
 <td>SPI MOSI — pixel data</td>
-<td>GP11 (SPI1 TX)</td>
-<td>15</td>
+<td>GP19 (SPI0 TX)</td>
+<td>25</td>
 <td>→ display</td>
 </tr>
 <tr>
-<td>CLK</td>
+<td>SCL (CLK)</td>
 <td>SPI clock</td>
-<td>GP10 (SPI1 SCK)</td>
-<td>14</td>
+<td>GP18 (SPI0 SCK)</td>
+<td>24</td>
 <td>→ display</td>
 </tr>
 <tr>
 <td>CS</td>
 <td>Chip select (active LOW)</td>
-<td>GP9 (SPI1 CSn)</td>
-<td>12</td>
+<td>GP17 (SPI0 CSn)</td>
+<td>22</td>
 <td>→ display</td>
 </tr>
 <tr>
 <td>DC</td>
 <td>Data / command select</td>
-<td>GP8</td>
-<td>11</td>
+<td>GP20</td>
+<td>26</td>
 <td>→ display</td>
 </tr>
 <tr>
-<td>RST</td>
+<td>RES (RST)</td>
 <td>Reset (active LOW)</td>
-<td>GP12</td>
-<td>16</td>
+<td>GP21</td>
+<td>27</td>
 <td>→ display</td>
 </tr>
 <tr>
 <td>BUSY</td>
 <td>Busy flag (HIGH = refreshing)</td>
-<td>GP13</td>
-<td>17</td>
+<td>GP22</td>
+<td>29</td>
 <td>← display</td>
 </tr>
 </tbody>
@@ -4035,7 +4038,7 @@
 </span></code></pre></div></p>
 <p>When the button is pressed it pulls the GPIO line LOW → software reads as pressed.</p>
 <h3 id="button-gpio-assignments">Button GPIO Assignments<a class="headerlink" href="#button-gpio-assignments" title="Permanent link">&para;</a></h3>
-<p>Pins chosen to avoid SPI1 (display) and leave SPI0 free for future use.</p>
+<p>Pins chosen to avoid the display SPI0 bus (GP17-22) and the I2C0 accelerometer (GP0/GP1).</p>
 <table>
 <thead>
 <tr>
@@ -4098,46 +4101,46 @@
 <thead>
 <tr>
 <th>Function</th>
-<th>Pico W GPIO</th>
-<th>Pico W Pin #</th>
+<th>Pico 2 W GPIO</th>
+<th>Pico 2 W Pin #</th>
 <th>Interface</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>e-ink CS</td>
+<td>GP17</td>
+<td>22</td>
+<td>SPI0 CSn</td>
+</tr>
+<tr>
+<td>e-ink CLK (SCL)</td>
+<td>GP18</td>
+<td>24</td>
+<td>SPI0 SCK</td>
+</tr>
+<tr>
+<td>e-ink DIN (SDA)</td>
+<td>GP19</td>
+<td>25</td>
+<td>SPI0 TX</td>
+</tr>
+<tr>
 <td>e-ink DC</td>
-<td>GP8</td>
-<td>11</td>
+<td>GP20</td>
+<td>26</td>
 <td>Digital out</td>
 </tr>
 <tr>
-<td>e-ink CS</td>
-<td>GP9</td>
-<td>12</td>
-<td>SPI1 CSn</td>
-</tr>
-<tr>
-<td>e-ink CLK</td>
-<td>GP10</td>
-<td>14</td>
-<td>SPI1 SCK</td>
-</tr>
-<tr>
-<td>e-ink DIN</td>
-<td>GP11</td>
-<td>15</td>
-<td>SPI1 TX</td>
-</tr>
-<tr>
-<td>e-ink RST</td>
-<td>GP12</td>
-<td>16</td>
+<td>e-ink RST (RES)</td>
+<td>GP21</td>
+<td>27</td>
 <td>Digital out</td>
 </tr>
 <tr>
 <td>e-ink BUSY</td>
-<td>GP13</td>
-<td>17</td>
+<td>GP22</td>
+<td>29</td>
 <td>Digital in</td>
 </tr>
 <tr>
@@ -4219,11 +4222,12 @@
 <p>The 3.7V LiPo connects to VSYS (pin 39) and GND (pin 38) — shared with the e-Paper module's power rail. See the dedicated <a href="../battery-wiring/">Battery Wiring Guide</a> for full setup instructions, charging options, and voltage monitoring.</p>
 </div>
 <hr />
-<h2 id="pico-w-pin-map-visual">Pico W Pin Map (Visual)<a class="headerlink" href="#pico-w-pin-map-visual" title="Permanent link">&para;</a></h2>
-<p>Pins used by this project are highlighted. Full electrical specs in the <a href="../../reference/pico-w/">Pico W reference</a>.</p>
+<h2 id="pico-2-w-pin-map-visual">Pico 2 W Pin Map (Visual)<a class="headerlink" href="#pico-2-w-pin-map-visual" title="Permanent link">&para;</a></h2>
+<p>Pins used by this project are highlighted. The display lives on <strong>SPI0 (GP17-22)</strong>,
+mirroring the Dilder PCB. Full electrical specs in the <a href="../../reference/pico-2-w/">Pico 2 W reference</a>.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>               ┌───USB───┐
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>   GP0  [ 1]   │         │  [40]  VBUS
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>   GP1  [ 2]   │  PICO   │  [39]  VSYS      ◄── e-ink VSYS
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>▶  GP0  [ 1]   │         │  [40]  VBUS      I2C0 SDA → SC7A20
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>▶  GP1  [ 2]   │ PICO 2  │  [39]  VSYS      ◄── e-ink VSYS
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>   GND  [ 3]   │    W    │  [38]  GND       ◄── e-ink GND
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>▶  GP2  [ 4]   │         │  [37]  3V3_EN
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>▶  GP3  [ 5]   │         │  [36]  3V3(OUT)
@@ -4231,36 +4235,35 @@
 </span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>▶  GP5  [ 7]   │         │  [34]  GP28
 </span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>   GND  [ 8]   │         │  [33]  AGND
 </span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>▶  GP6  [ 9]   │         │  [32]  GP27
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>   GP7  [10]   │         │  [31]  GP26
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>▶  GP8  [11]   │         │  [30]  RUN
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>▶  GP9  [12]   │         │  [29]  GP22
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>▶  GP7  [10]   │         │  [31]  GP26
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>   GP8  [11]   │         │  [30]  RUN
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>   GP9  [12]   │         │  [29]  GP22  ◄── e-ink BUSY
 </span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>   GND  [13]   │         │  [28]  GND
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>▶ GP10  [14]   │         │  [27]  GP21
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>▶ GP11  [15]   │         │  [26]  GP20
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>▶ GP12  [16]   │         │  [25]  GP19
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>▶ GP13  [17]   │         │  [24]  GP18
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>  GP10  [14]   │         │  [27]  GP21  ◄── e-ink RES
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>  GP11  [15]   │         │  [26]  GP20  ◄── e-ink DC
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>  GP12  [16]   │         │  [25]  GP19  ◄── e-ink SDA (SPI0 TX)
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>  GP13  [17]   │         │  [24]  GP18  ◄── e-ink SCL (SPI0 SCK)
 </span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>   GND  [18]   │         │  [23]  GND
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>  GP14  [19]   │         │  [22]  GP17
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>  GP15  [20]   └─────────┘  [21]  GP16
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>  GP14  [19]   │         │  [22]  GP17  ◄── e-ink CS
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>▶ GP15  [20]   └─────────┘  [21]  GP16
 </span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>▶ = used by Dilder
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>▶ = used by Dilder    (GP15 = SC7A20 accel INT)
 </span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>Left side (pins 4–17):  Buttons (GP2–GP6) + Display SPI (GP8–GP13)
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>Right side (pin 39):    VSYS power to display (onboard regulator)
-</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>Right side (pin 38):    GND to display
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>Left side:   Buttons (GP2-GP6), Speaker (GP7), I2C0 accel (GP0/GP1)
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>Right side:  Display SPI0 (GP17-GP22), VSYS/GND power to display
 </span></code></pre></div>
 <hr />
 <h2 id="wiring-diagram-text">Wiring Diagram (Text)<a class="headerlink" href="#wiring-diagram-text" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Pico W (on breadboard)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Pico 2 W (on breadboard — SPI0, mirrors the Dilder PCB)
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>│
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>├─ Pin 39 (VSYS)    ──────────── e-Paper VSYS
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>├─ Pin 38 (GND)     ──────────── e-Paper GND ── breadboard GND rail
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>├─ Pin 15 (GP11 / SPI1 TX)  ──── e-Paper DIN
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>├─ Pin 14 (GP10 / SPI1 SCK) ──── e-Paper CLK
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>├─ Pin 12 (GP9  / SPI1 CSn) ──── e-Paper CS
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├─ Pin 11 (GP8)  ─────────────── e-Paper DC
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>├─ Pin 16 (GP12) ─────────────── e-Paper RST
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>├─ Pin 17 (GP13) ─────────────── e-Paper BUSY
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>├─ Pin 22 (GP17 / SPI0 CSn) ──── e-Paper CS
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>├─ Pin 24 (GP18 / SPI0 SCK) ──── e-Paper SCL (CLK)
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>├─ Pin 25 (GP19 / SPI0 TX)  ──── e-Paper SDA (DIN)
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├─ Pin 26 (GP20) ─────────────── e-Paper DC
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>├─ Pin 27 (GP21) ─────────────── e-Paper RES (RST)
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>├─ Pin 29 (GP22) ─────────────── e-Paper BUSY
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>│
 </span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>├─ Pin 4  (GP2)  ─── [BTN UP]     ─── GND
 </span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>├─ Pin 5  (GP3)  ─── [BTN DOWN]   ─── GND
@@ -4270,7 +4273,8 @@
 </span></code></pre></div>
 <hr />
 <h2 id="spi-configuration">SPI Configuration<a class="headerlink" href="#spi-configuration" title="Permanent link">&para;</a></h2>
-<p>The e-ink display uses <strong>SPI1</strong> on the Pico W. No kernel configuration needed — SPI is set up in MicroPython code.</p>
+<p>The e-ink display uses <strong>SPI0</strong> (GP18 SCK, GP19 TX, GP17 CSn) on the Pico 2 W,
+matching the Dilder PCB.</p>
 <table>
 <thead>
 <tr>
@@ -4281,7 +4285,7 @@
 <tbody>
 <tr>
 <td>Controller</td>
-<td>SPI1</td>
+<td>SPI0</td>
 </tr>
 <tr>
 <td>Mode</td>
@@ -4303,9 +4307,9 @@
 </table>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pin</span><span class="p">,</span> <span class="n">SPI</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">spi</span> <span class="o">=</span> <span class="n">SPI</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">4_000_000</span><span class="p">,</span> <span class="n">polarity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>          <span class="n">sck</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">mosi</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">11</span><span class="p">))</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">cs</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">OUT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># active LOW, start HIGH</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">spi</span> <span class="o">=</span> <span class="n">SPI</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">4_000_000</span><span class="p">,</span> <span class="n">polarity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>          <span class="n">sck</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">18</span><span class="p">),</span> <span class="n">mosi</span><span class="o">=</span><span class="n">Pin</span><span class="p">(</span><span class="mi">19</span><span class="p">))</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">cs</span> <span class="o">=</span> <span class="n">Pin</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="n">Pin</span><span class="o">.</span><span class="n">OUT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># active LOW, start HIGH</span>
 </span></code></pre></div>
 <hr />
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>

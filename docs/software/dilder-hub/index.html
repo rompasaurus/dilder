@@ -3793,7 +3793,7 @@
 
 
 <h1 id="dilder-hub-all-in-one-firmware">Dilder Hub — All-In-One Firmware<a class="headerlink" href="#dilder-hub-all-in-one-firmware" title="Permanent link">&para;</a></h1>
-<p>The combined firmware that brings together all Dilder features: animated octopus with 16 moods, joystick menu navigation, WiFi scanning with on-screen keyboard, active buzzer with sound patterns, MPU-6050 accelerometer/gyroscope with pedometer, battery monitoring, and 10 navigable screens.</p>
+<p>The combined firmware that brings together all Dilder features: animated octopus with 16 moods, joystick menu navigation, <strong>accelerometer-driven auto-rotation</strong> (wide + tall "longways" layouts), a <strong>step / activity tracker</strong>, WiFi with <strong>saved networks</strong> and NTP clock sync, <strong>Bluetooth LE phone pairing</strong>, <strong>WiFi OTA updates</strong>, an active buzzer with sound patterns, battery monitoring, and navigable menu screens.</p>
 <hr />
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
 <table>
@@ -3809,20 +3809,36 @@
 <td>16 animated moods with 823 quotes, RTC clock header, mood-based body transforms</td>
 </tr>
 <tr>
+<td><strong>Auto-Rotation</strong></td>
+<td>SC7A20 tilt classifier picks 3 orientations; dedicated wide + tall "longways" layouts (speech-bubble quote above the octopus)</td>
+</tr>
+<tr>
+<td><strong>Activity Tracker</strong></td>
+<td>Low-power pedometer — step count + active minutes from the accelerometer, shown on the home screen</td>
+</tr>
+<tr>
 <td><strong>Mood Selector</strong></td>
 <td>Joystick-navigable picker for all 16 moods + "ALL (RANDOM)"</td>
 </tr>
 <tr>
 <td><strong>WiFi</strong></td>
-<td>CYW43 STA mode, network scanning, on-screen keyboard for password entry</td>
+<td>CYW43 STA mode, network scanning (sorted by signal), on-screen keyboard for password entry</td>
+</tr>
+<tr>
+<td><strong>Saved Networks</strong></td>
+<td>Credentials cached to the last flash sector — survives reboot <strong>and</strong> OTA; save / forget in-menu, no password re-entry (seeded with Moop Ship + MoopsterCell)</td>
 </tr>
 <tr>
 <td><strong>NTP Time Sync</strong></td>
 <td>Syncs RTC to pool.ntp.org on WiFi connect (UTC+2 CEST)</td>
 </tr>
 <tr>
-<td><strong>Network Menu</strong></td>
-<td>WiFi on/off, scan networks, connect to any network, live status display</td>
+<td><strong>Bluetooth LE</strong></td>
+<td>BTstack peripheral "Dilder Hub" — <strong>passkey pairing</strong> (6-digit code on e-ink, MITM-protected) + custom GATT service exposing live mood/steps and a phone command byte</td>
+</tr>
+<tr>
+<td><strong>WiFi OTA</strong></td>
+<td>picowota bootloader ported to RP2350 — hold joystick <strong>UP</strong> at boot to reflash over WiFi; USB reflash needs no BOOTSEL button</td>
 </tr>
 <tr>
 <td><strong>Sound</strong></td>
@@ -3830,7 +3846,11 @@
 </tr>
 <tr>
 <td><strong>Motion</strong></td>
-<td>MPU-6050 accelerometer/gyroscope — live values, pedometer, tilt angles, temperature, I2C bus scanner</td>
+<td>SC7A20 accelerometer (I²C, 0x18) — live values, pedometer, tilt angles, I2C bus scanner</td>
+</tr>
+<tr>
+<td><strong>Set Time</strong></td>
+<td>On-device date/time setter (year → minute)</td>
 </tr>
 <tr>
 <td><strong>Device Info</strong></td>
@@ -3842,7 +3862,7 @@
 </tr>
 <tr>
 <td><strong>Status Icons</strong></td>
-<td>WiFi icon (top-left), battery icon with lightning bolt (top-right)</td>
+<td>WiFi icon (top-left), Bluetooth rune (shown when paired), battery icon with lightning bolt (top-right) — both orientations</td>
 </tr>
 </tbody>
 </table>
@@ -3852,13 +3872,15 @@
 <p>The default view: animated octopus with mouth cycling, random quotes filtered by current mood, RTC clock header at the top, WiFi status icon top-left, battery icon top-right, and "DOWN:MENU" hint.</p>
 <p>The tagline below the speech bubble shows the current mood name (e.g. "- CONSPIRATORIAL -", "- ANGRY -"). When mood is set to ALL, it shows the mood of the current quote.</p>
 <h3 id="menu-state_menu">Menu (STATE_MENU)<a class="headerlink" href="#menu-state_menu" title="Permanent link">&para;</a></h3>
-<p>Press joystick DOWN on the main screen. Overlay on the bottom half showing:</p>
+<p>Press joystick DOWN on the main screen. Renders upright in both the wide and tall holds:</p>
 <ol>
 <li><strong>MOOD SELECT</strong> — pick a personality</li>
-<li><strong>NETWORK</strong> — WiFi on/off, scan, connect, status</li>
+<li><strong>NETWORK</strong> — WiFi on/off, scan, saved networks, status</li>
+<li><strong>BLUETOOTH</strong> — pair to a phone (passkey on screen)</li>
 <li><strong>SOUND</strong> — test patterns, volume, on/off</li>
 <li><strong>MOTION</strong> — accelerometer, pedometer, tilt, I2C scan</li>
 <li><strong>DEVICE INFO</strong> — system information</li>
+<li><strong>SET TIME</strong> — set date &amp; time</li>
 <li><strong>BACK</strong> — return to octopus</li>
 </ol>
 <p>Navigate: UP/DOWN to move, CENTER to select, LEFT to go back.</p>
@@ -4016,39 +4038,39 @@
 </thead>
 <tbody>
 <tr>
-<td>Display CLK</td>
-<td>14</td>
-<td>GP10</td>
-<td>SPI1 SCK</td>
-</tr>
-<tr>
-<td>Display DIN</td>
-<td>15</td>
-<td>GP11</td>
-<td>SPI1 TX</td>
-</tr>
-<tr>
 <td>Display CS</td>
-<td>12</td>
-<td>GP9</td>
-<td>Chip select</td>
+<td>22</td>
+<td>GP17</td>
+<td>SPI0 CSn</td>
+</tr>
+<tr>
+<td>Display CLK (SCL)</td>
+<td>24</td>
+<td>GP18</td>
+<td>SPI0 SCK</td>
+</tr>
+<tr>
+<td>Display DIN (SDA)</td>
+<td>25</td>
+<td>GP19</td>
+<td>SPI0 TX</td>
 </tr>
 <tr>
 <td>Display DC</td>
-<td>11</td>
-<td>GP8</td>
+<td>26</td>
+<td>GP20</td>
 <td>Data/command</td>
 </tr>
 <tr>
-<td>Display RST</td>
-<td>16</td>
-<td>GP12</td>
+<td>Display RST (RES)</td>
+<td>27</td>
+<td>GP21</td>
 <td>Reset</td>
 </tr>
 <tr>
 <td>Display BUSY</td>
-<td>17</td>
-<td>GP13</td>
+<td>29</td>
+<td>GP22</td>
 <td>Busy flag</td>
 </tr>
 <tr>

@@ -2731,6 +2731,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#rp2350-port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RP2350 port
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#how-it-works" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2746,17 +2757,6 @@
     <span class="md-ellipsis">
       
         DevTool Tab: Pico 2 W OTA
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#current-limitation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Current Limitation
       
     </span>
   </a>
@@ -3681,6 +3681,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#rp2350-port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RP2350 port
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#how-it-works" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3696,17 +3707,6 @@
     <span class="md-ellipsis">
       
         DevTool Tab: Pico 2 W OTA
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#current-limitation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Current Limitation
       
     </span>
   </a>
@@ -4021,34 +4021,44 @@
 </table>
 <hr />
 <h2 id="wifi-ota-via-picowota">WiFi OTA via picowota<a class="headerlink" href="#wifi-ota-via-picowota" title="Permanent link">&para;</a></h2>
-<p>An alternative approach using the <a href="https://github.com/usedbytes/picowota">picowota</a> WiFi bootloader. Currently limited — flash operations don't work on RP2350 hardware. Documented here for reference.</p>
+<p>Wireless firmware updates using the <a href="https://github.com/usedbytes/picowota">picowota</a> WiFi bootloader, <strong>ported to the RP2350 / Pico 2 W</strong>. Flash a combined bootloader+app image once over USB; every update after that goes over WiFi.</p>
+<h3 id="rp2350-port">RP2350 port<a class="headerlink" href="#rp2350-port" title="Permanent link">&para;</a></h3>
+<p>Upstream picowota targets the RP2040. For the Pico 2 W its two linker scripts (<code>standalone.ld</code>, <code>bootloader_shell.ld</code>) were ported to the RP2350 memory map:</p>
+<ul>
+<li><strong>512 KB RAM</strong> with scratch banks at <code>0x20080000</code> / <code>0x20081000</code> (was 264 KB at <code>0x20040000</code>)</li>
+<li><strong>4 MB flash</strong> (<code>FLASH_APP</code> grows to <code>4096k − 364k</code>)</li>
+<li>Added the <strong><code>.embedded_block</code> / IMAGE_DEF</strong> the RP2350 bootrom requires to recognize and enter the image — <em>the</em> fix that makes combined images bootable</li>
+<li><code>boot2</code> relaxed to optional (<code>&lt;= 256</code> bytes); dropped the RP2040 "binary info in first 256 bytes" assert (the M33 vector table is larger)</li>
+</ul>
+<p>The bootloader <strong>must</strong> be built <code>pico2_w</code> (a <code>pico_w</code> build is RP2040 Cortex-M0+ and won't boot on the M33).</p>
 <h3 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Flash the picowota bootloader via USB (once)</li>
-<li>The Pico creates a WiFi network or joins yours</li>
-<li>The DevTool sends firmware over TCP port 4242</li>
-<li>The Pico reboots into the new firmware</li>
+<li>Build a <strong>combined</strong> image — picowota bootloader + dilder-hub app, linked for the RP2350. A single <code>-DPICOWOTA_OTA=ON</code> build emits both <code>picowota_dilder_hub.uf2</code> (USB) and <code>dilder_hub.elf</code> (the standalone OTA payload at <code>0x1005b000</code>).</li>
+<li>Flash the combined <code>.uf2</code> via USB <strong>once</strong>.</li>
+<li>Enter the bootloader: hold <strong>joystick UP at power-on</strong>, pull <strong>GPIO15 low + reset</strong>, or click <strong>Reboot to Bootloader</strong>. (A fresh device with no valid app stays in the bootloader on its own.)</li>
+<li>The DevTool sends the standalone <code>dilder_hub.elf</code> over TCP port 4242.</li>
+<li>The Pico verifies the image CRC and reboots into the new firmware.</li>
 </ol>
 <h3 id="devtool-tab-pico-2-w-ota">DevTool Tab: Pico 2 W OTA<a class="headerlink" href="#devtool-tab-pico-2-w-ota" title="Permanent link">&para;</a></h3>
 <p><strong>Tab 8</strong> provides:</p>
 <ul>
-<li><strong>Bootloader Setup</strong> — install picowota submodule, build with WiFi credentials, flash via USB</li>
-<li><strong>WiFi Configuration</strong> — AP mode (Pico creates network) or STA mode (joins your WiFi). Credentials persist in <code>~/.config/dilder-devtool/ota-settings.json</code></li>
+<li><strong>Bootloader Setup</strong> — install picowota submodule, build the combined image (<code>pico2_w</code>) with your WiFi credentials + Display variant, flash via USB</li>
+<li><strong>WiFi Configuration</strong> — AP mode (Pico creates network) or STA mode (joins your WiFi). The same SSID/password are baked into both the bootloader and the app. Credentials persist in <code>~/.config/dilder-devtool/ota-settings.json</code></li>
 <li><strong>Device Discovery</strong> — probe single IP or scan /24 subnet</li>
-<li><strong>Flash OTA</strong> — firmware list with clean build + OTA flash option</li>
+<li><strong>Flash OTA</strong> — <code>Flash OTA</code> pushes the existing <code>build-ota/dilder_hub.elf</code>; <code>Clean Build &amp; Flash OTA</code> rebuilds the OTA image natively then pushes it</li>
 </ul>
-<h3 id="current-limitation">Current Limitation<a class="headerlink" href="#current-limitation" title="Permanent link">&para;</a></h3>
-<p>The picowota bootloader connects to WiFi successfully on the Pico 2 W (confirmed via router — device appears at 192.168.2.184 as "PicoW"). However, flash ERASE operations return ERR. The RP2040-compatibility-mode build can initialize WiFi (CYW43 chip is identical) but can't write to the RP2350's flash hardware through picowota's abstraction layer.</p>
-<p><strong>Workaround:</strong> Use picotool (Tab 9) instead. picotool works reliably for all flash operations.</p>
+<blockquote>
+<p><strong>Only picowota-integrated apps can be OTA'd</strong> — currently <code>dilder-hub</code>. Other programs link at <code>0x10000000</code> and must be flashed over USB (picotool tab). To make another app OTA-capable, add the <code>-DPICOWOTA_OTA</code> integration block to its <code>CMakeLists.txt</code> like dilder-hub's.</p>
+</blockquote>
 <h3 id="picowota_clientpy">picowota_client.py<a class="headerlink" href="#picowota_clientpy" title="Permanent link">&para;</a></h3>
 <p>A standalone Python TCP client for the picowota protocol, located at <code>tools/devtool/picowota_client.py</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Scan for devices</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python3<span class="w"> </span>picowota_client.py<span class="w"> </span>--scan<span class="w"> </span>--subnet<span class="w"> </span><span class="m">192</span>.168.2<span class="w"> </span>dummy
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Flash firmware</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>python3<span class="w"> </span>picowota_client.py<span class="w"> </span><span class="m">192</span>.168.4.1<span class="w"> </span>firmware.elf
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>python3<span class="w"> </span>picowota_client.py<span class="w"> </span><span class="m">192</span>.168.4.1<span class="w"> </span>dilder_hub.elf
 </span></code></pre></div>
-<p>Supports ELF, UF2, and raw binary files. Implements the full serial-flash protocol: SYNC, INFO, ERASE, WRITE, SEAL, GOTO.</p>
+<p>Supports ELF, UF2, and raw binary files. Implements the full serial-flash protocol: SYNC, INFO, ERASE, WRITE, SEAL, GOGO. It reconstructs the flash image from the ELF's physical addresses, so it pushes the standalone OTA image (linked at <code>0x1005b000</code>), not a normal <code>0x10000000</code> build.</p>
 <hr />
 <h2 id="display-variant-selector">Display Variant Selector<a class="headerlink" href="#display-variant-selector" title="Permanent link">&para;</a></h2>
 <p>The <strong>Display</strong> dropdown in the DevTool's top toolbar selects which e-ink driver variant is compiled:</p>

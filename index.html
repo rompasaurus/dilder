@@ -483,6 +483,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#latest-milestone-the-firmware-comes-alive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Latest Milestone — The Firmware Comes Alive
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-current-build-mk2-translucent-prototype" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3502,6 +3513,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#latest-milestone-the-firmware-comes-alive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Latest Milestone — The Firmware Comes Alive
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-current-build-mk2-translucent-prototype" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3761,6 +3783,35 @@
 </div>
 <p><a class="md-button md-button--primary" href="blog/dilder-full-board-rev1/">Read the full milestone write-up <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
 <hr />
+<h2 id="latest-milestone-the-firmware-comes-alive">Latest Milestone — The Firmware Comes Alive<a class="headerlink" href="#latest-milestone-the-firmware-comes-alive" title="Permanent link">&para;</a></h2>
+<p>The custom <strong>Dilder Board</strong> is running the real firmware, and it grew a brain this month: the octopus <strong>auto-rotates</strong> with the device, <strong>counts your steps</strong>, <strong>remembers your WiFi</strong>, flashes itself <strong>over the air</strong>, and now <strong>pairs to your phone over Bluetooth LE</strong> with a passkey shown right on the e-ink.</p>
+<div class="grid">
+<figure>
+  <img alt="Bare custom Dilder Board — green PCB with Raspberry Pi Pico 2 W, TP4056 charger, solar pads, and the octopus silkscreen reading &quot;Dilder Board&quot;" loading="lazy" src="assets/images/firmware/dilder-custom-pcb-bare.jpg" width="420" />
+<br />
+<figcaption>The custom Dilder Board — Pico 2 W, TP4056 charging, solar pads, USB-C.</figcaption>
+</figure>
+<figure>
+  <img alt="Dilder Board running firmware on the bench — e-ink reads &quot;STOP LOOKING AT ME. STOP IT. I SAID STOP.&quot; with the octopus, clock, and NORMAL mood" loading="lazy" src="assets/images/firmware/dilder-board-running-normal-quote.jpg" width="420" />
+<br />
+<figcaption>Firmware live on the custom board — clock, mood line, and menu prompt.</figcaption>
+</figure>
+</div>
+<div class="grid">
+<figure>
+  <img alt="Dilder Board with joystick on a world map — wide layout showing &quot;I SWEAR THIS OCEAN GETS STUPIDER EVERY DAY.&quot;, ANGRY mood, STEPS 3, and WiFi/Bluetooth/battery status icons" loading="lazy" src="assets/images/firmware/dilder-board-wide-angry-steps.jpg" width="420" />
+<br />
+<figcaption>Wide layout — live step count and the new WiFi / Bluetooth / battery status bar.</figcaption>
+</figure>
+<figure>
+  <img alt="Dilder Board in tall portrait orientation — speech-bubble quote &quot;I KEEP SWIMMING EAST HOPING IT'LL FEEL LIKE HOME EVENTUALLY.&quot; above a HOMESICK octopus, STEPS 4, Bluetooth icon lit" loading="lazy" src="assets/images/firmware/dilder-board-tall-homesick.jpg" width="420" />
+<br />
+<figcaption>Auto-rotated tall "longways" layout — speech bubble, HOMESICK octopus, Bluetooth paired.</figcaption>
+</figure>
+</div>
+<p><strong>This milestone added:</strong> auto-rotating UI (3 orientations) · accelerometer step + activity tracking · saved WiFi with NTP clock · <strong>Bluetooth LE pairing</strong> (passkey-secured, phone-readable mood/steps) · WiFi OTA + buttonless USB reflash · WiFi/BT/battery status icons.</p>
+<p><a class="md-button md-button--primary" href="blog/firmware-comes-alive-bluetooth-pairing-auto-rotate-and-the-custom-dilder-board/">Read the full firmware milestone <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
+<hr />
 <h2 id="the-current-build-mk2-translucent-prototype">The Current Build — Mk2 Translucent Prototype<a class="headerlink" href="#the-current-build-mk2-translucent-prototype" title="Permanent link">&para;</a></h2>
 <p>The latest revision: printed in <strong>natural/clear PETG</strong> so every internal component is visible through the case walls. Running the Conspiratorial Octopus personality on battery power.</p>
 <div class="grid">
@@ -3979,7 +4030,7 @@
 <p class="admonition-title">Phase 2 — Firmware Foundation (C on Pico 2 W) <img alt="🎉" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f389.svg" title=":tada:" /> Full Board Rev 1 Complete</p>
 <p>Phase 1 (hardware + tooling) is complete. The unit is <strong>fully soldered and battery-powered</strong> — running off a 10440 Li-ion cell with USB-C charging via TP4056 confirmed working. Two enclosure variants available: <strong>Solar</strong> (with AK 62x36mm panel) and <strong>NoSolar</strong> (slimmer, USB-only).</p>
 <p><strong><img alt="✨" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2728.svg" title=":sparkles:" /> New milestone:</strong> the <strong>Dilder Full Board Rev 1</strong> is fully designed in KiCad — schematic finalized, 4-layer stackup configured, board routed end-to-end, and the 3D preview verified. Every component the case carries now lives on a single PCB.</p>
-<p><strong>Done:</strong> Runtime rendering engine | 16 emotions | Body animations | Custom fat/lazy bodies | 823 quotes | C-faithful preview renderer | DevTool with firmware size estimation | <strong>GPIO joystick input</strong> | On-screen input indicator | <strong>Soldered unit</strong> | <strong>Battery power</strong> | <strong>USB-C charging</strong> | <strong>NoSolar variant</strong> | <strong>Mk2 translucent case</strong> | <strong>Joystick PCB from JLCPCB</strong> | <strong>V4 display driver (two-pass partial refresh)</strong> | <strong>Firmware version system (v0.5.4)</strong> | <strong>KiCad pin swap fix</strong> | <strong><img alt="⭐" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2b50.svg" title=":star:" /> Full Board Rev 1 schematic + 4-layer routed PCB</strong></p>
+<p><strong>Done:</strong> Runtime rendering engine | 16 emotions | Body animations | Custom fat/lazy bodies | 823 quotes | C-faithful preview renderer | DevTool with firmware size estimation | <strong>GPIO joystick input</strong> | On-screen input indicator | <strong>Soldered unit</strong> | <strong>Battery power</strong> | <strong>USB-C charging</strong> | <strong>NoSolar variant</strong> | <strong>Mk2 translucent case</strong> | <strong>Joystick PCB from JLCPCB</strong> | <strong>V4 display driver (two-pass partial refresh)</strong> | <strong>Firmware version system (v0.5.4)</strong> | <strong>KiCad pin swap fix</strong> | <strong><img alt="⭐" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2b50.svg" title=":star:" /> Full Board Rev 1 schematic + 4-layer routed PCB</strong> | <strong>Custom Dilder Board bring-up</strong> | <strong>Accelerometer (SC7A20)</strong> | <strong>Auto-rotating UI (3 orientations + tall layout)</strong> | <strong>Step / activity tracker</strong> | <strong>Saved WiFi + NTP clock</strong> | <strong>WiFi OTA (picowota → RP2350)</strong> | <strong>Bluetooth LE pairing (passkey)</strong> | <strong>WiFi/BT/battery status icons</strong></p>
 <p><strong>In Progress:</strong> V4 partial refresh tuning (blacks slightly washed vs V3). Awaiting first batch of Full Board Rev 1 bare PCBs from fab.</p>
 <p><strong>Next:</strong> <strong>Order Full Board Rev 1 from JLCPCB</strong> <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span> <strong>Solder the extended components onto the bare board</strong> (USB-C, TP4056, IMU, slide switch, decoupling caps) <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span> <strong>Design a new FreeCAD case based on the Full Board measurements</strong> — slimmer, no more internal channels for module wiring | Wire up piezo speaker | Implement menu system | Battery life benchmarks</p>
 </div>
