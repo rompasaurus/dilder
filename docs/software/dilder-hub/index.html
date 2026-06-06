@@ -3834,7 +3834,11 @@
 </tr>
 <tr>
 <td><strong>Bluetooth LE</strong></td>
-<td>BTstack peripheral "Dilder Hub" — <strong>passkey pairing</strong> (6-digit code on e-ink, MITM-protected) + custom GATT service exposing live mood/steps and a phone command byte</td>
+<td>BTstack peripheral "Dilder Hub" — <strong>passkey pairing</strong> (6-digit code on e-ink, MITM-protected) + custom GATT service exposing live mood/steps and a phone command byte. <strong>OFF by default; CENTER on the Bluetooth screen enables/disables the radio</strong> to save power</td>
+</tr>
+<tr>
+<td><strong>Power Saving</strong></td>
+<td><strong>Pocket / idle screen freeze</strong> — the accelerometer stops e-ink redraws after ~30 s of stillness (or immediately when laid face-down); the frozen image holds at zero power and any motion or button press wakes it. Bluetooth fully powers off when disabled</td>
 </tr>
 <tr>
 <td><strong>WiFi OTA</strong></td>
