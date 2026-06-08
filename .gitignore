@@ -33,6 +33,12 @@ dev-setup/*/lwipopts.h
 # Keep hello-world/lib as the shared source (not a symlink)
 !dev-setup/hello-world/lib/
 !dev-setup/hello-world/pico_sdk_import.cmake
+# dilder-hub-rtos is a SELF-CONTAINED teaching codebase: it keeps its own copy of
+# the Waveshare lib (we modify the e-ink driver for the BUSY interrupt) and its
+# RTOS-specific lwipopts.h / SDK import shim. Commit all of them.
+!dev-setup/dilder-hub-rtos/lib/
+!dev-setup/dilder-hub-rtos/lwipopts.h
+!dev-setup/dilder-hub-rtos/pico_sdk_import.cmake
 
 # ─── Credentials & user config ───
 # WiFi credentials — never commit real passwords
