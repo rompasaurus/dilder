@@ -12,13 +12,11 @@
         <meta name="author" content="rompasaurus">
       
       
-        <link rel="canonical" href="https://dilder.dev/blog/engagement-plan/">
+        <link rel="canonical" href="https://dilder.dev/blog/rtos-rewrite-social-emotes/">
       
       
-        <link rel="prev" href="../hardware-arrives/">
+        <link rel="prev" href="../firmware-comes-alive-bluetooth-pairing-auto-rotate-and-the-custom-dilder-board/">
       
-      
-        <link rel="next" href="../joystick-first-input/">
       
       
         
@@ -29,7 +27,7 @@
     
     
       
-        <title>The User Engagement Plan — Making Dilder Feel Alive - Dilder</title>
+        <title>Dilder Goes Real-Time: FreeRTOS, Dilder-to-Dilder Hellos, and a BUSY-Line Whodunit - Dilder</title>
       
     
     
@@ -92,7 +90,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-user-engagement-plan-making-dilder-feel-alive" class="md-skip">
+        <a href="#dilder-goes-real-time-freertos-dilder-to-dilder-hellos-and-a-busy-line-whodunit" class="md-skip">
           Skip to content
         </a>
       
@@ -125,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              The User Engagement Plan — Making Dilder Feel Alive
+              Dilder Goes Real-Time: FreeRTOS, Dilder-to-Dilder Hellos, and a BUSY-Line Whodunit
             
           </span>
         </div>
@@ -3272,10 +3270,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#beyond-the-tamagotchi" class="md-nav__link">
+  <a href="#why-rewrite-it-at-all" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Beyond the Tamagotchi
+        Why rewrite it at all?
       
     </span>
   </a>
@@ -3283,10 +3281,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-stat-system" class="md-nav__link">
+  <a href="#dilders-can-say-hello-now" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Stat System
+        Dilders can say hello now 🐙👋
       
     </span>
   </a>
@@ -3294,10 +3292,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sensor-driven-emotions" class="md-nav__link">
+  <a href="#the-input-trick-pace-the-buttons-to-the-screen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sensor-Driven Emotions
+        The input trick: pace the buttons to the screen
       
     </span>
   </a>
@@ -3305,10 +3303,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#life-stages-and-evolution" class="md-nav__link">
+  <a href="#the-busy-line-whodunit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Life Stages and Evolution
+        The BUSY-line whodunit 🔎
       
     </span>
   </a>
@@ -3316,10 +3314,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#treasure-hunts" class="md-nav__link">
+  <a href="#also-in-this-drop" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Treasure Hunts
+        Also in this drop
       
     </span>
   </a>
@@ -3327,32 +3325,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-targets-and-streaks" class="md-nav__link">
+  <a href="#where-this-leaves-us" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step Targets and Streaks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-research-behind-it" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The Research Behind It
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's Next
+        Where this leaves us
       
     </span>
   </a>
@@ -3415,7 +3391,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2026-04-13 00:00:00+00:00" class="md-ellipsis">April 13, 2026</time>
+                        <time datetime="2026-06-09 00:00:00+00:00" class="md-ellipsis">June 9, 2026</time>
                       </div>
                     </li>
                     
@@ -3426,8 +3402,9 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../category/planning/">Planning</a>, 
-                              <a href="../category/software/">Software</a></span>
+                              <a href="../category/firmware/">Firmware</a>, 
+                              <a href="../category/rtos/">RTOS</a>, 
+                              <a href="../category/milestone/">Milestone</a></span>
                         </div>
                       </li>
                     
@@ -3438,7 +3415,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              3 min read
+                              5 min read
                             
                           </span>
                         </div>
@@ -3465,125 +3442,56 @@
   
 
 
-<h1 id="the-user-engagement-plan-making-dilder-feel-alive">The User Engagement Plan — Making Dilder Feel Alive<a class="headerlink" href="#the-user-engagement-plan-making-dilder-feel-alive" title="Permanent link">&para;</a></h1>
-<p>What makes a virtual pet worth carrying around? Not the hardware. Not the display. It's the feeling that something in your pocket needs you — and that it notices when you're there. The user engagement plan is the design document for that feeling.</p>
+<h1 id="dilder-goes-real-time-freertos-dilder-to-dilder-hellos-and-a-busy-line-whodunit">Dilder Goes Real-Time: FreeRTOS, Dilder-to-Dilder Hellos, and a BUSY-Line Whodunit<a class="headerlink" href="#dilder-goes-real-time-freertos-dilder-to-dilder-hellos-and-a-busy-line-whodunit" title="Permanent link">&para;</a></h1>
+<p>The Dilder firmware grew up this month. It moved off a single bare-metal super-loop and onto <strong>FreeRTOS running on both cores</strong> of the RP2350, learned how to <strong>wave hello to other Dilders in the wild</strong>, got a proper <strong>emote system</strong>, and — along the way — taught us to read a board's health from a single line of serial output while chasing down three "dead" units that turned out to be very much alive.</p>
 <!-- more -->
 
-<h2 id="beyond-the-tamagotchi">Beyond the Tamagotchi<a class="headerlink" href="#beyond-the-tamagotchi" title="Permanent link">&para;</a></h2>
-<p>The original Tamagotchi had a simple loop: stats decay, you feed/clean/play, the pet grows. It worked because the obligation was real — neglect it and it dies. But it was also frustrating. Miss an afternoon and your pet is gone.</p>
-<p>Dilder takes a different approach: <strong>no permanent death, but real consequences.</strong> Neglect makes the octopus visibly suffer (sad, hungry, homesick), but recovery is always possible. The goal is the sweet spot between Tamagotchi's harshness and modern apps' toothlessness.</p>
-<h2 id="the-stat-system">The Stat System<a class="headerlink" href="#the-stat-system" title="Permanent link">&para;</a></h2>
-<p>Five primary stats decay in real time:</p>
-<table>
-<thead>
-<tr>
-<th>Stat</th>
-<th>Decay Rate</th>
-<th>Refill</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Hunger</td>
-<td>-1 / 10 min</td>
-<td>Feed action</td>
-</tr>
-<tr>
-<td>Happiness</td>
-<td>-1 / 15 min</td>
-<td>Pet, play, walk</td>
-</tr>
-<tr>
-<td>Energy</td>
-<td>-1 / 12 min</td>
-<td>Sleep</td>
-</tr>
-<tr>
-<td>Hygiene</td>
-<td>-1 / 30 min</td>
-<td>Clean action</td>
-</tr>
-<tr>
-<td>Health</td>
-<td>Static unless neglected</td>
-<td>Maintain other stats</td>
-</tr>
-</tbody>
-</table>
-<p>Plus secondary stats that accumulate over time: Bond Level, Discipline, Intelligence, Fitness, Exploration. These drive evolution paths and unlock features.</p>
-<h2 id="sensor-driven-emotions">Sensor-Driven Emotions<a class="headerlink" href="#sensor-driven-emotions" title="Permanent link">&para;</a></h2>
-<p>This is where Dilder diverges from every other virtual pet. The 16 emotional states aren't just driven by stats — they respond to the <strong>physical world</strong> through sensors:</p>
+<h2 id="why-rewrite-it-at-all">Why rewrite it at all?<a class="headerlink" href="#why-rewrite-it-at-all" title="Permanent link">&para;</a></h2>
+<p>The old firmware was one big loop: animate the octopus, poll the joystick, refresh the e-ink, repeat. The problem is that an e-ink refresh <strong>takes about 700 ms</strong>, and during that whole time the loop couldn't do anything else — including notice that you pressed a button. Inputs felt mushy, and the longer the screen took, the worse it got.</p>
+<p>The fix is the classic real-time-systems move: <strong>stop doing slow things on the same thread as responsive things.</strong> So the firmware was rebuilt on <strong>FreeRTOS in dual-core SMP mode</strong>:</p>
 <ul>
-<li><strong>Bright light</strong> wakes the octopus up, <strong>darkness</strong> triggers sleep</li>
-<li><strong>Loud noise</strong> startles it, <strong>sustained silence</strong> makes it lonely</li>
-<li><strong>Gentle touch</strong> (capacitive pads) boosts happiness</li>
-<li><strong>Walking</strong> (accelerometer) builds fitness and triggers adventure mode</li>
-<li><strong>Temperature drops</strong> make it shiver, <strong>humidity</strong> makes it happy (it's an octopus)</li>
+<li><strong>Core 1</strong> does nothing but drive the e-ink display.</li>
+<li><strong>Core 0</strong> runs everything else — input, the UI/state machine, and a housekeeping task for sensors and battery.</li>
 </ul>
-<p>The emotion engine blends all these inputs: <code>EMOTION = f(stats, sensors, recent_events, personality)</code>. Transitions aren't instant — emotions fade between states over 2-3 animation frames.</p>
-<h2 id="life-stages-and-evolution">Life Stages and Evolution<a class="headerlink" href="#life-stages-and-evolution" title="Permanent link">&para;</a></h2>
-<p>Dilder grows through six life stages over 30+ real days:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>EGG (day 0-1) → HATCHLING (1-3) → JUVENILE (3-7)
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>→ ADOLESCENT (7-14) → ADULT (14-30) → ELDER (30+)
-</span></code></pre></div>
-<p>The adult form depends on how the pet was raised. High intelligence + high bond = <strong>Deep-Sea Scholar</strong> (glasses, philosophical quotes). High fitness + exploration = <strong>Reef Guardian</strong> (muscular, encouraging). Low discipline + chaos = <strong>Tidal Trickster</strong> (jester hat, unpredictable).</p>
-<p>Six distinct adult forms, each with unique visuals and dialogue. The evolution is fully deterministic — your care choices create the outcome, not random chance.</p>
-<h2 id="treasure-hunts">Treasure Hunts<a class="headerlink" href="#treasure-hunts" title="Permanent link">&para;</a></h2>
-<p>With a GPS module (Phase 4B), Dilder generates real-world treasure hunts. Virtual "gifts" are placed at GPS coordinates within walking distance. The e-ink display shows a compass bearing and distance — turn the device into a pirate treasure map.</p>
-<p>Treasures range from common (60% — snack items) to mythic (&lt;1% — one-of-a-kind cosmetics). They spawn based on step milestones, new locations, and life stage transitions. Hunts expire after 24 hours, creating urgency without punishment.</p>
-<h2 id="step-targets-and-streaks">Step Targets and Streaks<a class="headerlink" href="#step-targets-and-streaks" title="Permanent link">&para;</a></h2>
-<p>Daily step milestones drive both rewards and mood:</p>
-<table>
-<thead>
-<tr>
-<th>Target</th>
-<th>Steps</th>
-<th>Effect</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Bronze</td>
-<td>2,000</td>
-<td>+10 XP, happy octopus</td>
-</tr>
-<tr>
-<td>Silver</td>
-<td>5,000</td>
-<td>+25 XP, bonus snack</td>
-</tr>
-<tr>
-<td>Gold</td>
-<td>8,000</td>
-<td>+50 XP, cosmetic chance</td>
-</tr>
-<tr>
-<td>Platinum</td>
-<td>12,000</td>
-<td>+100 XP, guaranteed cosmetic</td>
-</tr>
-<tr>
-<td>Diamond</td>
-<td>20,000</td>
-<td>Full stat restore, rare cosmetic</td>
-</tr>
-</tbody>
-</table>
-<p>Weekly and monthly targets stack on top. A 30-day streak earns a +750 XP bond boost and an exclusive cosmetic. One free miss per week prevents frustration from sick days or travel.</p>
-<h2 id="the-research-behind-it">The Research Behind It<a class="headerlink" href="#the-research-behind-it" title="Permanent link">&para;</a></h2>
-<p>The engagement plan is backed by research into 10+ virtual pet and activity games:</p>
+<p>The slow screen refresh now happens <em>beside</em> the rest of the device instead of <em>blocking</em> it. Buttons stay responsive even mid-refresh, and the architecture has room to grow.</p>
+<h2 id="dilders-can-say-hello-now">Dilders can say hello now 🐙👋<a class="headerlink" href="#dilders-can-say-hello-now" title="Permanent link">&para;</a></h2>
+<p>The headline feature: <strong>proximity social</strong>. Turn on scanning in the new <strong>Social</strong> menu, and when another Dilder comes into Bluetooth range, yours pipes up — <em>"A DILDER APPEARS IN THE WILD! Say hi?"</em></p>
+<p>Say yes and you pick an <strong>emote</strong> to send. The octopus stays on screen and <strong>acts it out</strong>:</p>
 <ul>
-<li><strong>Tamagotchi</strong> — deterministic evolution, care mistakes, stat decay rates (reverse-engineered from community documentation)</li>
-<li><strong>Digimon</strong> — battle-based evolution (adapted as activity-based)</li>
-<li><strong>Pokemon GO</strong> — step tracking, adventure sync, weekly rewards</li>
-<li><strong>Pikmin Bloom</strong> — location-type cosmetics, ambient engagement</li>
-<li><strong>Finch</strong> — real-world activity as pet nurturing (the closest modern analogue)</li>
-<li><strong>Creatures</strong> — neural networks and artificial biochemistry (inspiration for emergent behavior)</li>
-<li><strong>Nintendogs</strong> — touch and voice interaction patterns</li>
+<li><strong>WAVE</strong> — a little hand waves back and forth</li>
+<li><strong>LOVE</strong> — hearts float up</li>
+<li><strong>LAUGH</strong> — "HAHA" bounces</li>
+<li><strong>PARTY</strong> — music notes bob</li>
+<li><strong>SLEEPY</strong> — "Z z z" stacks up</li>
+<li><strong>WHOA</strong> — "!!!"</li>
 </ul>
-<h2 id="whats-next">What's Next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
-<p>The engagement plan is the design document — implementation starts with Phase 3A (core game loop: stats, decay, care actions, emotion resolution). Sensor integration follows in Phase 3B-3C.</p>
-<p>The full document is published on the <a href="https://dilder.dev/docs/design/user-engagement-plan/">Design docs page</a> — 21 sections, from gameplay loops to hardware sensor specs to a phased rollout plan.</p>
+<p>The other Dilder sees your emote performed on <em>its</em> octopus, with a caption, and gets a menu to respond. If you both spot each other at the same instant, whoever fires first wins and the other's screen flips from "say hi?" to "…says hello!" — the race is handled.</p>
+<p>Every Dilder gets an auto-generated, gloriously stupid name derived from a random ID (think <em>Unhinged Trashpanda</em> or <em>Soggy Noodle</em>), so the names are consistent everywhere without ever being transmitted. There's a <strong>Dilders Met</strong> log, a 24-hour re-greet cooldown so it never spams, and you can re-roll your own name in the menu.</p>
+<p>The clever part under the hood: the whole exchange is <strong>connectionless</strong>. Instead of pairing and connecting (which two Dilders can't do — neither can type the other's passkey), each Dilder simply <strong>broadcasts</strong> a tiny beacon in its Bluetooth advertisement, with a "directed emote" field aimed at a specific ID for ~15 seconds. The other one sees it while scanning. No pairing, no connection, and it never touches the secure phone-pairing path. It also gracefully handles the other Dilder wandering out of range mid-greeting.</p>
+<h2 id="the-input-trick-pace-the-buttons-to-the-screen">The input trick: pace the buttons to the screen<a class="headerlink" href="#the-input-trick-pace-the-buttons-to-the-screen" title="Permanent link">&para;</a></h2>
+<p>E-ink is slow, so a held or mashed button used to pile up a backlog of "ghost" presses that all fired after the refresh finished — you'd tap once and the menu would jump three items.</p>
+<p>The neat fix: <strong>pace input to the display itself.</strong> The firmware already knows exactly when the panel is busy (a frame is in flight) versus idle. So now a press fires <strong>instantly when the screen is idle</strong>, a mash <em>during</em> a refresh <strong>collapses into one move</strong>, and <strong>holding a direction scrolls at exactly the panel's real refresh rate</strong> — never faster, never backed up. No magic timeout; the response time tunes itself to the hardware.</p>
+<h2 id="the-busy-line-whodunit">The BUSY-line whodunit 🔎<a class="headerlink" href="#the-busy-line-whodunit" title="Permanent link">&para;</a></h2>
+<p>Then three units "died." Snow on the screen, refusing to boot — but they'd still accept a firmware flash just fine. Was it the battery? Over-discharge? The missing accelerometer? A fried board?</p>
+<p>The serial log cracked it in one line. A healthy e-ink refresh logs <strong>~700 ms</strong>. The dead units logged:</p>
+<ul>
+<li><strong>~21 ms</strong> on two of them, and</li>
+<li><strong>~5000 ms</strong> (or nothing at all) on the third.</li>
+</ul>
+<p>That's the <strong>BUSY signal</strong> — the wire the display uses to say "I'm still drawing." If it never asserts, the refresh "finishes" in 21 ms having drawn nothing (snow). If it's stuck on, the driver waits forever (freeze). Both point at one pin: <strong>the e-ink BUSY line on a hand-soldered 2×4 header</strong>, where BUSY sits in a corner right next to a data pin and a power pin — exactly where a sloppy iron leaves a solder bridge or a cold joint.</p>
+<p>So: <strong>not the silicon.</strong> The boards, flash, and firmware were all fine. Three display-connection faults from the same assembly step. The cure is a soldering-iron, not a landfill.</p>
+<p>The whole adventure left the firmware tougher, too. We added <strong>timeouts</strong> to the things that can hang on bad hardware — the accelerometer I²C probe and the e-ink BUSY wait — so a missing sensor or a stuck panel can <strong>never freeze the device at boot</strong> again. It degrades to a diagnosable state instead of bricking. And the refresh-time reading became a one-glance health meter:</p>
+<blockquote>
+<p><strong>~700 ms = healthy · ~20 ms = BUSY open/dead · ~5 s = BUSY stuck.</strong></p>
+</blockquote>
+<h2 id="also-in-this-drop">Also in this drop<a class="headerlink" href="#also-in-this-drop" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Battery gauge</strong> reworked to a load-aware <strong>peak-hold + smoothing</strong> reading (e-ink and the radio sag the rail; the peak across a window tracks the true resting voltage), with <strong>no calibration ritual</strong> required.</li>
+<li>A hard look at the <strong>charging path</strong> turned up the real Rev 1 power flaw — the running load hangs on the battery node with no power-path, so the radio can <strong>starve the charger</strong>. That's now a blocking requirement for the Rev 2 board (true load-sharing + reverse-polarity protection + a keyed connector).</li>
+<li>New <strong>Social</strong> status icon, every new screen works in <strong>both screen orientations</strong>, and the DevTool gained a <strong>Full Erase</strong> button to recover flash-corrupted units.</li>
+</ul>
+<h2 id="where-this-leaves-us">Where this leaves us<a class="headerlink" href="#where-this-leaves-us" title="Permanent link">&para;</a></h2>
+<p>Dilder is now a real-time, multi-core, <em>social</em> device — and considerably harder to brick. Two Dilders in the same room can wave at each other. The next time you see snow on an e-ink screen, check the refresh time before you blame the chip. 🐙</p>
 
 
 
@@ -3630,7 +3538,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../hardware-arrives/" class="md-footer__link md-footer__link--prev" aria-label="Previous: New Hardware: Joystick Module and LiPo Battery">
+          <a href="../firmware-comes-alive-bluetooth-pairing-auto-rotate-and-the-custom-dilder-board/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Firmware Comes Alive: Bluetooth Pairing, Auto-Rotate, and the Custom Dilder Board">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3640,27 +3548,11 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                New Hardware: Joystick Module and LiPo Battery
+                Firmware Comes Alive: Bluetooth Pairing, Auto-Rotate, and the Custom Dilder Board
               </div>
             </div>
           </a>
         
-        
-          
-          <a href="../joystick-first-input/" class="md-footer__link md-footer__link--next" aria-label="Next: First Real Input — Joystick Wired, Octopus Responds">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                First Real Input — Joystick Wired, Octopus Responds
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
         
       </nav>
     

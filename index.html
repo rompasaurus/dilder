@@ -483,10 +483,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#latest-milestone-the-firmware-comes-alive" class="md-nav__link">
+  <a href="#latest-milestone-dilder-goes-real-time-and-social" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Latest Milestone — The Firmware Comes Alive
+        Latest Milestone — Dilder Goes Real-Time (and Social)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#milestone-the-firmware-comes-alive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Milestone — The Firmware Comes Alive
       
     </span>
   </a>
@@ -1440,6 +1451,36 @@
     
   
     Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="blog/category/rtos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RTOS
   
 
     
@@ -3513,10 +3554,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#latest-milestone-the-firmware-comes-alive" class="md-nav__link">
+  <a href="#latest-milestone-dilder-goes-real-time-and-social" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Latest Milestone — The Firmware Comes Alive
+        Latest Milestone — Dilder Goes Real-Time (and Social)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#milestone-the-firmware-comes-alive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Milestone — The Firmware Comes Alive
       
     </span>
   </a>
@@ -3783,7 +3835,13 @@
 </div>
 <p><a class="md-button md-button--primary" href="blog/dilder-full-board-rev1/">Read the full milestone write-up <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
 <hr />
-<h2 id="latest-milestone-the-firmware-comes-alive">Latest Milestone — The Firmware Comes Alive<a class="headerlink" href="#latest-milestone-the-firmware-comes-alive" title="Permanent link">&para;</a></h2>
+<h2 id="latest-milestone-dilder-goes-real-time-and-social">Latest Milestone — Dilder Goes Real-Time (and Social)<a class="headerlink" href="#latest-milestone-dilder-goes-real-time-and-social" title="Permanent link">&para;</a></h2>
+<p>The firmware moved off its single bare-metal loop onto <strong>FreeRTOS across both cores</strong> of the RP2350 — the slow e-ink refresh now lives on its own core so buttons stay snappy. And the big new trick: <strong>Dilders can find each other.</strong> Turn on the new <strong>Social</strong> mode and when another Dilder comes into Bluetooth range, your octopus pipes up — <em>"A Dilder appears in the wild! Say hi?"</em> — then <strong>acts out an emote</strong> (wave, hearts, laugh, party, sleepy, whoa) that the other Dilder performs on its own screen.</p>
+<p>It's all <strong>connectionless</strong> (a beacon broadcast, no pairing), every Dilder gets a gloriously dumb auto-name (<em>Unhinged Trashpanda</em>, anyone?), and there's a <strong>Dilders Met</strong> log with a 24-hour re-greet cooldown. Under the hood: input now <strong>paces itself to the display</strong> (no more ghost presses), the battery gauge is load-aware, and a field-debugging saga traced three "dead" units to <strong>e-ink BUSY-line solder joints</strong> — not the silicon — which led to hang-proof timeouts on the accelerometer and display drivers.</p>
+<p><strong>This milestone added:</strong> FreeRTOS dual-core SMP rewrite · <strong>Dilder-to-Dilder proximity hellos + emotes</strong> (octopus animations) · Social menu, scan-nearby, met-log · display-paced input (no ghost presses) · load-aware battery reading · I²C + e-ink <strong>timeouts</strong> (no more boot hangs on bad hardware) · DevTool Full Erase recovery.</p>
+<p><a class="md-button md-button--primary" href="blog/rtos-rewrite-social-emotes/">Read the full RTOS + social milestone <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg></span></a></p>
+<hr />
+<h2 id="milestone-the-firmware-comes-alive">Milestone — The Firmware Comes Alive<a class="headerlink" href="#milestone-the-firmware-comes-alive" title="Permanent link">&para;</a></h2>
 <p>The custom <strong>Dilder Board</strong> is running the real firmware, and it grew a brain this month: the octopus <strong>auto-rotates</strong> with the device, <strong>counts your steps</strong>, <strong>remembers your WiFi</strong>, flashes itself <strong>over the air</strong>, and now <strong>pairs to your phone over Bluetooth LE</strong> with a passkey shown right on the e-ink.</p>
 <div class="grid">
 <figure>

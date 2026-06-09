@@ -209,6 +209,10 @@
          <lastmod>2026-06-09</lastmod>
     </url>
     <url>
+         <loc>https://dilder.dev/blog/rtos-rewrite-social-emotes/</loc>
+         <lastmod>2026-06-09</lastmod>
+    </url>
+    <url>
          <loc>https://dilder.dev/blog/runtime-rendering-revolution/</loc>
          <lastmod>2026-06-09</lastmod>
     </url>
@@ -417,6 +421,18 @@
          <lastmod>2026-06-09</lastmod>
     </url>
     <url>
+         <loc>https://dilder.dev/blog/category/firmware/</loc>
+         <lastmod>2026-06-09</lastmod>
+    </url>
+    <url>
+         <loc>https://dilder.dev/blog/category/rtos/</loc>
+         <lastmod>2026-06-09</lastmod>
+    </url>
+    <url>
+         <loc>https://dilder.dev/blog/category/milestone/</loc>
+         <lastmod>2026-06-09</lastmod>
+    </url>
+    <url>
          <loc>https://dilder.dev/blog/category/software/</loc>
          <lastmod>2026-06-09</lastmod>
     </url>
@@ -430,14 +446,6 @@
     </url>
     <url>
          <loc>https://dilder.dev/blog/category/kicad/</loc>
-         <lastmod>2026-06-09</lastmod>
-    </url>
-    <url>
-         <loc>https://dilder.dev/blog/category/milestone/</loc>
-         <lastmod>2026-06-09</lastmod>
-    </url>
-    <url>
-         <loc>https://dilder.dev/blog/category/firmware/</loc>
          <lastmod>2026-06-09</lastmod>
     </url>
     <url>
