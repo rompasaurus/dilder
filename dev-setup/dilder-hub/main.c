@@ -1907,37 +1907,52 @@ static void init_rtc_from_compile_time(void) {
  *     to a VSYS threshold. */
 static bool battery_adc_ready = false;
 
-/* Multiply VSYS reading by this to calibrate out ADC-ref / divider tolerance.
- * 1.0 = no correction. If the % is consistently off, measure the pack with a
- * meter and set this to (meter_volts / reported_volts). */
+/* Board-level fixed correction (ADC-ref / divider tolerance). Compile-time.
+ * On top of this sits g_vsys_cal — a flash-persisted runtime trim the user
+ * calibrates ON-DEVICE from the Device Info screen (UP = "battery is full →
+ * treat this reading as 4.20 V"). One-point calibration corrects the common
+ * Pico W systematic low VSYS read that pegs a full pack at ~2 bars. */
 #ifndef VSYS_CAL
 #define VSYS_CAL 1.0f
 #endif
+static float g_vsys_cal = 1.0f;        /* persisted runtime calibration trim */
 
 static void battery_init(void) {
     adc_gpio_init(29);          /* disable digital pulls on ADC3 */
     battery_adc_ready = true;
 }
 
-static float read_vsys_volts(void) {
+/* Uncalibrated VSYS (battery) voltage — raw divider math + board VSYS_CAL only. */
+static float read_vsys_raw_volts(void) {
     if (!battery_adc_ready) battery_init();
 
     /* GPIO 29 is shared with CYW43 SPI — lock it out while we read */
     cyw43_thread_enter();
-
     adc_gpio_init(29);              /* reclaim pin as ADC input */
     adc_select_input(3);            /* ADC3 = GP29 = VSYS/3 */
-    uint32_t acc = 0;
-    const int N = 32;
-    for (int i = 0; i < N; i++) acc += adc_read();
-
+    uint16_t s[48];
+    const int N = 48;
+    for (int i = 0; i < N; i++) s[i] = (uint16_t)adc_read();
     cyw43_thread_exit();
 
-    float raw = (float)acc / (float)N;
-    /* 3:1 divider, 3.3 V ADC ref. VSYS_CAL corrects for ADC-ref / divider
-     * tolerance — measure the battery with a multimeter and set this to
-     * (actual_volts / reported_volts) if the reading is consistently off. */
+    /* Trimmed mean: sort, drop the lowest/highest 25%, average the middle —
+     * shrugs off the CYW43-SPI switching noise coupled onto the shared pin. */
+    for (int i = 1; i < N; i++) {
+        uint16_t v = s[i]; int j = i - 1;
+        while (j >= 0 && s[j] > v) { s[j + 1] = s[j]; j--; }
+        s[j + 1] = v;
+    }
+    uint32_t acc = 0; int lo = N / 4, hi = N - N / 4, cnt = 0;
+    for (int i = lo; i < hi; i++) { acc += s[i]; cnt++; }
+    float raw = (float)acc / (float)cnt;
+
+    /* 3:1 divider, 3.3 V ADC ref. */
     return raw * 3.3f / 4095.0f * 3.0f * VSYS_CAL;
+}
+
+/* Calibrated VSYS (battery) voltage. */
+static float read_vsys_volts(void) {
+    return read_vsys_raw_volts() * g_vsys_cal;
 }
 
 static bool is_usb_powered(void) {
@@ -2202,7 +2217,9 @@ static void render_text_tall(const char *title, const char *const *lines, int n)
 #define MAX_SAVED     8
 #define SAVED_FLASH_OFFSET  (PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE)
 typedef struct { char ssid[33]; char pass[64]; } saved_net_t;
-typedef struct { uint32_t magic, count; saved_net_t nets[MAX_SAVED]; } saved_store_t;
+/* vsys_cal appended at the END so older flash images (which lack it) stay
+ * loadable — the trailing bytes read as 0xFF→NaN and are reset to 1.0. */
+typedef struct { uint32_t magic, count; saved_net_t nets[MAX_SAVED]; float vsys_cal; } saved_store_t;
 static saved_store_t g_saved;
 static const char *saved_find_pass(const char *ssid);   /* fwd (used in handlers) */
 
@@ -2394,20 +2411,24 @@ static void render_sound_menu(int sel) {
 
 /* ─── Draw device info screen ─── */
 static void render_info_screen(void) {
+    int   pct  = read_battery_percent();
+    float vsys = read_vsys_volts();
+
     if (orientation_is_tall()) {
-        static char L[7][40]; static const char *lp[7]; int n = 0;
+        static char L[9][40]; static const char *lp[9]; int n = 0;
         datetime_t t; rtc_get_datetime(&t);
         int h = t.hour % 12; if (h == 0) h = 12;
-        int pct = read_battery_percent();
         snprintf(L[n], 40, "FW V%s", DILDER_VERSION); lp[n] = L[n]; n++;
         snprintf(L[n], 40, "DISP %s", DISPLAY_NAME); lp[n] = L[n]; n++;
         snprintf(L[n], 40, "%s %d %d:%02d%s", month_names[t.month - 1], t.day,
                  h, t.min, t.hour < 12 ? "A" : "P"); lp[n] = L[n]; n++;
         snprintf(L[n], 40, "MOOD %s", current_mood < 0 ? "ALL" : mood_names[current_mood]); lp[n] = L[n]; n++;
-        snprintf(L[n], 40, "QUOTES %d", QUOTE_COUNT); lp[n] = L[n]; n++;
         snprintf(L[n], 40, "WIFI %s", wifi_connected ? wifi_ip_str : "OFF"); lp[n] = L[n]; n++;
-        if (pct < 0) snprintf(L[n], 40, "POWER USB"); else snprintf(L[n], 40, "BATT %d%%", pct);
+        if (pct < 0) snprintf(L[n], 40, "USB %.2fV", (double)vsys);
+        else         snprintf(L[n], 40, "BATT %d%% %.2fV", pct, (double)vsys);
         lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "CAL x%.3f", (double)g_vsys_cal); lp[n] = L[n]; n++;
+        snprintf(L[n], 40, "UP:CAL FULL=4.2"); lp[n] = L[n]; n++;
         render_text_tall("DEVICE INFO", lp, n);
         return;
     }
@@ -2437,18 +2458,18 @@ static void render_info_screen(void) {
     snprintf(buf, sizeof(buf), "WIFI: %s", wifi_connected ? wifi_ip_str : "OFF");
     draw_text(10, y, buf, IMG_W); y += 11;
 
-    /* Battery / power status */
-    int pct = read_battery_percent();
-    float vsys = read_vsys_volts();
+    /* Battery / power status — show the live voltage to 2 decimals + cal trim. */
     if (pct < 0) {
-        snprintf(buf, sizeof(buf), "POWER: USB (%.1fV)", (double)vsys);
+        snprintf(buf, sizeof(buf), "POWER: USB  %.2fV  (CAL x%.3f)",
+                 (double)vsys, (double)g_vsys_cal);
     } else {
-        snprintf(buf, sizeof(buf), "BATTERY: %d%% (%.1fV)", pct, (double)vsys);
+        snprintf(buf, sizeof(buf), "BATTERY: %d%%  %.2fV  (CAL x%.3f)",
+                 pct, (double)vsys, (double)g_vsys_cal);
     }
     draw_text(10, y, buf, IMG_W); y += 11;
 
-    draw_text(10, 110, "PICO 2 W  RP2350", IMG_W);
-    draw_text(175, 110, "LEFT:BACK", IMG_W);
+    draw_text(10, 100, "UP:CAL FULL=4.2V  DN:RESET CAL", IMG_W);
+    draw_text(10, 112, "PICO 2 W  RP2350        LEFT:BACK", IMG_W);
 }
 
 /* ─── Draw mood select screen ─── */
@@ -3024,6 +3045,7 @@ static void saved_seed_defaults(void) {
     strncpy(g_saved.nets[0].pass, WIFI_PASS,       sizeof(g_saved.nets[0].pass) - 1);
     strncpy(g_saved.nets[1].ssid, "MoopsterCell",  sizeof(g_saved.nets[1].ssid) - 1);
     strncpy(g_saved.nets[1].pass, WIFI_PASS,       sizeof(g_saved.nets[1].pass) - 1);
+    g_saved.vsys_cal = 1.0f;
 }
 
 static void saved_load(void) {
@@ -3034,6 +3056,18 @@ static void saved_load(void) {
         saved_seed_defaults();   /* first boot — persist the two defaults */
         saved_write_flash();
     }
+    /* Older flash images lack vsys_cal (reads as 0xFF→NaN/garbage) — sanitise. */
+    if (!(g_saved.vsys_cal >= 0.5f && g_saved.vsys_cal <= 2.0f)) g_saved.vsys_cal = 1.0f;
+    g_vsys_cal = g_saved.vsys_cal;
+}
+
+/* Persist the on-device battery calibration trim. */
+static void battery_cal_save(float cal) {
+    if (cal < 0.5f) cal = 0.5f; else if (cal > 2.0f) cal = 2.0f;
+    g_vsys_cal = cal;
+    g_saved.vsys_cal = cal;
+    g_saved.magic = SAVED_MAGIC;       /* ensure a valid header if seeding */
+    saved_write_flash();
 }
 
 static const char *saved_find_pass(const char *ssid) {
@@ -3511,8 +3545,17 @@ int main(void) {
 
             POLL_INPUT(4000)
                 if (inp == INPUT_LEFT || inp == INPUT_CENTER) {
-                    state = STATE_MENU; 
+                    state = STATE_MENU;
                     speaker_tone(500, 50); break;
+                }
+                if (inp == INPUT_UP) {        /* calibrate: treat current reading as a full 4.20 V pack */
+                    float raw = read_vsys_raw_volts();
+                    if (raw > 2.0f) { battery_cal_save(4.20f / raw); speaker_tone(1500, 80); }
+                    break;                    /* re-render with the new CAL/% */
+                }
+                if (inp == INPUT_DOWN) {      /* reset calibration */
+                    battery_cal_save(1.0f); speaker_tone(700, 60);
+                    break;
                 }
             POLL_END
             break;

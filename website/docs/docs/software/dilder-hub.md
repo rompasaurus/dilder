@@ -22,7 +22,7 @@ The combined firmware that brings together all Dilder features: animated octopus
 | **Motion** | SC7A20 accelerometer (I²C, 0x18) — live values, pedometer, tilt angles, I2C bus scanner |
 | **Set Time** | On-device date/time setter (year → minute) |
 | **Device Info** | Firmware version, build date, display variant, battery voltage, WiFi status |
-| **Battery Monitor** | ADC3 reads VSYS/3 via CYW43 SPI lock — shows percentage or USB-powered status |
+| **Battery Monitor** | ADC3 reads VSYS/3 via CYW43 SPI lock (trimmed-mean to reject SPI noise) → LiPo % + live voltage. **On-device calibration:** on Device Info, **UP** treats the current reading as a full 4.20 V pack and stores the trim to flash (fixes the common Pico W low-read that pegs a full battery at ~2 bars); **DOWN** resets it. Voltage (2 dp) + CAL factor shown in both layouts |
 | **Status Icons** | WiFi icon (top-left), Bluetooth rune (shown when paired), battery icon with lightning bolt (top-right) — both orientations |
 
 ---
