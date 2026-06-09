@@ -30,6 +30,8 @@
  *     task/scheduler API (xTaskCreate, vTaskStartScheduler, vTaskDelay, ...). --- */
 #include "FreeRTOS.h"
 #include "task.h"
+#include "pico/flash.h"        /* flash_safe_execute — multicore-safe flash writes (SMP) */
+#include "rtos_tasks.h"        /* Phase 2: the 4-task split interface */
 #include "lwip/dns.h"
 #include "lwip/pbuf.h"
 #include "lwip/udp.h"
@@ -171,7 +173,8 @@ static uint8_t rotate_input(uint8_t dir) {
     return dir;
 }
 
-static uint8_t read_joystick(void) {
+/* Non-static: the Input task (rtos_tasks.c) is the sole runtime caller. */
+uint8_t read_joystick(void) {
     uint8_t raw = INPUT_NONE;
     if      (!gpio_get(JOY_UP))     raw = INPUT_UP;
     else if (!gpio_get(JOY_DOWN))   raw = INPUT_DOWN;
@@ -671,8 +674,17 @@ static void set_canvas_tall(void) {
     display_rotation = ORIENT_CFG[g_orientation].disp_rot;
 }
 
-/* Display buffer (portrait orientation for e-ink driver) */
-static uint8_t display_buf[((DISP_W + 7) / 8) * DISP_H];
+/* ── Display hand-off buffers (Phase 2 / RTOS) ──────────────────────────────
+ * ui_buf        : the UI task's PRIVATE transpose target. transpose_to_display()
+ *                 writes the finished panel image here.
+ * display_buf[2]: the two Display-task buffers. display_render() copies ui_buf
+ *                 into a FREE one and hands its index to the Display task (core 1),
+ *                 which does the ~300 ms e-ink refresh. Two buffers let the UI
+ *                 prepare the next frame while core 1 is still pushing the last
+ *                 one — with zero shared-buffer race (ownership passes by queue). */
+#define DISPLAY_BUF_SIZE (((DISP_W + 7) / 8) * DISP_H)
+static uint8_t ui_buf[DISPLAY_BUF_SIZE];
+static uint8_t display_buf[2][DISPLAY_BUF_SIZE];
 
 /* Layout origin — lets the octopus art be repositioned (e.g. bottom of the
  * tall canvas) without touching any of the px_set_off drawing routines. */
@@ -1785,7 +1797,7 @@ static void transpose_to_display(void) {
     const int PW = DISP_W;   /* panel width  = 122 */
     const int PH = DISP_H;   /* panel height = 250 */
     uint16_t dst_row_bytes = (PW + 7) / 8;
-    memset(display_buf, 0xFF, sizeof(display_buf));
+    memset(ui_buf, 0xFF, sizeof(ui_buf));   /* UI's private buffer (Phase 2) */
 
     for (int y = 0; y < canvas_h; y++) {
         for (int x = 0; x < canvas_w; x++) {
@@ -1801,10 +1813,20 @@ static void transpose_to_display(void) {
             }
             if (dx < 0 || dx >= PW || dy < 0 || dy >= PH) continue;
             int dst_byte = dy * dst_row_bytes + dx / 8;
-            display_buf[dst_byte] &= ~(1 << (7 - (dx & 7)));
+            ui_buf[dst_byte] &= ~(1 << (7 - (dx & 7)));
         }
     }
 }
+
+/* ── Display-task hooks (called from rtos_tasks.c) ──────────────────────────
+ * These keep ALL e-ink/driver access in main.c; rtos_tasks.c only orchestrates.
+ * display_grab_into : UI side — snapshot the just-transposed ui_buf into the
+ *                     free Display buffer `idx` (a cheap 4000-byte copy).
+ * display_blit      : Display task (core 1) — the actual ~300 ms panel refresh.
+ * display_init_panel: Display task prologue — bring the panel up from core 1. */
+void display_grab_into(int idx)   { memcpy(display_buf[idx], ui_buf, sizeof(ui_buf)); }
+void display_blit(int idx)        { EPD_Partial(display_buf[idx]); }
+void display_init_panel(void)     { EPD_Init(); EPD_Clear(); }
 
 /* ─── Simple PRNG (seeded from ADC noise) ─── */
 
@@ -2869,7 +2891,7 @@ static void render_i2c_scan(void) {
 
     draw_text(10, 20, "SCANNING I2C0 (GP0/GP1)...", IMG_W);
     transpose_to_display();
-    EPD_Partial(display_buf);
+    display_render();
 
     /* Scan all valid 7-bit addresses */
     uint8_t found[16];
@@ -2924,7 +2946,7 @@ static void show_connecting_screen(const char *ssid) {
     draw_text(40, 55, ssid, IMG_W);
     draw_text(40, 75, "PLEASE WAIT...", IMG_W);
     transpose_to_display();
-    EPD_Partial(display_buf);
+    display_render();
 }
 
 /* ─── WiFi / NTP functions ─── */
@@ -3032,14 +3054,35 @@ static void wifi_start_scan(void) {
 }
 
 /* ─── Saved WiFi networks: flash-backed store (data declared earlier) ─── */
+/* The raw erase+program. Run ONLY via flash_safe_execute() (below) so the other
+ * core is parked first — critical under SMP because the Display task on core 1
+ * executes from XIP flash and its next instruction fetch during an erase would
+ * fault. `param` points at the 4 KB image to program. */
+static void saved_flash_op(void *param) {
+    const uint8_t *buf = (const uint8_t *)param;
+    flash_range_erase(SAVED_FLASH_OFFSET, FLASH_SECTOR_SIZE);
+    flash_range_program(SAVED_FLASH_OFFSET, buf, FLASH_SECTOR_SIZE);
+}
+
 static void saved_write_flash(void) {
     static uint8_t buf[FLASH_SECTOR_SIZE];
     memset(buf, 0xFF, sizeof(buf));
     memcpy(buf, &g_saved, sizeof(g_saved));
-    uint32_t ints = save_and_disable_interrupts();
-    flash_range_erase(SAVED_FLASH_OFFSET, FLASH_SECTOR_SIZE);
-    flash_range_program(SAVED_FLASH_OFFSET, buf, FLASH_SECTOR_SIZE);
-    restore_interrupts(ints);
+
+    /* flash_safe_execute uses the FreeRTOS-SMP multicore lockout to safely park
+     * core 1 (the Display task) for the duration of the write, then runs
+     * saved_flash_op. This is the critical SMP-safety fix: a plain
+     * interrupts-off write only stops THIS core and would let core 1 XIP-fault. */
+    int rc = flash_safe_execute(saved_flash_op, buf, 3000 /* ms */);
+    if (rc != PICO_OK) {
+        /* Fallback (e.g. lockout not yet initialised very early at boot): a plain
+         * write. Safe only while core 1 is not yet executing the e-ink driver. */
+        printf("[flash] flash_safe_execute rc=%d — falling back to local write\n", rc);
+        uint32_t ints = save_and_disable_interrupts();
+        flash_range_erase(SAVED_FLASH_OFFSET, FLASH_SECTOR_SIZE);
+        flash_range_program(SAVED_FLASH_OFFSET, buf, FLASH_SECTOR_SIZE);
+        restore_interrupts(ints);
+    }
 }
 
 static void saved_seed_defaults(void) {
@@ -3171,12 +3214,52 @@ static void bt_push_status(void) {
     dilder_bt_set_status(s);
 }
 
+/* ─── Housekeeping sampling (Phase 2) ───────────────────────────────────────
+ * Called repeatedly by the Housekeeping task (rtos_tasks.c). This is now the
+ * ONLY runtime caller of the I2C accelerometer and the battery ADC, so those
+ * blocking reads leave the UI/render path entirely. It samples motion +
+ * orientation + steps every pass, the battery every ~2 s, then publishes a
+ * snapshot the UI copies. Battery values are also cached in module globals so
+ * the battery icon / info screen can read them without an inline ADC hit. */
+static volatile int   g_batt_pct = -1;    /* cached battery % (HK updates; -1 = USB) */
+static volatile float g_batt_v   = 0.0f;  /* cached battery volts (calibrated)        */
+
+void hk_sample(void) {
+    orientation_update();                  /* accel -> g_orientation, steps, input rotation */
+    viewing_update();                      /* updates last_motion_ms from real motion       */
+    g_screen_idle = !screen_is_viewed();   /* pocket/idle freeze flag — HK owns it now       */
+
+    /* Battery changes slowly; sample ~every 2 s instead of every 50 ms. */
+    static uint32_t last_batt = 0;
+    uint32_t now = to_ms_since_boot(get_absolute_time());
+    if (last_batt == 0 || now - last_batt > 2000) {
+        last_batt  = now;
+        g_batt_pct = read_battery_percent();
+        g_batt_v   = read_vsys_volts();
+    }
+
+    sensor_snapshot_t s;
+    s.orientation    = (uint8_t)g_orientation;
+    s.is_tall        = orientation_is_tall();
+    s.ax = accel_x; s.ay = accel_y; s.az = accel_z;
+    s.mag            = accel_magnitude();
+    s.steps_today    = steps_today;
+    s.active_seconds = active_seconds_today;
+    s.last_motion_ms = last_motion_ms;
+    s.mpu_ok         = mpu_ok;
+    s.batt_pct       = g_batt_pct;
+    s.vsys           = g_batt_v;
+    s.vsys_raw       = 0.0f;   /* the battery-cal screen takes its own fresh RAW read */
+    s.usb            = is_usb_powered();
+    rtos_snapshot_publish(&s);
+}
+
 /* ─── Main ─── */
-/* ─── FreeRTOS application task (Phase 1) ───────────────────────────────────
- * In Phase 1 the ENTIRE original super-loop lives inside one FreeRTOS task,
- * `app_task`, pinned to core 0. This proves the whole firmware runs correctly
- * *under the scheduler* before Phase 2 splits it into Input/UI/Display/
- * Housekeeping tasks. Declared here, defined just below main(). */
+/* ─── FreeRTOS application task ─────────────────────────────────────────────
+ * This is the UI task: it renders, runs the state machine, consumes input
+ * EVENTS from the Input task's queue, and hands frames to the Display task
+ * (core 1). It also spawns the Input/Display/Housekeeping tasks once it is
+ * running (see rtos_tasks_start). Declared here, defined just below main(). */
 static void app_task(void *param);
 static TaskHandle_t g_app_task = NULL;
 
@@ -3218,8 +3301,10 @@ int main(void) {
     speaker_tone(1500, 80); sleep_ms(30);
     speaker_tone(2000, 120);
 
-    EPD_Init();
-    EPD_Clear();
+    /* NOTE: EPD_Init()/EPD_Clear() are NO LONGER called here. The e-ink panel is
+     * now owned exclusively by the Display task (core 1), which initialises it in
+     * its prologue (display_init_panel). DEV_Module_Init() above already brought
+     * up the SPI bus on the boot core, which is fine (one-time, pre-scheduler). */
     rng_seed();
 
     /* ═══════════ Hand control to the FreeRTOS scheduler ═══════════
@@ -3263,6 +3348,18 @@ static void app_task(void *param) {
 
     battery_init();
     mpu_init();
+
+    /* ═══ Phase 2: spin up the Input, Display, and Housekeeping tasks ═══
+     * From here on THIS task is the UI task: it renders, runs the state machine,
+     * gets input from the Input task's queue, and hands finished frames to the
+     * Display task (core 1). cyw43_arch_init() above stays on this (core 0) task,
+     * which is where the cyw43/Wi-Fi/BT background task must live. */
+    rtos_tasks_start();
+
+    /* Give the Display task (core 1) a moment to run flash_safe_execute_core_init()
+     * before saved_load() — which may write flash on first boot — so that write is
+     * SMP-safe (core 1 parked, no XIP fault). */
+    vTaskDelay(pdMS_TO_TICKS(80));
     saved_load();   /* load cached WiFi networks (seeds Moop Ship + MoopsterCell) */
 
     /* ─── State machine ─── */
@@ -3274,33 +3371,24 @@ static void app_task(void *param) {
 
     int snd_sel = 0;
 
-    uint32_t last_input_ms = 0;
-    /* Joystick debounce, ms. Off — a 5-way SMD switch bounces ~1 ms and the
-     * real nav latency is the e-ink refresh, not debounce. */
-    #define INPUT_DEBOUNCE 0
-
-    /* Helper macro for polling input in sub-screens */
+    /* Sub-screen input: block on the Input task's event queue for up to `ms` ms.
+     * The do-while(0) PRESERVES the old `break;` semantics in every screen body —
+     * a `break` leaves the poll, then the case's trailing `break` triggers the
+     * redraw — but with NO busy-wait: the UI sleeps until a press arrives or the
+     * timeout elapses (the Input task captures presses meanwhile). */
     #define POLL_INPUT(ms) \
-        for (int _pi = 0; _pi < ((ms)/5); _pi++) { \
-            sleep_ms(5); \
-            if (wifi_enabled || scan_in_progress || dilder_bt_active()) cyw43_arch_poll(); \
-            if (to_ms_since_boot(get_absolute_time()) - last_input_ms < INPUT_DEBOUNCE) continue; \
-            uint8_t inp = read_joystick(); \
-            if (inp == INPUT_NONE) continue; \
-            last_input_ms = to_ms_since_boot(get_absolute_time());
-
-    #define POLL_END break; }
+        do { \
+            uint8_t inp; \
+            if (!ui_get_input(&inp, (ms))) break;
+    #define POLL_END } while (0);
 
     while (true) {
-        uint32_t now = to_ms_since_boot(get_absolute_time());
-
-        /* Default every screen to the WIDE canvas; the tall octopus layout
-         * overrides this for itself. Refresh accel orientation (auto-rotate). */
+        /* Default every screen to the WIDE canvas; the tall layouts override it
+         * for themselves. NOTE (Phase 2): accelerometer sampling
+         * (orientation_update) now runs in the Housekeeping task, and Wi-Fi/BT are
+         * serviced by the cyw43 FreeRTOS background task — so the per-iteration
+         * orientation_update()/cyw43_arch_poll() that used to sit here are gone. */
         set_canvas_wide();
-        orientation_update();
-
-        /* Poll WiFi / scan */
-        if (wifi_enabled || scan_in_progress || dilder_bt_active()) cyw43_arch_poll();
 
         switch (state) {
 
@@ -3336,39 +3424,39 @@ static void app_task(void *param) {
                 draw_orient_hud();   /* calibration overlay (ORIENT_DEBUG) */
                 transpose_to_display();
 
-                EPD_Partial(display_buf);
+                display_render();
                 bt_push_status();    /* keep a paired phone's mood/steps read fresh */
                 frame_idx++;
             }
 
-            /* Poll 3 seconds for joystick */
-            int o0 = g_orientation;
-            for (int i = 0; i < 600 && state == STATE_OCTOPUS; i++) {
-                sleep_ms(5);
-                if (wifi_enabled || scan_in_progress || dilder_bt_active()) cyw43_arch_poll();
-                orientation_update();
-                viewing_update();
-                if (!screen_is_viewed()) {
-                    g_screen_idle = true;            /* pocketed/still → freeze frame */
-                } else if (g_screen_idle) {
-                    wake_screen(); break;            /* motion → wake + redraw */
-                }
-                if (g_orientation != o0) { wake_screen(); break; }  /* re-render on rotate */
+            /* UI tick loop (~3 s, then re-render so the mouth animates). The
+             * accelerometer/idle are sampled by the Housekeeping task — we just
+             * watch the snapshot's orientation + the g_screen_idle flag and drain
+             * the Input task's event queue. The ~300 ms refresh runs on core 1, so
+             * this loop keeps reacting to presses the whole time. */
+            sensor_snapshot_t s; rtos_snapshot_get(&s);
+            uint8_t o0    = s.orientation;
+            bool    idle0 = g_screen_idle;
+            for (int i = 0; i < 200 && state == STATE_OCTOPUS; i++) {
+                uint8_t inp;
+                bool got = ui_get_input(&inp, 15);     /* ~15 ms tick; sleeps efficiently */
+                rtos_snapshot_get(&s);
+                /* Idle flag is owned by Housekeeping (it freezes redraws when
+                 * pocketed). Just re-enter the case on a change so the render
+                 * gate (if !g_screen_idle) re-evaluates — do NOT wake_screen here
+                 * or we'd fight HK and redraw forever while idle. */
+                if (g_screen_idle != idle0) break;
+                if (s.orientation != o0) { wake_screen(); break; }   /* rotated → user present, redraw */
                 if (dilder_bt_active() && dilder_bt_take_command() >= 0) {
                     qi = pick_quote();   /* phone poked us → fresh quote */
                     speaker_tone(1600, 60);
-                    wake_screen(); break;            /* re-render */
+                    wake_screen(); break;
                 }
-                if (to_ms_since_boot(get_absolute_time()) - last_input_ms < INPUT_DEBOUNCE) continue;
-                uint8_t inp = read_joystick();
-                if (inp != INPUT_NONE) wake_screen();   /* any press = user present */
-                if (inp == INPUT_DOWN) {
-                    last_input_ms = to_ms_since_boot(get_absolute_time());
-                    state = STATE_MENU; menu_sel = 0;
-                    speaker_tone(800, 50);
-                } else if (inp == INPUT_CENTER) {
-                    last_input_ms = to_ms_since_boot(get_absolute_time());
-                    speaker_tone(1319, 100);
+                if (got) {
+                    wake_screen();                      /* any press = user present */
+                    if (inp == INPUT_DOWN)        { state = STATE_MENU; menu_sel = 0; speaker_tone(800, 50); }
+                    else if (inp == INPUT_CENTER) { speaker_tone(1319, 100); }
+                    break;                              /* re-render after a press */
                 }
             }
             break;
@@ -3376,18 +3464,12 @@ static void app_task(void *param) {
 
         /* ════════ MENU ════════ */
         case STATE_MENU: {
-            /* Responsive menu: the e-ink refresh blocks for ~300ms, so instead
-             * of refreshing on every keypress (and missing presses during the
-             * blackout) we sample the joystick continuously (~8ms), move the
-             * selection immediately in memory, and only repaint once input
-             * SETTLES. Holding fast-scrolls; rapid taps accumulate; CENTER/LEFT
-             * are edge-triggered so a held press can't double-fire. */
-            int      need_draw = 1;
-            int      moved     = 0;
-            uint8_t  prev      = INPUT_NONE;
-            uint32_t last_move = 0;
-            uint32_t key_down  = 0;       /* when the current hold started */
-            int      was_tall  = orientation_is_tall();
+            /* Phase 2: the Input task already converts a held UP/DOWN into repeat
+             * events and makes CENTER/LEFT strict one-shots, so this loop just
+             * DRAINS the event queue and repaints. Because the ~300 ms refresh now
+             * runs on core 1, presses are never lost during a repaint. */
+            bool was_tall  = orientation_is_tall();
+            bool need_draw = true;
             for (;;) {
                 if (need_draw) {
                     if (orientation_is_tall()) {
@@ -3398,21 +3480,19 @@ static void app_task(void *param) {
                         render_menu(menu_sel);
                     }
                     transpose_to_display();
-                    EPD_Partial(display_buf);
-                    need_draw = 0; moved = 0;
+                    display_render();
+                    need_draw = false;
                 }
 
-                sleep_ms(8);
-                if (wifi_enabled || scan_in_progress || dilder_bt_active()) cyw43_arch_poll();
-                orientation_update();                 /* keep auto-rotate live */
-                uint8_t  j = read_joystick();
-                uint32_t t = to_ms_since_boot(get_absolute_time());
+                uint8_t inp;
+                bool got = ui_get_input(&inp, 200);   /* wake on a press, or re-check rotation */
 
                 if (orientation_is_tall() != was_tall) {   /* rotated → redraw */
-                    was_tall = orientation_is_tall(); need_draw = 1; continue;
+                    was_tall = orientation_is_tall(); need_draw = true; continue;
                 }
+                if (!got) continue;
 
-                if (j == INPUT_CENTER && prev != INPUT_CENTER) {
+                if (inp == INPUT_CENTER) {
                     speaker_tone(1000, 40);
                     switch (menu_sel) {
                         case 0: state = STATE_MOOD_SELECT; mood_sel = current_mood + 1; break;
@@ -3428,27 +3508,14 @@ static void app_task(void *param) {
                     }
                     break;
                 }
-                if (j == INPUT_LEFT && prev != INPUT_LEFT) {
+                if (inp == INPUT_LEFT) {
                     speaker_tone(500, 40); state = STATE_OCTOPUS; break;
                 }
-                if (j == INPUT_UP || j == INPUT_DOWN) {
-                    int edge = (prev != j);
-                    /* Move once on press. Only auto-repeat after a clear HOLD
-                     * (>400ms, longer than a normal tap) so a single press can
-                     * never skip two options; then repeat fast (~120ms). */
-                    int repeat = !edge && (t - key_down) > 400 && (t - last_move) > 120;
-                    if (edge) key_down = t;
-                    if (edge || repeat) {
-                        menu_sel = (menu_sel + (j == INPUT_UP ? -1 : 1) + MENU_COUNT) % MENU_COUNT;
-                        last_move = t; moved = 1;
-                        speaker_tone(620, 12);
-                    }
+                if (inp == INPUT_UP || inp == INPUT_DOWN) {
+                    menu_sel = (menu_sel + (inp == INPUT_UP ? -1 : 1) + MENU_COUNT) % MENU_COUNT;
+                    speaker_tone(620, 12);
+                    need_draw = true;
                 }
-                prev = j;
-
-                /* Repaint only after the user pauses post-move: a fast scroll
-                 * yields one repaint at the end; deliberate taps repaint each. */
-                if (moved && j == INPUT_NONE && (t - last_move) > 130) need_draw = 1;
             }
             break;
         }
@@ -3457,7 +3524,7 @@ static void app_task(void *param) {
         case STATE_SET_TIME: {
             render_set_time();
             transpose_to_display();
-            EPD_Partial(display_buf);
+            display_render();
 
             POLL_INPUT(4000)
                 if (inp == INPUT_LEFT) {
@@ -3491,7 +3558,7 @@ static void app_task(void *param) {
         case STATE_MOOD_SELECT: {
             render_mood_select(mood_sel);
             transpose_to_display();
-            EPD_Partial(display_buf);
+            display_render();
 
             POLL_INPUT(4000)
                 if (inp == INPUT_UP) {
@@ -3521,7 +3588,7 @@ static void app_task(void *param) {
         case STATE_NETWORK: {
             render_network_screen();
             transpose_to_display();
-            EPD_Partial(display_buf);
+            display_render();
 
             POLL_INPUT(4000)
                 if (inp == INPUT_LEFT || inp == INPUT_CENTER) {
@@ -3536,7 +3603,7 @@ static void app_task(void *param) {
         case STATE_SOUND: {
             render_sound_menu(snd_sel);
             transpose_to_display();
-            EPD_Partial(display_buf);
+            display_render();
 
             POLL_INPUT(4000)
                 if (inp == INPUT_UP) {
@@ -3589,7 +3656,7 @@ static void app_task(void *param) {
         case STATE_INFO: {
             render_info_screen();
             transpose_to_display();
-            EPD_Partial(display_buf);
+            display_render();
 
             POLL_INPUT(4000)
                 if (inp == INPUT_LEFT || inp == INPUT_CENTER) {
@@ -3614,7 +3681,7 @@ static void app_task(void *param) {
             static int net_menu_sel = 0;
             render_net_menu(net_menu_sel);
             transpose_to_display();
-            EPD_Partial(display_buf);
+            display_render();
 
             POLL_INPUT(4000)
                 if (inp == INPUT_UP) {
@@ -3656,7 +3723,7 @@ static void app_task(void *param) {
         case STATE_SAVED_NETS: {
             render_saved_nets();
             transpose_to_display();
-            EPD_Partial(display_buf);
+            display_render();
             POLL_INPUT(4000)
                 if (g_saved.count > 0 && inp == INPUT_UP) {
                     saved_sel = (saved_sel - 1 + g_saved.count) % g_saved.count;
@@ -3686,7 +3753,6 @@ static void app_task(void *param) {
             bt_state_t shown = (bt_state_t)255;
             int  was_tall  = orientation_is_tall();
             bool shown_en  = !bt_enabled;     /* mismatch forces the first render */
-            uint8_t prev   = INPUT_NONE;
             for (;;) {
                 if (dilder_bt_state() != shown || orientation_is_tall() != was_tall
                         || bt_enabled != shown_en) {
@@ -3695,21 +3761,20 @@ static void app_task(void *param) {
                     shown_en = bt_enabled;
                     render_bluetooth();
                     transpose_to_display();
-                    EPD_Partial(display_buf);
+                    display_render();
                 }
-                sleep_ms(10);
-                if (dilder_bt_active()) cyw43_arch_poll();   /* only when radio is on */
-                orientation_update();
-                uint8_t j = read_joystick();
-                if (j == INPUT_LEFT && prev != INPUT_LEFT) {
+                /* Wake on a press, or every 250 ms to re-check the live BLE state
+                 * (the cyw43 background task drives pairing/connection changes). */
+                uint8_t inp;
+                if (!ui_get_input(&inp, 250)) continue;   /* timeout → re-check state */
+                if (inp == INPUT_LEFT) {
                     speaker_tone(500, 40); state = STATE_MENU; break;
                 }
-                if (j == INPUT_CENTER && prev != INPUT_CENTER) {
+                if (inp == INPUT_CENTER) {
                     bt_enabled = !bt_enabled;
                     if (bt_enabled) { dilder_bt_init(); speaker_tone(1200, 60); }
                     else            { dilder_bt_stop(); speaker_tone(600, 60); }  /* radio OFF → save power */
                 }
-                prev = j;
             }
             break;
         }
@@ -3728,7 +3793,7 @@ static void app_task(void *param) {
 
             render_scan_results();
             transpose_to_display();
-            EPD_Partial(display_buf);
+            display_render();
 
             POLL_INPUT(scan_in_progress ? 500 : 4000)
                 if (inp == INPUT_LEFT) {
@@ -3777,7 +3842,7 @@ static void app_task(void *param) {
         case STATE_NET_KEYBOARD: {
             render_keyboard();
             transpose_to_display();
-            EPD_Partial(display_buf);
+            display_render();
 
             POLL_INPUT(4000)
                 if (inp == INPUT_UP) {
@@ -3855,7 +3920,7 @@ static void app_task(void *param) {
             static int mot_sel = 0;
             render_motion_menu(mot_sel);
             transpose_to_display();
-            EPD_Partial(display_buf);
+            display_render();
 
             POLL_INPUT(500)  /* fast refresh for live data */
                 if (inp == INPUT_UP) {
@@ -3885,7 +3950,7 @@ static void app_task(void *param) {
                             speaker_tone(1000, 50);
                             render_i2c_scan();
                             transpose_to_display();
-                            EPD_Partial(display_buf);
+                            display_render();
                             /* Wait for any button to go back */
                             POLL_INPUT(30000)
                                 speaker_tone(500, 30);

@@ -68,6 +68,7 @@ message(STATUS "Display variant: ${DISPLAY_VARIANT}")
 # which point more .c files get added here.
 add_executable(dilder_hub_rtos
     main.c
+    rtos_tasks.c          # Phase 2: the Input/Display/Housekeeping task orchestration
     freertos_hooks.c      # kernel-required callbacks (idle/timer memory, error hooks)
     bt.c
     lib/Config/DEV_Config.c
