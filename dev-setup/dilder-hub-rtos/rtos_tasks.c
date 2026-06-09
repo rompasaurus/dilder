@@ -55,6 +55,10 @@ static TaskHandle_t g_input_task = NULL;
 static TaskHandle_t g_disp_task  = NULL;
 static TaskHandle_t g_hk_task    = NULL;
 
+/* Given by the Display task (core 1) once it has registered with the flash
+ * lockout; the UI task waits on it before its first flash write. */
+static SemaphoreHandle_t g_flash_ready = NULL;
+
 /* ----------------------------------------------------------------------------
  *  Snapshot publish / get  (tiny critical sections — copy only, never block
  *  while holding the mutex; doc 06 §3)
@@ -70,6 +74,12 @@ void rtos_snapshot_get(sensor_snapshot_t *out) {
     xSemaphoreTake(g_snap_mtx, portMAX_DELAY);
     *out = g_snap;
     xSemaphoreGive(g_snap_mtx);
+}
+
+void rtos_wait_flash_ready(void) {
+    /* Wait (up to 2 s) for the Display task to have run flash_safe_execute_core_
+     * init() on core 1, so the next flash write is multicore-safe. */
+    if (g_flash_ready) xSemaphoreTake(g_flash_ready, pdMS_TO_TICKS(2000));
 }
 
 /* ----------------------------------------------------------------------------
@@ -101,6 +111,7 @@ static void display_task(void *arg) {
      * safely instead of XIP-faulting mid-erase. Must run before any flash write
      * on core 0 can land (app_task delays saved_load until after this). */
     flash_safe_execute_core_init();
+    if (g_flash_ready) xSemaphoreGive(g_flash_ready);   /* tell the UI: flash writes are now SMP-safe */
 
     /* Bring the panel up from THIS task so the SPI/e-ink hardware is touched from
      * exactly one core for the whole program (the bare-metal DEV_Module_Init in
@@ -170,10 +181,11 @@ static void hk_task(void *arg) {
  * ------------------------------------------------------------------------- */
 void rtos_tasks_start(void) {
     /* IPC objects first, before any task that uses them can run. */
-    g_input_q  = xQueueCreate(8, sizeof(uint8_t));
-    g_snap_mtx = xSemaphoreCreateMutex();
-    g_free_q   = xQueueCreate(2, sizeof(int));
-    g_render_q = xQueueCreate(2, sizeof(int));
+    g_input_q     = xQueueCreate(8, sizeof(uint8_t));
+    g_snap_mtx    = xSemaphoreCreateMutex();
+    g_free_q      = xQueueCreate(2, sizeof(int));
+    g_render_q    = xQueueCreate(2, sizeof(int));
+    g_flash_ready = xSemaphoreCreateBinary();
 
     /* Seed the free list with both buffer indices (0 and 1). */
     int b0 = 0, b1 = 1;

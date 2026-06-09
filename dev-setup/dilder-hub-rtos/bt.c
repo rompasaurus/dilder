@@ -19,7 +19,10 @@ static uint32_t   g_passkey = 0;
 static btstack_packet_callback_registration_t hci_reg, sm_reg;
 
 static char            g_status[24] = "BOOTING 0";
-static int             g_cmd        = -1;
+/* volatile: written by the BTstack callback (cyw43 background task) and read+
+ * cleared by the UI task (both core 0). A phone command landing in the
+ * read-clear window can be dropped — rare, non-corrupting, acceptable. */
+static volatile int    g_cmd        = -1;
 static hci_con_handle_t g_con       = HCI_CON_HANDLE_INVALID;
 static bool            g_notify     = false;
 static btstack_context_callback_registration_t g_notify_cb;

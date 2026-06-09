@@ -106,6 +106,13 @@ extern SemaphoreHandle_t g_snap_mtx;   /* guards the sensor snapshot */
  * handle can be recorded as the display-completion target. */
 void rtos_tasks_start(void);
 
+/* Block until the Display task (core 1) has registered with the flash-lockout
+ * machinery (flash_safe_execute_core_init). The UI task MUST call this before any
+ * flash write (e.g. saved_load's first-boot seed) so that write is SMP-safe — an
+ * explicit handshake, not a timing guess. Returns after the ready signal or a
+ * safety timeout. */
+void rtos_wait_flash_ready(void);
+
 /* Copy the latest sensor snapshot out (mutex-guarded). Cheap; safe from the UI. */
 void rtos_snapshot_get(sensor_snapshot_t *out);
 

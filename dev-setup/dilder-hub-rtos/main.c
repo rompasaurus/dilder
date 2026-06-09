@@ -130,7 +130,12 @@ static void joystick_init(void) {
  * joystick read auto-rotates — no other code changes needed.
  */
 typedef enum { ROT_0 = 0, ROT_90 = 1, ROT_180 = 2, ROT_270 = 3 } input_rotation_t;
-static input_rotation_t input_rotation = ROT_180;  /* default for the Dilder hold */
+/* volatile: written by the Housekeeping task (orientation_update) and read by the
+ * higher-priority Input task (read_joystick). A single aligned enum store is
+ * atomic on the Cortex-M33, so no torn read — `volatile` just stops the compiler
+ * caching it. INVARIANT: both Housekeeping and Input are pinned to core 0; if a
+ * future phase moves either off core 0 this must become snapshot-/mutex-guarded. */
+static volatile input_rotation_t input_rotation = ROT_180;  /* default for the Dilder hold */
 
 /* Display orientation state (declared early so the accel orientation_update()
  * can drive it). display_rotation is the panel-map angle (see transpose);
@@ -2804,10 +2809,10 @@ static void render_keyboard(void) {
 #define MOT_MENU_COUNT     7
 
 static void render_motion_menu(int sel) {
-    /* Poll sensor fresh data */
-    mpu_read_all();
-    pedometer_update();
-
+    /* Phase 2: the Housekeeping task already samples the accelerometer (~20 Hz)
+     * and runs the pedometer, so we read the shared accel/step globals it keeps
+     * fresh. Calling mpu_read_all()/pedometer_update() here too would DOUBLE-COUNT
+     * steps (HK + UI both crossing the threshold) — so it's removed. */
     memset(frame, 0, sizeof(frame));
     draw_text(30, 3, "MOTION", IMG_W);
     for (int x = 10; x < 240; x++) px_set(x, 14);
@@ -3070,19 +3075,16 @@ static void saved_write_flash(void) {
     memcpy(buf, &g_saved, sizeof(g_saved));
 
     /* flash_safe_execute uses the FreeRTOS-SMP multicore lockout to safely park
-     * core 1 (the Display task) for the duration of the write, then runs
-     * saved_flash_op. This is the critical SMP-safety fix: a plain
-     * interrupts-off write only stops THIS core and would let core 1 XIP-fault. */
-    int rc = flash_safe_execute(saved_flash_op, buf, 3000 /* ms */);
-    if (rc != PICO_OK) {
-        /* Fallback (e.g. lockout not yet initialised very early at boot): a plain
-         * write. Safe only while core 1 is not yet executing the e-ink driver. */
-        printf("[flash] flash_safe_execute rc=%d — falling back to local write\n", rc);
-        uint32_t ints = save_and_disable_interrupts();
-        flash_range_erase(SAVED_FLASH_OFFSET, FLASH_SECTOR_SIZE);
-        flash_range_program(SAVED_FLASH_OFFSET, buf, FLASH_SECTOR_SIZE);
-        restore_interrupts(ints);
+     * core 1 (the Display task, which runs the e-ink driver from XIP flash) for
+     * the duration of the write. We ALWAYS go through it and retry on contention.
+     * We deliberately do NOT fall back to a plain interrupts-off write: that only
+     * stops THIS core and would let core 1 XIP-fault mid-erase. All callers run
+     * under the scheduler after the flash-ready handshake, so this is safe. */
+    for (int attempt = 0; attempt < 3; attempt++) {
+        if (flash_safe_execute(saved_flash_op, buf, 3000 /* ms */) == PICO_OK) return;
+        vTaskDelay(pdMS_TO_TICKS(20));
     }
+    printf("[flash] WARNING: flash_safe_execute failed 3x — settings NOT saved this time\n");
 }
 
 static void saved_seed_defaults(void) {
@@ -3356,10 +3358,10 @@ static void app_task(void *param) {
      * which is where the cyw43/Wi-Fi/BT background task must live. */
     rtos_tasks_start();
 
-    /* Give the Display task (core 1) a moment to run flash_safe_execute_core_init()
-     * before saved_load() — which may write flash on first boot — so that write is
-     * SMP-safe (core 1 parked, no XIP fault). */
-    vTaskDelay(pdMS_TO_TICKS(80));
+    /* Wait (explicit handshake, not a timing guess) for the Display task on core 1
+     * to register with the flash lockout before saved_load() — which may write
+     * flash on first boot — so that write is SMP-safe (core 1 parked, no XIP fault). */
+    rtos_wait_flash_ready();
     saved_load();   /* load cached WiFi networks (seeds Moop Ship + MoopsterCell) */
 
     /* ─── State machine ─── */
@@ -3492,6 +3494,28 @@ static void app_task(void *param) {
                 }
                 if (!got) continue;
 
+                /* Fold a run of held UP/DOWN repeats into a SINGLE move so a fast
+                 * scroll repaints once at the end (not once per ~120 ms repeat
+                 * event, which would lag behind the ~300 ms e-ink refresh). Drains
+                 * everything queued right now; a CENTER/LEFT ends the scroll and is
+                 * then handled below. */
+                if (inp == INPUT_UP || inp == INPUT_DOWN) {
+                    int delta = 0;
+                    do {
+                        if      (inp == INPUT_UP)   delta -= 1;
+                        else if (inp == INPUT_DOWN) delta += 1;
+                        else break;                       /* CENTER/LEFT terminates the scroll */
+                        inp = INPUT_NONE;
+                    } while (ui_get_input(&inp, 0));       /* non-blocking drain */
+                    if (delta) {
+                        menu_sel = ((menu_sel + delta) % MENU_COUNT + MENU_COUNT) % MENU_COUNT;
+                        speaker_tone(620, 12);
+                        need_draw = true;
+                    }
+                    if (inp != INPUT_CENTER && inp != INPUT_LEFT) continue;  /* only moves were queued */
+                    /* else fall through with inp = CENTER/LEFT */
+                }
+
                 if (inp == INPUT_CENTER) {
                     speaker_tone(1000, 40);
                     switch (menu_sel) {
@@ -3510,11 +3534,6 @@ static void app_task(void *param) {
                 }
                 if (inp == INPUT_LEFT) {
                     speaker_tone(500, 40); state = STATE_OCTOPUS; break;
-                }
-                if (inp == INPUT_UP || inp == INPUT_DOWN) {
-                    menu_sel = (menu_sel + (inp == INPUT_UP ? -1 : 1) + MENU_COUNT) % MENU_COUNT;
-                    speaker_tone(620, 12);
-                    need_draw = true;
                 }
             }
             break;
