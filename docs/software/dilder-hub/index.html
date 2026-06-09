@@ -3862,7 +3862,7 @@
 </tr>
 <tr>
 <td><strong>Battery Monitor</strong></td>
-<td>ADC3 reads VSYS/3 via CYW43 SPI lock — shows percentage or USB-powered status</td>
+<td>ADC3 reads VSYS/3 via CYW43 SPI lock (trimmed-mean to reject SPI noise) → LiPo % + live voltage. <strong>On-device calibration:</strong> on Device Info, <strong>UP</strong> treats the current reading as a full 4.20 V pack and stores the trim to flash (fixes the common Pico W low-read that pegs a full battery at ~2 bars); <strong>DOWN</strong> resets it. Voltage (2 dp) + CAL factor shown in both layouts</td>
 </tr>
 <tr>
 <td><strong>Status Icons</strong></td>
