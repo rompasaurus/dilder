@@ -29,8 +29,12 @@ include(pico_sdk_import.cmake)
 
 # Tell the FreeRTOS import shim where the kernel lives. Our kernel is a git
 # submodule at the repository root (two directories up from here), mirroring how
-# the `picowota` bootloader submodule is wired.
-set(FREERTOS_KERNEL_PATH ${CMAKE_CURRENT_LIST_DIR}/../../FreeRTOS-Kernel)
+# the `picowota` bootloader submodule is wired. Only default it when neither a
+# -D nor the FREERTOS_KERNEL_PATH env var is already set — the Docker build mounts
+# the kernel elsewhere and points at it via the environment.
+if(NOT DEFINED FREERTOS_KERNEL_PATH AND NOT DEFINED ENV{FREERTOS_KERNEL_PATH})
+    set(FREERTOS_KERNEL_PATH ${CMAKE_CURRENT_LIST_DIR}/../../FreeRTOS-Kernel)
+endif()
 include(FreeRTOS_Kernel_import.cmake)
 
 project(dilder_hub_rtos C CXX ASM)

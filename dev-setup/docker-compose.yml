@@ -203,3 +203,21 @@ services:
       - ./dilder-hub:/project
       - ./hello-world/lib:/project/lib
     working_dir: /project
+
+  # dilder-hub-rtos is the FreeRTOS (SMP) variant. It is self-contained (keeps its
+  # OWN lib copy, so do NOT mount hello-world/lib over it), and it needs the
+  # FreeRTOS-Kernel submodule — which lives at the repository ROOT (one level above
+  # dev-setup) WITH its nested port submodules already initialised on the host
+  # (git submodule update --init --recursive). We mount it at /FreeRTOS-Kernel and
+  # point the build at it via FREERTOS_KERNEL_PATH. Build this variant only with
+  # PICO_BOARD=pico2_w (RP2350) — the DevTool passes that via -e.
+  build-dilder-hub-rtos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./dilder-hub-rtos:/project
+      - ../FreeRTOS-Kernel:/FreeRTOS-Kernel
+    working_dir: /project
+    environment:
+      - FREERTOS_KERNEL_PATH=/FreeRTOS-Kernel
