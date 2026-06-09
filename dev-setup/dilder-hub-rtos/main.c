@@ -102,6 +102,14 @@ static void play_sound_pattern(int idx) {
 }
 
 /* ─── Joystick init ─── */
+/* GPIO interrupt callback (shared by all 5 joystick pins). Fires on every press
+ * AND release edge; it does nothing but wake the Input task instantly — all the
+ * debounce/edge/repeat logic lives in the task, off the interrupt. */
+static void joystick_irq_cb(uint gpio, uint32_t events) {
+    (void)gpio; (void)events;
+    rtos_input_isr_notify();
+}
+
 static void joystick_init(void) {
     const uint pins[] = {JOY_UP, JOY_DOWN, JOY_LEFT, JOY_RIGHT, JOY_CENTER};
     for (int i = 0; i < 5; i++) {
@@ -109,6 +117,14 @@ static void joystick_init(void) {
         gpio_set_dir(pins[i], GPIO_IN);
         gpio_pull_up(pins[i]);
     }
+    /* Interrupt-driven input: wake the Input task the instant any line changes,
+     * instead of polling. Sub-millisecond press latency, and the core idles when
+     * nothing is pressed (better for battery). One callback is shared by all
+     * pins; register it on the first, then enable the IRQ on the rest. */
+    gpio_set_irq_enabled_with_callback(pins[0], GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE,
+                                       true, joystick_irq_cb);
+    for (int i = 1; i < 5; i++)
+        gpio_set_irq_enabled(pins[i], GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true);
 }
 
 /* ─── Joystick read (returns single direction or 0) ─── */

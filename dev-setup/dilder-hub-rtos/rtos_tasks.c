@@ -138,30 +138,49 @@ static void display_task(void *arg) {
  *  This is the exact edge/repeat logic that used to live inside the menu loop;
  *  centralizing it here means every screen gets clean, identical events from one
  *  place. (doc 06 §4 / the plan's step 5.) */
+/* Woken by the joystick GPIO interrupt (main.c's callback calls this). Pure
+ * notification — no work in the ISR beyond unblocking the Input task. */
+void rtos_input_isr_notify(void) {
+    if (!g_input_task) return;                   /* task not created yet → ignore the edge */
+    BaseType_t woke = pdFALSE;
+    vTaskNotifyGiveFromISR(g_input_task, &woke);
+    portYIELD_FROM_ISR(woke);                    /* switch to the Input task immediately if it's higher prio */
+}
+
 static void input_task(void *arg) {
     (void)arg;
-    uint8_t  prev      = INPUT_NONE;
-    uint32_t key_down  = 0;     /* tick when the current hold began */
-    uint32_t last_rep  = 0;     /* tick of the last emitted (auto-)repeat */
+    uint8_t    prev     = INPUT_NONE;
+    uint32_t   key_down = 0;                      /* ms when the current hold began */
+    uint32_t   last_rep = 0;                      /* ms of the last emitted (auto-)repeat */
+    TickType_t wait     = portMAX_DELAY;          /* idle: sleep until an edge interrupt */
 
     for (;;) {
-        vTaskDelay(pdMS_TO_TICKS(8));            /* ~125 Hz sampling; yields the core */
-        uint8_t j = read_joystick();             /* main.c: rotated current direction */
+        /* Sleep with ZERO CPU until a joystick edge wakes us (instant press), or
+         * — while a key is held — until the repeat interval elapses. */
+        ulTaskNotifyTake(pdTRUE, wait);
+        vTaskDelay(pdMS_TO_TICKS(2));             /* tiny settle so a contact bounce reads as one level */
+
+        uint8_t  j = read_joystick();             /* main.c: rotated current direction */
         uint32_t t = xTaskGetTickCount() * portTICK_PERIOD_MS;
         uint8_t  emit = INPUT_NONE;
 
         if (j == INPUT_UP || j == INPUT_DOWN) {
             int edge   = (prev != j);
-            int repeat = !edge && (t - key_down) > 400 && (t - last_rep) > 120;
+            int repeat = !edge && (t - key_down) > INPUT_REPEAT_DELAY_MS
+                                && (t - last_rep) > INPUT_REPEAT_RATE_MS;
             if (edge)   key_down = t;
             if (edge || repeat) { emit = j; last_rep = t; }
-        } else if (j != INPUT_NONE) {            /* LEFT / RIGHT / CENTER */
-            if (prev != j) emit = j;             /* one-shot on the press edge */
+        } else if (j != INPUT_NONE) {             /* LEFT / RIGHT / CENTER */
+            if (prev != j) emit = j;              /* one-shot on the press edge */
         }
         prev = j;
 
         if (emit != INPUT_NONE)
-            xQueueSend(g_input_q, &emit, 0);     /* don't block if UI is slow; drop oldest never */
+            xQueueSend(g_input_q, &emit, 0);      /* never block; UI drains when it can */
+
+        /* Held → wake again in one repeat interval; released/idle → sleep until
+         * the next edge interrupt (no polling, no wasted power). */
+        wait = (j != INPUT_NONE) ? pdMS_TO_TICKS(INPUT_REPEAT_RATE_MS) : portMAX_DELAY;
     }
 }
 

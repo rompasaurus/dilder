@@ -61,6 +61,15 @@
 #define DISPLAY_TASK_STACK  2048   /* the EPD driver + SPI push call chain */
 #define HK_TASK_STACK       2048   /* accel maths + battery ADC */
 
+/* Input feel — tune these for snappiness:
+ *   REPEAT_DELAY_MS: how long a direction must be HELD before it starts auto-
+ *                    repeating (longer than a normal tap, so one tap = one move).
+ *   REPEAT_RATE_MS : the auto-repeat interval while held (smaller = faster scroll).
+ * A press itself is captured INSTANTLY via the joystick GPIO interrupt — these
+ * only govern the held-key repeat. */
+#define INPUT_REPEAT_DELAY_MS  400
+#define INPUT_REPEAT_RATE_MS    90
+
 /*  Core affinity bitmasks: bit 0 = core 0, bit 1 = core 1. Everything is on
  *  core 0 EXCEPT the Display task, which is alone on core 1. (The cyw43/Wi-Fi/BT
  *  background task also lives on core 0 — see main.c.) */
@@ -130,6 +139,10 @@ void display_render(void);
  * true and sets *code (an INPUT_* value) on an event; false on timeout. This
  * replaces the old busy-poll: the UI sleeps efficiently instead of spinning. */
 bool ui_get_input(uint8_t *code, uint32_t timeout_ms);
+
+/* Called from the joystick GPIO interrupt (in main.c) to wake the Input task
+ * the instant any joystick line changes. Safe before the task exists (no-op). */
+void rtos_input_isr_notify(void);
 
 /* ----------------------------------------------------------------------------
  *  Hooks the tasks call back into main.c (defined there, declared here so

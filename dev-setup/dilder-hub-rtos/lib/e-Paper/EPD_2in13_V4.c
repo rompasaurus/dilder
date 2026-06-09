@@ -81,9 +81,12 @@ static void EPD_2in13_V4_SendData(UBYTE Data)
 
 static void EPD_2in13_V4_ReadBusy(void)
 {
+    /* Poll at 2 ms (was 10 ms) so we detect refresh-complete up to ~8 ms sooner
+     * — shaves latency off every screen update. Under FreeRTOS DEV_Delay_ms
+     * yields, so this does not busy-spin the core. */
     while (DEV_Digital_Read(EPD_BUSY_PIN) == 1)
-        DEV_Delay_ms(10);
-    DEV_Delay_ms(10);
+        DEV_Delay_ms(2);
+    DEV_Delay_ms(2);
 }
 
 static void EPD_2in13_V4_TurnOnDisplay(void)
