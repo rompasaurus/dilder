@@ -61,12 +61,24 @@
 #define DISPLAY_TASK_STACK  2048   /* the EPD driver + SPI push call chain */
 #define HK_TASK_STACK       2048   /* accel maths + battery ADC */
 
+/* Input acquisition mode:
+ *   0 = POLLING (Phase 2, proven) — the Input task samples the joystick every
+ *       few ms. This is the DEFAULT.
+ *   1 = INTERRUPT-driven (Phase 3a) — a GPIO edge ISR wakes the Input task.
+ * Polling is the default because the interrupt path SOFT-BRICKED the RP2350 under
+ * FreeRTOS SMP (the firmware's first-ever ...FromISR call) and is not yet root-
+ * caused. Turn it on (=1) ONLY on the bench with USB serial attached, so a fault
+ * is observable instead of bricking a deployed board. */
+#ifndef INPUT_USE_IRQ
+#define INPUT_USE_IRQ  0
+#endif
+
 /* Input feel — tune these for snappiness:
  *   REPEAT_DELAY_MS: how long a direction must be HELD before it starts auto-
  *                    repeating (longer than a normal tap, so one tap = one move).
  *   REPEAT_RATE_MS : the auto-repeat interval while held (smaller = faster scroll).
- * A press itself is captured INSTANTLY via the joystick GPIO interrupt — these
- * only govern the held-key repeat. */
+ * In INTERRUPT mode a press is captured instantly and these govern only the held-
+ * key repeat; in POLLING mode they govern the same edge/repeat logic per sample. */
 #define INPUT_REPEAT_DELAY_MS  400
 #define INPUT_REPEAT_RATE_MS    90
 

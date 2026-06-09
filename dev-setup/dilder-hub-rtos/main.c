@@ -102,13 +102,16 @@ static void play_sound_pattern(int idx) {
 }
 
 /* ─── Joystick init ─── */
+#if INPUT_USE_IRQ
 /* GPIO interrupt callback (shared by all 5 joystick pins). Fires on every press
  * AND release edge; it does nothing but wake the Input task instantly — all the
- * debounce/edge/repeat logic lives in the task, off the interrupt. */
+ * debounce/edge/repeat logic lives in the task, off the interrupt.
+ * Compiled only when INPUT_USE_IRQ=1 (bench-only — see rtos_tasks.h). */
 static void joystick_irq_cb(uint gpio, uint32_t events) {
     (void)gpio; (void)events;
     rtos_input_isr_notify();
 }
+#endif
 
 static void joystick_init(void) {
     const uint pins[] = {JOY_UP, JOY_DOWN, JOY_LEFT, JOY_RIGHT, JOY_CENTER};
@@ -117,14 +120,18 @@ static void joystick_init(void) {
         gpio_set_dir(pins[i], GPIO_IN);
         gpio_pull_up(pins[i]);
     }
+#if INPUT_USE_IRQ
     /* Interrupt-driven input: wake the Input task the instant any line changes,
      * instead of polling. Sub-millisecond press latency, and the core idles when
      * nothing is pressed (better for battery). One callback is shared by all
-     * pins; register it on the first, then enable the IRQ on the rest. */
+     * pins; register it on the first, then enable the IRQ on the rest.
+     * GATED OFF by default: this path soft-bricked the RP2350 under FreeRTOS SMP
+     * and is not yet root-caused. Enable only on the bench with serial. */
     gpio_set_irq_enabled_with_callback(pins[0], GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE,
                                        true, joystick_irq_cb);
     for (int i = 1; i < 5; i++)
         gpio_set_irq_enabled(pins[i], GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true);
+#endif
 }
 
 /* ─── Joystick read (returns single direction or 0) ─── */
@@ -219,6 +226,14 @@ uint8_t read_joystick(void) {
 #define STATE_SET_TIME    10  /* Manual date/time setter */
 #define STATE_SAVED_NETS  11  /* Saved WiFi networks (connect / forget) */
 #define STATE_BLUETOOTH   12  /* Bluetooth pairing screen */
+#define STATE_SOCIAL          13  /* Social menu (toggle, met list, set name) */
+#define STATE_SOCIAL_PROMPT   14  /* "Dilder found — say hi?" Y/N */
+#define STATE_SOCIAL_RECV     15  /* "Dilder says hello!" — say hi back? Y/N */
+#define STATE_SOCIAL_NAME     16  /* reroll picker for your Dilder name */
+#define STATE_SOCIAL_MET      17  /* list of Dilders we've met */
+#define STATE_SOCIAL_NEARBY   18  /* live list of Dilders in range now */
+#define STATE_EMOTE_PICK      19  /* pick an emote to send to g_social_peer */
+#define STATE_EMOTE_PLAY      20  /* octopus acts out g_play_emote, then g_play_next */
 
 /* ─── WiFi state ─── */
 static bool wifi_enabled = false;
@@ -227,6 +242,24 @@ static bool ntp_synced = false;
 
 /* Bluetooth is OFF by default to save power; toggled on in the Bluetooth screen. */
 static bool bt_enabled = false;
+
+/* ── Social UI state (the Dilder a prompt/recv screen is currently about) ── */
+static uint16_t g_social_peer      = 0;
+static int8_t   g_social_peer_rssi = 0;
+static uint16_t g_name_seed        = 0;   /* candidate seed on the Set-Name reroll screen */
+
+/* Live "scan nearby" buffer — distinct Dilder ids seen while the screen is open. */
+#define NEARBY_MAX 8
+static uint16_t g_nearby_id[NEARBY_MAX];
+static int8_t   g_nearby_rssi[NEARBY_MAX];
+static int      g_nearby_count = 0;
+
+/* Emote playback: which emote the octopus is acting out, who it's about, whether
+ * we received it (vs sent), and which state to enter once the animation ends. */
+static uint8_t  g_play_emote    = 0;
+static bool     g_play_incoming = false;
+static uint8_t  g_play_next     = 0;
+static int      g_emote_sel     = 0;
 static int32_t wifi_rssi = 0;
 static char wifi_ssid_display[33] = "---";
 static char wifi_ip_str[20] = "---";
@@ -307,22 +340,28 @@ static uint32_t step_count = 0;
 static float    step_threshold = 1.3f;  /* g — adjustable */
 static bool     step_above = false;     /* debounce: was last sample above threshold? */
 
+/* ALWAYS use the *_timeout_us variants — never the plain _blocking ones — so a
+ * missing / half-soldered / bus-held-low accelerometer can never hang a task
+ * (especially the boot-time probe). A no-device bus then just returns an error
+ * and mpu_ok stays false; the firmware runs fine without orientation/steps. */
+#define MPU_I2C_TIMEOUT_US 3000
+
 static bool mpu_write_reg(uint8_t reg, uint8_t val) {
     uint8_t buf[2] = {reg, val};
-    return i2c_write_blocking(MPU_I2C, mpu_addr, buf, 2, false) == 2;
+    return i2c_write_timeout_us(MPU_I2C, mpu_addr, buf, 2, false, MPU_I2C_TIMEOUT_US) == 2;
 }
 
 static int mpu_read_reg(uint8_t reg) {
     uint8_t val;
-    if (i2c_write_blocking(MPU_I2C, mpu_addr, &reg, 1, true) < 0) return -1;
-    if (i2c_read_blocking(MPU_I2C, mpu_addr, &val, 1, false) < 0) return -1;
+    if (i2c_write_timeout_us(MPU_I2C, mpu_addr, &reg, 1, true, MPU_I2C_TIMEOUT_US) < 0) return -1;
+    if (i2c_read_timeout_us(MPU_I2C, mpu_addr, &val, 1, false, MPU_I2C_TIMEOUT_US) < 0) return -1;
     return val;
 }
 
 static bool mpu_read_burst(uint8_t reg, uint8_t *dst, uint8_t len) {
     reg |= SC_AUTO_INC;  /* SC7A20/LIS2DH need this for multi-byte reads */
-    if (i2c_write_blocking(MPU_I2C, mpu_addr, &reg, 1, true) < 0) return false;
-    return i2c_read_blocking(MPU_I2C, mpu_addr, dst, len, false) == len;
+    if (i2c_write_timeout_us(MPU_I2C, mpu_addr, &reg, 1, true, MPU_I2C_TIMEOUT_US) < 0) return false;
+    return i2c_read_timeout_us(MPU_I2C, mpu_addr, dst, len, false, MPU_I2C_TIMEOUT_US) == (int)len;
 }
 
 static void mpu_init(void) {
@@ -340,8 +379,8 @@ static void mpu_init(void) {
         uint8_t addr = try_addrs[a];
         uint8_t reg = SC_WHO_AM_I;
         uint8_t who = 0;
-        int w = i2c_write_blocking(MPU_I2C, addr, &reg, 1, true);
-        int r = i2c_read_blocking(MPU_I2C, addr, &who, 1, false);
+        int w = i2c_write_timeout_us(MPU_I2C, addr, &reg, 1, true, MPU_I2C_TIMEOUT_US);
+        int r = i2c_read_timeout_us(MPU_I2C, addr, &who, 1, false, MPU_I2C_TIMEOUT_US);
         printf("[ACCEL] Probe 0x%02X: w=%d r=%d who=0x%02X\n", addr, w, r, who);
         if (w >= 0 && r >= 0) {
             mpu_addr = addr;
@@ -715,6 +754,7 @@ static int layout_ox = 0, layout_oy = 0;
 static void draw_battery_icon(int x0, int y0);
 static void draw_wifi_icon(int x0, int y0, bool connected);
 static void draw_bt_icon(int x0, int y0);
+static void draw_social_icon(int x0, int y0);
 
 /* Vertical offset — pushes octopus + bubble down to make room for clock */
 #define Y_OFF 12
@@ -1719,7 +1759,11 @@ static void render_octopus_tall(const Quote *q, int expr, uint32_t frame_idx) {
 
     /* ── Status bar (y0..24): wifi + bt + battery, then date/time ── */
     draw_wifi_icon(0, 1, wifi_connected);
-    if (dilder_bt_state() == BT_PAIRED) draw_bt_icon(18, 1);
+    {
+        int soc_x = 18;
+        if (dilder_bt_state() == BT_PAIRED) { draw_bt_icon(18, 1); soc_x = 32; }
+        if (dilder_social_active()) draw_social_icon(soc_x, 1);
+    }
     draw_battery_icon(104, 1);
     {
         datetime_t t; rtc_get_datetime(&t);
@@ -1965,6 +2009,13 @@ static bool battery_adc_ready = false;
 #endif
 static float g_vsys_cal = 1.0f;        /* persisted runtime calibration trim */
 
+/* Filtered battery state, owned and updated by the Housekeeping task (hk_sample)
+ * and read by the battery icon / info screen — so the render path never does an
+ * inline ADC hit, and everything shows ONE smoothed value instead of a fresh,
+ * load-perturbed instantaneous read each frame. -1 = running on USB. */
+static volatile int   g_batt_pct = -1;
+static volatile float g_batt_v   = 0.0f;   /* filtered battery volts (calibrated) */
+
 static void battery_init(void) {
     adc_gpio_init(29);          /* disable digital pulls on ADC3 */
     battery_adc_ready = true;
@@ -1974,10 +2025,16 @@ static void battery_init(void) {
 static float read_vsys_raw_volts(void) {
     if (!battery_adc_ready) battery_init();
 
-    /* GPIO 29 is shared with CYW43 SPI — lock it out while we read */
+    /* GPIO 29 is shared with the CYW43 SPI clock — lock the radio out while we read. */
     cyw43_thread_enter();
     adc_gpio_init(29);              /* reclaim pin as ADC input */
     adc_select_input(3);            /* ADC3 = GP29 = VSYS/3 */
+    /* GP29 was just toggling as the SPI clock; the VSYS/3 divider node needs to
+     * settle back to its analog level. Wait, then DISCARD the first conversions —
+     * they sample the settling transient and read LOW, which was pegging the gauge
+     * near 0% once the radio (BLE scan / WiFi) started running continuously. */
+    sleep_us(800);
+    for (int i = 0; i < 8; i++) (void)adc_read();
     uint16_t s[48];
     const int N = 48;
     for (int i = 0; i < N; i++) s[i] = (uint16_t)adc_read();
@@ -2033,15 +2090,20 @@ static int lipo_percent(float v) {
     return 0;
 }
 
-/* Returns 0..100 from VSYS, or -1 if running on USB. */
-static int read_battery_percent(void) {
-    if (is_usb_powered()) return -1;
-    return lipo_percent(read_vsys_volts());
+/* lipo_percent() with a small deadband so the displayed % doesn't toggle on
+ * sub-percent voltage wobble. Allowed to move freely once it must (and always
+ * reaches the 0/100 rails). State is private to this mapper. */
+static int lipo_percent_hyst(float v) {
+    static int shown = -1;
+    int raw = lipo_percent(v);
+    if (shown < 0 || raw >= 100 || raw <= 0 || raw >= shown + 2 || raw <= shown - 2)
+        shown = raw;
+    return shown;
 }
 
 /* ─── Battery icon (16x10 pixels) ─── */
 static void draw_battery_icon(int x0, int y0) {
-    int pct = read_battery_percent();
+    int pct = g_batt_pct;   /* filtered value from hk_sample — no inline ADC read */
 
     /* Battery outline: 14x8 rectangle + 2x4 terminal nub */
     for (int x = x0; x < x0 + 14; x++) { px_set(x, y0); px_set(x, y0 + 7); }
@@ -2125,6 +2187,18 @@ static void draw_bt_icon(int x0, int y0) {
     icon_line(cx + w, l, cx - w, u); /* lower knee → upper-left  */
 }
 
+/* Social/scanning icon — concentric "broadcast" rings (distinct from the wifi
+ * corner-arcs). Shown when proximity scanning is live. ~9px box. */
+static void draw_social_icon(int x0, int y0) {
+    int cx = x0 + 4, cy = y0 + 4;
+    px_set(cx, cy);                                                   /* center dot */
+    px_set(cx, cy-2); px_set(cx, cy+2); px_set(cx-2, cy); px_set(cx+2, cy);      /* inner ring */
+    px_set(cx-1, cy-1); px_set(cx+1, cy-1); px_set(cx-1, cy+1); px_set(cx+1, cy+1);
+    px_set(cx, cy-4); px_set(cx, cy+4); px_set(cx-4, cy); px_set(cx+4, cy);      /* outer ring */
+    px_set(cx-3, cy-2); px_set(cx+3, cy-2); px_set(cx-3, cy+2); px_set(cx+3, cy+2);
+    px_set(cx-2, cy-3); px_set(cx+2, cy-3); px_set(cx-2, cy+3); px_set(cx+2, cy+3);
+}
+
 /* ─── Menu items ─── */
 static const char *menu_items[] = {
     "MOOD SELECT",
@@ -2134,12 +2208,14 @@ static const char *menu_items[] = {
     "MOTION",
     "DEVICE INFO",
     "SET TIME",
+    "SOCIAL",
     "BACK",
 };
-#define MENU_COUNT 8
+#define MENU_COUNT 9
 #define MENU_IDX_BLUETOOTH 2
 #define MENU_IDX_SET_TIME  6
-#define MENU_IDX_BACK      7
+#define MENU_IDX_SOCIAL    7
+#define MENU_IDX_BACK      8
 
 /* ─── Helper: draw inverted text (white on black bar) ─── */
 static void draw_inverted_line(int y, const char *text) {
@@ -2261,15 +2337,61 @@ static void render_text_tall(const char *title, const char *const *lines, int n)
 
 /* ─── Saved WiFi networks store — data (flash-backed; functions defined later
  * near the WiFi connect code). Last flash sector survives reboot + OTA. ─── */
-#define SAVED_MAGIC   0x4D4F4F50u    /* 'MOOP' */
+#define SAVED_MAGIC   0x4D4F5033u    /* 'MOP3' — bumped: added social/identity block */
 #define MAX_SAVED     8
+#define SOCIAL_MAX    16             /* other Dilders remembered in the Social log */
 #define SAVED_FLASH_OFFSET  (PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE)
 typedef struct { char ssid[33]; char pass[64]; } saved_net_t;
-/* vsys_cal appended at the END so older flash images (which lack it) stay
- * loadable — the trailing bytes read as 0xFF→NaN and are reset to 1.0. */
-typedef struct { uint32_t magic, count; saved_net_t nets[MAX_SAVED]; float vsys_cal; } saved_store_t;
+
+/* One remembered peer Dilder. The name is NOT stored — it is derived
+ * deterministically from `id` (every Dilder computes the same ridiculous name
+ * for a given id), so the log only needs the id + when we last greeted + how. */
+#define MET_HELLO_SENT  0x01
+#define MET_HELLO_RECV  0x02
+typedef struct { uint16_t id; uint32_t last_day; uint8_t flags; } dilder_met_t;
+
+/* vsys_cal and the social/identity block are appended at the END; the magic bump
+ * forces a clean re-seed so we never read stale layout into the new fields. */
+typedef struct {
+    uint32_t     magic, count;
+    saved_net_t  nets[MAX_SAVED];
+    float        vsys_cal;
+    /* ── Dilder identity + social ── */
+    uint16_t     dilder_id;            /* our BLE social id (random, set once) */
+    char         dilder_name[24];      /* custom name; "" → use the auto name */
+    uint8_t      social_on;            /* persisted opt-in for proximity scanning */
+    uint32_t     met_count;
+    dilder_met_t met[SOCIAL_MAX];
+} saved_store_t;
 static saved_store_t g_saved;
 static const char *saved_find_pass(const char *ssid);   /* fwd (used in handlers) */
+
+/* ─── Ridiculous Dilder name generator ───────────────────────────────────────
+ * A Dilder's name is derived purely from its 16-bit id, so EVERY Dilder computes
+ * the same name for a given id without transmitting it. 32×32 = 1024 combos. */
+static const char *k_name_adj[32] = {
+    "Soggy","Feral","Greasy","Smug","Moist","Cursed","Spicy","Wobbly",
+    "Crusty","Unhinged","Sneaky","Thicc","Forbidden","Haunted","Disco","Goth",
+    "Sassy","Rancid","Deluxe","Bonkers","Gremlin","Chonky","Slippery","Vile",
+    "Majestic","Sweaty","Eldritch","Bootleg","Feral","Yeeted","Mlem","Zoomie",
+};
+static const char *k_name_noun[32] = {
+    "Noodle","Goblin","Trashpanda","Wizard","Gremlin","Nugget","Possum","Crumpet",
+    "Walrus","Pickle","Goose","Yeti","Muppet","Cryptid","Dumpling","Snail",
+    "Beans","Hamster","Goblin","Toad","Raccoon","Biscuit","Lizard","Moth",
+    "Blobfish","Chinchilla","Wombat","Gourd","Sphinx","Frog","Capybara","Slug",
+};
+/* Fill `buf` with the deterministic auto-name for `id`. */
+static void dilder_auto_name(uint16_t id, char *buf, size_t n) {
+    snprintf(buf, n, "%s %s", k_name_adj[id & 31], k_name_noun[(id >> 5) & 31]);
+}
+/* OUR display name: the custom one if set, else the auto-name for our id. */
+static const char *dilder_display_name(void) {
+    static char nm[24];
+    if (g_saved.dilder_name[0]) return g_saved.dilder_name;
+    dilder_auto_name(g_saved.dilder_id, nm, sizeof(nm));
+    return nm;
+}
 
 /* ─── Saved networks screen (connect / forget) ─── */
 static int saved_sel = 0;
@@ -2376,6 +2498,232 @@ static void render_bluetooth(void) {
     draw_text(tall ? 6 : 8, tall ? 236 : 110, "C:DISABLE  LEFT:BACK", canvas_w);
 }
 
+/* ─── Emotes (Dilder-to-Dilder expressions) ─────────────────────────────────
+ * An emote = a 1-byte code carried in the beacon. Each maps the octopus to a
+ * fitting mood/face PLUS an animated overlay glyph, so the octopus stays on
+ * screen and "acts out" the emote. Code 0 = none. */
+#define EMOTE_NONE   0
+#define EMOTE_WAVE   1
+#define EMOTE_LOVE   2
+#define EMOTE_LAUGH  3
+#define EMOTE_PARTY  4
+#define EMOTE_SLEEPY 5
+#define EMOTE_WHOA   6
+#define EMOTE_COUNT  7
+typedef struct { const char *name; uint8_t mood; uint8_t expr; } emote_def_t;
+static const emote_def_t emote_defs[EMOTE_COUNT] = {
+    /* NONE  */ { "-",      MOOD_NORMAL,    EXPR_SMIRK     },
+    /* WAVE  */ { "WAVE",   MOOD_CHILL,     EXPR_SMILE     },
+    /* LOVE  */ { "LOVE",   MOOD_EXCITED,   EXPR_EXCITED   },
+    /* LAUGH */ { "LAUGH",  MOOD_SLAPHAPPY, EXPR_SLAPHAPPY },
+    /* PARTY */ { "PARTY",  MOOD_EXCITED,   EXPR_EXCITED   },
+    /* SLEEPY*/ { "SLEEPY", MOOD_TIRED,     EXPR_TIRED     },
+    /* WHOA  */ { "WHOA",   MOOD_EXCITED,   EXPR_OPEN      },
+};
+
+/* ── small procedural glyphs (wide-canvas coords) ── */
+static void draw_heart(int cx, int cy) {
+    px_set(cx-2,cy); px_set(cx-1,cy); px_set(cx+1,cy); px_set(cx+2,cy);
+    for (int dx=-3; dx<=3; dx++) { px_set(cx+dx,cy+1); px_set(cx+dx,cy+2); }
+    for (int dx=-2; dx<=2; dx++) px_set(cx+dx,cy+3);
+    px_set(cx-1,cy+4); px_set(cx,cy+4); px_set(cx+1,cy+4);
+    px_set(cx,cy+5);
+}
+static void draw_note(int x, int y) {
+    for (int a=0;a<3;a++) for (int b=0;b<3;b++) px_set(x+a, y+5+b);   /* head */
+    for (int b=0;b<8;b++) px_set(x+3, y+b);                          /* stem */
+    px_set(x+4,y); px_set(x+5,y+1);                                  /* flag */
+}
+/* A waving hand that tilts with `t` (the wave motion). */
+static void draw_wave_hand(int x, int y, int t) {
+    int s = (t & 1) ? 1 : -1;
+    for (int a=0;a<6;a++) for (int b=0;b<5;b++) px_set(x+a+(b<2?s:0), y+b+3);  /* palm */
+    for (int f=0; f<4; f++) { int fx = x + f*1 + 1; px_set(fx+s, y+1); px_set(fx+s, y+2); }
+}
+
+/* Render the octopus acting out `emote`, with `caption` to the right. `tick`
+ * drives the overlay animation. Keeps the octopus on screen at all times. */
+/* Draw the animated emote glyph relative to a base origin (bx,by) so the same
+ * code serves both orientations — only the base differs. */
+static void draw_emote_overlay(uint8_t emote, int bx, int by, uint32_t tick) {
+    switch (emote) {
+        case EMOTE_WAVE:  draw_wave_hand(bx + 2, by + 4, (int)tick); break;
+        case EMOTE_LOVE:
+            for (int i = 0; i < 3; i++) draw_heart(bx + 6 + i*13, by + 32 - (int)((tick*3 + i*7) % 32));
+            break;
+        case EMOTE_LAUGH: draw_text(bx, by + 2, (tick & 1) ? "HA HA" : " HAHA", IMG_W); break;
+        case EMOTE_PARTY:
+            draw_note(bx + 2 + ((tick&1)?0:3), by + 2);
+            draw_note(bx + 24, by + 10 + ((tick&1)?2:0));
+            draw_note(bx + 44, by + ((tick&1)?0:3));
+            break;
+        case EMOTE_SLEEPY: {
+            int n = (int)(tick % 3) + 1;
+            for (int i = 0; i < n; i++) draw_text(bx + 6 + i*12, by + 18 - i*9, "Z", IMG_W);
+            break;
+        }
+        case EMOTE_WHOA:  draw_text(bx + 2, by + 2, (tick & 1) ? "! !" : "!!!", IMG_W); break;
+        default: break;
+    }
+}
+
+/* Octopus acting out an emote — works in BOTH orientations (wide: octopus left,
+ * caption right; tall: caption top, octopus at the bottom like the main screen). */
+static void render_emote_octopus(uint8_t emote, const char *caption, uint32_t tick) {
+    if (emote >= EMOTE_COUNT) emote = EMOTE_WAVE;
+    const emote_def_t *e = &emote_defs[emote];
+    Quote tq; tq.text = ""; tq.mood = e->mood;
+    char nm[20]; snprintf(nm, sizeof(nm), "* %s *", e->name);
+
+    if (orientation_is_tall()) {
+        set_canvas_tall();
+        memset(frame, 0, sizeof(frame));
+        draw_text(6, 12, caption, 122);
+        draw_text(6, 30, nm, 122);
+        for (int x = 4; x < 118; x++) px_set(x, 44);
+        layout_ox = (122 - 65) / 2 - 5; layout_oy = 113;   /* same spot as the main tall octopus */
+        draw_octopus(&tq, e->expr, tick);
+        draw_emote_overlay(emote, 36, 70, tick);            /* just above the head */
+    } else {
+        set_canvas_wide();
+        memset(frame, 0, sizeof(frame));
+        layout_ox = 0; layout_oy = 0;
+        draw_clock_header();
+        draw_octopus(&tq, e->expr, tick);
+        draw_emote_overlay(emote, 58, 12, tick);
+        draw_text(140, 34, caption, 108);
+        draw_text(140, 52, nm, 108);
+    }
+}
+
+/* ─── Social screens (Dilder-to-Dilder) ─── */
+#define SOCIAL_MENU_COUNT 5
+#define SOC_ITEM_SCAN   0
+#define SOC_ITEM_NEARBY 1
+#define SOC_ITEM_MET    2
+#define SOC_ITEM_NAME   3
+#define SOC_ITEM_BACK   4
+static void render_social_menu(int sel) {
+    bool tall = orientation_is_tall();
+    if (tall) set_canvas_tall(); else set_canvas_wide();
+    memset(frame, 0, sizeof(frame));
+    draw_text(tall ? 8 : 40, tall ? 10 : 3, "SOCIAL", canvas_w);
+    for (int x = 4; x < canvas_w - 4; x++) px_set(x, tall ? 22 : 14);
+
+    char line[40];
+    int y = tall ? 28 : 17, dy = tall ? 17 : 12;
+    snprintf(line, sizeof(line), "ME: %s", dilder_display_name());
+    draw_text(8, y, line, canvas_w); y += dy;
+    snprintf(line, sizeof(line), "ID #%04X  MET %lu",
+             g_saved.dilder_id, (unsigned long)g_saved.met_count);
+    draw_text(8, y, line, canvas_w); y += dy + 2;
+
+    const char *items[SOCIAL_MENU_COUNT];
+    static char it0[24];
+    snprintf(it0, sizeof(it0), "SCAN: %s", g_saved.social_on ? "ON" : "OFF");
+    items[SOC_ITEM_SCAN]   = it0;
+    items[SOC_ITEM_NEARBY] = "SCAN NEARBY";
+    items[SOC_ITEM_MET]    = "DILDERS MET";
+    items[SOC_ITEM_NAME]   = "SET NAME";
+    items[SOC_ITEM_BACK]   = "BACK";
+    for (int i = 0; i < SOCIAL_MENU_COUNT; i++) {
+        int yy = y + i * dy; char l[28];
+        if (i == sel) { snprintf(l, sizeof(l), "> %s", items[i]); draw_inverted_line(yy, l); }
+        else          { snprintf(l, sizeof(l), "  %s", items[i]); draw_text(8, yy, l, canvas_w); }
+    }
+    draw_text(4, tall ? 232 : 108, "U/D  C:SEL  L:BACK", canvas_w);
+}
+
+/* Scrollable list helper shared by "DILDERS MET" and "SCAN NEARBY". `ids`/`rssi`
+ * hold `count` entries; rssi==NULL hides the dBm column (met list). */
+static void render_dilder_list(const char *title, const uint16_t *ids, const int8_t *rssi,
+                               const uint8_t *flags, int count, int sel, const char *empty,
+                               const char *foot) {
+    bool tall = orientation_is_tall();
+    if (tall) set_canvas_tall(); else set_canvas_wide();
+    memset(frame, 0, sizeof(frame));
+    draw_text(tall ? 8 : 24, tall ? 10 : 3, title, canvas_w);
+    for (int x = 4; x < canvas_w - 4; x++) px_set(x, tall ? 22 : 14);
+    if (count <= 0) {
+        draw_text(8, tall ? 60 : 40, empty, canvas_w);
+        draw_text(4, tall ? 232 : 108, "L:BACK", canvas_w);
+        return;
+    }
+    int rows = tall ? 9 : 6, top = (sel >= rows) ? sel - rows + 1 : 0;
+    int y0 = tall ? 30 : 20, dy = tall ? 20 : 13;
+    for (int i = 0; i < rows && (top + i) < count; i++) {
+        int idx = top + i;
+        char nm[24]; dilder_auto_name(ids[idx], nm, sizeof(nm));
+        char line[40];
+        if (rssi) {
+            snprintf(line, sizeof(line), "%s %ddBm", nm, (int)rssi[idx]);
+        } else {
+            char mk[4]; int k = 0;
+            if (flags && (flags[idx] & MET_HELLO_SENT)) mk[k++] = '>';
+            if (flags && (flags[idx] & MET_HELLO_RECV)) mk[k++] = '<';
+            mk[k] = '\0';
+            snprintf(line, sizeof(line), "%s %s", nm, mk);
+        }
+        int y = y0 + i * dy;
+        if (idx == sel) { char l[44]; snprintf(l, sizeof(l), "> %s", line); draw_inverted_line(y, l); }
+        else            { draw_text(8, y, line, canvas_w); }
+    }
+    draw_text(4, tall ? 232 : 108, foot, canvas_w);
+}
+
+/* "say hi?" / "say hi back?" prompts share a layout; `incoming` flips the wording. */
+static void render_social_card(bool incoming) {
+    bool tall = orientation_is_tall();
+    if (tall) set_canvas_tall(); else set_canvas_wide();
+    memset(frame, 0, sizeof(frame));
+    char nm[24]; dilder_auto_name(g_social_peer, nm, sizeof(nm));
+    char line[40];
+    int y = tall ? 24 : 6, dy = tall ? 18 : 12;
+    if (incoming) {
+        draw_text(8, y, "ANOTHER DILDER", canvas_w); y += dy;
+        draw_text(8, y, "SAYS HELLO!", canvas_w); y += dy + 3;
+    } else {
+        draw_text(8, y, "A DILDER APPEARS", canvas_w); y += dy;
+        draw_text(8, y, "IN THE WILD!", canvas_w); y += dy + 3;
+    }
+    draw_text(8, y, nm, canvas_w); y += dy;
+    snprintf(line, sizeof(line), "#%04X  %d dBm", g_social_peer, (int)g_social_peer_rssi);
+    draw_text(8, y, line, canvas_w); y += dy + 3;
+    draw_text(8, y, incoming ? "RESPOND?" : "SAY HI?", canvas_w);
+    draw_text(4, tall ? 232 : 108, incoming ? "C:EMOTE  L:NO" : "C:YES  L:NO", canvas_w);
+}
+
+static void render_social_name(void) {
+    bool tall = orientation_is_tall();
+    if (tall) set_canvas_tall(); else set_canvas_wide();
+    memset(frame, 0, sizeof(frame));
+    char nm[24]; dilder_auto_name(g_name_seed, nm, sizeof(nm));
+    int y = tall ? 24 : 8, dy = tall ? 22 : 18;
+    draw_text(8, y, "PICK A NAME:", canvas_w); y += dy + 4;
+    draw_text(8, y, nm, canvas_w);
+    draw_text(4, tall ? 232 : 108, "U/D:REROLL C:SAVE L:NO", canvas_w);
+}
+
+#define EMOTE_PICK_COUNT (EMOTE_COUNT - 1)   /* skip EMOTE_NONE */
+static void render_emote_pick(int sel) {
+    bool tall = orientation_is_tall();
+    if (tall) set_canvas_tall(); else set_canvas_wide();
+    memset(frame, 0, sizeof(frame));
+    draw_text(tall ? 8 : 24, tall ? 10 : 3, "SEND EMOTE", canvas_w);
+    for (int x = 4; x < canvas_w - 4; x++) px_set(x, tall ? 22 : 14);
+    char nm[24]; dilder_auto_name(g_social_peer, nm, sizeof(nm));
+    char line[40]; snprintf(line, sizeof(line), "TO: %s", nm);
+    int y = tall ? 28 : 18, dy = tall ? 17 : 13;
+    draw_text(8, y, line, canvas_w); y += dy + 2;
+    for (int i = 0; i < EMOTE_PICK_COUNT; i++) {
+        int yy = y + i * dy; char l[28];
+        const char *n = emote_defs[i + 1].name;
+        if (i == sel) { snprintf(l, sizeof(l), "> %s", n); draw_inverted_line(yy, l); }
+        else          { snprintf(l, sizeof(l), "  %s", n); draw_text(8, yy, l, canvas_w); }
+    }
+    draw_text(4, tall ? 232 : 108, "U/D C:SEND L:BACK", canvas_w);
+}
+
 /* ─── Manual date/time setter ─── */
 static datetime_t settime_dt;
 static int settime_field = 0;   /* 0=year 1=month 2=day 3=hour 4=min */
@@ -2459,8 +2807,8 @@ static void render_sound_menu(int sel) {
 
 /* ─── Draw device info screen ─── */
 static void render_info_screen(void) {
-    int   pct  = read_battery_percent();
-    float vsys = read_vsys_volts();
+    int   pct  = g_batt_pct;   /* filtered (hk_sample) — consistent with the icon */
+    float vsys = g_batt_v;
 
     if (orientation_is_tall()) {
         static char L[9][40]; static const char *lp[9]; int n = 0;
@@ -2921,7 +3269,7 @@ static void render_i2c_scan(void) {
 
     for (int addr = 0x08; addr < 0x78; addr++) {
         uint8_t dummy;
-        int ret = i2c_read_blocking(MPU_I2C, addr, &dummy, 1, false);
+        int ret = i2c_read_timeout_us(MPU_I2C, addr, &dummy, 1, false, MPU_I2C_TIMEOUT_US);
         if (ret >= 0 && found_count < 16) {
             found[found_count++] = (uint8_t)addr;
             printf("[I2C]   Device at 0x%02X\n", addr);
@@ -3112,6 +3460,10 @@ static void saved_seed_defaults(void) {
     strncpy(g_saved.nets[1].ssid, "MoopsterCell",  sizeof(g_saved.nets[1].ssid) - 1);
     strncpy(g_saved.nets[1].pass, WIFI_PASS,       sizeof(g_saved.nets[1].pass) - 1);
     g_saved.vsys_cal = 1.0f;
+    g_saved.dilder_id = 0;            /* 0 → generated in saved_load() */
+    g_saved.dilder_name[0] = '\0';
+    g_saved.social_on = 0;
+    g_saved.met_count = 0;
 }
 
 static void saved_load(void) {
@@ -3122,17 +3474,83 @@ static void saved_load(void) {
         saved_seed_defaults();   /* first boot — persist the two defaults */
         saved_write_flash();
     }
-    /* Older flash images lack vsys_cal (reads as 0xFF→NaN/garbage) — sanitise. */
-    if (!(g_saved.vsys_cal >= 0.5f && g_saved.vsys_cal <= 2.0f)) g_saved.vsys_cal = 1.0f;
-    g_vsys_cal = g_saved.vsys_cal;
+    /* Battery trim is NOT loaded from flash anymore: the measurement uses the
+     * baked nominal estimate (VSYS_CAL, the 3:1-divider + 3.3 V-ref math) every
+     * boot, so the device needs no calibration ritual. The 4-bar icon doesn't
+     * need per-board precision, and the peak-hold estimator removes the load
+     * bias that used to make calibration seem necessary. The Device-Info UP/DOWN
+     * keys remain as an OPTIONAL live trim (not persisted). For real per-board
+     * accuracy, Rev 2 will auto-anchor to 4.2 V off the TP4056 STDBY pin. */
+    g_vsys_cal = 1.0f;
+
+    /* Assign a persistent social id on first ever boot (and defend against a
+     * zeroed/sanitised field). rng is already seeded before the scheduler. */
+    if (g_saved.dilder_id == 0) {
+        g_saved.dilder_id = (uint16_t)(rng_next() & 0xFFFF);
+        if (g_saved.dilder_id == 0) g_saved.dilder_id = 0x1D1E;   /* never 0 */
+        if (g_saved.met_count > SOCIAL_MAX) g_saved.met_count = 0;
+        saved_write_flash();
+    }
+    if (g_saved.met_count > SOCIAL_MAX) g_saved.met_count = 0;     /* sanity */
+    printf("[social] this Dilder: id=%04X name=\"%s\"\n",
+           g_saved.dilder_id, dilder_display_name());
 }
 
-/* Persist the on-device battery calibration trim. */
+/* Optional LIVE battery-trim nudge (Device-Info UP/DOWN). Not persisted — it
+ * resets to the baked nominal estimate on the next boot. Kept only as a bench
+ * sanity tool; normal use needs no calibration. */
 static void battery_cal_save(float cal) {
     if (cal < 0.5f) cal = 0.5f; else if (cal > 2.0f) cal = 2.0f;
     g_vsys_cal = cal;
-    g_saved.vsys_cal = cal;
-    g_saved.magic = SAVED_MAGIC;       /* ensure a valid header if seeding */
+}
+
+/* ─── Social log (other Dilders we've met) ───────────────────────────────────
+ * Persisted in g_saved.met[]. Names aren't stored (derived from id). */
+
+/* Calendar-day key for the 24 h re-greet cooldown. RTC unset → 0 (still works:
+ * a re-greet fires whenever the day key changes). */
+static uint32_t dilder_today(void) {
+    datetime_t t;
+    rtc_get_datetime(&t);
+    if (t.year < 2020) return 0;
+    return (uint32_t)t.year * 10000u + (uint32_t)t.month * 100u + (uint32_t)t.day;
+}
+static int met_find(uint16_t id) {
+    for (uint32_t i = 0; i < g_saved.met_count && i < SOCIAL_MAX; i++)
+        if (g_saved.met[i].id == id) return (int)i;
+    return -1;
+}
+/* OR-in `flag`, stamp `day`, persisting. Evicts the oldest if the log is full. */
+static void met_record(uint16_t id, uint8_t flag, uint32_t day) {
+    int idx = met_find(id);
+    if (idx < 0) {
+        if (g_saved.met_count < SOCIAL_MAX) {
+            idx = (int)g_saved.met_count++;
+        } else {
+            /* full — evict the entry with the oldest last_day */
+            idx = 0;
+            for (uint32_t i = 1; i < SOCIAL_MAX; i++)
+                if (g_saved.met[i].last_day < g_saved.met[idx].last_day) idx = (int)i;
+        }
+        g_saved.met[idx].id = id;
+        g_saved.met[idx].flags = 0;
+    }
+    g_saved.met[idx].flags |= flag;
+    g_saved.met[idx].last_day = day;
+    saved_write_flash();
+}
+/* True if we should auto-prompt for this Dilder today (24 h cooldown). */
+static bool met_should_greet(uint16_t id) {
+    int idx = met_find(id);
+    if (idx < 0) return true;                       /* never met */
+    return g_saved.met[idx].last_day != dilder_today();
+}
+static void dilder_set_name(const char *name) {
+    snprintf(g_saved.dilder_name, sizeof(g_saved.dilder_name), "%s", name ? name : "");
+    saved_write_flash();
+}
+static void dilder_set_social(bool on) {
+    g_saved.social_on = on ? 1 : 0;
     saved_write_flash();
 }
 
@@ -3173,11 +3591,55 @@ static void wifi_connect_to(const char *ssid, const char *password) {
     cyw43_arch_enable_sta_mode();
 
     uint32_t auth = (password[0] != '\0') ? CYW43_AUTH_WPA2_AES_PSK : 0;
-    int err = cyw43_arch_wifi_connect_timeout_ms(ssid, password, auth, 15000);
+
+    /* Drive the join ourselves instead of cyw43_arch_wifi_connect_timeout_ms().
+     *
+     * WHY: under pico_cyw43_arch_lwip_sys_freertos (SMP), that SDK helper's wait
+     * loop calls cyw43_arch_wait_for_work_until(<full deadline>) — and in this
+     * config a link/DHCP-completion event does NOT reliably wake that wait. So it
+     * sleeps the entire timeout, then its own time_reached() check trips and it
+     * returns PICO_ERROR_TIMEOUT *even though association + DHCP had succeeded*.
+     * Net effect: scanning worked but every connect "failed".
+     *
+     * FIX: start the join async, then poll cyw43_tcpip_link_status() ~4x/sec so we
+     * see the LINK_UP transition (DHCP done) immediately. Link states:
+     *   0=DOWN 1=JOIN 2=NOIP 3=UP ; negative: -1=FAIL -2=NONET -3=BADAUTH. */
+    int err = cyw43_arch_wifi_connect_async(ssid, password, auth);
     if (err) {
-        printf("[WiFi] Connection failed (err=%d)\n", err);
+        printf("[WiFi] connect_async start failed (err=%d)\n", err);
         wifi_connected = false;
         return;
+    }
+
+    int last_t = -999;
+    absolute_time_t deadline = make_timeout_time_ms(20000);
+    for (;;) {
+        int ts = cyw43_tcpip_link_status(&cyw43_state, CYW43_ITF_STA);
+        if (ts != last_t) {
+            printf("[WiFi] link tcpip=%d\n", ts);
+            last_t = ts;
+        }
+        if (ts == CYW43_LINK_UP) break;          /* associated + DHCP IP assigned */
+        if (ts == CYW43_LINK_BADAUTH) {
+            printf("[WiFi] bad auth — wrong password\n");
+            wifi_connected = false;
+            return;
+        }
+        if (ts == CYW43_LINK_FAIL) {
+            printf("[WiFi] association failed\n");
+            wifi_connected = false;
+            return;
+        }
+        /* CYW43_LINK_NONET = AP not seen this round; re-issue the join (mirrors the
+         * SDK) and keep polling until the deadline. */
+        if (ts == CYW43_LINK_NONET)
+            cyw43_arch_wifi_connect_async(ssid, password, auth);
+        if (time_reached(deadline)) {
+            printf("[WiFi] timeout (last tcpip=%d)\n", last_t);
+            wifi_connected = false;
+            return;
+        }
+        cyw43_arch_wait_for_work_until(make_timeout_time_ms(250));
     }
 
     wifi_connected = true;
@@ -3237,23 +3699,71 @@ static void bt_push_status(void) {
  * ONLY runtime caller of the I2C accelerometer and the battery ADC, so those
  * blocking reads leave the UI/render path entirely. It samples motion +
  * orientation + steps every pass, the battery every ~2 s, then publishes a
- * snapshot the UI copies. Battery values are also cached in module globals so
- * the battery icon / info screen can read them without an inline ADC hit. */
-static volatile int   g_batt_pct = -1;    /* cached battery % (HK updates; -1 = USB) */
-static volatile float g_batt_v   = 0.0f;  /* cached battery volts (calibrated)        */
-
+ * snapshot the UI copies. Battery values are cached in g_batt_pct/g_batt_v
+ * (declared in the battery section) so the icon / info screen read them with no
+ * inline ADC hit. */
 void hk_sample(void) {
     orientation_update();                  /* accel -> g_orientation, steps, input rotation */
     viewing_update();                      /* updates last_motion_ms from real motion       */
     g_screen_idle = !screen_is_viewed();   /* pocket/idle freeze flag — HK owns it now       */
 
-    /* Battery changes slowly; sample ~every 2 s instead of every 50 ms. */
-    static uint32_t last_batt = 0;
+    /* ── Battery: PEAK-HOLD over a ~2 s window, then EMA-smoothed ──
+     * The old code took one instantaneous trimmed-mean burst every 2 s and showed
+     * it raw — so the reading swung with whatever load happened to be on the rail
+     * that instant (the e-ink full-refresh runs ~every 0.7 s and the radio bursts,
+     * both of which pull VSYS DOWN). Load only ever sags VSYS below the true
+     * resting voltage, never above it, so the MAX reading across a window of
+     * lightly-spaced samples ≈ the open-circuit voltage the discharge curve
+     * expects. We sample once per HK tick (~50 ms), keep the window peak, and
+     * every ~2 s fold that peak into an EMA. Result: a steady reading that tracks
+     * real charge instead of momentary load. */
+    static uint32_t batt_win_start = 0, batt_last_ms = 0;
+    static float    batt_win_peak  = 0.0f;
+    static float    batt_v_ema     = 0.0f;
     uint32_t now = to_ms_since_boot(get_absolute_time());
-    if (last_batt == 0 || now - last_batt > 2000) {
-        last_batt  = now;
-        g_batt_pct = read_battery_percent();
-        g_batt_v   = read_vsys_volts();
+
+    /* Sample at most ~4x/sec. read_vsys_volts() grabs the cyw43 lock (GP29 is
+     * shared with the CYW43 SPI), so hammering it at 20 Hz contends with the BLE
+     * radio; 250 ms still gives ~8 peak samples across a 2 s window. */
+    static int   was_usb  = -1;
+    static float last_bv  = 0.0f;     /* last on-battery reading, retained for diag */
+    static int   last_bp  = -1;
+    if (now - batt_last_ms >= 250) {
+        batt_last_ms = now;
+        bool usb = is_usb_powered();
+        if (usb) {
+            /* On USB the rail isn't the battery; show live rail volts, flag -1. */
+            g_batt_pct = -1;
+            g_batt_v   = read_vsys_volts();
+            batt_win_peak = 0.0f; batt_win_start = now; batt_v_ema = 0.0f;
+            (void)was_usb;
+            /* DIAGNOSTIC: serial needs USB, but USB hides the battery. Print the
+             * LAST on-battery reading every ~2 s so it's easy to capture: run on
+             * battery a few seconds, replug USB, read this line. */
+            static uint32_t usb_log_ms = 0;
+            if (now - usb_log_ms >= 2000) {
+                usb_log_ms = now;
+                printf("[BATT] USB rail=%.3f V | last on-battery=%.3f V %d%%\n",
+                       (double)g_batt_v, (double)last_bv, last_bp);
+            }
+        } else {
+            float v = read_vsys_volts();                 /* one clean trimmed-mean burst */
+            if (v > batt_win_peak) batt_win_peak = v;    /* keep the lightest-load sample */
+            if (batt_win_start == 0) batt_win_start = now;
+            if (batt_v_ema <= 0.0f) {                    /* seed immediately on unplug/boot */
+                batt_v_ema = v; g_batt_v = v; g_batt_pct = lipo_percent_hyst(v);
+            }
+            if (now - batt_win_start >= 2000) {
+                float peak = batt_win_peak;
+                batt_v_ema += 0.35f * (peak - batt_v_ema);   /* ~5-window settle */
+                g_batt_v    = batt_v_ema;
+                g_batt_pct  = lipo_percent_hyst(batt_v_ema);
+                batt_win_peak = 0.0f;
+                batt_win_start = now;
+            }
+            last_bv = g_batt_v; last_bp = g_batt_pct;
+        }
+        was_usb = usb ? 1 : 0;
     }
 
     sensor_snapshot_t s;
@@ -3380,6 +3890,15 @@ static void app_task(void *param) {
     rtos_wait_flash_ready();
     saved_load();   /* load cached WiFi networks (seeds Moop Ship + MoopsterCell) */
 
+    /* Social: bake our id into the beacon, and resume scanning if it was left on. */
+    dilder_social_set_self(g_saved.dilder_id);
+    if (g_saved.social_on) {
+        if (!dilder_bt_active()) dilder_bt_init();
+        bt_enabled = true;
+        dilder_social_set_self(g_saved.dilder_id);   /* re-push now that BT is up */
+        dilder_social_enable(true);
+    }
+
     /* ─── State machine ─── */
     uint8_t state = STATE_OCTOPUS;
     uint32_t frame_idx = 0;
@@ -3388,6 +3907,9 @@ static void app_task(void *param) {
     int mood_sel = 0;  /* 0 = ALL, 1-16 = specific mood */
 
     int snd_sel = 0;
+    int social_sel = 0;
+    int met_sel = 0;
+    int nearby_sel = 0;
 
     /* Sub-screen input: block on the Input task's event queue for up to `ms` ms.
      * The do-while(0) PRESERVES the old `break;` semantics in every screen body —
@@ -3429,7 +3951,11 @@ static void app_task(void *param) {
                 } else {
                     render_frame(&quotes[qi], expr, frame_idx);
                     draw_wifi_icon(0, 1, wifi_connected);   /* top-left */
-                    if (dilder_bt_state() == BT_PAIRED) draw_bt_icon(18, 1);
+                    {
+                        int soc_x = 18;
+                        if (dilder_bt_state() == BT_PAIRED) { draw_bt_icon(18, 1); soc_x = 32; }
+                        if (dilder_social_active()) draw_social_icon(soc_x, 1);
+                    }
                     draw_battery_icon(234, 1);               /* top-right */
                     {
                         char sbuf[20];
@@ -3469,6 +3995,24 @@ static void app_task(void *param) {
                     qi = pick_quote();   /* phone poked us → fresh quote */
                     speaker_tone(1600, 60);
                     wake_screen(); break;
+                }
+                /* Another Dilder in range? Interrupt the mood cycle. */
+                if (g_saved.social_on) {
+                    dilder_peer_t pr;
+                    if (dilder_social_poll(&pr)) {
+                        if (pr.hello_to_me) {
+                            met_record(pr.id, MET_HELLO_RECV, dilder_today());
+                            g_social_peer = pr.id; g_social_peer_rssi = pr.rssi;
+                            g_play_emote = pr.emote ? pr.emote : EMOTE_WAVE;
+                            g_play_incoming = true; g_play_next = STATE_SOCIAL_RECV;
+                            speaker_tone(1800, 90);
+                            wake_screen(); state = STATE_EMOTE_PLAY; break;
+                        } else if (met_should_greet(pr.id)) {
+                            g_social_peer = pr.id; g_social_peer_rssi = pr.rssi;
+                            speaker_tone(1200, 100);
+                            wake_screen(); state = STATE_SOCIAL_PROMPT; break;
+                        }
+                    }
                 }
                 if (got) {
                     wake_screen();                      /* any press = user present */
@@ -3544,6 +4088,7 @@ static void app_task(void *param) {
                         case MENU_IDX_SET_TIME:
                             rtc_get_datetime(&settime_dt); settime_field = 0;
                             state = STATE_SET_TIME; break;
+                        case MENU_IDX_SOCIAL: social_sel = 0; state = STATE_SOCIAL; break;
                         default: state = STATE_OCTOPUS; break;
                     }
                     break;
@@ -3699,8 +4244,15 @@ static void app_task(void *param) {
                     speaker_tone(500, 50); break;
                 }
                 if (inp == INPUT_UP) {        /* calibrate: treat current reading as a full 4.20 V pack */
-                    float raw = read_vsys_raw_volts();
-                    if (raw > 2.0f) { battery_cal_save(4.20f / raw); speaker_tone(1500, 80); }
+                    /* Trim against the SAME filtered value the icon shows (g_batt_v),
+                     * so the cal target matches the displayed estimator. Off-USB
+                     * only — on USB the rail isn't the resting pack voltage. */
+                    if (g_batt_pct >= 0 && g_batt_v > 2.0f) {
+                        battery_cal_save(g_vsys_cal * 4.20f / g_batt_v);
+                        speaker_tone(1500, 80);
+                    } else {
+                        speaker_tone(300, 120);   /* refuse on USB / before first reading */
+                    }
                     break;                    /* re-render with the new CAL/% */
                 }
                 if (inp == INPUT_DOWN) {      /* reset calibration */
@@ -3808,9 +4360,260 @@ static void app_task(void *param) {
                 if (inp == INPUT_CENTER) {
                     bt_enabled = !bt_enabled;
                     if (bt_enabled) { dilder_bt_init(); speaker_tone(1200, 60); }
-                    else            { dilder_bt_stop(); speaker_tone(600, 60); }  /* radio OFF → save power */
+                    else {
+                        /* radio OFF → save power; social shares the radio, so stop it too */
+                        if (g_saved.social_on) dilder_set_social(false);
+                        dilder_social_enable(false);
+                        dilder_bt_stop(); speaker_tone(600, 60);
+                    }
                 }
             }
+            break;
+        }
+
+        /* ════════ SOCIAL MENU ════════ */
+        case STATE_SOCIAL: {
+            render_social_menu(social_sel);
+            transpose_to_display();
+            display_render();
+            POLL_INPUT(4000)
+                if (inp == INPUT_UP)   { social_sel = (social_sel - 1 + SOCIAL_MENU_COUNT) % SOCIAL_MENU_COUNT; speaker_tone(600, 30); break; }
+                if (inp == INPUT_DOWN) { social_sel = (social_sel + 1) % SOCIAL_MENU_COUNT; speaker_tone(600, 30); break; }
+                if (inp == INPUT_LEFT) { state = STATE_MENU; speaker_tone(500, 50); break; }
+                if (inp == INPUT_CENTER) {
+                    switch (social_sel) {
+                    case SOC_ITEM_SCAN: {                  /* toggle persistent scanning */
+                        bool on = !g_saved.social_on;
+                        dilder_set_social(on);
+                        if (on) {
+                            if (!dilder_bt_active()) dilder_bt_init();
+                            bt_enabled = true;
+                            dilder_social_set_self(g_saved.dilder_id);
+                            dilder_social_enable(true);
+                            speaker_tone(1200, 60);
+                        } else {
+                            dilder_social_enable(false);
+                            speaker_tone(600, 60);
+                        }
+                        break;
+                    }
+                    case SOC_ITEM_NEARBY:                  /* live scan for in-range Dilders */
+                        nearby_sel = 0; g_nearby_count = 0;
+                        state = STATE_SOCIAL_NEARBY; speaker_tone(1000, 40);
+                        break;
+                    case SOC_ITEM_MET:                     /* who we've met */
+                        met_sel = 0;
+                        state = STATE_SOCIAL_MET; speaker_tone(1000, 40);
+                        break;
+                    case SOC_ITEM_NAME:                    /* set name (reroll picker) */
+                        g_name_seed = (uint16_t)rng_next();
+                        state = STATE_SOCIAL_NAME; speaker_tone(1000, 40);
+                        break;
+                    default:                               /* BACK */
+                        state = STATE_MENU; speaker_tone(500, 50);
+                        break;
+                    }
+                    break;
+                }
+            POLL_END
+            break;
+        }
+
+        /* ════════ SET NAME (reroll) ════════ */
+        case STATE_SOCIAL_NAME: {
+            render_social_name();
+            transpose_to_display();
+            display_render();
+            POLL_INPUT(8000)
+                if (inp == INPUT_UP || inp == INPUT_DOWN) {
+                    g_name_seed = (uint16_t)rng_next(); speaker_tone(800, 30); break;
+                }
+                if (inp == INPUT_CENTER) {
+                    char nm[24]; dilder_auto_name(g_name_seed, nm, sizeof(nm));
+                    dilder_set_name(nm); speaker_tone(1400, 80);
+                    state = STATE_SOCIAL; break;
+                }
+                if (inp == INPUT_LEFT) { state = STATE_SOCIAL; speaker_tone(500, 50); break; }
+            POLL_END
+            break;
+        }
+
+        /* ════════ DILDERS MET (social log) ════════ */
+        case STATE_SOCIAL_MET: {
+            int n = (int)g_saved.met_count;
+            uint16_t ids[SOCIAL_MAX]; uint8_t fl[SOCIAL_MAX];
+            for (int i = 0; i < n && i < SOCIAL_MAX; i++) { ids[i] = g_saved.met[i].id; fl[i] = g_saved.met[i].flags; }
+            render_dilder_list("DILDERS MET", ids, NULL, fl, n, met_sel,
+                               "NONE YET - TURN ON SCAN", "U/D  L:BACK");
+            transpose_to_display();
+            display_render();
+            POLL_INPUT(6000)
+                if (n > 0 && inp == INPUT_UP)   { met_sel = (met_sel - 1 + n) % n; speaker_tone(600, 30); break; }
+                if (n > 0 && inp == INPUT_DOWN) { met_sel = (met_sel + 1) % n; speaker_tone(600, 30); break; }
+                if (inp == INPUT_LEFT)          { state = STATE_SOCIAL; speaker_tone(500, 50); break; }
+            POLL_END
+            break;
+        }
+
+        /* ════════ SCAN NEARBY (live, in-range Dilders) ════════ */
+        case STATE_SOCIAL_NEARBY: {
+            /* Make sure scanning is live for the duration of this screen. */
+            if (!dilder_bt_active()) { dilder_bt_init(); bt_enabled = true; }
+            dilder_social_set_self(g_saved.dilder_id);
+            dilder_social_enable(true);
+
+            int last_count = -1, last_sel = -1, last_tall = -1;
+            for (;;) {
+                /* Drain freshly-seen Dilders into the nearby list (unique by id). */
+                dilder_peer_t pr;
+                while (dilder_social_poll(&pr)) {
+                    int f = -1;
+                    for (int i = 0; i < g_nearby_count; i++) if (g_nearby_id[i] == pr.id) { f = i; break; }
+                    if (f >= 0) { g_nearby_rssi[f] = pr.rssi; }
+                    else if (g_nearby_count < NEARBY_MAX) {
+                        g_nearby_id[g_nearby_count] = pr.id;
+                        g_nearby_rssi[g_nearby_count] = pr.rssi;
+                        g_nearby_count++;
+                    }
+                    /* NOTE: do NOT met_record() here — that flash-writes (parks the
+                     * display core) on every advert seen and would softlock. The log
+                     * is updated only when a hello is actually sent/received. */
+                }
+                int tall_now = orientation_is_tall() ? 1 : 0;
+                if (g_nearby_count != last_count || nearby_sel != last_sel || tall_now != last_tall) {
+                    if (nearby_sel >= g_nearby_count) nearby_sel = g_nearby_count ? g_nearby_count - 1 : 0;
+                    render_dilder_list("SCAN NEARBY", g_nearby_id, g_nearby_rssi, NULL,
+                                       g_nearby_count, nearby_sel,
+                                       "SCANNING... NONE YET", "C:EMOTE  L:BACK");
+                    transpose_to_display();
+                    display_render();
+                    last_count = g_nearby_count; last_sel = nearby_sel; last_tall = tall_now;
+                }
+                uint8_t inp;
+                if (!ui_get_input(&inp, 300)) continue;   /* keep scanning between presses */
+                if (inp == INPUT_LEFT) {
+                    if (!g_saved.social_on) dilder_social_enable(false);   /* stop scan if not opted-in */
+                    state = STATE_SOCIAL; speaker_tone(500, 50); break;
+                }
+                if (g_nearby_count > 0 && inp == INPUT_UP)   { nearby_sel = (nearby_sel - 1 + g_nearby_count) % g_nearby_count; speaker_tone(600, 30); }
+                if (g_nearby_count > 0 && inp == INPUT_DOWN) { nearby_sel = (nearby_sel + 1) % g_nearby_count; speaker_tone(600, 30); }
+                if (g_nearby_count > 0 && inp == INPUT_CENTER) {
+                    g_social_peer = g_nearby_id[nearby_sel];
+                    g_social_peer_rssi = g_nearby_rssi[nearby_sel];
+                    if (!g_saved.social_on) dilder_social_enable(false);  /* stop live scan; advertising stays */
+                    g_emote_sel = 0; speaker_tone(1000, 50);
+                    state = STATE_EMOTE_PICK; break;
+                }
+            }
+            break;
+        }
+
+        /* ════════ "A DILDER APPEARS — SAY HI?" ════════ */
+        case STATE_SOCIAL_PROMPT: {
+            render_social_card(false);
+            transpose_to_display();
+            display_render();
+            /* Hold the card for ~2 min so there's real time to react. Poll input
+             * AND an incoming hello each second; render only on a change (e-ink
+             * holds the image). The peer may leave range mid-window — that's fine,
+             * saying YES still logs them and best-effort broadcasts our reply. */
+            uint32_t start = to_ms_since_boot(get_absolute_time());
+            bool was_tall = orientation_is_tall();
+            for (;;) {
+                if (orientation_is_tall() != was_tall) {   /* rotated → redraw for new layout */
+                    was_tall = !was_tall;
+                    render_social_card(false); transpose_to_display(); display_render();
+                }
+                uint8_t inp;
+                if (ui_get_input(&inp, 1000)) {
+                    if (inp == INPUT_CENTER) {           /* YES — pick an emote (logs on send) */
+                        g_emote_sel = 0; state = STATE_EMOTE_PICK; speaker_tone(1000, 50); break;
+                    }
+                    if (inp == INPUT_LEFT) {             /* NO — cooldown today */
+                        met_record(g_social_peer, 0, dilder_today());
+                        speaker_tone(500, 50); state = STATE_OCTOPUS; wake_screen(); break;
+                    }
+                }
+                dilder_peer_t pr;                        /* did THEY greet us first? */
+                if (dilder_social_poll(&pr) && pr.hello_to_me && pr.id == g_social_peer) {
+                    met_record(pr.id, MET_HELLO_RECV, dilder_today());
+                    g_social_peer_rssi = pr.rssi;
+                    g_play_emote = pr.emote ? pr.emote : EMOTE_WAVE;
+                    g_play_incoming = true; g_play_next = STATE_SOCIAL_RECV;
+                    speaker_tone(1800, 90); state = STATE_EMOTE_PLAY; break;
+                }
+                if ((uint32_t)(to_ms_since_boot(get_absolute_time()) - start) >= 120000) {
+                    met_record(g_social_peer, 0, dilder_today());   /* timed out — cooldown */
+                    state = STATE_OCTOPUS; wake_screen(); break;
+                }
+            }
+            break;
+        }
+
+        /* ════════ "A DILDER SAYS HELLO!" — RESPOND? ════════ */
+        case STATE_SOCIAL_RECV: {
+            render_social_card(true);
+            transpose_to_display();
+            display_render();
+            uint32_t start = to_ms_since_boot(get_absolute_time());
+            bool was_tall = orientation_is_tall();
+            for (;;) {
+                if (orientation_is_tall() != was_tall) {
+                    was_tall = !was_tall;
+                    render_social_card(true); transpose_to_display(); display_render();
+                }
+                uint8_t inp;
+                if (ui_get_input(&inp, 1000)) {
+                    if (inp == INPUT_CENTER) {           /* respond with an emote */
+                        g_emote_sel = 0; state = STATE_EMOTE_PICK; speaker_tone(1000, 50); break;
+                    }
+                    if (inp == INPUT_LEFT) {
+                        speaker_tone(500, 50); state = STATE_OCTOPUS; wake_screen(); break;
+                    }
+                }
+                if ((uint32_t)(to_ms_since_boot(get_absolute_time()) - start) >= 120000) {
+                    state = STATE_OCTOPUS; wake_screen(); break;   /* ~2 min, then dismiss */
+                }
+            }
+            break;
+        }
+
+        /* ════════ EMOTE PICKER (send to g_social_peer) ════════ */
+        case STATE_EMOTE_PICK: {
+            render_emote_pick(g_emote_sel);
+            transpose_to_display();
+            display_render();
+            POLL_INPUT(15000)
+                if (inp == INPUT_UP)   { g_emote_sel = (g_emote_sel - 1 + EMOTE_PICK_COUNT) % EMOTE_PICK_COUNT; speaker_tone(600, 30); break; }
+                if (inp == INPUT_DOWN) { g_emote_sel = (g_emote_sel + 1) % EMOTE_PICK_COUNT; speaker_tone(600, 30); break; }
+                if (inp == INPUT_LEFT) { state = STATE_OCTOPUS; speaker_tone(500, 50); wake_screen(); break; }
+                if (inp == INPUT_CENTER) {
+                    uint8_t code = (uint8_t)(g_emote_sel + 1);   /* skip EMOTE_NONE */
+                    dilder_social_send_emote(g_social_peer, code);
+                    met_record(g_social_peer, MET_HELLO_SENT, dilder_today());
+                    g_play_emote = code; g_play_incoming = false; g_play_next = STATE_OCTOPUS;
+                    speaker_tone(1600, 80);
+                    state = STATE_EMOTE_PLAY; break;
+                }
+            POLL_END
+            break;
+        }
+
+        /* ════════ EMOTE PLAYBACK (octopus acts it out) ════════ */
+        case STATE_EMOTE_PLAY: {
+            char nm[24]; dilder_auto_name(g_social_peer, nm, sizeof(nm));
+            char cap[40];
+            if (g_play_incoming) snprintf(cap, sizeof(cap), "%s SENT YOU", nm);
+            else                 snprintf(cap, sizeof(cap), "TO %s", nm);
+            for (uint32_t t = 0; t < 6; t++) {           /* ~6 animation frames */
+                render_emote_octopus(g_play_emote, cap, t);
+                transpose_to_display();
+                display_render();
+                uint8_t inp;
+                if (ui_get_input(&inp, 350) && inp == INPUT_LEFT) break;   /* skip */
+            }
+            state = g_play_next ? g_play_next : STATE_OCTOPUS;
+            if (state == STATE_OCTOPUS) wake_screen();
             break;
         }
 

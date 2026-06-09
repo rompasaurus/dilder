@@ -71,7 +71,19 @@ This is the moment Dilder graduates from "breadboard inside a case" to **actual 
 
 ---
 
-## Latest Milestone — The Firmware Comes Alive
+## Latest Milestone — Dilder Goes Real-Time (and Social)
+
+The firmware moved off its single bare-metal loop onto **FreeRTOS across both cores** of the RP2350 — the slow e-ink refresh now lives on its own core so buttons stay snappy. And the big new trick: **Dilders can find each other.** Turn on the new **Social** mode and when another Dilder comes into Bluetooth range, your octopus pipes up — *"A Dilder appears in the wild! Say hi?"* — then **acts out an emote** (wave, hearts, laugh, party, sleepy, whoa) that the other Dilder performs on its own screen.
+
+It's all **connectionless** (a beacon broadcast, no pairing), every Dilder gets a gloriously dumb auto-name (*Unhinged Trashpanda*, anyone?), and there's a **Dilders Met** log with a 24-hour re-greet cooldown. Under the hood: input now **paces itself to the display** (no more ghost presses), the battery gauge is load-aware, and a field-debugging saga traced three "dead" units to **e-ink BUSY-line solder joints** — not the silicon — which led to hang-proof timeouts on the accelerometer and display drivers.
+
+**This milestone added:** FreeRTOS dual-core SMP rewrite · **Dilder-to-Dilder proximity hellos + emotes** (octopus animations) · Social menu, scan-nearby, met-log · display-paced input (no ghost presses) · load-aware battery reading · I²C + e-ink **timeouts** (no more boot hangs on bad hardware) · DevTool Full Erase recovery.
+
+[Read the full RTOS + social milestone :material-arrow-right:](blog/posts/rtos-rewrite-social-emotes.md){ .md-button .md-button--primary }
+
+---
+
+## Milestone — The Firmware Comes Alive
 
 The custom **Dilder Board** is running the real firmware, and it grew a brain this month: the octopus **auto-rotates** with the device, **counts your steps**, **remembers your WiFi**, flashes itself **over the air**, and now **pairs to your phone over Bluetooth LE** with a passkey shown right on the e-ink.
 

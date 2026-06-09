@@ -8245,6 +8245,10 @@ class PicotoolTab(ttk.Frame):
                                        command=self._reboot_to_bootsel)
         self._reboot_btn.pack(side=tk.LEFT, padx=(0, 4))
 
+        self._erase_btn = ttk.Button(dev_row, text="Full Erase",
+                                      command=self._full_erase)
+        self._erase_btn.pack(side=tk.LEFT, padx=(0, 4))
+
         self._dev_status = ttk.Label(dev_frame, text="Plug in Pico 2 W via USB",
                                       foreground=FG_DIM,
                                       font=("JetBrains Mono", 9))
@@ -8657,6 +8661,51 @@ REQUIREMENTS
 
         threading.Thread(target=_run, daemon=True).start()
 
+    def _full_erase(self):
+        """Erase the ENTIRE flash — recovery for a board that won't boot (snow /
+        hang) after a brownout corrupted its flash. Wipes firmware, the saved-
+        settings sector, and any bootloader; re-flash firmware afterward."""
+        if not self._picotool_path:
+            messagebox.showwarning("picotool", "Install picotool first.")
+            return
+        if not messagebox.askyesno(
+            "Full Chip Erase",
+            "This ERASES ALL FLASH on the connected Pico — firmware, saved "
+            "settings, and any bootloader.\n\n"
+            "Use it to recover a board that shows snow / won't boot after a "
+            "brownout (corrupted flash). You must re-flash firmware afterward "
+            "(it's left in BOOTSEL, ready).\n\nProceed?"):
+            return
+
+        self.app.log("[picotool] Full chip erase requested...")
+        self._dev_status.config(text="Erasing all flash...", foreground=FG_YELLOW)
+        self._erase_btn.config(state=tk.DISABLED)
+
+        def _run():
+            # -a: all of flash. -F: if running, reboot to BOOTSEL and LEAVE it
+            # there (ready to flash). Erase of 4-16 MB can take several seconds.
+            rc, out, err = self._run_picotool(["erase", "-a", "-F"], timeout=60)
+            if rc != 0:
+                # Already in BOOTSEL (firmware hung / manual BOOTSEL) → plain erase.
+                rc, out, err = self._run_picotool(["erase", "-a"], timeout=60)
+
+            def _update():
+                self._erase_btn.config(state=tk.NORMAL)
+                if rc == 0:
+                    self._dev_status.config(
+                        text="Flash erased — now Flash Firmware to restore",
+                        foreground=FG_GREEN)
+                    self.app.log("[picotool] Full erase complete. Board is blank "
+                                 "and in BOOTSEL — flash firmware next.")
+                else:
+                    msg = (err.strip() or out.strip()
+                           or "No device. Hold BOOTSEL, plug in, then retry.")
+                    self._dev_status.config(text=msg[:70], foreground=FG_RED)
+                    self.app.log(f"[picotool] Erase failed: {msg}")
+            self.after(0, _update)
+
+        threading.Thread(target=_run, daemon=True).start()
+
     def _wait_for_bootsel_mount(self, timeout=8):
         """Wait for the BOOTSEL drive to appear. Returns mount path or None."""
         for _ in range(timeout * 4):
@@ -8668,36 +8717,42 @@ REQUIREMENTS
 
     @staticmethod
     def _eject_bootsel(mount_path):
-        """Sync and unmount/eject the BOOTSEL drive to trigger Pico reboot."""
+        """Flush writes and LOGICALLY unmount the BOOTSEL drive.
+
+        We deliberately do NOT call `eject`: on USB mass storage `eject` issues a
+        SCSI START STOP UNIT (power-off) that wedges the xHCI port until the host
+        controller resets (i.e. a reboot), which previously left the Pico unable
+        to re-enumerate. It is also unnecessary — the RP2 bootrom auto-reboots the
+        moment it has received a complete .uf2, so all we need is to flush the
+        write and clean up the (now stale) mountpoint logically. Both unmount
+        attempts are best-effort; failure is fine (the device is likely already
+        gone, having rebooted itself)."""
         try:
-            # Sync to flush writes
+            # Flush buffered writes to the device before it reboots.
             subprocess.run(["sync"], timeout=5)
-            # Try udisksctl (most desktop Linux)
-            r = subprocess.run(
-                ["udisksctl", "unmount", "-b",
-                 subprocess.run(
-                     ["findmnt", "-n", "-o", "SOURCE", str(mount_path)],
-                     capture_output=True, text=True, timeout=5
-                 ).stdout.strip()],
-                capture_output=True, text=True, timeout=10)
-            if r.returncode == 0:
-                return True
         except Exception:
             pass
         try:
-            # Fallback: umount
+            # Logical unmount via udisksctl (most desktop Linux). Safe — no power-off.
+            src = subprocess.run(
+                ["findmnt", "-n", "-o", "SOURCE", str(mount_path)],
+                capture_output=True, text=True, timeout=5).stdout.strip()
+            if src:
+                r = subprocess.run(
+                    ["udisksctl", "unmount", "-b", src],
+                    capture_output=True, text=True, timeout=10)
+                if r.returncode == 0:
+                    return True
+        except Exception:
+            pass
+        try:
+            # Fallback: plain logical umount (also safe — never powers the port off).
             subprocess.run(["umount", str(mount_path)],
                            capture_output=True, timeout=10)
             return True
         except Exception:
             pass
-        try:
-            # Fallback: eject
-            subprocess.run(["eject", str(mount_path)],
-                           capture_output=True, timeout=10)
-            return True
-        except Exception:
-            pass
+        # Even if both unmounts failed, the device reboots itself — not an error.
         return False
 
     def _flash_firmware(self):
@@ -8837,14 +8892,14 @@ REQUIREMENTS
                     text="Ejecting drive — Pico will reboot...",
                     foreground=FG_YELLOW))
                 self.after(0, lambda: self.app.log(
-                    "[picotool] Ejecting BOOTSEL drive..."))
+                    "[picotool] Flushing + unmounting BOOTSEL drive..."))
 
                 if self._eject_bootsel(mount):
                     self.after(0, lambda: self.app.log(
-                        "[picotool] Drive ejected — Pico rebooting"))
+                        "[picotool] Unmounted — Pico reboots itself into the new firmware"))
                 else:
                     self.after(0, lambda: self.app.log(
-                        "[picotool] Auto-eject failed — unplug USB to reboot"))
+                        "[picotool] Mountpoint already gone — Pico already rebooting (normal)"))
 
                 self.after(0, lambda: self._progress_var.set(90))
                 time.sleep(3)

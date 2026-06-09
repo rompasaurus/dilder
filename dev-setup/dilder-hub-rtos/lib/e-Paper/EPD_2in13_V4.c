@@ -83,9 +83,18 @@ static void EPD_2in13_V4_ReadBusy(void)
 {
     /* Poll at 2 ms (was 10 ms) so we detect refresh-complete up to ~8 ms sooner
      * — shaves latency off every screen update. Under FreeRTOS DEV_Delay_ms
-     * yields, so this does not busy-spin the core. */
-    while (DEV_Digital_Read(EPD_BUSY_PIN) == 1)
+     * yields, so this does not busy-spin the core.
+     *
+     * BOUNDED: a real refresh finishes in well under 1 s. Cap the wait at ~3 s so
+     * a panel whose BUSY line is stuck asserted (bad FPC / shorted-high GP22) can
+     * NEVER hang the Display task and freeze the whole UI — it just gives up and
+     * carries on (the panel won't show correctly, but the device stays alive and
+     * the fast "refresh" time in the log flags the fault). */
+    int waited = 0;
+    while (DEV_Digital_Read(EPD_BUSY_PIN) == 1) {
         DEV_Delay_ms(2);
+        if ((waited += 2) >= 3000) break;
+    }
     DEV_Delay_ms(2);
 }
 

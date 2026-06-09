@@ -7,6 +7,7 @@
 /* BTstack features */
 #define ENABLE_BLE
 #define ENABLE_LE_PERIPHERAL
+#define ENABLE_LE_CENTRAL                 /* scan/observer for Dilder-to-Dilder discovery */
 #define ENABLE_LE_SECURE_CONNECTIONS
 #define ENABLE_LE_DATA_LENGTH_EXTENSION
 #define ENABLE_LOG_ERROR

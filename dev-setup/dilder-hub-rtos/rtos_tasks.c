@@ -108,6 +108,15 @@ bool ui_get_input(uint8_t *code, uint32_t timeout_ms) {
     return xQueueReceive(g_input_q, code, pdMS_TO_TICKS(timeout_ms)) == pdTRUE;
 }
 
+/* The e-ink is "busy" whenever a frame is in flight — i.e. fewer than both
+ * double-buffers sit free. (display_render() pulls a buffer out to fill it; the
+ * Display task returns it after the ~0.7 s waveform completes.) The Input task
+ * uses this to PACE presses to the panel instead of a fixed timer. */
+#define NUM_DISP_BUFFERS 2
+bool ui_display_busy(void) {
+    return g_free_q && uxQueueMessagesWaiting(g_free_q) < NUM_DISP_BUFFERS;
+}
+
 /* ----------------------------------------------------------------------------
  *  Display task (core 1, alone) — the ONLY post-boot caller of the e-ink driver
  * ------------------------------------------------------------------------- */
@@ -153,48 +162,77 @@ static void display_task(void *arg) {
  *  centralizing it here means every screen gets clean, identical events from one
  *  place. (doc 06 §4 / the plan's step 5.) */
 /* Woken by the joystick GPIO interrupt (main.c's callback calls this). Pure
- * notification — no work in the ISR beyond unblocking the Input task. */
+ * notification — no work in the ISR beyond unblocking the Input task. The body is
+ * compiled out unless INPUT_USE_IRQ=1; in the default polling build the function
+ * still exists (harmless no-op) but nothing wires the ISR that would call it. */
 void rtos_input_isr_notify(void) {
+#if INPUT_USE_IRQ
     if (!g_input_task) return;                   /* task not created yet → ignore the edge */
     BaseType_t woke = pdFALSE;
     vTaskNotifyGiveFromISR(g_input_task, &woke);
     portYIELD_FROM_ISR(woke);                    /* switch to the Input task immediately if it's higher prio */
+#endif
 }
 
 static void input_task(void *arg) {
     (void)arg;
     uint8_t    prev     = INPUT_NONE;
+    uint8_t    pending  = INPUT_NONE;             /* press waiting for the panel to settle */
     uint32_t   key_down = 0;                      /* ms when the current hold began */
     uint32_t   last_rep = 0;                      /* ms of the last emitted (auto-)repeat */
+#if INPUT_USE_IRQ
     TickType_t wait     = portMAX_DELAY;          /* idle: sleep until an edge interrupt */
+#endif
 
     for (;;) {
-        /* Sleep with ZERO CPU until a joystick edge wakes us (instant press), or
-         * — while a key is held — until the repeat interval elapses. */
+#if INPUT_USE_IRQ
+        /* Interrupt mode: sleep with ZERO CPU until a joystick edge wakes us
+         * (instant press), or — while a key is held — until the repeat interval
+         * elapses. */
         ulTaskNotifyTake(pdTRUE, wait);
         vTaskDelay(pdMS_TO_TICKS(2));             /* tiny settle so a contact bounce reads as one level */
+#else
+        /* Polling mode (default): ~125 Hz sampling; vTaskDelay yields the core
+         * each pass, so this is not a busy-spin. Proven path (Phase 2). */
+        vTaskDelay(pdMS_TO_TICKS(8));
+#endif
 
         uint8_t  j = read_joystick();             /* main.c: rotated current direction */
         uint32_t t = xTaskGetTickCount() * portTICK_PERIOD_MS;
-        uint8_t  emit = INPUT_NONE;
 
+        /* Turn the raw level into a "pending intent" rather than emitting straight
+         * away. UP/DOWN auto-repeat while held; the others are one-shot edges. */
         if (j == INPUT_UP || j == INPUT_DOWN) {
             int edge   = (prev != j);
             int repeat = !edge && (t - key_down) > INPUT_REPEAT_DELAY_MS
                                 && (t - last_rep) > INPUT_REPEAT_RATE_MS;
-            if (edge)   key_down = t;
-            if (edge || repeat) { emit = j; last_rep = t; }
+            if (edge)        { key_down = t; pending = j; }
+            else if (repeat) { pending = j; }     /* last_rep is set when we actually emit */
         } else if (j != INPUT_NONE) {             /* LEFT / RIGHT / CENTER */
-            if (prev != j) emit = j;              /* one-shot on the press edge */
+            if (prev != j) pending = j;           /* one-shot on the press edge */
         }
         prev = j;
 
-        if (emit != INPUT_NONE)
-            xQueueSend(g_input_q, &emit, 0);      /* never block; UI drains when it can */
+        /* DISPLAY-PACED EMIT — the clever bit. Only release a press once the panel
+         * has caught up (both buffers free). This makes the FIRST press instant
+         * (panel idle → emit this tick), COALESCES a mash during a ~0.7 s refresh
+         * into a single move (pending just gets overwritten), and THROTTLES a held
+         * key to the panel's real refresh rate. No fixed timeout, no queue pile-up,
+         * no ghost presses — response time self-tunes to the display. A press made
+         * mid-refresh is remembered (survives release) so deliberate taps still
+         * count; only repeats/mashes are thrown out. */
+        if (pending != INPUT_NONE && !ui_display_busy()) {
+            xQueueSend(g_input_q, &pending, 0);
+            last_rep = t;
+            pending = INPUT_NONE;
+        }
 
+#if INPUT_USE_IRQ
         /* Held → wake again in one repeat interval; released/idle → sleep until
          * the next edge interrupt (no polling, no wasted power). */
-        wait = (j != INPUT_NONE) ? pdMS_TO_TICKS(INPUT_REPEAT_RATE_MS) : portMAX_DELAY;
+        wait = (j != INPUT_NONE || pending != INPUT_NONE)
+                   ? pdMS_TO_TICKS(INPUT_REPEAT_RATE_MS) : portMAX_DELAY;
+#endif
     }
 }
 

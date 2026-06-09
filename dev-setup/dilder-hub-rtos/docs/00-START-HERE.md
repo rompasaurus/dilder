@@ -79,6 +79,8 @@ on a single thread those fight each other. See **doc 03** for the full primer.
 | 07 | **07-BUILD-AND-DEPLOY.md** | How to compile, flash over USB, and update over Wi-Fi (incl. the DevTool) |
 | 08 | **08-FUNCTION-REFERENCE.md** | Per-module breakdown of the important functions and calls |
 | 09 | **09-SOURCES-AND-FURTHER-READING.md** | Cited, linked references that justify these design choices |
+| 10 | **10-SOCIAL-AND-EMOTES.md** | Dilder-to-Dilder proximity hellos + emotes (connectionless BLE beacon), the Social menu, names, the met-log |
+| 11 | **11-TROUBLESHOOTING.md** | Field diagnosis from the serial log — refresh-time/battery meters, the symptom→cause→fix chart, recovery |
 
 ---
 
