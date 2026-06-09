@@ -5790,6 +5790,7 @@ class ProgramsTab(ttk.Frame):
         # default_mood collapses them all to mood 0 — the bug that left 12 of
         # 16 moods empty and made every state show the same NORMAL phrases.)
         "dilder_hub":             (DILDER_HUB_QUOTES, "~ DILDER HUB ~", None),
+        "dilder_hub_rtos":        (DILDER_HUB_QUOTES, "~ DILDER HUB RTOS ~", None),
         "mood_selector":          (DILDER_HUB_QUOTES, "~ MOOD SELECTOR ~", None),
         "joystick_mood_selector": (DILDER_HUB_QUOTES, "~ JOYSTICK MOOD ~", None),
     }
@@ -6406,6 +6407,7 @@ class ProgramsTab(ttk.Frame):
     # Maps program keys to their firmware directory name
     _FIRMWARE_DIRS = {
         "dilder_hub":             "dilder-hub",
+        "dilder_hub_rtos":        "dilder-hub-rtos",
         "sassy_octopus":          "sassy-octopus",
         "supportive_octopus":     "supportive-octopus",
         "angry_octopus":          "angry-octopus",
@@ -7019,6 +7021,7 @@ class OTAUpdateTab(ttk.Frame):
             "moodselector-sound",
             "moodselector-sound-wifi",
             "dilder-hub",
+            "dilder-hub-rtos",
         ]),
     ]
 
@@ -7479,14 +7482,24 @@ and restored when you reopen the DevTool.
             return
 
         variant = self._get_variant_key()
-        # The bundled dilder-hub uses the Dilder SPI0 e-ink wiring (GP17-22),
-        # shared by the PCB and the breadboard prototype.
-        _w = apply_eink_wiring(DEV_SETUP / "dilder-hub",
+
+        # Build the combined image for whichever OTA-capable firmware is selected
+        # in the tree (so dilder-hub-rtos builds itself); fall back to dilder-hub.
+        _selk, _sele, sel_dir, sel_name = self._get_selected_firmware()
+        if (not sel_dir
+                or not (DEV_SETUP / sel_dir / "CMakeLists.txt").exists()
+                or "PICOWOTA_OTA" not in (DEV_SETUP / sel_dir / "CMakeLists.txt").read_text(errors="ignore")):
+            sel_dir, sel_name = "dilder-hub", "dilder_hub"
+        self._boot_fw_dir, self._boot_fw_name = sel_dir, sel_name
+
+        # Both dilder-hub and dilder-hub-rtos use the Dilder SPI0 e-ink wiring
+        # (GP17-22), shared by the PCB and the breadboard prototype.
+        _w = apply_eink_wiring(DEV_SETUP / sel_dir,
                                self.app.target_board in DILDER_PCB_BOARDS)
         if _w:
             self.app.log(f"[ota] e-ink wiring set for {_w}")
-        self.app.log(f"[ota] Building combined bootloader+app: mode={mode}, "
-                     f"ssid={ssid}, display={variant}")
+        self.app.log(f"[ota] Building combined bootloader+app for '{sel_dir}': "
+                     f"mode={mode}, ssid={ssid}, display={variant}")
         self._boot_status.config(text="Building combined image (pico2_w)...",
                                   foreground=FG_YELLOW)
         self._build_bl_btn.config(state=tk.DISABLED)
@@ -7501,25 +7514,25 @@ and restored when you reopen the DevTool.
                         text="picowota not installed", foreground=FG_RED))
                     return
 
-                if not (DEV_SETUP / "dilder-hub" / "CMakeLists.txt").exists():
+                if not (DEV_SETUP / self._boot_fw_dir / "CMakeLists.txt").exists():
                     self.after(0, lambda: self.app.log(
-                        "[ota] ERROR: dilder-hub project not found (needed for the combined image)"))
+                        f"[ota] ERROR: {self._boot_fw_dir} project not found (needed for the combined image)"))
                     self.after(0, lambda: self._boot_status.config(
-                        text="dilder-hub not found", foreground=FG_RED))
+                        text=f"{self._boot_fw_dir} not found", foreground=FG_RED))
                     return
 
                 self.after(0, lambda: self.app.log(
                     f"[ota] WiFi: mode={'AP' if mode == 'ap' else 'STA'}, ssid={ssid}"))
 
                 combined_uf2, standalone_elf = self._compile_ota_image(
-                    "dilder-hub", "dilder_hub", variant, ssid, password, mode,
+                    self._boot_fw_dir, self._boot_fw_name, variant, ssid, password, mode,
                     clean=True)
 
                 if combined_uf2:
                     size_kb = combined_uf2.stat().st_size // 1024
                     self.after(0, lambda: self.app.log(
                         f"[ota] Combined image ready: {combined_uf2.name} ({size_kb}KB). "
-                        "OTA payload: build-ota/dilder_hub.elf"))
+                        f"OTA payload: build-ota/{self._boot_fw_name}.elf"))
                     self.after(0, lambda: self._boot_status.config(
                         text=f"Built {combined_uf2.name} ({size_kb}KB) — flash via USB next",
                         foreground=FG_GREEN))
@@ -7542,8 +7555,10 @@ and restored when you reopen the DevTool.
 
     def _flash_bootloader_usb(self):
         """Flash the combined bootloader+app image via USB BOOTSEL."""
-        # The combined image is produced by the dilder-hub OTA build.
-        build_dir = DEV_SETUP / "dilder-hub" / "build-ota"
+        # Flash the combined image for the firmware we last built (dilder-hub or
+        # dilder-hub-rtos); fall back to dilder-hub if nothing has been built yet.
+        boot_dir = getattr(self, "_boot_fw_dir", "dilder-hub")
+        build_dir = DEV_SETUP / boot_dir / "build-ota"
         uf2_files = (list(build_dir.glob("picowota_*.uf2"))
                      if build_dir.exists() else [])
 
