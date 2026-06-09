@@ -87,15 +87,21 @@ on a single thread those fight each other. See **doc 03** for the full primer.
 This firmware is built in phases so each step is independently testable. See
 **05-DESIGN-AND-ARCHITECTURE.md** for details.
 
-- ✅ **Phase 0/1 — DONE:** FreeRTOS is integrated; the entire original program runs as a
-  single task under the scheduler on core 0; builds for USB and Wi-Fi-OTA. This proves
-  the operating system, Wi-Fi, Bluetooth, and the updater all work under the RTOS.
-- 🔜 **Phase 2 — task split:** carve the monolith into Input / UI / Display / Housekeeping
-  tasks and pin the slow Display task to core 1 (the responsiveness payoff).
-- 🔜 **Phase 3 — hardening:** background sensor task, multicore-safe flash writes, a
-  hardware interrupt for the screen-busy signal, and stack tuning.
+- ✅ **Phase 0/1 — DONE:** FreeRTOS integrated; the whole program ran as one task under the
+  scheduler; builds for USB and Wi-Fi-OTA.
+- ✅ **Phase 2 — DONE:** split into **Input / UI / Display / Housekeeping** tasks; the slow
+  Display task is pinned **alone to core 1** (the responsiveness payoff); input flows through
+  a queue (with edge + auto-repeat); sensors publish a mutex-guarded snapshot; flash writes
+  are multicore-safe via `flash_safe_execute` + a core-1 lockout handshake. Implemented in
+  `rtos_tasks.c`, builds clean, and was put through a multi-agent adversarial concurrency
+  review whose findings were fixed.
+- 🔜 **Phase 3 — hardening (optional):** a BUSY-pin interrupt so the Display task *blocks*
+  instead of polling (marginal — the e-ink wait already yields core 1), and stack tuning from
+  on-device high-water marks.
 
-Where a doc describes Phase 2/3 design that is not yet in the code, it says so.
+> On-device validation (input latency during a refresh, BLE pairing, OTA round-trip) still
+> needs the physical board: the builds are verified, the hardware behaviour is owed.
+> Where a doc still describes Phase 3 design not yet in the code, it says so.
 
 ---
 

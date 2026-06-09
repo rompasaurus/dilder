@@ -132,14 +132,20 @@ the bootloader must happen on bare metal, with no tasks alive.
 | Piece | Status |
 |---|---|
 | FreeRTOS SMP integrated, builds USB + OTA | ✅ Phase 0 |
-| Whole program runs as one task under the scheduler (core 0) | ✅ Phase 1 (in `main.c`'s `app_task`) |
-| cyw43 pinned to core 0 (explicit affinity) | 🔜 Phase 2 (currently default affinity) |
-| Split into Input / UI / Display / Housekeeping tasks | 🔜 Phase 2 |
-| Display pinned to core 1 + double-buffer render hand-off | 🔜 Phase 2 |
-| Sensor snapshot + mutex; queues for input | 🔜 Phase 2/3 |
-| `flash_safe_execute()` for settings/calibration writes | 🔜 Phase 3 |
-| BUSY-pin interrupt → Display task notification | 🔜 Phase 3 |
-| Stack/priority tuning via high-water marks | 🔜 Phase 3 |
+| Whole program runs as one task under the scheduler (core 0) | ✅ Phase 1 |
+| Split into Input / UI / Display / Housekeeping tasks | ✅ Phase 2 (`rtos_tasks.c`) |
+| Display pinned to core 1 + 2-buffer render hand-off | ✅ Phase 2 |
+| Input task + event queue (edge + auto-repeat) | ✅ Phase 2 |
+| Housekeeping task + mutex-guarded sensor snapshot | ✅ Phase 2 |
+| `flash_safe_execute()` for settings/calibration writes (+ core-1 lockout handshake) | ✅ Phase 2 |
+| Verified by multi-agent adversarial concurrency review | ✅ Phase 2 |
+| BUSY-pin interrupt → Display blocks instead of polling | 🔜 Phase 3 (marginal: the e-ink wait already yields core 1 cooperatively) |
+| Stack/priority tuning via `uxTaskGetStackHighWaterMark` | 🔜 Phase 3 (needs on-device measurement) |
 
-Until Phase 2 lands, the firmware behaves exactly like the original (no responsiveness gain
-yet) but is provably running on the RTOS — the foundation the rest builds on.
+Phase 2 is implemented and builds clean (0 warnings) for USB + OTA. An adversarial review
+(3 diverse-lens reviewers + synthesis) confirmed the concurrency core — the 2-buffer hand-off,
+the snapshot mutex, the `POLL_INPUT` rewrite, and the `flash_safe_execute` mechanism — is
+correct; the review's polish findings (flash handshake, step double-count, menu repeat fold,
+volatiles) were fixed. The remaining Phase 3 items are hardening that is either marginal (the
+display already yields core 1) or requires the physical board (stack high-water marks).
+On-device validation of input latency, BLE pairing, and OTA is still owed by the hardware.
