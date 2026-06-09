@@ -13,6 +13,13 @@
 #include "rtos_tasks.h"
 #include "pico/flash.h"   /* flash_safe_execute_core_init — core-1 side of safe flash writes */
 #include <string.h>
+#include <stdio.h>
+
+/* Set to 1 to log each e-ink refresh duration over USB serial (helps decide if
+ * further display-speed work is worth it). Set to 0 to silence. */
+#ifndef EPD_TIMING
+#define EPD_TIMING 1
+#endif
 
 /* INPUT_* codes live in main.c; mirror the ones we need (kept in sync by hand).
  * They are tiny stable constants, not worth a shared header just for these. */
@@ -123,7 +130,14 @@ static void display_task(void *arg) {
         int idx;
         /* Sleep here (no CPU burned) until the UI hands us a filled buffer. */
         if (xQueueReceive(g_render_q, &idx, portMAX_DELAY) != pdTRUE) continue;
-        display_blit(idx);              /* main.c: EPD_Partial(display_buf[idx]) — ~300 ms */
+#if EPD_TIMING
+        TickType_t t0 = xTaskGetTickCount();
+        display_blit(idx);              /* main.c: EPD_Partial(display_buf[idx]) — the e-ink waveform */
+        printf("[disp] refresh %lu ms\n",
+               (unsigned long)((xTaskGetTickCount() - t0) * portTICK_PERIOD_MS));
+#else
+        display_blit(idx);
+#endif
         xQueueSend(g_free_q, &idx, portMAX_DELAY);   /* return the buffer to the UI */
     }
 }
