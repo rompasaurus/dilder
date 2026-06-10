@@ -2009,6 +2009,20 @@ static bool battery_adc_ready = false;
 #endif
 static float g_vsys_cal = 1.0f;        /* persisted runtime calibration trim */
 
+/* Battery-path voltage drop (ADDED BACK on battery only). The cell reaches the
+ * Pico's VSYS through the board's series elements (D3 Schottky + slide switch),
+ * so a full 4.20 V cell reads ~3.67 V at the ADC — about 0.53 V low. The USB
+ * path doesn't have this drop (USB rail reads correctly at ~4.57 V), so the
+ * offset is applied ONLY to on-battery samples. Measured on hardware: full pack
+ * tops out at ~3.67 V device-read → +0.53 V puts it back at 4.20 V = 100%. */
+#define VSYS_BATT_OFFSET 0.53f
+
+/* True while USB is connected (updated by hk_sample). Used for the "charging
+ * power-diet": with no load-sharing on the board, the running radio/e-ink load
+ * can out-draw the ~120 mA charger, so the cell never fills. While on USB we
+ * suspend BLE scanning and slow the e-ink so the charge current wins. */
+static volatile bool g_on_usb = false;
+
 /* Filtered battery state, owned and updated by the Housekeeping task (hk_sample)
  * and read by the battery icon / info screen — so the render path never does an
  * inline ADC hit, and everything shows ONE smoothed value instead of a fresh,
@@ -3731,6 +3745,15 @@ void hk_sample(void) {
     if (now - batt_last_ms >= 250) {
         batt_last_ms = now;
         bool usb = is_usb_powered();
+        g_on_usb = usb;
+        /* Charging power-diet: on a USB plug/unplug edge, suspend BLE scanning
+         * while charging (it's the biggest continuous radio load), and restore
+         * the user's setting when unplugged — so the cell can actually fill. */
+        if ((was_usb != 1) && usb) {
+            dilder_social_enable(false);
+        } else if ((was_usb != 0) && !usb) {
+            if (g_saved.social_on) { dilder_social_set_self(g_saved.dilder_id); dilder_social_enable(true); }
+        }
         if (usb) {
             /* On USB the rail isn't the battery; show live rail volts, flag -1. */
             g_batt_pct = -1;
@@ -3747,7 +3770,8 @@ void hk_sample(void) {
                        (double)g_batt_v, (double)last_bv, last_bp);
             }
         } else {
-            float v = read_vsys_volts();                 /* one clean trimmed-mean burst */
+            /* Add back the battery-path drop so device-read 3.67 V (full) → 4.20 V. */
+            float v = read_vsys_volts() + VSYS_BATT_OFFSET;
             if (v > batt_win_peak) batt_win_peak = v;    /* keep the lightest-load sample */
             if (batt_win_start == 0) batt_win_start = now;
             if (batt_v_ema <= 0.0f) {                    /* seed immediately on unplug/boot */
@@ -3981,7 +4005,12 @@ static void app_task(void *param) {
             sensor_snapshot_t s; rtos_snapshot_get(&s);
             uint8_t o0    = s.orientation;
             bool    idle0 = g_screen_idle;
-            for (int i = 0; i < 200 && state == STATE_OCTOPUS; i++) {
+            /* While charging, animate ~10x less often (each tick is ~15 ms, so
+             * 200=~3 s normally, 2000=~30 s on USB) to cut e-ink refresh load and
+             * let the cell charge. Input still polled every tick, so it stays
+             * responsive — only the idle animation cadence slows. */
+            int octo_ticks = g_on_usb ? 2000 : 200;
+            for (int i = 0; i < octo_ticks && state == STATE_OCTOPUS; i++) {
                 uint8_t inp;
                 bool got = ui_get_input(&inp, 15);     /* ~15 ms tick; sleeps efficiently */
                 rtos_snapshot_get(&s);
