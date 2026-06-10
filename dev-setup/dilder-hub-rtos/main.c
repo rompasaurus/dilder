@@ -188,6 +188,12 @@ static const orient_cfg_t ORIENT_CFG[3] = {
 };
 static bool orientation_is_tall(void) { return ORIENT_CFG[g_orientation].tall; }
 
+/* Display settings (runtime mirror of g_saved.auto_rotate / .manual_orient, which
+ * are declared much later; loaded in saved_load). When auto_rotate is false,
+ * orientation_update() locks g_orientation to g_manual_orient. */
+static bool    g_auto_rotate   = true;
+static uint8_t g_manual_orient = OR_TALL;
+
 /* Directions in clockwise order; the rotation is how many 90° CW steps the
  * device is turned, so a press maps forward around the ring by that many. */
 static const uint8_t CW_RING[4] = { INPUT_UP, INPUT_RIGHT, INPUT_DOWN, INPUT_LEFT };
@@ -234,6 +240,7 @@ uint8_t read_joystick(void) {
 #define STATE_SOCIAL_NEARBY   18  /* live list of Dilders in range now */
 #define STATE_EMOTE_PICK      19  /* pick an emote to send to g_social_peer */
 #define STATE_EMOTE_PLAY      20  /* octopus acts out g_play_emote, then g_play_next */
+#define STATE_DISPLAY         21  /* Display settings: auto-rotate + orientation */
 
 /* ─── WiFi state ─── */
 static bool wifi_enabled = false;
@@ -539,6 +546,14 @@ static void wake_screen(void) {        /* user is present → unfreeze + redraw 
  * are first-pass guesses — confirm each physical hold on the device and adjust.
  * Throttled to ~4 Hz; cheap enough to leave running. */
 static void orientation_update(void) {
+    /* Manual orientation: lock to the user's chosen hold regardless of the
+     * accelerometer (so it works even on a unit with no accel). */
+    if (!g_auto_rotate) {
+        if (g_orientation != (int)g_manual_orient) {
+            g_orientation = (int)g_manual_orient;
+            input_set_rotation(ORIENT_CFG[g_orientation].in_rot);
+        }
+    }
     if (!mpu_ok) return;
     static uint32_t last_ms = 0;
     uint32_t now = to_ms_since_boot(get_absolute_time());
@@ -548,6 +563,7 @@ static void orientation_update(void) {
     mpu_read_all();
     pedometer_update();          /* coarse step sampling at this 4 Hz cadence */
     activity_update(250);        /* daily steps + active-time accrual */
+    if (!g_auto_rotate) return;   /* manual hold: steps counted, skip auto-rotate */
     float ax = accel_g(accel_x), ay = accel_g(accel_y), az = accel_g(accel_z);
 
     /* In-plane gravity angle (degrees, 0..360). Measured anchors:
@@ -2223,13 +2239,15 @@ static const char *menu_items[] = {
     "DEVICE INFO",
     "SET TIME",
     "SOCIAL",
+    "DISPLAY",
     "BACK",
 };
-#define MENU_COUNT 9
+#define MENU_COUNT 10
 #define MENU_IDX_BLUETOOTH 2
 #define MENU_IDX_SET_TIME  6
 #define MENU_IDX_SOCIAL    7
-#define MENU_IDX_BACK      8
+#define MENU_IDX_DISPLAY   8
+#define MENU_IDX_BACK      9
 
 /* ─── Helper: draw inverted text (white on black bar) ─── */
 static void draw_inverted_line(int y, const char *text) {
@@ -2376,6 +2394,11 @@ typedef struct {
     uint8_t      social_on;            /* persisted opt-in for proximity scanning */
     uint32_t     met_count;
     dilder_met_t met[SOCIAL_MAX];
+    /* ── Display settings (appended AFTER the social block so old flash images
+     * load fine — these read as 0xFF and get sanitised to defaults on load,
+     * no SAVED_MAGIC bump needed). ── */
+    uint8_t      auto_rotate;          /* 1 = accelerometer auto-rotate (default), 0 = manual */
+    uint8_t      manual_orient;        /* OR_LAND_R/OR_LAND_L/OR_TALL when auto_rotate==0 */
 } saved_store_t;
 static saved_store_t g_saved;
 static const char *saved_find_pass(const char *ssid);   /* fwd (used in handlers) */
@@ -2736,6 +2759,46 @@ static void render_emote_pick(int sel) {
         else          { snprintf(l, sizeof(l), "  %s", n); draw_text(8, yy, l, canvas_w); }
     }
     draw_text(4, tall ? 232 : 108, "U/D C:SEND L:BACK", canvas_w);
+}
+
+/* ─── Display settings (auto-rotate + orientation) ─── */
+static const char *orient_names[3] = {
+    /* OR_LAND_R */ "WIDE",
+    /* OR_LAND_L */ "WIDE FLIP",
+    /* OR_TALL   */ "TALL",
+};
+#define DISP_MENU_COUNT 3
+#define DISP_ITEM_AUTO   0
+#define DISP_ITEM_ORIENT 1
+#define DISP_ITEM_BACK   2
+static void render_display_menu(int sel) {
+    bool tall = orientation_is_tall();
+    if (tall) set_canvas_tall(); else set_canvas_wide();
+    memset(frame, 0, sizeof(frame));
+    draw_text(tall ? 8 : 36, tall ? 10 : 3, "DISPLAY", canvas_w);
+    for (int x = 4; x < canvas_w - 4; x++) px_set(x, tall ? 22 : 14);
+
+    const char *items[DISP_MENU_COUNT];
+    static char it_auto[24], it_orient[28];
+    snprintf(it_auto, sizeof(it_auto), "AUTO-ROTATE: %s", g_auto_rotate ? "ON" : "OFF");
+    /* Show the orientation that's actually active (auto follows the accel;
+     * manual shows the locked choice). */
+    int show_o = g_auto_rotate ? g_orientation : (int)g_manual_orient;
+    if (show_o < 0 || show_o > 2) show_o = OR_TALL;
+    snprintf(it_orient, sizeof(it_orient), "ORIENT: %s", orient_names[show_o]);
+    items[DISP_ITEM_AUTO]   = it_auto;
+    items[DISP_ITEM_ORIENT] = it_orient;
+    items[DISP_ITEM_BACK]   = "BACK";
+
+    int y = tall ? 34 : 24, dy = tall ? 22 : 14;
+    for (int i = 0; i < DISP_MENU_COUNT; i++) {
+        int yy = y + i * dy; char l[36];
+        if (i == sel) { snprintf(l, sizeof(l), "> %s", items[i]); draw_inverted_line(yy, l); }
+        else          { snprintf(l, sizeof(l), "  %s", items[i]); draw_text(8, yy, l, canvas_w); }
+    }
+    /* Hint: ORIENT cycles WIDE → WIDE FLIP → TALL (and locks auto-rotate off). */
+    draw_text(8, tall ? 232 : 108,
+              sel == DISP_ITEM_ORIENT ? "C:CYCLE  L:BACK" : "C:TOGGLE  L:BACK", canvas_w);
 }
 
 /* ─── Manual date/time setter ─── */
@@ -3478,6 +3541,8 @@ static void saved_seed_defaults(void) {
     g_saved.dilder_name[0] = '\0';
     g_saved.social_on = 0;
     g_saved.met_count = 0;
+    g_saved.auto_rotate = 1;          /* auto-rotate ON by default */
+    g_saved.manual_orient = OR_TALL;
 }
 
 static void saved_load(void) {
@@ -3506,6 +3571,12 @@ static void saved_load(void) {
         saved_write_flash();
     }
     if (g_saved.met_count > SOCIAL_MAX) g_saved.met_count = 0;     /* sanity */
+    /* Display settings appended after the social block — old images read 0xFF
+     * here, so sanitise to defaults (auto-rotate ON, tall). */
+    if (g_saved.auto_rotate > 1)   g_saved.auto_rotate = 1;
+    if (g_saved.manual_orient > 2) g_saved.manual_orient = OR_TALL;
+    g_auto_rotate   = g_saved.auto_rotate ? true : false;
+    g_manual_orient = g_saved.manual_orient;
     printf("[social] this Dilder: id=%04X name=\"%s\"\n",
            g_saved.dilder_id, dilder_display_name());
 }
@@ -3932,6 +4003,7 @@ static void app_task(void *param) {
 
     int snd_sel = 0;
     int social_sel = 0;
+    int disp_sel = 0;
     int met_sel = 0;
     int nearby_sel = 0;
 
@@ -4118,6 +4190,7 @@ static void app_task(void *param) {
                             rtc_get_datetime(&settime_dt); settime_field = 0;
                             state = STATE_SET_TIME; break;
                         case MENU_IDX_SOCIAL: social_sel = 0; state = STATE_SOCIAL; break;
+                        case MENU_IDX_DISPLAY: disp_sel = 0; state = STATE_DISPLAY; break;
                         default: state = STATE_OCTOPUS; break;
                     }
                     break;
@@ -4130,6 +4203,42 @@ static void app_task(void *param) {
         }
 
         /* ════════ SET DATE / TIME ════════ */
+        /* ════════ DISPLAY SETTINGS (auto-rotate + orientation) ════════ */
+        case STATE_DISPLAY: {
+            render_display_menu(disp_sel);
+            transpose_to_display();
+            display_render();
+            POLL_INPUT(4000)
+                if (inp == INPUT_UP)   { disp_sel = (disp_sel - 1 + DISP_MENU_COUNT) % DISP_MENU_COUNT; speaker_tone(600, 30); break; }
+                if (inp == INPUT_DOWN) { disp_sel = (disp_sel + 1) % DISP_MENU_COUNT; speaker_tone(600, 30); break; }
+                if (inp == INPUT_LEFT) { state = STATE_MENU; speaker_tone(500, 50); break; }
+                if (inp == INPUT_CENTER) {
+                    if (disp_sel == DISP_ITEM_AUTO) {
+                        /* Toggle auto-rotate. Turning it OFF locks to the current hold. */
+                        g_auto_rotate = !g_auto_rotate;
+                        if (!g_auto_rotate) g_manual_orient = (uint8_t)g_orientation;
+                        speaker_tone(1000, 50);
+                    } else if (disp_sel == DISP_ITEM_ORIENT) {
+                        /* Cycle WIDE → WIDE FLIP → TALL; picking one locks auto off. */
+                        g_auto_rotate = false;
+                        g_manual_orient = (uint8_t)(((int)g_manual_orient + 1) % 3);
+                        /* Apply immediately so the menu redraws in the new hold. */
+                        g_orientation = (int)g_manual_orient;
+                        input_set_rotation(ORIENT_CFG[g_orientation].in_rot);
+                        speaker_tone(1200, 50);
+                    } else {
+                        state = STATE_MENU; speaker_tone(500, 50); break;
+                    }
+                    /* Persist the display settings. */
+                    g_saved.auto_rotate = g_auto_rotate ? 1 : 0;
+                    g_saved.manual_orient = g_manual_orient;
+                    saved_write_flash();
+                    break;
+                }
+            POLL_END
+            break;
+        }
+
         case STATE_SET_TIME: {
             render_set_time();
             transpose_to_display();
