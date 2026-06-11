@@ -12,6 +12,7 @@
 
 #include "rtos_tasks.h"
 #include "pico/flash.h"   /* flash_safe_execute_core_init — core-1 side of safe flash writes */
+#include "hardware/watchdog.h"   /* watchdog_reboot — hard-reboot escape hatch */
 #include <string.h>
 #include <stdio.h>
 
@@ -199,6 +200,20 @@ static void input_task(void *arg) {
 
         uint8_t  j = read_joystick();             /* main.c: rotated current direction */
         uint32_t t = xTaskGetTickCount() * portTICK_PERIOD_MS;
+
+        /* HARD-REBOOT ESCAPE HATCH: hold CENTER for ~10 s and the device reboots,
+         * no matter what — this task always runs even if the UI is soft-locked,
+         * and watchdog_reboot() restarts the firmware unconditionally. */
+        static uint32_t center_since = 0;
+        if (j == INPUT_CENTER) {
+            if (center_since == 0) center_since = t;
+            else if ((uint32_t)(t - center_since) >= 10000) {
+                printf("[INPUT] CENTER held 10s -> reboot\n");
+                watchdog_reboot(0, 0, 0);          /* immediate, unconditional restart */
+            }
+        } else {
+            center_since = 0;
+        }
 
         /* Turn the raw level into a "pending intent" rather than emitting straight
          * away. UP/DOWN auto-repeat while held; the others are one-shot edges. */

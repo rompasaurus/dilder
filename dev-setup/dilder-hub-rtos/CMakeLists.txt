@@ -99,6 +99,7 @@ target_link_libraries(dilder_hub_rtos
     hardware_pwm           # piezo speaker
     hardware_i2c           # accelerometer
     hardware_flash         # low-level flash erase/program
+    hardware_watchdog      # watchdog_reboot — hold-CENTER hard reboot
     pico_flash             # flash_safe_execute() — multicore-safe flash writes
     m                      # libm (sqrtf/atan2f for the accelerometer maths)
 

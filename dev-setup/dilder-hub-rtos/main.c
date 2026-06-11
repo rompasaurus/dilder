@@ -3249,6 +3249,39 @@ static void render_keyboard(void) {
 #define MOT_ITEM_BACK      6
 #define MOT_MENU_COUNT     7
 
+/* Tall layout: the 122px width can't fit "ACCEL: x y zG" on one line, so the
+ * three read-out items put their value on its OWN line under the label. */
+static void render_motion_tall(int sel) {
+    set_canvas_tall();
+    memset(frame, 0, sizeof(frame));
+    draw_text(8, 10, "MOTION", canvas_w);
+    for (int x = 4; x < 118; x++) px_set(x, 22);
+
+    static char vacc[24], vped[24], vtil[24], vthr[20];
+    snprintf(vacc, sizeof(vacc), " %.1f %.1f %.1fG",
+             (double)accel_g(accel_x), (double)accel_g(accel_y), (double)accel_g(accel_z));
+    snprintf(vped, sizeof(vped), " %lu ST %ld MIN",
+             (unsigned long)steps_today, (long)(active_seconds_today / 60));
+    snprintf(vtil, sizeof(vtil), " X%.0f Y%.0f %.1fC",
+             (double)tilt_x_deg(), (double)tilt_y_deg(), (double)mpu_temp_c);
+    snprintf(vthr, sizeof(vthr), "THRESHOLD: %.1fG", (double)step_threshold);
+
+    const char *labels[MOT_MENU_COUNT] = {
+        "ACCEL:", "TODAY:", "TILT:", "RESET PEDOMETER", vthr, "I2C BUS SCAN", "BACK",
+    };
+    const char *vals[MOT_MENU_COUNT] = { vacc, vped, vtil, NULL, NULL, NULL, NULL };
+
+    int y = 30, dy = 16;
+    for (int i = 0; i < MOT_MENU_COUNT; i++) {
+        char line[28];
+        if (i == sel) { snprintf(line, sizeof(line), "> %s", labels[i]); draw_inverted_line(y, line); }
+        else          { snprintf(line, sizeof(line), "  %s", labels[i]); draw_text(8, y, line, canvas_w); }
+        y += dy;
+        if (vals[i]) { draw_text(8, y, vals[i], canvas_w); y += dy; }
+    }
+    draw_text(6, 236, "C:SEL  L:BACK", canvas_w);
+}
+
 static void render_motion_menu(int sel) {
     /* Phase 2: the Housekeeping task already samples the accelerometer (~20 Hz)
      * and runs the pedometer, so we read the shared accel/step globals it keeps
@@ -3286,7 +3319,7 @@ static void render_motion_menu(int sel) {
     items[MOT_ITEM_BACK] = "BACK";
 
     if (orientation_is_tall()) {
-        render_list_tall("MOTION", items, MOT_MENU_COUNT, sel, "C:SEL L:BACK");
+        render_motion_tall(sel);
         return;
     }
 
